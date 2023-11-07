@@ -1,0 +1,140 @@
+@media screen and (min-width: 1400px) {
+    .contact{
+        padding: 100px 15vw !important;
+    }
+}
+
+.contact{
+    padding: 75px 5vw;
+    
+}
+
+
+
+.contact h2{
+    font-size: 40px;
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.contactMediaList{
+    display: flex;
+
+    gap: 20px;
+    justify-content: space-between;
+}
+
+.contactMediaList span{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.contactMediaList span svg{
+    font-size: 24px;
+}
+
+.contactMediaList span span{
+    font-weight: 500;
+}
+
+
+.cofaContact{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 380px;
+    gap: 25px;
+}
+
+.cofaContact img{
+    width: 200px;
+}
+
+.socialMediaList{
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+}
+
+.linkRedirect{
+    color: var(--primary-color)
+}
+
+.contactInfoItem{
+    display: flex;
+    margin: 50px 0;
+    justify-content: space-between;
+    margin-top: 100px;
+}
+.contactInfoItem .cofaContact{
+    display: flex;
+    flex-direction: column;
+    
+}
+.links{
+    display: flex;
+    
+    gap: 20px
+}
+.contactMap{
+    width: 400px;
+    height: 150px;
+    border-radius: 10px;
+    background-color: gray;
+}
+.contactListLink{
+    display: flex;
+    justify-content: space-between;
+}
+.contactListLink a{
+    color:rgba(64, 64, 64, 1);
+}
+
+@media screen and (max-width: 950px){
+    .contact{
+        display: flex;
+        flex-direction: column;
+    }
+
+    .contact .contactMediaList{
+        display: flex;
+        flex-direction: column;
+    }
+
+    .contact .contactInfoItem{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 50px;
+    }
+    
+}
+
+@media screen and (max-width:550px){
+    .contactListLink a{
+        font-size: 14px;
+    }
+}
+
+@media screen and (max-width:450px){
+    .contact .contactInfoItem .contactMap{
+        width: 100%;
+    }
+    .contactListLink a{
+        font-size: 16px;
+    }
+    .contactListLink{
+        flex-direction: column;
+        align-items: center;
+        gap: 25px
+    }
+    .contact .contactInfoItem .cofaContact{
+        width: 100%;
+    }
+    .contact .contactInfoItem .cofaContact .links{
+        flex-direction: column;
+        align-items: center;
+    }
+}

@@ -1,0 +1,98 @@
+.about-us{
+    padding: 0vh 5vw;
+    background-color: rgba(36, 149, 87, 0.10);
+    padding-bottom: 50px;
+}
+
+.about-us h2{
+    padding: 50px 0;
+    color: var(--text-color);
+    font-size: 40px;
+    text-align: center;
+}
+
+.about-us-content{
+    display: flex;
+    /* max-width: 600px; */
+    justify-content: center;
+    gap: 100px;
+}
+
+.about-us-content div{
+
+    height: min-content;
+}
+
+.about-us-content div img{
+    width: 600px;
+}
+
+.info-about-us{
+    display: flex;
+    flex-direction: column;
+    gap: 50px;
+    max-width: 600px;
+}
+
+.info-about-us p{
+    line-height: 24px;
+    font-size: 16px;
+}
+
+.reasons-to-chose{
+    background-color: var(--primary-color);
+    border-radius: 20px;
+    padding: 15px;
+    height: min-content;
+    padding-bottom: 30px;
+}
+
+.reasons-to-chose h3{
+    color: white;
+    margin-bottom: 30px;
+    font-size: 28px;
+}
+
+.reasons-to-chose ul{
+    list-style-type: none;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+
+}
+
+.reasons-to-chose ul li{
+    color: white;
+    display: flex;
+    gap: 10px;
+}
+
+.reasons-to-chose ul li svg path{
+    color: white
+}
+
+.reasons-to-chose ul li svg polyline{
+    color: white
+}
+
+@media screen and (max-width: 1300px){
+    .about-us-content div img{
+        width: 400px;
+    }
+}
+
+@media screen and (max-width: 1200px){
+    .about-us-content{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0;
+    }
+}
+
+
+@media screen and (max-width: 750px){
+    .about-us-content div img{
+        display: none;
+    }
+}

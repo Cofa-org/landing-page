@@ -1,0 +1,65 @@
+.terms-list-container{
+    padding: 75px 5vw;
+}
+.terms-list{
+
+    list-style-type: decimal;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+
+    padding-left: 10px;
+
+}
+
+.subterm-list{
+    padding: 20px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    list-style-type:upper-alpha;
+}
+
+.subsubterm-list{
+    padding: 20px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    list-style-type: upper-roman;
+}
+
+.terms-list li::marker{
+    color: var(--primary-color) !important;
+}
+
+.terms-header{
+    padding: 75px 5vw;
+}
+
+.terms-header p{
+    line-height: 32px;
+}
+
+.terms-title{
+    color: var(--text-color);
+    font-size: 40px;
+    text-align: center;
+    margin-bottom: 48px;
+}
+
+.terms-header div {
+    display: flex;
+    justify-content: center;
+    margin-top: 48px;
+    margin-bottom: 48px;
+}
+
+.terms-header div a svg{
+    font-size: 30px;
+}
+
+.terms-header div a svg path{
+    color: var(--primary-color);
+}
+
+

@@ -1,0 +1,55 @@
+.clientReview{
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 20px; 
+    padding: 75px 5vw;
+}
+
+.clientReview h2{
+    text-align: center;
+    font-size: 28px;
+}
+
+.clientReview p{
+    font-size: 22px;
+}
+
+.authorReview{
+    font-weight: 600;
+}
+
+.clientReview .quotes{
+
+}
+.quote{
+    font-style: italic;
+}
+.close-quotes{
+    text-align: end;
+}
+.open-quotes{
+    text-align: start;
+}
+
+.clientReview .quotes svg{
+    font-size: 50px;
+}
+
+.clientReview .quotes svg path{
+    color: var(--primary-color);
+    
+}
+
+.authorReview{
+    font-size: 24px;
+}
+
+@media screen and (max-width: 700px){
+    .clientReview{
+        padding: 50px 5vw;
+    }
+    .clientReview p{
+        font-size: 18px;
+    }
+}

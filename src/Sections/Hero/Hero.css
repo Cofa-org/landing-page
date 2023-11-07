@@ -1,0 +1,196 @@
+
+@media screen and (min-width: 1400px) {
+    .hero-container{
+        padding: 100px 15vw !important;
+    }
+}
+.hero-container{
+    background-color: var(--background-color);
+    padding: 100px 5vw;
+
+}
+
+.hero{
+    display: flex;
+    justify-content:space-between;
+    align-items: center;
+    gap: 10%;
+}
+
+.hero .hero-info{
+    width: 450px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.animated-title{
+    color: var(--primary-color);
+}
+
+.hero .hero-info h1{
+    font-size: 70px;
+    font-weight: 500;
+}
+
+.hero .hero-info h1 strong{
+    color: var(--primary-color);
+}
+.info-container{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+.info-container h2{
+    margin-top: 30px;
+    margin-bottom: 30px;
+    text-align: center;
+    font-size: 32px;
+    font-weight: 500;
+}
+
+.info-list{
+    display: flex;
+    justify-content: space-between;
+}
+
+.info-list .info-card{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 220px;
+}
+
+.info-card .info-icon{
+    font-size: 34px;
+}
+
+.info-card .info-icon path{
+    color: var(--primary-color);
+   
+}
+
+
+.backgroundDecorationInfo{
+    position: absolute;
+    right: 0;
+    background-color: #24955722;
+    width: 50%;
+    border-radius: 50%;
+    height: 100%;
+    box-shadow: 0 0 30px 30px #24955722;
+}
+
+.mq-title-wrap{
+    display: none;
+}
+
+
+.typewriter {
+    display: inline-block;
+    position: relative;
+  }
+  
+  .cursor::after {
+    content: '|'; /* El carácter que simula la barra de escritura */
+    display: inline-block;
+    width: 0; /* Inicialmente no se muestra */
+    animation: blink-caret 0.75s step-end infinite; /* Animación de parpadeo */
+  }
+  
+  @keyframes blink-caret {
+    50% {
+
+    }
+  }
+
+/* 
+@media screen and (max-width: 100px){ */
+
+@media screen and (max-width: 900px){
+    .hero-container .hero{
+        display: flex;
+        flex-direction: column;
+    }
+    .hero .hero-img{
+        order: 1;
+    }
+    .hero .hero-info{
+        width: 100%;
+        order: 2;
+    }
+    .hero .hero-info h1 br{
+        display: none;
+    }
+    .hero .hero-info h1{
+        font-size: 40px;
+        text-align: center;
+    }
+    .hero-container{
+        padding-top: 50px;
+    }
+    .hero .hero-info h1 .mq-title-wrap{
+        display: block;
+    }
+    .info-list{
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+
+    }
+    .info-list .info-card{
+        flex-basis: 50%;
+        margin-bottom: 10px;
+    }
+    .hero-img{
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+    .hero-img img{
+        width: 45%;
+    }
+}
+
+@media screen and (max-width: 700px){
+    .hero-img img{
+        width: 65%;
+    }
+    .hero-container{
+        padding-bottom: 50px;
+    }
+}
+
+
+@media screen and (max-width: 500px){
+    .hero-img img{
+        width: 85%;
+    }
+    .hero .hero-info h1{
+        font-size: 30px;
+    }
+    .hero-container .info-container .info-list{
+        flex-direction: column;
+        gap: 20px;
+    }
+    .hero-container .info-container .info-list .info-card{
+        flex-basis: 100%;
+        width: 100%;
+    }
+    .hero-container .info-container .info-list .info-card .info-icon{
+        margin: auto;
+    }
+    .hero-container .info-container .info-list .info-card{
+        text-align: center;
+    }
+    .info-card .info-icon{
+        font-size: 40px;
+    }
+}
+
+@media screen and (max-width: 400px){
+    .hero-img img{
+        width: 95%;
+    }
+    
+}

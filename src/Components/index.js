@@ -1,0 +1,7 @@
+import AnimatedTitle from "./AnimatedTitle/AnimatedTitle";
+import Footer from "./Footer/Footer";
+import Header from "./Header/Header";
+
+
+
+export {Header,Footer, AnimatedTitle}

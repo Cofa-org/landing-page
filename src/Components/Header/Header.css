@@ -1,0 +1,139 @@
+header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 100px;
+    padding: 0vh 5vw;
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 100;
+}
+
+header nav{
+    display: flex;
+    gap: 32px;
+}
+
+header nav a{
+    font-weight: 600;
+}
+
+.link-selected{
+    color: var(--primary-color);
+}
+
+.btn-show-links{
+    display: none;
+}
+.mobible-navbar{
+    display: none;
+    right: -250px;
+    transition: right 0.4s ease;
+}
+
+
+
+@keyframes to-right {
+    0% {
+        right: -250px;
+    }
+    100% {
+        right: 0;
+    }
+}
+
+@media screen and (max-width: 1000px){
+    header>nav{
+        display: none;
+    }   
+    .btn-show-links{
+        display: flex;
+        background-color: transparent;
+        border: none;
+
+    }
+    .btn-show-links svg{
+        font-size: 40px;
+        color: var(--primary-color);
+    }
+
+    .btn-show-links svg line{
+        color: var(--text-color);
+    }
+    .buttons-container{
+        display: flex;
+        align-items: center;
+        gap: 32px;
+    }
+    .open {
+        display: flex;
+        flex-direction: column;
+        transition: right 400ms ease; 
+        position: fixed;
+        top: 0;
+        width: 250px;
+        right: 0;
+        animation-name: to-right;
+        animation-duration: 400ms;
+        height: 100vh !important;
+        background-color: white;
+        z-index: 3;
+        padding: 10px;
+        gap: 20px;
+    }
+    .not-first{
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        right: -350px;
+        transition: 500ms;
+        height: 100vh;
+        top: 0;
+        background-color: white;
+        z-index: 3;
+        padding: 10px;
+        justify-content: space-between;
+        width: 250px;
+    }
+    .mobible-links{
+        display: flex;
+        flex-direction: column;
+    }
+    .btn-back{
+        background-color: transparent;
+        border: none;
+        font-size: 32px;
+        display: flex;
+        justify-content: end;
+    }
+    .background-layer{
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.158);
+        z-index: 1;
+    }   
+/*     .mobible-nav-secondary-btn{
+        position: absolute;
+        bottom: 10px;
+    } */
+}
+
+@media screen and (max-width: 700px){
+    header{
+        height: 70px;
+    }
+    header img{
+        width: 150px;
+    }
+    
+}
+
+@media screen and (max-width: 500px){
+    .buttons-container>.primary-btn{
+        display: none;
+    }
+}
