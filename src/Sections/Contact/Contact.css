@@ -92,6 +92,17 @@
     color:rgba(64, 64, 64, 1);
 }
 
+
+.border-footer{
+    border-top: var(--primary-color) 3px solid !important;
+    height: 3px;
+    width: 100%;
+    background-color: var(--primary-color);
+    margin-bottom: 50px;
+    display: block;
+}
+
+
 @media screen and (max-width: 950px){
     .contact{
         display: flex;
