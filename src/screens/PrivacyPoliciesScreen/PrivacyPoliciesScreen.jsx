@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react'
 import { Footer, Header } from '../../Components'
 import { Contact } from '../../Sections';
+import PrivacyPolicies from '../../Sections/PrivacyHeader/PrivacyPolicies';
 import PrivacyHeader from '../../Sections/PrivacyHeader/privacyHeader';
-import PrivacyPolicies from '../../Sections/PrivacyHeader/privacyPolicies';
 
 const PrivacyPoliciesScreen = () => {
   useEffect(() => {
