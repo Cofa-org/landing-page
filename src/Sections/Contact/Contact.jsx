@@ -38,11 +38,11 @@ const Contact = () => {
                     <BsWhatsapp/>
                 </div>
                 <div className='links'>
-                    <a className='linkRedirect'>
+                    <Link className='linkRedirect' to={'/privacy-policies/#top'}>
                         Politicas de privacidad
-                    </a>
+                    </Link>
                     <Link className='linkRedirect' to={'/terms-and-conditions/#top'}>
-                    Términos y condiciones
+                    Términos y Condiciones
                     </Link>
                 </div>
                 
