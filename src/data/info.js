@@ -10,7 +10,7 @@ export const infoList = [
     {
         Icon: TbCheckupList,
         title: 'Pedí tu préstamo',
-        content: 'Decinos cuánto necesitas y nosotros te ayudamos!\nOtorgamos préstamos online en el acto sólo con CBU.'
+        content: 'Decinos cuánto necesitás y nosotros te ayudamos!\nOtorgamos préstamos online en el acto sólo con CBU.'
     },
     {
         Icon: CiMoneyBill,
@@ -82,7 +82,7 @@ export const frecuentQuestions = [
     },
     {
         name: '¿Cuáles son los requisitos para obtener mi préstamo?',
-        content: 'Para otorgarte un préstamo en línea el instante, todo lo que necesitas enviarnos es tu DNI para analizar tus antecedentes crediticios y tu CBU para transferirte el dinero.',
+        content: 'Para otorgarte un préstamo en línea el instante, todo lo que necesitás enviarnos es tu DNI para analizar tus antecedentes crediticios y tu CBU para transferirte el dinero.',
         id: 2
     },
     {
@@ -97,7 +97,7 @@ export const frecuentQuestions = [
     },
     {
         name: '¿Cómo pago mi cuota?',
-        content: 'Las cuotas podrán ser abonadas mediante transferencia o depósito bancario, debito interno o intrabancario y/o a través de los botones de pago habilitados.',
+        content: 'Las cuotas podrán ser abonadas mediante transferencia o depósito bancario, débito interno o intrabancario y/o a través de los botones de pago habilitados.',
         id: 5
     },
     {

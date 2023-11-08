@@ -22,13 +22,14 @@ footer{
     display: flex;
     flex-direction: column;
     gap: 40px;
-
+    
     flex-basis: calc(50% - 41px);
 }
 
 .footer-box-right p{
     border-left: var(--primary-color) 1px solid;
     padding-left: 20px;
+    text-align: justify;
 }
 
 footer .registeredBrand{

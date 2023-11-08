@@ -26,7 +26,7 @@ const Header = () => {
             <a href="#contact">Contacto</a>
         </nav>
         <div className='buttons-container'>
-          <button className='primary-btn'>Quiero mi prestamo</button>
+          <button className='primary-btn'>Quiero mi préstamo</button>
           <button className='btn-show-links' onClick={openNavbar}><FiMenu/></button>
         </div>
         <div className={isOpen ? 'mobible-navbar open' : (first ?  'mobible-navbar' : 'mobible-navbar not-first')}>
@@ -39,7 +39,7 @@ const Header = () => {
             <a href="#frecuent-questions" onClick={handleCloseNabvar} >Preguntas Frecuentes</a>
             <a href="#contact" onClick={handleCloseNabvar}>Contacto</a>
           </nav>
-          <button className='primary-btn mobible-nav-secondary-btn'>Quiero mi prestamo</button>
+          <button className='primary-btn mobible-nav-secondary-btn'>Quiero mi préstamo</button>
           
         </div>
         {

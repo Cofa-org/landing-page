@@ -18,7 +18,7 @@ const Hero = () => {
                 <button className='primary-btn'>Quiero mi préstamo</button>
             </div>
             <div className='hero-img'>
-                <img src='/img/hero-img.png' alt='minimos requisitos, toma tu prestamos, mas de 95000 clientes satisfechos, mas de 15 años de trayectoria'/>
+                <img src='/img/hero-img.png' alt='minimos requisitos, toma tu préstamos, mas de 95000 clientes satisfechos, mas de 15 años de trayectoria'/>
             </div>
         </div>
         <div className='info-container'>

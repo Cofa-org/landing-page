@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 function AnimatedTitle() {
-  const options = ['rapida', '100% online', 'sencilla'];
+  const options = ['rápida', '100% online', 'sencilla'];
   const [currentOptionIndex, setCurrentOptionIndex] = useState(0);
 
   useEffect(() => {
