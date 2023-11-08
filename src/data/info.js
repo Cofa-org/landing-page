@@ -10,12 +10,12 @@ export const infoList = [
     {
         Icon: TbCheckupList,
         title: 'Pedí tu préstamo',
-        content: 'Decinos cuánto necesitas y nosotros te ayudamos! \n Otorgamos préstamos online en el acto sólo con CBU.'
+        content: 'Decinos cuánto necesitas y nosotros te ayudamos!\nOtorgamos préstamos online en el acto sólo con CBU.'
     },
     {
         Icon: CiMoneyBill,
         title: 'Elegí las cuotas',
-        content: 'Simulá tu préstamo y elegí la opción que más se adapte a vos. \n Devolvé el préstamo en cuotas fijas y en pesos. Sin sorpresas.'
+        content: 'Simulá tu préstamo y elegí la opción que más se adapte a vos.\nDevolvé el préstamo en cuotas fijas y en pesos. Sin sorpresas.'
     },
     {
         Icon: BsCreditCard,
@@ -87,7 +87,7 @@ export const frecuentQuestions = [
     },
     {
         name: '¿Qué analizan para darme el préstamo?',
-        content: 'El análisis crediticio que realizamos está basado en tu historial financiero.\n Usamos un scoring crediticio propio, analizando decenas de variables, por lo que no importa si tenés antecedentes negativos en las agencias de información crediticia.\n Cuanto mejor cumplimiento tenés, accedés a mejores condiciones en el préstamo.',
+        content: 'El análisis crediticio que realizamos está basado en tu historial financiero.\nUsamos un scoring crediticio propio, analizando decenas de variables, por lo que no importa si tenés antecedentes negativos en las agencias de información crediticia.\nCuanto mejor cumplimiento tenés, accedés a mejores condiciones en el préstamo.',
         id: 3
     },
     {
@@ -289,7 +289,7 @@ export const privacyPolicies = [
     },
     {
         title: 'Cookies',
-        content: 'Una cookie se refiere a un fichero que es enviado con la finalidad de solicitar permiso para almacenarse en su ordenador, al aceptar dicho fichero se crea y la cookie sirve entonces para tener información respecto al tráfico web, y también facilita las futuras visitas a una web recurrente. Otra función que tienen las cookies es que con ellas las webs pueden reconocerte individualmente y por tanto brindarte el mejor servicio personalizado.\n Nuestro sitio web puede emplear las cookies para poder identificar las páginas que son visitadas y su frecuencia. Esta información es empleada únicamente para análisis estadístico y después la información se elimina de forma permanente. Usted puede eliminar las cookies en cualquier momento desde su dispositivo. Sin embargo, las cookies ayudan a proporcionar un mejor servicio de los sitios web, estás no dan acceso a información de su dispositivo ni de usted, a menos de que usted así lo quiera y la proporcione directamente. Usted puede aceptar o negar el uso de cookies, sin embargo, la mayoría de los navegadores aceptan cookies automáticamente pues sirve para tener un mejor servicio. También usted puede cambiar la configuración de su ordenador para declinar las cookies. Si se declinan es posible que no pueda utilizar algunos de nuestros servicios.'
+        content: 'Una cookie se refiere a un fichero que es enviado con la finalidad de solicitar permiso para almacenarse en su ordenador, al aceptar dicho fichero se crea y la cookie sirve entonces para tener información respecto al tráfico web, y también facilita las futuras visitas a una web recurrente. Otra función que tienen las cookies es que con ellas las webs pueden reconocerte individualmente y por tanto brindarte el mejor servicio personalizado.\nNuestro sitio web puede emplear las cookies para poder identificar las páginas que son visitadas y su frecuencia. Esta información es empleada únicamente para análisis estadístico y después la información se elimina de forma permanente. Usted puede eliminar las cookies en cualquier momento desde su dispositivo. Sin embargo, las cookies ayudan a proporcionar un mejor servicio de los sitios web, estás no dan acceso a información de su dispositivo ni de usted, a menos de que usted así lo quiera y la proporcione directamente. Usted puede aceptar o negar el uso de cookies, sin embargo, la mayoría de los navegadores aceptan cookies automáticamente pues sirve para tener un mejor servicio. También usted puede cambiar la configuración de su ordenador para declinar las cookies. Si se declinan es posible que no pueda utilizar algunos de nuestros servicios.'
     },
     {
         title: 'Enlaces a Terceros',
@@ -297,6 +297,6 @@ export const privacyPolicies = [
     },
     {
         title: 'Control de su información personal',
-        content: 'En cualquier momento usted puede restringir la recopilación o el uso de la información personal que es proporcionada a nuestro sitio web. Cada vez que se le solicite rellenar un formulario, como el de alta de usuario, consultas o solicitudes, puede marcar o desmarcar la opción de recibir información por correo electrónico y/o mensajes telefónicos. En caso de que haya marcado la opción de recibir nuestras comunicaciones y/o publicidades, usted puede cancelarla en cualquier momento. COFA no venderá, cederá ni distribuirá la información personal que es recopilada sin su consentimiento, salvo que sea requerido por orden judicial.\n Al utilizar cualquier formulario o la página web, el usuario autoriza expresamente a COBRO FACIL S.R.L., sus afiliadas y subsidiarias, en los términos requeridos por el art. 5 y 11 de la Ley 25.326 a usar sus datos personales para cumplimentar con la solicitud y/o consulta -incluyendo verificar identidad, realizar controles de fraude y de crédito y evaluar su capacidad para pagar el préstamo (análisis crediticio). A su vez, el usuario ha sido informado que, como titular de los datos personales, tiene la facultad de ejercer el derecho de acceso, rectificación y supresión de estos en forma gratuita a intervalos no inferiores a seis meses, salvo que se acredite un interés legítimo al efecto conforme lo establecido en el artículo 14, inciso 3 de la Ley Nº 25.326. La DIRECCIÓN NACIONAL DE PROTECCIÓN DE DATOS PERSONALES, Órgano de Control de la Ley Nº 25.326, tiene la atribución de atender las denuncias y reclamos que se interpongan con relación al incumplimiento de las normas sobre protección de datos personales.” \n Cobro Facil SRL se reserva el derecho de cambiar los términos de la presente Política de Privacidad en cualquier momento.'
+        content: 'En cualquier momento usted puede restringir la recopilación o el uso de la información personal que es proporcionada a nuestro sitio web. Cada vez que se le solicite rellenar un formulario, como el de alta de usuario, consultas o solicitudes, puede marcar o desmarcar la opción de recibir información por correo electrónico y/o mensajes telefónicos. En caso de que haya marcado la opción de recibir nuestras comunicaciones y/o publicidades, usted puede cancelarla en cualquier momento. COFA no venderá, cederá ni distribuirá la información personal que es recopilada sin su consentimiento, salvo que sea requerido por orden judicial.\nAl utilizar cualquier formulario o la página web, el usuario autoriza expresamente a COBRO FACIL S.R.L., sus afiliadas y subsidiarias, en los términos requeridos por el art. 5 y 11 de la Ley 25.326 a usar sus datos personales para cumplimentar con la solicitud y/o consulta -incluyendo verificar identidad, realizar controles de fraude y de crédito y evaluar su capacidad para pagar el préstamo (análisis crediticio). A su vez, el usuario ha sido informado que, como titular de los datos personales, tiene la facultad de ejercer el derecho de acceso, rectificación y supresión de estos en forma gratuita a intervalos no inferiores a seis meses, salvo que se acredite un interés legítimo al efecto conforme lo establecido en el artículo 14, inciso 3 de la Ley Nº 25.326. La DIRECCIÓN NACIONAL DE PROTECCIÓN DE DATOS PERSONALES, Órgano de Control de la Ley Nº 25.326, tiene la atribución de atender las denuncias y reclamos que se interpongan con relación al incumplimiento de las normas sobre protección de datos personales.”\nCobro Facil SRL se reserva el derecho de cambiar los términos de la presente Política de Privacidad en cualquier momento.'
     }
 ]
