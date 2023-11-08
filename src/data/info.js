@@ -48,7 +48,7 @@ export const reasonsToChose = [
 
 export const ourServices = [
     {
-        name: 'Grua',
+        name: 'Grúa',
         id:1,
         Icon: TbCarCrane
     },
@@ -77,17 +77,17 @@ export const ourServices = [
 export const frecuentQuestions = [
     {
         name: '¿Quién puede obtener un préstamo en COFA?',
-        content: 'Cualquier persona mayor de 18 años que trabaje en relación de dependencia con, al menos, 3 meses de antigüedad.',
+        content: 'Brindamos préstamos online al instante a cualquier persona mayor de 18 años que trabaje en relación de dependencia con, al menos, 3 meses de antigüedad.',
         id: 1
     },
     {
         name: '¿Cuáles son los requisitos para obtener mi préstamo?',
-        content: 'Todo lo que necesitas enviarnos es tu DNI para analizar tus antecedentes crediticios y tu CBU para transferirte el dinero.',
+        content: 'Para otorgarte un préstamo en línea el instante, todo lo que necesitas enviarnos es tu DNI para analizar tus antecedentes crediticios y tu CBU para transferirte el dinero.',
         id: 2
     },
     {
         name: '¿Qué analizan para darme el préstamo?',
-        content: 'Analizamos tus antecedentes crediticios, es decir, como fue tu cumplimiento anterior con productos financieros.\nUsamos un scoring propio, analizando decenas de variables, por lo que no importa si tenés antecedentes negativos en las agencias de información crediticia.\nCuanto mejor cumplimiento tenés, accedés a mejores condiciones en el préstamo.',
+        content: 'El análisis crediticio que realizamos está basado en tu historial financiero.\n Usamos un scoring crediticio propio, analizando decenas de variables, por lo que no importa si tenés antecedentes negativos en las agencias de información crediticia.\nCuanto mejor cumplimiento tenés, accedés a mejores condiciones en el préstamo.',
         id: 3
     },
     {
@@ -107,12 +107,12 @@ export const frecuentQuestions = [
     },
     {
         name: '¿Tenés otras preguntas?',
-        content: 'Si tenes otras preguntas, escribinos a consultas@cofa.com.ar y responderemos tus dudas a la brevedad.',
+        content: 'Si tenés otras preguntas, escribinos a consultas@cofa.com.ar y responderemos tus dudas a la brevedad.',
         id: 7
     },
     {
         name: '¿Cuándo vencen las cuotas?',
-        content: 'Podés optar por la fecha de vencimiento que más te convenga. Cuando solicitas el préstamo, nos avisas qué día te conviene pagar y ya queda registrado.',
+        content: 'Podés optar por la fecha de vencimiento que más te convenga. Cuando solicitás el préstamo, nos avisas qué día te conviene pagar y ya queda registrado.',
         id: 8
     }
 ]
