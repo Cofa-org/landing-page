@@ -1,6 +1,6 @@
 import React from 'react'
 import {FaCircleArrowDown} from 'react-icons/fa6'
-import '../TermsAndConditions/TermsAndCondition.css'
+import '../TermsAndConditions/termsAndCondition.css'
 const TermsHeader = () => {
   return (
     <section className='terms-header'>
