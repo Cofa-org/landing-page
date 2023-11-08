@@ -276,3 +276,27 @@ export const termsAndConditions = [
         ]
     }
 ]
+
+
+export const privacyPolicies = [
+    {
+        title: 'Información que es recogida',
+        content: 'Nuestro sitio web podrá recoger información personal, por ejemplo: Nombre y apellido, información de contacto como número de teléfono o su dirección de correo electrónico, e información demográfica. Asimismo, cuando sea necesario, podrá ser requerida información específica para procesar algún pedido.'
+    },
+    {
+        title: 'Uso de la información recogida',
+        content: 'Nuestro sitio web emplea la información con el fin de proporcionar el mejor servicio posible, particularmente para procesar solicitudes y consultas, y para mejorar nuestro servicio. Es posible que sean enviados correos electrónicos o mensajes telefónicos a través de nuestro sitio con ofertas especiales, nuevos productos y otra información publicitaria que consideremos relevante para usted o que pueda brindarle algún beneficio, estas comunicaciones serán enviados a la dirección o teléfono que usted proporcione y podrán ser cancelados en cualquier momento. Usamos los sistemas más avanzados y los actualizamos constantemente para asegurarnos que no exista ningún acceso no autorizado.'
+    },
+    {
+        title: 'Cookies',
+        content: 'Una cookie se refiere a un fichero que es enviado con la finalidad de solicitar permiso para almacenarse en su ordenador, al aceptar dicho fichero se crea y la cookie sirve entonces para tener información respecto al tráfico web, y también facilita las futuras visitas a una web recurrente. Otra función que tienen las cookies es que con ellas las webs pueden reconocerte individualmente y por tanto brindarte el mejor servicio personalizado. Nuestro sitio web puede emplear las cookies para poder identificar las páginas que son visitadas y su frecuencia. Esta información es empleada únicamente para análisis estadístico y después la información se elimina de forma permanente. Usted puede eliminar las cookies en cualquier momento desde su dispositivo. Sin embargo, las cookies ayudan a proporcionar un mejor servicio de los sitios web, estás no dan acceso a información de su dispositivo ni de usted, a menos de que usted así lo quiera y la proporcione directamente. Usted puede aceptar o negar el uso de cookies, sin embargo, la mayoría de los navegadores aceptan cookies automáticamente pues sirve para tener un mejor servicio. También usted puede cambiar la configuración de su ordenador para declinar las cookies. Si se declinan es posible que no pueda utilizar algunos de nuestros servicios.'
+    },
+    {
+        title: 'Enlaces a Terceros',
+        content: 'Este sitio web pudiera contener enlaces a otros sitios que pudieran ser de su interés. Una vez que usted hace click en estos enlaces y abandona nuestra página, ya no tenemos control sobre al sitio al que es redirigido y por lo tanto no somos responsables de los términos o privacidad ni de la protección de sus datos en esos otros sitios terceros. Dichos sitios están sujetos a sus propias políticas de privacidad por lo cual es recomendable que las consulte para confirmar que usted está de acuerdo con estas.'
+    },
+    {
+        title: 'Control de su información personal',
+        content: 'En cualquier momento usted puede restringir la recopilación o el uso de la información personal que es proporcionada a nuestro sitio web. Cada vez que se le solicite rellenar un formulario, como el de alta de usuario, consultas o solicitudes, puede marcar o desmarcar la opción de recibir información por correo electrónico y/o mensajes telefónicos. En caso de que haya marcado la opción de recibir nuestras comunicaciones y/o publicidades, usted puede cancelarla en cualquier momento.COFA no venderá, cederá ni distribuirá la información personal que es recopilada sin su consentimiento, salvo que sea requerido por orden judicial. Al utilizar cualquier formulario o la página web, el usuario autoriza expresamente a COBRO FACIL S.R.L., sus afiliadas y subsidiarias, en los términos requeridos por el art. 5 y 11 de la Ley 25.326 a usar sus datos personales para cumplimentar con la solicitud y/o consulta -incluyendo verificar identidad, realizar controles de fraude y de crédito y evaluar su capacidad para pagar el préstamo (análisis crediticio). A su vez, el usuario ha sido informado que, como titular de los datos personales, tiene la facultad de ejercer el derecho de acceso, rectificación y supresión de estos en forma gratuita a intervalos no inferiores a seis meses, salvo que se acredite un interés legítimo al efecto conforme lo establecido en el artículo 14, inciso 3 de la Ley Nº 25.326. La DIRECCIÓN NACIONAL DE PROTECCIÓN DE DATOS PERSONALES, Órgano de Control de la Ley Nº 25.326, tiene la atribución de atender las denuncias y reclamos que se interpongan con relación al incumplimiento de las normas sobre protección de datos personales.” Cobro Facil SRL se reserva el derecho de cambiar los términos de la presente Política de Privacidad en cualquier momento.'
+    }
+]
