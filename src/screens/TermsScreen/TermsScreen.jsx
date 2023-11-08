@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { Footer, Header } from '../../Components'
-import { TermsAndConditions, TermsHeader } from '../../Sections'
+import { Contact, TermsAndConditions, TermsHeader } from '../../Sections'
 
 const TermsScreen = () => {
   useEffect(() => {
@@ -12,6 +12,7 @@ const TermsScreen = () => {
         <Header/>
         <TermsHeader/>
         <TermsAndConditions/>
+        <Contact/>
         <Footer/>
     </>
   )
