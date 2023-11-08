@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import './Header.css'
 import {FiMenu} from 'react-icons/fi'
 import {IoMdArrowBack} from 'react-icons/io'
+import { Link } from 'react-router-dom'
 
 const Header = () => {
   const [first, setFirst] = useState(true)
@@ -15,7 +16,9 @@ const Header = () => {
   }
   return (
     <header >
-        <img src='/Logo.svg'/>
+        <Link to={'/home'}>
+          <img src='/Logo.svg'/>
+        </Link>
         <nav>
             <a href="#header"  className='link-selected'>Inicio</a>
             <a href="#about-us">Nosotros</a>
