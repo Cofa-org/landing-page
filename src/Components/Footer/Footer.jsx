@@ -9,7 +9,7 @@ const Footer = () => {
                 <p>
                     INSCRIPTO EN EL REGISTRO DE PROVEEDORES NO FINANCIEROS DE CRÉDITOS ANTE EL BCRA, BAJO EL NRO. 55287.
                 </p>
-                <div>
+                <div className='footer-contracts'>
                     <div>
                         <h3>
                             CONTRATOS DE ADHESIÓN LEY 24240 DE DEFENSA AL CONSUMIDOR
@@ -19,7 +19,7 @@ const Footer = () => {
                     </div>
                     <div>
                         <h3>
-                            Defensa al CONSUMIDOR
+                            DEFENSA AL CONSUMIDOR
                         </h3>
                         <p>Defensa Consumidor Nación</p>
                         <p>Defensa Consumidor CABA </p>
@@ -51,9 +51,6 @@ const Footer = () => {
                         <span>Atención al asegurado 0800-666-8400</span>
                         <img src='/ssn-logo.svg' />
                     </div>
-                    <a href="http://qr.afip.gob.ar/?qr=bC_FPNgu3wM23TMcwi2Nwg">
-                        <img src='/img/QR-cofa.png' alt='Qr de cofa' />
-                    </a>
 
                 </div>
 
@@ -83,7 +80,10 @@ const Footer = () => {
                     </p>
                 </div>
             </div>
-            <p className='registeredBrand'><BiRegistered />COFA ES UNA MARCA REGISTRADA DE COBRO FÁCIL SRL, CUIT 33-71133479-9 </p>
+            <div className='registeredBrand'>
+                <p><BiRegistered />COFA ES UNA MARCA REGISTRADA DE COBRO FÁCIL SRL. </p>
+                <p> CUIT 33-71133479-9</p>
+            </div>
         </footer>
     )
 }

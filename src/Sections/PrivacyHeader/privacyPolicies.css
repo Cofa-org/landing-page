@@ -23,3 +23,14 @@
     gap: 30px;
     list-style-type:upper-alpha;
 }
+
+.p-after-title{
+    text-align: justify;
+}
+
+@media screen and (max-width:400px){
+    .policies-list h2{
+        font-size: 20px;
+        text-align: start;
+    }
+}

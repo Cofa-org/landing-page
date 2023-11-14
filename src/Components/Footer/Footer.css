@@ -18,6 +18,7 @@ footer{
     gap: 20px;
     flex-basis: 50%;
 }
+
 .footer-box-right{
     display: flex;
     flex-direction: column;
@@ -26,6 +27,12 @@ footer{
     flex-basis: calc(50% - 41px);
 }
 
+.footer-contracts{
+    display: flex;
+}
+.footer-contracts div{
+    width: 50%;
+}
 .footer-box-right p{
     border-left: var(--primary-color) 1px solid;
     padding-left: 20px;
@@ -36,6 +43,7 @@ footer .registeredBrand{
     flex-basis: 100%;
     display: flex;
     justify-content: center;
+    flex-wrap: wrap;
 }
 
 .footer-entities{
@@ -53,8 +61,18 @@ footer .registeredBrand{
 .ssn-container{
     display: flex;
     margin-top: 20px;
+    justify-content: center;
 }
-
+.ssn-container div{ 
+    text-align: center;
+    align-items: center;
+}
+.ssn-container img{ 
+    width: 60%;
+}
+.ssn-container span{ 
+    margin-top: 1%;
+}
 
 @media screen and (max-width: 1100px) {
     footer{
