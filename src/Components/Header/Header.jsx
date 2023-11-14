@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react'
 import './Header.css'
 import {FiMenu} from 'react-icons/fi'
 import {IoMdArrowBack} from 'react-icons/io'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 
 const Header = () => {
+  const location = useLocation()
   const [first, setFirst] = useState(true)
   const [isOpen, setIsOpen] = useState(false)
+  const [inHome, setInHome] = useState(location.pathname == '/') 
   const openNavbar = () =>{
     setIsOpen(true)
     setFirst(false)
@@ -14,19 +16,40 @@ const Header = () => {
   const handleCloseNabvar = () =>{
     setIsOpen(false)
   }
+
+  useEffect(() =>{
+    console.log(location.pathname)
+    setInHome(location.pathname == '/')
+
+  }, [location.pathname])
   return (
     <header >
-        <Link to={'/home'}>
-          <img src='/Logo.svg'/>
-        </Link>
+        <img src='/Logo.svg'/>
         <nav>
-            <a href="#header"  className='link-selected'>Inicio</a>
-            <a href="#about-us">Nosotros</a>
-            <a href="#frecuent-questions">Preguntas Frecuentes</a>
-            <a href="#contact">Contacto</a>
+
+          {
+            inHome 
+            ? (
+              <>
+                <a href="#header"  className='link-selected'>Inicio</a>
+                <a href="#about-us">Nosotros</a>
+                <a href="#frecuent-questions">Preguntas Frecuentes</a>
+                <a href="#contact">Contacto</a>
+              </>
+            )
+            : (
+              <>
+                <Link to={'/#header'} className='link-selected'>Inicio</Link>
+                <Link to={'/#about'} >Nosotros</Link>
+                <Link to={'/#header'} >Preguntas Frecuentes</Link>
+                <Link to={'/#header'} >Contacto</Link>
+              </>
+            )
+          }
+           
         </nav>
         <div className='buttons-container'>
-          <button className='primary-btn'>Quiero mi préstamo</button>
+          <button className='primary-btn'>Quiero mi prestamo</button>
           <button className='btn-show-links' onClick={openNavbar}><FiMenu/></button>
         </div>
         <div className={isOpen ? 'mobible-navbar open' : (first ?  'mobible-navbar' : 'mobible-navbar not-first')}>
@@ -39,7 +62,7 @@ const Header = () => {
             <a href="#frecuent-questions" onClick={handleCloseNabvar} >Preguntas Frecuentes</a>
             <a href="#contact" onClick={handleCloseNabvar}>Contacto</a>
           </nav>
-          <button className='primary-btn mobible-nav-secondary-btn'>Quiero mi préstamo</button>
+          <button className='primary-btn mobible-nav-secondary-btn'>Quiero mi prestamo</button>
           
         </div>
         {
