@@ -11,6 +11,11 @@ const PointsScreen = () => {
   return (
     <>
         <HeaderPoints/>
+        {/* hero */}
+        {/* uso de puntos */}
+        {/* acreditacion */}
+        {/* restricciones */}
+        {/* valor */}
         <Contact/>
         <Footer/>
     </>
