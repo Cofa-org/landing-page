@@ -24,9 +24,10 @@ const Header = () => {
   }, [location.pathname])
   return (
     <header >
-        <img src='/Logo.svg'/>
+        <Link to={'/home'}>
+          <img src='/Logo.svg'/>
+        </Link>
         <nav>
-
           {
             inHome 
             ? (
@@ -43,6 +44,8 @@ const Header = () => {
                 <Link to={'/#about'} >Nosotros</Link>
                 <Link to={'/#header'} >Preguntas Frecuentes</Link>
                 <Link to={'/#header'} >Contacto</Link>
+                {/* <Link to={'/cofa-points'} >Puntos COFA</Link>
+                <Link to={'/assists'} >Asistencias</Link> */}
               </>
             )
           }
@@ -61,6 +64,8 @@ const Header = () => {
             <a href="#about-us" onClick={handleCloseNabvar}>Nosotros</a>
             <a href="#frecuent-questions" onClick={handleCloseNabvar} >Preguntas Frecuentes</a>
             <a href="#contact" onClick={handleCloseNabvar}>Contacto</a>
+            {/* <Link to={'/cofa-points'} >Puntos COFA</Link>
+            <Link to={'/assists'} >Asistencias</Link> */}
           </nav>
           <button className='primary-btn mobible-nav-secondary-btn'>Quiero mi prestamo</button>
           
