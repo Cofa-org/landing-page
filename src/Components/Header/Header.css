@@ -31,7 +31,15 @@ header nav a{
     right: -250px;
     transition: right 0.4s ease;
 }
-
+.buttons-container{
+    display: flex;
+    align-items: center;
+    gap: 32px;
+}
+#btn-points-assist{
+    width: 100%;
+    font-weight: 500;
+}
 
 
 @keyframes to-right {
@@ -115,7 +123,7 @@ header nav a{
         height: 100vh;
         background-color: rgba(0, 0, 0, 0.158);
         z-index: 1;
-    }   
+    }
 /*     .mobible-nav-secondary-btn{
         position: absolute;
         bottom: 10px;
@@ -134,6 +142,9 @@ header nav a{
 
 @media screen and (max-width: 500px){
     .buttons-container>.primary-btn{
+        display: none;
+    }
+    .buttons-container>.secondary-btn{
         display: none;
     }
 }
