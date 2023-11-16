@@ -18,6 +18,7 @@ const PointsScreen = () => {
         {/* valor */}
         hola
         pepe
+        holaaa
         <Contact/>
         <Footer/>
     </>
