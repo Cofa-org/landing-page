@@ -41,9 +41,9 @@ const Header = () => {
             : (
               <>
                 <Link to={'/#header'} className='link-selected'>Inicio</Link>
-                <Link to={'/#about'} >Nosotros</Link>
-                <Link to={'/#header'} >Preguntas Frecuentes</Link>
-                <Link to={'/#header'} >Contacto</Link>
+                <Link to={'/#about-us'} >Nosotros</Link>
+                <Link to={'/#frecuent-questions'} >Preguntas Frecuentes</Link>
+                <Link to={'/#contact'} >Contacto</Link>
                 {/* <Link to={'/cofa-points'} >Puntos COFA</Link>
                 <Link to={'/assists'} >Asistencias</Link> */}
               </>
