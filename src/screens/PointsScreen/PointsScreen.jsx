@@ -17,6 +17,7 @@ const PointsScreen = () => {
         {/* restricciones */}
         {/* valor */}
         hola
+        holaaa
         <Contact/>
         <Footer/>
     </>
