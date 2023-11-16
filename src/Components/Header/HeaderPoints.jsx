@@ -4,7 +4,7 @@ import {FiMenu} from 'react-icons/fi'
 import {IoMdArrowBack} from 'react-icons/io'
 import { Link, useLocation } from 'react-router-dom'
 
-const Header = () => {
+const HeaderPoints = () => {
   const location = useLocation()
   const [first, setFirst] = useState(true)
   const [isOpen, setIsOpen] = useState(false)
@@ -33,27 +33,30 @@ const Header = () => {
             ? (
               <>
                 <a href="#header"  className='link-selected'>Inicio</a>
-                <a href="#about-us">Nosotros</a>
-                <a href="#frecuent-questions">Preguntas Frecuentes</a>
+                <a href="#use-of-points">Uso de Puntos</a>
+                <a href="#accreditation">Acreditación</a>
+                <a href="#restrictions">Restricciones</a>
+                <a href="#points-value">Valor</a>
                 <a href="#contact">Contacto</a>
               </>
             )
             : (
               <>
                 <Link to={'/#header'} className='link-selected'>Inicio</Link>
-                <Link to={'/#about'} >Nosotros</Link>
-                <Link to={'/#header'} >Preguntas Frecuentes</Link>
-                <Link to={'/#header'} >Contacto</Link>
-                {/* <Link to={'/cofa-points'} >Puntos COFA</Link>
-                <Link to={'/assists'} >Asistencias</Link> */}
+                <Link to={'/#use-of-points'} >Uso de Puntos</Link>
+                <Link to={'/#accreditation'} >Acreditación</Link>
+                <Link to={'/#restrictions'} >Restricciones</Link>
+                <Link to={'/#points-value'} >Valor</Link>
+                <Link to={'/#contact'} >Contacto</Link>
               </>
             )
           }
            
         </nav>
         <div className='buttons-container'>
-          <button className='primary-btn'>Quiero mi prestamo</button>
-          <button className='btn-show-links' onClick={openNavbar}><FiMenu/></button>
+            <button className='secondary-btn' id='btn-points-assist'>Quiero mi Asistencia</button>
+            <button className='primary-btn'>Quiero mi Préstamo</button>
+            <button className='btn-show-links' onClick={openNavbar}><FiMenu/></button>
         </div>
         <div className={isOpen ? 'mobible-navbar open' : (first ?  'mobible-navbar' : 'mobible-navbar not-first')}>
           <nav className='mobible-links'>
@@ -61,13 +64,15 @@ const Header = () => {
               <IoMdArrowBack/>
             </button>
             <a href="#header" className='link-selected'>Inicio</a>
-            <a href="#about-us" onClick={handleCloseNabvar}>Nosotros</a>
-            <a href="#frecuent-questions" onClick={handleCloseNabvar} >Preguntas Frecuentes</a>
+            <a href="#use-of-points" onClick={handleCloseNabvar}>Uso de Puntos</a>
+            <a href="#accreditation" onClick={handleCloseNabvar}>Acreditación</a>
+            <a href="#restrictions" onClick={handleCloseNabvar}>Restricciones</a>
+            <a href="#points-value" onClick={handleCloseNabvar}>Valor</a>
             <a href="#contact" onClick={handleCloseNabvar}>Contacto</a>
-            {/* <Link to={'/cofa-points'} >Puntos COFA</Link>
-            <Link to={'/assists'} >Asistencias</Link> */}
+            
           </nav>
-          <button className='primary-btn mobible-nav-secondary-btn'>Quiero mi prestamo</button>
+          <button className='secondary-btn mobible-nav-secondary-btn'>Quiero mi Asistencia</button>
+          <button className='primary-btn mobible-nav-secondary-btn'>Quiero mi Préstamo</button>
           
         </div>
         {
@@ -78,4 +83,4 @@ const Header = () => {
   )
 }
 
-export default Header
+export default HeaderPoints
