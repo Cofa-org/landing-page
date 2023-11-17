@@ -23,6 +23,7 @@ const HeaderPoints = () => {
 
   }, [location.pathname])
   return (
+    <>
     <header >
         <Link to={'/home'}>
           <img src='/Logo.svg'/>
@@ -80,7 +81,17 @@ const HeaderPoints = () => {
         }
         
     </header>
+    <div>
+      <img src="" alt="" className="hero-img-points" />
+      <img src='/img/hero-points.svg' className='img-hero-points-svg'/>
+    </div>
+    
+    </>
   )
 }
 
 export default HeaderPoints
+
+
+
+

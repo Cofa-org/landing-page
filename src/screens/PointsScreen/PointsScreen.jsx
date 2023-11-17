@@ -16,9 +16,7 @@ const PointsScreen = () => {
         {/* acreditacion */}
         {/* restricciones */}
         {/* valor */}
-        hola
-        pepe
-        holaaa
+        <div className='divisor'></div>
         <Contact/>
         <Footer/>
     </>

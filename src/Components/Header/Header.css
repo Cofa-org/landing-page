@@ -6,7 +6,7 @@ header{
     padding: 0vh 5vw;
     position: sticky;
     top: 0;
-    background-color: white;
+    background-color: rgba(255, 255, 255, 0);
     z-index: 100;
 }
 
@@ -40,6 +40,20 @@ header nav a{
     width: 100%;
     font-weight: 500;
 }
+
+
+.img-hero-points-svg{
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: -1;
+}
+
+
+.divisor{
+    height: 80vh;
+}
+
 
 
 @keyframes to-right {
