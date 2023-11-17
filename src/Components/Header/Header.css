@@ -42,20 +42,6 @@ header nav a{
 }
 
 
-.img-hero-points-svg{
-    position: absolute;
-    top: 0;
-    right: 0;
-    z-index: -1;
-}
-
-
-.divisor{
-    height: 80vh;
-}
-
-
-
 @keyframes to-right {
     0% {
         right: -250px;

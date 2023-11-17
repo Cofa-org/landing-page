@@ -4,6 +4,10 @@ import {BsCreditCard, BsHouse, BsShieldCheck} from 'react-icons/bs'
 import { WiStars} from 'react-icons/wi'
 import { MdComputer} from 'react-icons/md'
 import {PiBandaidsFill } from 'react-icons/pi'
+import { PiUsersThreeLight } from "react-icons/pi";
+import { LuClipboardCheck } from "react-icons/lu";
+import { IoRibbonOutline } from "react-icons/io5";
+import { PiConfetti } from "react-icons/pi";
 
 
 export const infoList = [
@@ -298,5 +302,28 @@ export const privacyPolicies = [
     {
         title: 'Control de su información personal',
         content: 'En cualquier momento usted puede restringir la recopilación o el uso de la información personal que es proporcionada a nuestro sitio web. Cada vez que se le solicite rellenar un formulario, como el de alta de usuario, consultas o solicitudes, puede marcar o desmarcar la opción de recibir información por correo electrónico y/o mensajes telefónicos. En caso de que haya marcado la opción de recibir nuestras comunicaciones y/o publicidades, usted puede cancelarla en cualquier momento. COFA no venderá, cederá ni distribuirá la información personal que es recopilada sin su consentimiento, salvo que sea requerido por orden judicial.\nAl utilizar cualquier formulario o la página web, el usuario autoriza expresamente a COBRO FACIL S.R.L., sus afiliadas y subsidiarias, en los términos requeridos por el art. 5 y 11 de la Ley 25.326 a usar sus datos personales para cumplimentar con la solicitud y/o consulta -incluyendo verificar identidad, realizar controles de fraude y de crédito y evaluar su capacidad para pagar el préstamo (análisis crediticio). A su vez, el usuario ha sido informado que, como titular de los datos personales, tiene la facultad de ejercer el derecho de acceso, rectificación y supresión de estos en forma gratuita a intervalos no inferiores a seis meses, salvo que se acredite un interés legítimo al efecto conforme lo establecido en el artículo 14, inciso 3 de la Ley Nº 25.326. La DIRECCIÓN NACIONAL DE PROTECCIÓN DE DATOS PERSONALES, Órgano de Control de la Ley Nº 25.326, tiene la atribución de atender las denuncias y reclamos que se interpongan con relación al incumplimiento de las normas sobre protección de datos personales.”\nCobro Facil SRL se reserva el derecho de cambiar los términos de la presente Política de Privacidad en cualquier momento.'
+    }
+]
+
+export const howDoAddPoints = [
+    {
+        Icon: PiUsersThreeLight,
+        title: 'Referir amigos',
+        content: 'Compartí el nombre, número de celular y correo de tu referido, mayor de 18 años y sin historial en COFA para adquirir un préstamo y/o una asistencia.'
+    },
+    {
+        Icon: LuClipboardCheck,
+        title: 'Encuestas de satisfacción',
+        content: 'Completá y enviá la encuesta de satisfacción que te va a llegar después de contratar un producto COFA.'
+    },
+    {
+        Icon: IoRibbonOutline,
+        title: 'Finalizar un préstamo',
+        content: 'Cuando terminás un préstamo en el plazo acordado cuyas cuotas hayan sido abonadas en tiempo y forma, y sin atrasos mayores a 30 días corridos del vencimiento de cada una.'
+    },
+    {
+        Icon: PiConfetti,
+        title: 'Cumpleaños feliz',
+        content: 'Para obtener puntos COFA, asegurate de tener al menos un producto activo el día de tu cumpleaños.'
     }
 ]

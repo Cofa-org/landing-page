@@ -7,10 +7,11 @@ import Contact from "./Contact/Contact";
 import TermsHeader from "./TermsHeader/TermsHeader";
 import TermsAndConditions from "./TermsAndConditions/TermsAndConditions";
 import PrivacyHeader from "./PrivacyHeader/PrivacyHeader";
-import PrivacyPolicies from "./PrivacyHeader/PrivacyPolicies"
+import PrivacyPolicies from "./PrivacyHeader/PrivacyPolicies";
+import HeroPoints from "./Hero/HeroPoints";
 
 
 
 
 
-export {Hero, AboutUs, OurServices, ClientReview, FrecuentQuestion, Contact, TermsHeader, TermsAndConditions, PrivacyHeader, PrivacyPolicies}
+export {Hero, AboutUs, OurServices, ClientReview, FrecuentQuestion, Contact, TermsHeader, TermsAndConditions, PrivacyHeader, PrivacyPolicies, HeroPoints}

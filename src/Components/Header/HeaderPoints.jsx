@@ -80,12 +80,7 @@ const HeaderPoints = () => {
           isOpen && <div className='background-layer' onClick={handleCloseNabvar}></div>
         }
         
-    </header>
-    <div>
-      <img src="" alt="" className="hero-img-points" />
-      <img src='/img/hero-points.svg' className='img-hero-points-svg'/>
-    </div>
-    
+    </header>  
     </>
   )
 }

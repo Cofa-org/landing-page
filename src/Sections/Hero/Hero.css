@@ -5,7 +5,7 @@
     }
 }
 .hero-container{
-    background-color: var(--background-color);
+    /* background-color: var(--background-color); */
     padding: 100px 5vw;
 
 }
@@ -70,7 +70,6 @@
    
 }
 
-
 .backgroundDecorationInfo{
     position: absolute;
     right: 0;
@@ -84,7 +83,6 @@
 .mq-title-wrap{
     display: none;
 }
-
 
 .typewriter {
     display: inline-block;
@@ -193,4 +191,98 @@
         width: 95%;
     }
     
+}
+
+/* HERO POINTS */
+
+.stain-hero-points-svg{
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: -1;
+}
+
+.hero-img-points{
+    position: absolute;
+    top: 20%;
+    right: 0;
+    z-index: 0;
+}
+
+.divisor{
+    height: 80vh;
+}
+
+.line-background-points{
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: -1;
+}
+
+.welcome{
+    padding: 1% 2%;
+    border-radius: 71px;
+    background-color: #D3EADD;
+    font-weight: 500;
+}
+
+.hero-points-h1{
+    font-size: 70px;
+    font-weight: 500;
+    margin-top: 3%;
+}
+
+.hero-points {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    gap: 32px;
+    width: 54%;
+}
+
+.btn-score-points{
+    border-radius: 15px;
+    background-color: #D3EADD;
+    color: var(--primary-color);
+    border: none;
+    width: 120%;
+    text-align: center;
+}
+
+.hero-buttons {
+    display: flex;
+    align-items: flex-end;
+    width: 100%;
+    gap: 32px;
+}
+
+.hero-info p{
+    font-size: 20px;
+    margin-top: 2%;
+}
+
+.how-do-add-points{
+    margin-top:25%;
+    display: flex;
+    gap: 10%;
+    align-items: center;
+}
+
+.how-do-add-points h1{
+    font-size: 50px;
+    font-weight: 500;
+}
+
+.how-do-add-points p {
+    margin-top: 5%;
+    margin-bottom: 5%;
+}
+
+.how-do-add-points .info-list{
+    display: flex;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    flex-direction: column;
 }
