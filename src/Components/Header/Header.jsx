@@ -36,6 +36,8 @@ const Header = () => {
                 <a href="#about-us">Nosotros</a>
                 <a href="#frecuent-questions">Preguntas Frecuentes</a>
                 <a href="#contact">Contacto</a>
+                <Link to={'/cofa-points'} >Puntos COFA</Link>
+                <Link to={'/assists'} >Asistencias</Link>
               </>
             )
             : (
@@ -44,8 +46,8 @@ const Header = () => {
                 <Link to={'/#about-us'} >Nosotros</Link>
                 <Link to={'/#frecuent-questions'} >Preguntas Frecuentes</Link>
                 <Link to={'/#contact'} >Contacto</Link>
-                {/* <Link to={'/cofa-points'} >Puntos COFA</Link>
-                <Link to={'/assists'} >Asistencias</Link> */}
+                <Link to={'/cofa-points'} >Puntos COFA</Link>
+                <Link to={'/assists'} >Asistencias</Link>
               </>
             )
           }
@@ -64,8 +66,8 @@ const Header = () => {
             <a href="#about-us" onClick={handleCloseNabvar}>Nosotros</a>
             <a href="#frecuent-questions" onClick={handleCloseNabvar} >Preguntas Frecuentes</a>
             <a href="#contact" onClick={handleCloseNabvar}>Contacto</a>
-            {/* <Link to={'/cofa-points'} >Puntos COFA</Link>
-            <Link to={'/assists'} >Asistencias</Link> */}
+            <Link to={'/cofa-points'} >Puntos COFA</Link>
+            <Link to={'/assists'} >Asistencias</Link>
           </nav>
           <button className='primary-btn mobible-nav-secondary-btn'>Quiero mi prestamo</button>
           
