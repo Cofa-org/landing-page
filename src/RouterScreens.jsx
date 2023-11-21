@@ -1,6 +1,6 @@
 import React from 'react'
 import { Route, Routes } from 'react-router-dom'
-import { HomeScreen, TermsScreen, PrivacyPoliciesScreen, PointsScreen } from './screens'
+import { HomeScreen, TermsScreen, PrivacyPoliciesScreen, PointsScreen, AssistenceScreen } from './screens'
 
 
 const RouterScreens = () => {
@@ -11,7 +11,7 @@ const RouterScreens = () => {
         <Route path='/terms-and-conditions' element={<TermsScreen/>} />
         <Route path='/privacy-policies' element={<PrivacyPoliciesScreen/>} />
         <Route path='/cofa-points' element={<PointsScreen/>}/>
-        <Route path='/assists' element={<HomeScreen/>}/>
+        <Route path='/assists' element={<AssistenceScreen/>}/>
     </Routes>
   )
 }

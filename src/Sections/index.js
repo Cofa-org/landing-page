@@ -9,9 +9,24 @@ import TermsAndConditions from "./TermsAndConditions/TermsAndConditions";
 import PrivacyHeader from "./PrivacyHeader/PrivacyHeader";
 import PrivacyPolicies from "./PrivacyHeader/PrivacyPolicies";
 import HeroPoints from "./Hero/HeroPoints";
+import HeroAssistence from "./Hero/HeroAssistence";
+import ExploreMultiassist from "./ExploreMultiassist/ExploreMultiassist";
 
 
 
 
-
-export {Hero, AboutUs, OurServices, ClientReview, FrecuentQuestion, Contact, TermsHeader, TermsAndConditions, PrivacyHeader, PrivacyPolicies, HeroPoints}
+export {
+    Hero, 
+    AboutUs, 
+    OurServices, 
+    ClientReview,
+    FrecuentQuestion, 
+    Contact, 
+    TermsHeader, 
+    TermsAndConditions, 
+    PrivacyHeader, 
+    PrivacyPolicies, 
+    HeroPoints, 
+    HeroAssistence,
+    ExploreMultiassist
+}
