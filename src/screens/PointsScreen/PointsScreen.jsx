@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import { Footer, HeaderPoints } from '../../Components'
 import { Contact, HeroPoints } from '../../Sections'
+import UsePoints from '../../Sections/UsePoints/UsePoints';
 
 const PointsScreen = () => {
   useEffect(() => {
@@ -11,7 +12,7 @@ const PointsScreen = () => {
     <>
         <HeaderPoints/>
         <HeroPoints/>
-        {/* uso de puntos */}
+        <UsePoints/>
         {/* acreditacion */}
         {/* restricciones */}
         {/* valor */}
