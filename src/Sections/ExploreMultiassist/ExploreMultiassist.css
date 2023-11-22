@@ -1,0 +1,18 @@
+.explore-multiassist-header{
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.explore-multiassist-header h2{
+    font-size: 54px;
+}
+
+.price-assist{
+
+}
+.price{
+    font-size: 70px;
+    color: var(--primary-color);
+    font-weight: 700;
+}

@@ -54,7 +54,7 @@ const Contact = () => {
             </div>
         </div>
         <div className='contactListLink'>
-            <a>Quejas | Sugerencias</a>
+            <Link to={'/suggestions'}>Quejas | Sugerencias</Link>
             <a>Reclamos</a>
             <a>Botón de arrepentimiento/baja</a>
         </div>

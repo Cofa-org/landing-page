@@ -1,6 +1,7 @@
 import React from 'react'
 import { ourServices } from '../../data/info'
 import './OurServices.css'
+import { OurServicesList } from '../../Components'
 
 const OurServices = () => {
   return (
@@ -11,14 +12,7 @@ const OurServices = () => {
         <p>
         COFA ofrece una amplia gama de prestaciones para acompañar a las personas y brindarles más seguridad y tranquilidad 
         </p>
-        <div className='servicesContainer'>
-            {ourServices.map((service) =>(
-                <div key={service.id}>
-                    <service.Icon/>
-                    <span>{service.name}</span>
-                </div>
-            ))}
-        </div>
+        <OurServicesList/>
     </section>
   )
 }
