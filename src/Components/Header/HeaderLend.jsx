@@ -4,7 +4,7 @@ import {FiMenu} from 'react-icons/fi'
 import {IoMdArrowBack} from 'react-icons/io'
 import { Link, useLocation } from 'react-router-dom'
 
-const HeaderAssistence = () => {
+const HeaderLend = () => {
   const location = useLocation()
   const [first, setFirst] = useState(true)
   const [isOpen, setIsOpen] = useState(false)
@@ -85,7 +85,7 @@ const HeaderAssistence = () => {
   )
 }
 
-export default HeaderAssistence
+export default HeaderLend
 
 
 

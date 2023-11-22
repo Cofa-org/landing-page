@@ -1,11 +1,17 @@
-import React from 'react'
-import { ContactForm } from '../../Components'
+import React from 'react';
+import './SuggestionsScreen.css';
+import { Footer, HeaderType2 } from '../../Components';
+import { Contact, HeroSuggestions } from '../../Sections';
+
 
 const SuggestionsScreen = () => {
   return (
-    <div>
-        <ContactForm/>
-    </div>
+    <>
+        <HeaderType2/>
+        <HeroSuggestions/>
+        <Contact/>
+        <Footer/>
+    </>
   )
 }
 

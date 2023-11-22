@@ -9,9 +9,10 @@ import TermsAndConditions from "./TermsAndConditions/TermsAndConditions";
 import PrivacyHeader from "./PrivacyHeader/PrivacyHeader";
 import PrivacyPolicies from "./PrivacyHeader/PrivacyPolicies";
 import HeroPoints from "./Hero/HeroPoints";
-import HeroAssistence from "./Hero/HeroAssistence";
+/* import HeroAssistence from "./Hero/HeroAssistence"; */
 import ExploreMultiassist from "./ExploreMultiassist/ExploreMultiassist";
-
+import HeroLend from "./Hero/HeroLend";
+import HeroSuggestions from "./Hero/HeroSuggestions";
 
 
 
@@ -27,6 +28,7 @@ export {
     PrivacyHeader, 
     PrivacyPolicies, 
     HeroPoints, 
-    HeroAssistence,
-    ExploreMultiassist
+    HeroLend,
+    ExploreMultiassist,
+    HeroSuggestions
 }

@@ -1,0 +1,113 @@
+.form-template{
+    position: absolute;
+    z-index:  1;
+    background-color: white;
+    box-shadow: -20px 15.99989px 71.99953px 0px rgba(60, 143, 124, 0.15), 0 0 0 20px rgba(255, 255, 255, 0.10);
+    right: 5vw;
+    top: 22vh;
+    width: 650px;
+    border-radius: 20px;
+    padding: 48px;
+    gap: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-template h2{
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.form-container{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: space-between;
+}
+.form-container .input-container{
+    width: 45%;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+
+}
+
+.form-container .input-container input, .form-container .input-container select, .form-container .input-container textarea{
+    padding: 18px 12px;
+    border-radius: 18px;
+    border:  1px solid  #B7B7B7;
+    resize: none;
+    width: 100%;
+}
+
+.form-container .input-container input::placeholder{
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.form-container .input-container-100{
+    width: 100%;
+}
+
+.submit button{
+    background-color: var(--primary-color);
+    border: none;
+    padding: 10px 33px;
+    border-radius: 15px;
+    font-size: 20px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+}
+
+.submit button svg path{
+    color: white;
+}
+
+.form-template{
+
+    position: static;
+
+}
+
+.form-container-type-2{
+    position: static;
+}
+
+.dropzone{
+    width: 100%;
+    border: var(--text-color)  2px dashed;
+    padding: 20px 10px;
+    border-radius: 10px;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.dropzone svg path{
+    color: var(--primary-color);
+    
+}
+
+.dropzone svg{
+    font-size: 34px;
+}
+
+
+.quejas-sugerencias{
+
+
+
+
+
+    border-radius: 20px;
+    padding: 48px;
+    gap: 20px;
+    display: flex;
+    flex-direction: column;
+    background-color: #FFFFFF;
+}

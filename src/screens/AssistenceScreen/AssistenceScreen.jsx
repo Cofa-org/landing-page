@@ -1,15 +1,15 @@
 import React from 'react'
-import { HeaderAssistence } from '../../Components'
-import HeroAssistence from '../../Sections/Hero/HeroAssistence'
+/* import { HeaderAssistence } from '../../Components'
+import HeroAssistence from '../../Sections/Hero/HeroLend'
 import { ExploreMultiassist } from '../../Sections'
-
+ */
 
 const AssistenceScreen = () => {
   return (
     <>
-        <HeaderAssistence/>
+        {/* <HeaderAssistence/>
         <HeroAssistence/>
-        <ExploreMultiassist/>
+        <ExploreMultiassist/> */}
     </>
   )
 }
