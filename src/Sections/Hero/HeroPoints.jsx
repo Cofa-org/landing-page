@@ -8,7 +8,7 @@ const HeroPoints = () => {
   return (
     <>
         <img src="/img/line-background-points.svg" className='line-background-points'/>
-        <section className='hero-container' id='header'>
+        <section className='hero-container' id='header-points'>
             <div className='hero-points'>
                 <div className='hero-info'>
                     <span className='welcome'>¡TE DAMOS LA BIENVENIDA!</span>
