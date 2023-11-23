@@ -11,19 +11,16 @@
 }
 .accreditation-info{
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
     padding-bottom: 30px;
-    padding-top: 30px;
 }
 p{
     font-size: 20px;
 }
 .accreditation-info svg{
-    width: 36px;
-    height: 36px;
-    margin-left: 40px;
-    color: #56514D;
+    margin-right: 20px;
+    color: #249557;
 }
 .divisor-info{
     width: 100%;

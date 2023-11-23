@@ -194,7 +194,23 @@
 }
 
 /* HERO POINTS */
-
+.info-icon{
+    width: 24px;
+    height: 24px;
+    color: #249557;
+}
+.info-cards-points{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+    justify-content: flex-end;
+    align-items: center;
+}
+.card-points{
+    width: 270px;
+    padding: 24px;
+}
 .stain-hero-points-svg{
     position: absolute;
     top: 0;
@@ -286,7 +302,16 @@
     flex-wrap: wrap;
     flex-direction: column;
 }
-
+.background-icon{
+    width: 46px;
+    height: 46px;
+    border-radius: 6px;
+    background: #F0F5FF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 5%;
+}
 
 /* Hero assist */
 

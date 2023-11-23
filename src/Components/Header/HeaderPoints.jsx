@@ -9,7 +9,7 @@ const HeaderPoints = () => {
   const location = useLocation()
   const [first, setFirst] = useState(true)
   const [isOpen, setIsOpen] = useState(false)
-  const [inHome, setInHome] = useState(location.pathname == '/') 
+  const [inHome, setInHome] = useState(location.pathname == '/cofa-points') 
   const openNavbar = () =>{
     setIsOpen(true)
     setFirst(false)
@@ -20,7 +20,7 @@ const HeaderPoints = () => {
 
   useEffect(() =>{
     console.log(location.pathname)
-    setInHome(location.pathname == '/')
+    setInHome(location.pathname == '/cofa-points')
 
   }, [location.pathname])
 

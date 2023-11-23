@@ -1,4 +1,5 @@
 .value-container{
+    padding: 100px 15vw;
     display: flex;
     flex-direction: row;
     gap: 10%;
@@ -22,6 +23,7 @@
     flex-wrap: wrap;
     justify-content: flex-end;
     gap: 5%;
+    align-items: flex-end;
 }
 .style-card{
     display: flex;
@@ -31,6 +33,17 @@
     gap: 17px;
     border-radius: 10px;
     margin-bottom: 3%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+}
+.style-card svg{
+    width: 48px;
+    height: 48px;
+}
+.btn-terms{
+    margin-left: 40%;
 }
 
 @media screen and (min-width: 1400px) {

@@ -10,14 +10,14 @@
 }
 .info-card{
     display: flex;
-    width: 270px !important;
+    width: 310px !important;
     padding: 24px;
     flex-direction: column;
     align-items: flex-start;
     gap: 16px;
     align-self: stretch;
     border-radius: 12px;
-    /* border-top: 310px 3px #249557; */
+    border-top: 3px solid green;
     background: #ffffff;
     box-shadow: 3px 3px 5px 0px rgba(23, 148, 79, 0.25);
 }
@@ -52,6 +52,20 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+}
+.background-icon-redeem{
+    width: 48px;
+    height: 48px;
+    border: 3px solid green;
+    padding: 10px; 
+    display: inline-block;
+    flex-shrink: 0; 
+    border-radius: 15px;
+    opacity: 0.5;
+}
+.icon{
+    width: 24px;
+    height: 24px;
 }
 @media screen and (min-width: 1400px) {
     .redeem-container{
