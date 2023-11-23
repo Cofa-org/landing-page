@@ -33,21 +33,21 @@ const HeaderPoints = () => {
             inHome 
             ? (
               <>
-                <a href="#header-points"  className='link-selected'>Inicio</a>
+                <a href="#hero-points"  className='link-selected'>Inicio</a>
                 <a href="#use-of-points">Uso de Puntos</a>
                 <a href="#accreditation">Acreditación</a>
                 <a href="#restrictions">Restricciones</a>
-                <a href="#points-value">Valor</a>
+                <a href="#value">Valor</a>
                 <a href="#contact">Contacto</a>
               </>
             )
             : (
               <>
-                <Link to={'/#header-points'} className='link-selected'>Inicio</Link>
+                <Link to={'/#hero-points'} className='link-selected'>Inicio</Link>
                 <Link to={'/#use-of-points'} >Uso de Puntos</Link>
                 <Link to={'/#accreditation'} >Acreditación</Link>
                 <Link to={'/#restrictions'} >Restricciones</Link>
-                <Link to={'/#points-value'} >Valor</Link>
+                <Link to={'/#value'} >Valor</Link>
                 <Link to={'/#contact'} >Contacto</Link>
               </>
             )
@@ -64,11 +64,11 @@ const HeaderPoints = () => {
             <button onClick={() => setIsOpen(false)} className='btn-back'>
               <IoMdArrowBack/>
             </button>
-            <a href="#header-points" className='link-selected'>Inicio</a>
+            <a href="#hero-points" className='link-selected'>Inicio</a>
             <a href="#use-of-points" onClick={handleCloseNabvar}>Uso de Puntos</a>
             <a href="#accreditation" onClick={handleCloseNabvar}>Acreditación</a>
             <a href="#restrictions" onClick={handleCloseNabvar}>Restricciones</a>
-            <a href="#points-value" onClick={handleCloseNabvar}>Valor</a>
+            <a href="#value" onClick={handleCloseNabvar}>Valor</a>
             <a href="#contact" onClick={handleCloseNabvar}>Contacto</a>
             
           </nav>

@@ -2,6 +2,9 @@ import React, { useEffect } from 'react'
 import { Footer, HeaderPoints } from '../../Components'
 import { Contact, HeroPoints } from '../../Sections'
 import UsePoints from '../../Sections/UsePoints/UsePoints';
+import AccreditationPoints from '../../Sections/AccreditationPoints/AccreditationPoints';
+import RedeemPoints from '../../Sections/RedeemPoints/RedeemPoints';
+import ValuePoints from '../../Sections/ValuePoints/ValuePoints';
 
 const PointsScreen = () => {
   useEffect(() => {
@@ -13,10 +16,9 @@ const PointsScreen = () => {
         <HeaderPoints/>
         <HeroPoints/>
         <UsePoints/>
-        {/* acreditacion */}
-        {/* restricciones */}
-        {/* valor */}
-        <div className='divisor'></div>
+        <AccreditationPoints/>
+        <RedeemPoints/>
+        <ValuePoints/>
         <Contact/>
         <Footer/>
     </>

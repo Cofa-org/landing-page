@@ -1,0 +1,40 @@
+.value-container{
+    display: flex;
+    flex-direction: row;
+    gap: 10%;
+    justify-content: space-between;
+}
+.info{
+    width: 70%;
+}
+.info h1{
+    font-size: 50px;
+    font-weight: 500;
+    margin-bottom: 3%;
+}
+.info p{
+    margin-bottom: 5%;
+}
+.cards{
+    display: flex;
+    flex-direction: row;
+    width: 120%;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 5%;
+}
+.style-card{
+    display: flex;
+    width: 320px;
+    padding: 21px;
+    align-items: center;
+    gap: 17px;
+    border-radius: 10px;
+    margin-bottom: 3%;
+}
+
+@media screen and (min-width: 1400px) {
+    .value-container{
+        padding: 100px 15vw !important;
+    }
+}

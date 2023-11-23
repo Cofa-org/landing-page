@@ -1,23 +1,24 @@
 import React from 'react'
 import './UsePoints.css'
-import { RiCoupon3Line } from "react-icons/ri";
+import { TbDiscount2 } from "react-icons/tb";
 
 
 const UsePoints = () => {
   return (
     <>
-        <section className='use-container' id='header-points'>
-            <div className='use-info'>
-                <h1 className='use-points'>
+        <section className='use-container' id='use-of-points'>
+            <div>
+                <h1>
                     ¿Cómo uso los Puntos COFA?
                 </h1>
-                <div>
-                    <RiCoupon3Line />
+                <div className='use-info'>
+                    <TbDiscount2 />
                     <h2>Descuento de cuota</h2>
                     <p>Aplicalos para descontar hasta un 50% de una cuota de un <b>préstamo</b> que tengas vigente en COFA.</p>
                 </div>
-                <div>
-                    <RiCoupon3Line />
+                <div className='divider'></div>
+                <div className='use-info'>
+                    <TbDiscount2 />
                     <h2>Descuento en pago mensual</h2>
                     <p>Aplicalos para descontar hasta un 50%  del precio mensual de una <b>asistencia</b> en COFA.</p>
                 </div>

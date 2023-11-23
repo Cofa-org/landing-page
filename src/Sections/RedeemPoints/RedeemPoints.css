@@ -1,0 +1,60 @@
+.shape{
+    position: absolute;
+    right: 3px;
+    z-index: -1;
+    width: 35%;
+}
+.redeem-container{
+    display: flex;
+    flex-direction: column;
+}
+.info-card{
+    display: flex;
+    width: 270px !important;
+    padding: 24px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    align-self: stretch;
+    border-radius: 12px;
+    /* border-top: 310px 3px #249557; */
+    background: #ffffff;
+    box-shadow: 3px 3px 5px 0px rgba(23, 148, 79, 0.25);
+}
+.exchange{
+    display: flex;
+    justify-content: space-between;
+    gap: 15%;
+}
+.exchange h1{
+    font-size: 50px;
+    font-weight: 500;
+}
+.exchange-cards{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: 10%;
+}
+.restrictions{
+    margin-top: 5%;
+    display: flex;
+    flex-direction: column;
+}
+
+.restrictions h2{
+    font-size: 30px;
+    font-weight: 500;
+    margin-bottom: 3%;
+}
+
+.restrictions-cards{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+@media screen and (min-width: 1400px) {
+    .redeem-container{
+        padding: 100px 15vw !important;
+    }
+}
