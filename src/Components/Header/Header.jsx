@@ -3,6 +3,7 @@ import './Header.css'
 import {FiMenu} from 'react-icons/fi'
 import {IoMdArrowBack} from 'react-icons/io'
 import { Link, useLocation } from 'react-router-dom'
+import { useScrollContext } from '../../context'
 
 const Header = () => {
   const location = useLocation()
@@ -22,8 +23,10 @@ const Header = () => {
     setInHome(location.pathname == '/')
 
   }, [location.pathname])
+
+  const {scrolled } = useScrollContext()
   return (
-    <header >
+    <header  className={scrolled && 'solid'}>
         <Link to={'/home'}>
           <img src='/Logo.svg'/>
         </Link>

@@ -27,7 +27,11 @@
     gap: 30px;
     list-style-type: upper-roman;
 }
-
+/* .subsubterm-item{
+    height: 100px;
+    width: 200px;
+    background-color: blue;
+} */
 .terms-list li::marker{
     color: var(--primary-color) !important;
 }

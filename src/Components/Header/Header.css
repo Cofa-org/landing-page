@@ -9,7 +9,9 @@ header{
     background-color: rgba(255, 255, 255, 0);
     z-index: 100;
 }
-
+.solid{
+    background-color: white;
+}
 header nav{
     display: flex;
     gap: 32px;

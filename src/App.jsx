@@ -3,13 +3,17 @@ import { Footer, Header } from './Components'
 import './index.css'
 
 import RouterScreens from './RouterScreens'
+import { ScrollContextProvider } from './context'
 
 
 function App() {
 
   return (
     <>
-      <RouterScreens/>
+      <ScrollContextProvider>
+        <RouterScreens/>
+      </ScrollContextProvider>
+
     </>
   )
 }

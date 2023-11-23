@@ -3,6 +3,7 @@ import { termsAndConditions } from '../../data/info'
 import './termsAndCondition.css'
 
 const TermsAndConditions = () => {
+    console.log(termsAndConditions)
   return (
     <section id='terms' className='terms-list-container'>
         <ul className='terms-list'>
@@ -17,15 +18,19 @@ const TermsAndConditions = () => {
                                     term.subcontent.map((subterm, index) =>(
                                         <li key={index} className='subterm-item'>
                                             {subterm.content}
+                                            
                                             {
-                                                subterm.subcontent && 
+                                                
+                                                subterm.subcontent && (
                                                 <ul className='subsubterm-list'>
+                                                    {console.log(subterm.subcontent)}
                                                     {
-                                                        subterm.subcontent.map((subsubContent) =>{
-                                                            <li className='subsubterm-item'>{subsubContent.content}</li>
-                                                        })
+                                                        subterm.subcontent.map((subsubContent) =>(
+                                                            <li className='subsubterm-item'>{subsubContent.content} hola</li>
+                                                        ))
                                                     }
                                                 </ul>
+                                                )
                                             }
                                             
                                         </li>
