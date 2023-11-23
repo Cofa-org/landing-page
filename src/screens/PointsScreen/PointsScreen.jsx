@@ -1,10 +1,6 @@
 import React, { useEffect } from 'react'
 import { Footer, HeaderPoints } from '../../Components'
-import { Contact, HeroPoints } from '../../Sections'
-import UsePoints from '../../Sections/UsePoints/UsePoints';
-import AccreditationPoints from '../../Sections/AccreditationPoints/AccreditationPoints';
-import RedeemPoints from '../../Sections/RedeemPoints/RedeemPoints';
-import ValuePoints from '../../Sections/ValuePoints/ValuePoints';
+import { Contact, HeroPoints, UsePoints, AccreditationPoints, RedeemPoints, ValuePoints } from '../../Sections';
 
 const PointsScreen = () => {
   useEffect(() => {

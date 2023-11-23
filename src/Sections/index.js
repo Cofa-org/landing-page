@@ -13,6 +13,10 @@ import HeroPoints from "./Hero/HeroPoints";
 import ExploreMultiassist from "./ExploreMultiassist/ExploreMultiassist";
 import HeroLend from "./Hero/HeroLend";
 import HeroSuggestions from "./Hero/HeroSuggestions";
+import UsePoints from "./UsePoints/UsePoints"
+import AccreditationPoints from "./AccreditationPoints/AccreditationPoints"
+import RedeemPoints from "./RedeemPoints/RedeemPoints"
+import ValuePoints from "./ValuePoints/ValuePoints"
 
 
 
@@ -30,5 +34,9 @@ export {
     HeroPoints, 
     HeroLend,
     ExploreMultiassist,
-    HeroSuggestions
+    HeroSuggestions,
+    UsePoints, 
+    AccreditationPoints, 
+    RedeemPoints, 
+    ValuePoints,
 }

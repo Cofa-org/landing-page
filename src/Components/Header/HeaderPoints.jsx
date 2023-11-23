@@ -58,7 +58,9 @@ const HeaderPoints = () => {
            
         </nav>
         <div className='buttons-container'>
-            <button className='secondary-btn' id='btn-points-assist'>Quiero mi Asistencia</button>
+            <Link to={'/assists'}>
+              <button className='secondary-btn' id='btn-points-assist'>Quiero mi Asistencia</button>
+            </Link>
             <button className='primary-btn'>Quiero mi Préstamo</button>
             <button className='btn-show-links' onClick={openNavbar}><FiMenu/></button>
         </div>
