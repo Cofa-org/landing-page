@@ -4,12 +4,24 @@ import {FiMenu} from 'react-icons/fi'
 import {IoMdArrowBack} from 'react-icons/io'
 import { Link, useLocation } from 'react-router-dom'
 import { useScrollContext } from '../../context'
+import Modal from '../Modal/Modal'
 
 const HeaderPoints = () => {
   const location = useLocation()
   const [first, setFirst] = useState(true)
   const [isOpen, setIsOpen] = useState(false)
   const [inHome, setInHome] = useState(location.pathname == '/cofa-points') 
+  const [modalVisible, setModalVisible] = useState(false);
+
+  // Función para abrir el modal
+  const openModal = () => {
+    setModalVisible(true);
+  };
+  // Función para cerrar el modal
+  const closeModal = () => {
+    setModalVisible(false);
+  };
+
   const openNavbar = () =>{
     setIsOpen(true)
     setFirst(false)
@@ -61,7 +73,8 @@ const HeaderPoints = () => {
             <Link to={'/assists'}>
               <button className='secondary-btn' id='btn-points-assist'>Quiero mi Asistencia</button>
             </Link>
-            <button className='primary-btn'>Quiero mi Préstamo</button>
+            <button className='primary-btn' onClick={openModal}>Quiero mi Préstamo</button>
+            {modalVisible && <Modal closeModal={closeModal} />}
             <button className='btn-show-links' onClick={openNavbar}><FiMenu/></button>
         </div>
         <div className={isOpen ? 'mobible-navbar open' : (first ?  'mobible-navbar' : 'mobible-navbar not-first')}>
@@ -77,8 +90,10 @@ const HeaderPoints = () => {
             <a href="#contact" onClick={handleCloseNabvar}>Contacto</a>
             
           </nav>
-          <button className='secondary-btn mobible-nav-secondary-btn'>Quiero mi Asistencia</button>
-          <button className='primary-btn mobible-nav-secondary-btn'>Quiero mi Préstamo</button>
+          <Link to={'/assists'}>
+              <button className='secondary-btn mobible-nav-secondary-btn' id='btn-points-assist'>Quiero mi Asistencia</button>
+            </Link>
+            <button className='primary-btn mobible-nav-secondary-btn' onClick={openModal}>Quiero mi Préstamo</button>
           
         </div>
         {

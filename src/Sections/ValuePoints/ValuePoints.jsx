@@ -24,7 +24,7 @@ const ValuePoints = () => {
                     Por referido que toma una préstamo. 
                     </p>
                 </div>
-                <div className='style-card'>
+                <div className='style-card' style={{border: "1px solid #249557"}}>
                     <BsCheckCircle />
                     <h2>100 Puntos COFA</h2>
                     <p>

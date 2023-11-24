@@ -7,7 +7,7 @@ const UsePoints = () => {
   return (
     <>
         <section className='use-container' id='use-of-points'>
-            <div>
+            <div className='use-info-container'>
                 <h1>
                     ¿Cómo uso los Puntos COFA?
                 </h1>

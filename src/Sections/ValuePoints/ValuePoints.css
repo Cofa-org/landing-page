@@ -51,3 +51,55 @@
         padding: 100px 15vw !important;
     }
 }
+
+@media screen and (max-width: 950px){
+    .value-container{
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center
+    }
+    .cards{
+        display: flex;
+        flex-direction: row;
+    }
+    .style-card{
+        margin-top: 5%;
+    }
+    .btn-terms{
+        margin-left: 15%;
+    }
+}
+
+@media screen and (max-width:550px){
+    .value-container{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .cards{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        align-content: center;
+        margin-top: 6%;
+    }
+    .info{
+        width: 100%;
+    }
+    .info h1{
+        font-size: 40px;
+        font-weight: 500;
+        margin-bottom: 3%;
+    }
+    .btn-terms{
+        margin-left: 8%;
+    }
+}
+
+/* @media screen and (min-width: 1400px)
+@media screen and (max-width: 950px)
+@media screen and (max-width:550px)
+@media screen and (max-width:450px) */

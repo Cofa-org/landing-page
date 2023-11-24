@@ -1,5 +1,4 @@
 .use-container{
-    /* background-color: var(--background-color); */
     padding: 100px 5vw;
     display: flex;
     justify-content: space-around;
@@ -33,8 +32,76 @@
     height: 40px;
     margin-right: 15px;
 }
+
 @media screen and (min-width: 1400px){
     .use-container {
         padding: 100px 15vw !important;
+    }
+}
+
+@media screen and (max-width: 950px){
+    .use-container{
+        display: flex;
+        flex-wrap: wrap;
+    }
+    .use-container h1{
+        font-size: 40px;
+        font-weight: 500;
+    }
+    .use-info p {
+        margin-left: 5%;
+    }
+}
+
+@media screen and (max-width:550px){
+    .use-container{
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        flex-direction: row;
+    }
+    .use-container h1{
+        font-size: 30px;
+        font-weight: 500;
+        display: flex;
+    }
+    .use-info p {
+        margin-left: 9%;
+        font-size: 18px;
+    }
+    .use-img-points{
+        margin-top: 5%;
+    }
+}
+
+@media screen and (max-width:450px){
+    .use-container{
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        flex-direction: row;
+    }
+    .use-info-container{
+        margin-left: 20%;
+        margin-right: 20%;
+    }
+    .use-img-points{
+        width: auto;
+    }
+    .divider{
+        width: 350px;
+    }
+    .use-info{
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+    }
+    .use-info h2{
+        font-size: 20px;
+    }
+    .use-info p{
+        font-size: 16px;
+        margin-left: 11%;
     }
 }

@@ -20,14 +20,14 @@ p{
 }
 .accreditation-info svg{
     margin-right: 20px;
-    color: #249557;
+    color: var(--primary-color);
 }
 .divisor-info{
     width: 100%;
     height: 1px;
     background-color: rgba(23, 0, 52, 0.40);
     display: block;
-}
+} 
 
 @media screen and (min-width: 1400px){
     .accreditation-container {

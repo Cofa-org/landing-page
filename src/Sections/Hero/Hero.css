@@ -197,7 +197,7 @@
 .info-icon{
     width: 24px;
     height: 24px;
-    color: #249557;
+    color: var(--primary-color);
 }
 .info-cards-points{
     display: flex;
@@ -438,7 +438,7 @@
     justify-content: center;
     align-items: center;
     border-radius: 5px;
-    background-color: rgba(36, 149, 87, 0.15);
+    background-color: var(--primary-color-10);
 
 }
 
