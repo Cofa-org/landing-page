@@ -1,0 +1,66 @@
+/* App.css */
+
+.modal-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(36, 149, 87, 0.70);
+    
+}
+
+.modal {
+    background-color: #fff;
+    width: 650px;
+    height: auto;
+    padding: 48px;
+    z-index: 1;
+    border-radius: 16.867px;
+}
+  
+.modal h1{
+    font-size: 30px;
+    font-weight: 700;
+    text-align: left;
+}
+.modal p{
+    margin-top: 16px;
+    margin-bottom: 16px;
+    text-align: left;
+}
+
+.close-btn {
+    background: none;
+    border: none; 
+    cursor: pointer;
+    float: right;
+    
+}
+
+.close-btn svg{
+    width: 36px;
+    height: 36px;
+}
+
+.go-btn{
+  width: 100%; 
+  margin-top: 24px; 
+  margin-bottom: 24px;
+  font-size: 20px;
+}
+
+.loan-btn{
+    width: 100%;
+    border-radius: 15px;
+    background: rgba(36, 149, 87, 0.05);
+    font-size: 20px;
+}
+
+.loan-btn svg{
+    width: 20px;
+    height: 20px;
+}
