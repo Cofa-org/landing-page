@@ -76,26 +76,20 @@
 
 @media screen and (max-width:450px){
     .use-container{
-        display: flex;
         justify-content: center;
         flex-wrap: wrap;
         flex-direction: row;
-    }
-    .use-info-container{
-        margin-left: 20%;
-        margin-right: 20%;
+        margin-top: 0%;
+        padding-top: 20px;
     }
     .use-img-points{
-        width: auto;
+        display: none;
     }
     .divider{
         width: 350px;
     }
-    .use-info{
-        display: flex;
-        flex-direction: row;
-        justify-content: flex-start;
-        align-items: center;
+    .cards{
+        margin-top: 3% ;
     }
     .use-info h2{
         font-size: 20px;

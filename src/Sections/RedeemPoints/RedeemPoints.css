@@ -5,12 +5,14 @@
     width: 35%;
 }
 .redeem-container{
+    padding: 100px 5vw;
     display: flex;
     flex-direction: column;
+    flex-wrap: wrap;
 }
 .info-card{
     display: flex;
-    width: 310px !important;
+    width: 310px;
     padding: 24px;
     flex-direction: column;
     align-items: flex-start;
@@ -22,7 +24,6 @@
     box-shadow: 3px 3px 5px 0px rgba(23, 148, 79, 0.25);
 }
 .exchange{
-    display: flex;
     justify-content: space-between;
     gap: 15%;
 }
@@ -31,14 +32,13 @@
     font-weight: 500;
 }
 .exchange-cards{
-    display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     justify-content: flex-end;
     gap: 10%;
 }
 .restrictions{
     margin-top: 5%;
-    display: flex;
     flex-direction: column;
 }
 
@@ -49,8 +49,8 @@
 }
 
 .restrictions-cards{
-    display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     justify-content: space-between;
 }
 .background-icon-redeem{
@@ -70,5 +70,41 @@
 @media screen and (min-width: 1400px) {
     .redeem-container{
         padding: 100px 15vw !important;
+    }
+    .info-card{
+        width: 310px !important;
+    }
+}
+
+@media screen and (max-width: 450px){
+    .shape{
+        display: none;
+    }
+    .redeem-container{
+        padding: 50px 5vw;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: flex-start
+    }
+    .exchange h1{
+        font-size: 30px;
+        width: 100%;
+    }
+    .info-card{
+        margin-top: 5%;
+        width: calc(50% - 20px);
+    }
+    .exchange-cards{
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        flex-wrap: nowrap;
+    }
+    .restrictions-cards{
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        gap: 10%;
     }
 }

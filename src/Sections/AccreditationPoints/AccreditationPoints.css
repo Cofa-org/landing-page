@@ -1,6 +1,8 @@
 .accreditation-container{
     padding: 100px 5vw;
     display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
     justify-content: space-around;
     gap: 10%;
 }
@@ -32,5 +34,22 @@ p{
 @media screen and (min-width: 1400px){
     .accreditation-container {
         padding: 100px 15vw !important;
+    }
+    .div-info{
+        width: 60%;
+    }
+    
+}
+@media screen and (max-width: 450px){
+    .accreditation-container{
+        padding: 50px 5vw;
+        justify-content: flex-start
+    }
+    .div-info{
+        width: 100%;
+    }
+    .div-cards{
+        width: 100%;
+        margin-top: 10%;
     }
 }
