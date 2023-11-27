@@ -11,7 +11,7 @@ const UsePoints = () => {
                 <h1>
                     ¿Cómo uso los Puntos COFA?
                 </h1>
-                <div className='cards' style={{margin:'3%'}}>
+                <div className='cards-container-use'>
                     <div className='use-info'>
                         <TbDiscount2 className='icon'/>
                         <h2>Descuento de cuota</h2>
@@ -25,7 +25,7 @@ const UsePoints = () => {
                     </div>
                 </div>
             </div>
-            <div>
+            <div className='img-container'>
                 <img src="/img/img-use-points.png" className="use-img-points" />
             </div>
         </section>
