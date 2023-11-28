@@ -4,11 +4,18 @@ import PrivacyPoliciesScreen from "./PrivacyPoliciesScreen/PrivacyPoliciesScreen
 import PointsScreen from "./PointsScreen/PointsScreen";
 import AssistenceScreen from "./AssistenceScreen/AssistenceScreen";
 import LendScreen from "./LendScreen/LendScreen";
+import ComplaintsScreen from "./ComplaintsScreen/ComplaintsScreen";
+import RegretOrDischargeScreen from "./RegretOrDischargeScreen/RegretOrDischargeScreen";
+import SuggestionsScreen from "./SuggestionsScreen/SuggestionsScreen";
+
 
 export  {
     HomeScreen, 
     TermsScreen, 
     PrivacyPoliciesScreen,
     PointsScreen, 
-    LendScreen
+    LendScreen,
+    ComplaintsScreen,
+    RegretOrDischargeScreen,
+    SuggestionsScreen
 }

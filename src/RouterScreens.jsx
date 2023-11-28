@@ -1,7 +1,7 @@
 import React from 'react'
 import { Route, Routes } from 'react-router-dom'
-import { HomeScreen, TermsScreen, PrivacyPoliciesScreen, PointsScreen, LendScreen } from './screens'
-import SuggestionsScreen from './screens/SuggestionsScreen/SuggestionsScreen'
+import { HomeScreen, TermsScreen, PrivacyPoliciesScreen, PointsScreen, LendScreen, RegretOrDischargeScreen, ComplaintsScreen, SuggestionsScreen } from './screens'
+
 /* import SuggestionsScreen from './screens/SuggestionsScreen/SuggestionsScreen' */
 
 
@@ -14,6 +14,8 @@ const RouterScreens = () => {
         <Route path='/privacy-policies' element={<PrivacyPoliciesScreen/>} />
         <Route path='/cofa-points' element={<PointsScreen/>}/>
         <Route path='/suggestions' element={<SuggestionsScreen/>} />
+        <Route path='/regret-or-discharge' element={<RegretOrDischargeScreen/>} />
+        <Route path='/complaints' element={<ComplaintsScreen/>}/>
         {/* <Route path='/assists' element={<AssistenceScreen/>}/> */}
         <Route path='/lend' element={<LendScreen/>}/>
     </Routes>

@@ -47,10 +47,19 @@ const MyDropzone = ({ field, form: { setFieldValue } }) => {
   );
 };
 
-const ContactForm = () => {
-  const handleSubmit = (values) => {
-    console.log(values);
-    // Aquí puedes agregar la lógica para enviar el formulario, incluyendo los archivos adjuntos
+
+
+const ContactForm = ({type}) => {
+  const sendMailRequest  = async (values) =>{
+    const response = await fetch('http://localhost:1000/mail/' + type, {
+      headers: {
+        'Content-Type': 'application/json' 
+      },
+      body: JSON.stringify(values)
+    })
+  }
+  const handleSubmit = async ( values) => {
+    sendMailRequest(values)
   };
 
   const validate = (values) => {
@@ -103,7 +112,7 @@ const ContactForm = () => {
           </div>
 
           <div className="input-container input-container-100">
-            <label htmlFor="message">Situacion Laboral:</label>
+            <label htmlFor="message">Mensaje:</label>
             <Field as="textarea" name="message" id="message" />
             <ErrorMessage name="message" component="div" />
           </div>

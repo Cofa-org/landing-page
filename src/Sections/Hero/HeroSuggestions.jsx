@@ -7,15 +7,14 @@ import { ContactForm } from '../../Components';
 
 
 
-const HeroSuggestions= () => {
+const HeroSuggestions= ({Title, paragraph}) => {
   return (
     <>
         <section className='hero-container-type-2' id='header'>
             <div className='hero-content-left'><ContactForm/></div>
             <div className='hero-content-rigth'>
-                
-                    <h1>Quejas & <br/>Sugerencias</h1>
-                    <p>También podés contactarte con nosotros para recibir ayuda.</p>
+                    <Title/>
+                    <p>{paragraph}</p>
                     <button className='secondary-btn'>Enviar mensaje</button>
                 
             </div>

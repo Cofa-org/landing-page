@@ -8,7 +8,7 @@ const SuggestionsScreen = () => {
   return (
     <>
         <HeaderType2/>
-        <HeroSuggestions/>
+        <HeroSuggestions Title={()=> <h1>Quejas & <br/>Sugerencias</h1>} paragraph={'También podés contactarte con nosotros para recibir ayuda.'}/>
         <Contact/>
         <Footer/>
     </>

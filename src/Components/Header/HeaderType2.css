@@ -18,7 +18,7 @@
 }
 
 
-.header-type-2 nav{
+.header-type-2 .normal-nav{
     width: 650px;
     /* flex: 1; */
     display: flex;
@@ -31,7 +31,124 @@
 }
 
 
-.header-type-2 nav a{
+.header-type-2 .normal-nav a{
     color: white;
     font-weight: 400;
+}
+
+
+
+.btn-show-links{
+    display: none;
+}
+header .mobible-navbar{
+    display: none;
+    right: -250px;
+    transition: right 0.4s ease;
+}
+.buttons-container{
+    display: flex;
+    align-items: center;
+    gap: 32px;
+}
+
+@keyframes to-right {
+    0% {
+        right: -250px;
+    }
+    100% {
+        right: 0;
+    }
+}
+
+@media screen and (max-width: 1300px) {
+    .header-type-2 .normal-nav{
+        width: 500px;
+    }
+
+}
+
+@media screen and (max-width: 1120px) {
+    .header-type-2{
+        padding-left: 30px;
+        padding-right: 30px;
+    }
+    .header-type-2{
+        background-color: white;
+    }
+    .header-type-2>.normal-nav{
+        display: none;
+    }   
+    .btn-show-links{
+        display: flex;
+        background-color: transparent;
+        border: none;
+
+    }
+    .btn-show-links svg{
+        font-size: 40px;
+        color: var(--primary-color);
+    }
+
+    .btn-show-links svg line{
+        color: var(--text-color);
+    }
+    .buttons-container{
+        display: flex;
+        align-items: center;
+        gap: 32px;
+    }
+    header .open {
+        display: flex;
+        flex-direction: column;
+        transition: right 400ms ease; 
+        position: fixed;
+        top: 0;
+        width: 250px;
+        right: 0;
+        animation-name: to-right;
+        animation-duration: 400ms;
+        height: 100vh !important;
+        background-color: white;
+        z-index: 3;
+        padding: 10px;
+        gap: 20px;
+        justify-content: flex-start;
+    }
+    header .not-first{
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        right: -350px;
+        transition: 500ms;
+        height: 100vh;
+        top: 0;
+        background-color: white;
+        z-index: 3;
+        padding: 10px;
+        justify-content: space-between;
+        width: 250px;
+    }
+    .mobible-navbar .mobible-links{
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+
+    }
+    .btn-back{
+        background-color: transparent;
+        border: none;
+        font-size: 32px;
+        display: flex;
+        justify-content: end;
+    }
+    header .background-layer{
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.158);
+        z-index: 1;
+    }
 }
