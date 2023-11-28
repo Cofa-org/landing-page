@@ -61,4 +61,13 @@
     color: var(--primary-color);
 }
 
+.footer-terms-points{
+    font-size: 20px;
+    margin-top: 2%;
+}
+
+.footer-terms-points p{
+    margin-top: 1%;
+}
+
 
