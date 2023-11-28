@@ -7,6 +7,7 @@ import LendScreen from "./LendScreen/LendScreen";
 import ComplaintsScreen from "./ComplaintsScreen/ComplaintsScreen";
 import RegretOrDischargeScreen from "./RegretOrDischargeScreen/RegretOrDischargeScreen";
 import SuggestionsScreen from "./SuggestionsScreen/SuggestionsScreen";
+import TermsPointsScreen from './TermsScreen/TermsPointsScreen'
 
 
 export  {
@@ -17,5 +18,6 @@ export  {
     LendScreen,
     ComplaintsScreen,
     RegretOrDischargeScreen,
-    SuggestionsScreen
+    SuggestionsScreen,
+    TermsPointsScreen
 }

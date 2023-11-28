@@ -13,13 +13,13 @@ const RedeemPoints = () => {
                     Canje y uso de los Puntos COFA
                 </h1>
                 <div className='exchange-cards'>
-                    <div className='info-card'>
+                    <div className='info-card-exc'>
                         <div className='background-icon-redeem'>
                             <TbTransfer className='icon' />
                         </div>
                         <p>El canje de los puntos podrá ser solicitado en cualquier momento </p>
                     </div>
-                    <div className='info-card'>
+                    <div className='info-card-exc'>
                         <div className='background-icon-redeem'>
                             <TbTransfer  className='icon'/>
                         </div>
@@ -30,28 +30,28 @@ const RedeemPoints = () => {
             <div className='restrictions'>
                 <h2>Restricciones de uso de los Puntos COFA</h2>
                 <div className='restrictions-cards'>
-                    <div className='info-card'>
+                    <div className='info-card-exc'>
                         <div className='background-icon-redeem'>
                             <PiWarningOctagon className='icon' />
                         </div>
                         <p>En caso de aplicar los puntos a un crédito, el mismo debe estar pago en más del 50% de sus cuotas
                         </p>
                     </div>
-                    <div className='info-card'>
+                    <div className='info-card-exc'>
                         <div className='background-icon-redeem'>
                             <PiWarningOctagon className='icon' />
                         </div>
                         <p>Para aplicar los puntos al descuento del pago de una asistencia, la misma debe tener 3 meses de antigüedad y pagos al día.
                         </p>
                     </div>
-                    <div className='info-card'>
+                    <div className='info-card-exc'>
                         <div className='background-icon-redeem'>
                             <PiWarningOctagon className='icon' />
                         </div>
                         <p>Se puede realizar 1 canje de Puntos COFA por mes.
                         </p>
                     </div>
-                    <div className='info-card'>
+                    <div className='info-card-exc'>
                         <div className='background-icon-redeem'>
                             <PiWarningOctagon className='icon' />
                         </div>

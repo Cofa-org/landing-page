@@ -48,7 +48,7 @@
     margin-bottom: 3%;
 }
 
-.info-card {
+.info-card-exc {
     display: flex;
     width: 310px;
     padding: 24px;
@@ -90,10 +90,10 @@
     .redeem-container {
         padding: 100px 15vw;
     }
-    .exchange-cards .info-card {
+    .exchange-cards .info-card-exc {
     width: calc(50% - 10px);
     }
-    .restrictions-cards .info-card{
+    .restrictions-cards .info-card-exc{
         width: calc(25% - 10px);
     }
 }
@@ -116,13 +116,13 @@
         font-size: 35px;
         width: 50%;
     }
-    .exchange-cards .info-card{
+    .exchange-cards .info-card-exc{
         margin-top: 5%;
     }
     .restrictions-cards{
         flex-wrap: wrap;
     }
-    .restrictions-cards .info-card {
+    .restrictions-cards .info-card-exc {
         margin-top: 5%;
         width: calc(50% - 10px);
     }

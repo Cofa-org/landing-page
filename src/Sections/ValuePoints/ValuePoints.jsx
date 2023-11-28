@@ -2,6 +2,7 @@ import React from 'react'
 import './ValuePoints.css'
 import { GoArrowRight } from "react-icons/go";
 import { BsCheckCircle } from "react-icons/bs";
+import { Link } from 'react-router-dom';
 
 const ValuePoints = () => {
   return (
@@ -47,7 +48,9 @@ const ValuePoints = () => {
                 </div>
             </div>
         </section>
-        <button className='secondary-btn btn-terms'>Términos y Condiciones Particulares de Puntos COFA <GoArrowRight /></button>
+        <Link to={'/terms-and-conditions-cofa-points'} >
+            <button className='secondary-btn btn-terms'>Términos y Condiciones Particulares de Puntos COFA <GoArrowRight /></button>
+        </Link>
         
     </>
   )

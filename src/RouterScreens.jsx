@@ -1,6 +1,6 @@
 import React from 'react'
 import { Route, Routes } from 'react-router-dom'
-import { HomeScreen, TermsScreen, PrivacyPoliciesScreen, PointsScreen, LendScreen, RegretOrDischargeScreen, ComplaintsScreen, SuggestionsScreen } from './screens'
+import { HomeScreen, TermsScreen, PrivacyPoliciesScreen, PointsScreen, LendScreen, RegretOrDischargeScreen, ComplaintsScreen, SuggestionsScreen, TermsPointsScreen } from './screens'
 
 /* import SuggestionsScreen from './screens/SuggestionsScreen/SuggestionsScreen' */
 
@@ -18,6 +18,7 @@ const RouterScreens = () => {
         <Route path='/complaints' element={<ComplaintsScreen/>}/>
         {/* <Route path='/assists' element={<AssistenceScreen/>}/> */}
         <Route path='/lend' element={<LendScreen/>}/>
+        <Route path='/terms-and-conditions-cofa-points' element={<TermsPointsScreen/>} />
     </Routes>
   )
 }

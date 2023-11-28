@@ -13,10 +13,12 @@ import HeroPoints from "./Hero/HeroPoints";
 import ExploreMultiassist from "./ExploreMultiassist/ExploreMultiassist";
 import HeroLend from "./Hero/HeroLend";
 import HeroSuggestions from "./Hero/HeroSuggestions";
-import UsePoints from "./UsePoints/UsePoints"
-import AccreditationPoints from "./AccreditationPoints/AccreditationPoints"
-import RedeemPoints from "./RedeemPoints/RedeemPoints"
-import ValuePoints from "./ValuePoints/ValuePoints"
+import UsePoints from "./UsePoints/UsePoints";
+import AccreditationPoints from "./AccreditationPoints/AccreditationPoints";
+import RedeemPoints from "./RedeemPoints/RedeemPoints";
+import ValuePoints from "./ValuePoints/ValuePoints";
+import TermsPoints from './TermsHeader/TermsPoints';
+import TermsAndConditionsPoints from './TermsAndConditions/TermsAndConditionsPoints';
 
 
 
@@ -39,4 +41,6 @@ export {
     AccreditationPoints, 
     RedeemPoints, 
     ValuePoints,
+    TermsPoints,
+    TermsAndConditionsPoints,
 }
