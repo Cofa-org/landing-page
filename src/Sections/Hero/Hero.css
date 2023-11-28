@@ -236,14 +236,14 @@
     z-index: -1;
 }
 
-.welcome{
+.hero-points span{
     padding: 1% 2%;
     border-radius: 71px;
     background-color: #D3EADD;
     font-weight: 500;
 }
 
-.hero-points-h1{
+.hero-points h1{
     font-size: 70px;
     font-weight: 500;
     margin-top: 3%;
@@ -311,6 +311,66 @@
     align-items: center;
     justify-content: center;
     margin-bottom: 5%;
+}
+.text-add{
+    width: 80%;
+}
+
+
+@media screen and (max-width: 450px){
+    .hero-container{
+        margin-top: 13%;
+    }
+    .line-background-points{display: none;}
+    .stain-hero-points-svg{display: none;}
+    .hero-img-points{
+        background: cover fixed no-repeat;
+        color: var(--primary-color) ;
+        position: absolute;
+        z-index: -1;
+        height: 80vh;
+        top: 70px;
+        /* TO DO: FALTA OPACIDAD */
+    }
+    .hero-points{
+        width: 100%;
+    }
+    .text-info{
+        z-index: 1;
+        color: white;
+        margin-top: 2%;
+    }
+    .hero-points h1{
+        font-size: 45px;
+    }
+    .hero-buttons{
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    .how-do-add-points{
+        flex-direction: row;
+        flex-wrap: wrap;
+        width: 100%;
+    }
+    .text-add{
+        width: 100%;
+    }
+    .text-add h1{
+        font-size: 40px;
+    }
+    .info-cards-points{
+        margin-top: 10%;
+        justify-content: flex-start;
+        width: 100%;
+    }
+    .card-points{
+        width: 100%;
+        padding: 10px;
+    }
+    .btn{
+        width: 100%;
+    }
 }
 
 /* Hero assist */

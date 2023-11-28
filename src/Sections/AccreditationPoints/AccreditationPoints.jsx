@@ -7,7 +7,7 @@ const AccreditationPoints = () => {
   return (
     <>
         <section className='accreditation-container' id='accreditation'>
-            <div style={{width:'60%'}}>
+            <div className='div-info'>
                 <h1>
                     Acreditación de los Puntos COFA
                 </h1>
@@ -16,7 +16,7 @@ const AccreditationPoints = () => {
                 </p>
             </div>
             
-            <div>
+            <div className='div-cards'>
                 <div className='accreditation-info'>
                     <FiCheckCircle />
                     <p>El referido haya firmado el contrato del crédito adquirido.</p>

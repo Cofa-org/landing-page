@@ -8,13 +8,20 @@
     font-size: 50px;
     font-weight: 500;
 }
+.cards-container-use{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
 .divider{
-    width: 472px;
+    width: 500px;
     height: 2px;
     opacity: 0.12;
     background: #303030;
     margin-top: 3%;
     margin-bottom: 3%;
+    justify-content: flex-start;
 }
 .use-info{
     display: flex;
@@ -32,6 +39,10 @@
     height: 40px;
     margin-right: 15px;
 }
+.img-container{
+    width: 100%;
+}
+
 
 @media screen and (min-width: 1400px){
     .use-container {
@@ -76,26 +87,20 @@
 
 @media screen and (max-width:450px){
     .use-container{
-        display: flex;
         justify-content: center;
         flex-wrap: wrap;
         flex-direction: row;
-    }
-    .use-info-container{
-        margin-left: 20%;
-        margin-right: 20%;
+        margin-top: 0%;
+        padding-top: 20px;
     }
     .use-img-points{
-        width: auto;
+        display: none;
     }
     .divider{
         width: 350px;
     }
-    .use-info{
-        display: flex;
-        flex-direction: row;
-        justify-content: flex-start;
-        align-items: center;
+    .cards-container-use{
+        margin-top: 3% ;
     }
     .use-info h2{
         font-size: 20px;
