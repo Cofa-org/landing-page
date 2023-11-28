@@ -1,6 +1,7 @@
 import React from 'react'
 import { Footer, Header } from '../../Components'
 import { AboutUs, ClientReview, Contact, FrecuentQuestion, Hero, OurServices } from '../../Sections'
+import WorkWithUs from '../../Sections/WorkWithUs/WorkWithUs'
 
 const HomeScreen = () => {
   return (
@@ -11,6 +12,7 @@ const HomeScreen = () => {
         <OurServices/>
         <ClientReview/>
         <FrecuentQuestion/>
+        <WorkWithUs/>
         <Contact/>
         <Footer/>
     </>

@@ -19,7 +19,7 @@ import RedeemPoints from "./RedeemPoints/RedeemPoints";
 import ValuePoints from "./ValuePoints/ValuePoints";
 import TermsPoints from './TermsHeader/TermsPoints';
 import TermsAndConditionsPoints from './TermsAndConditions/TermsAndConditionsPoints';
-
+import FormWorkWithUs from './WorkWithUs/FormWorkWithUs'
 
 
 export {
@@ -43,4 +43,5 @@ export {
     ValuePoints,
     TermsPoints,
     TermsAndConditionsPoints,
+    FormWorkWithUs
 }
