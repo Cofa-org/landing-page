@@ -31,13 +31,18 @@
     margin-top: 5%;
     margin-bottom: 5%;
 }
-.use-info p {
+.use-info h2{
+    margin-left: 3%;
+}
+.use-info p{
     margin-left: 8%;
 }
-.icon{
+.use-info svg{
     width: 40px;
     height: 40px;
-    margin-right: 15px;
+}
+.use-info svg path{
+    color: var(--primary-color);
 }
 .img-container{
     width: 100%;

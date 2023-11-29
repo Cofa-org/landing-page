@@ -12,7 +12,7 @@ const AccreditationPoints = () => {
                     Acreditación de los Puntos COFA
                 </h1>
                 <p>
-                    A cada participante del programa Puntos COFA, se le otorgará una Cuenta Única COFA,  donde se depositarán los puntos que vaya sumando. Cada forma de conseguir puntos es independiente de las demás, por lo que puedes acumularlos de manera individual La acreditación de dichos puntos se realizará a los 15 días hábiles de realizadas las siguientes acciones.
+                    A cada participante del programa Puntos COFA, se le otorgará una Cuenta Única COFA,  donde se depositarán los puntos que vaya sumando. Cada forma de conseguir puntos es independiente de las demás, por lo que puedes acumularlos de manera individual La acreditación de dichos puntos se realizará a los 15 días hábiles de realizadas las siguientes acciones:
                 </p>
             </div>
             

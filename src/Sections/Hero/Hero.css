@@ -202,7 +202,7 @@
 .info-icon{
     width: 24px;
     height: 24px;
-    color: var(--primary-color);
+    
 }
 .info-cards-points{
     display: flex;
@@ -211,6 +211,9 @@
     width: 100%;
     justify-content: flex-end;
     align-items: center;
+}
+.background-icon svg path,rect,circle{
+    color: var(--primary-color);
 }
 .card-points{
     width: 270px;
@@ -222,9 +225,6 @@
     right: 0;
     z-index: -1;
 }
-
-
-
 
 .hero-img-points{
     position: absolute;
@@ -331,7 +331,7 @@
     margin-bottom: 5%;
 }
 .background-icon:hover{
-    background: var(--primary-color);
+    background: rgb(36, 149, 87, 0.4);
 }
 .text-add{
     width: 80%;

@@ -16,6 +16,12 @@
 .info p{
     margin-bottom: 5%;
 }
+.btn-refer{
+    font-size: 20px;
+}
+.btn-refer svg path{
+    color: white;
+}
 .cards{
     display: flex;
     flex-direction: row;
@@ -69,10 +75,18 @@
     height: 48px;
 }
 
+.style-card svg path{
+    color: var(--primary-color);
+}
+
 .container-btn-temrs{
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.btn-terms{
+    background: #F0F5FF;;
 }
 
 @media screen and (min-width: 1400px) {
