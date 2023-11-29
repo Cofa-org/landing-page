@@ -1,7 +1,7 @@
 import React from 'react'
-import { ourServices } from '../../data/info'
 import './OurServices.css'
 import { OurServicesList } from '../../Components'
+import { GoArrowRight } from "react-icons/go";
 
 const OurServices = () => {
   return (
@@ -13,6 +13,7 @@ const OurServices = () => {
         COFA ofrece una amplia gama de prestaciones para acompañar a las personas y brindarles más seguridad y tranquilidad 
         </p>
         <OurServicesList/>
+        <button className='primary-btn btn-assist'>Conocer Asistencias <GoArrowRight /></button>
     </section>
   )
 }

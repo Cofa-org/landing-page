@@ -57,7 +57,7 @@ const Header = () => {
            
         </nav>
         <div className='buttons-container'>
-          <button className='primary-btn'>Quiero mi prestamo</button>
+          <button className='primary-btn'>Quiero mi préstamo</button>
           <button className='btn-show-links' onClick={openNavbar}><FiMenu/></button>
         </div>
         <div className={isOpen ? 'mobible-navbar open' : (first ?  'mobible-navbar' : 'mobible-navbar not-first')}>
@@ -72,7 +72,7 @@ const Header = () => {
             <Link to={'/cofa-points'} >Puntos COFA</Link>
             <Link to={'/assists'} >Asistencias</Link>
           </nav>
-          <button className='primary-btn mobible-nav-secondary-btn'>Quiero mi prestamo</button>
+          <button className='primary-btn mobible-nav-secondary-btn'>Quiero mi préstamo</button>
           
         </div>
         {

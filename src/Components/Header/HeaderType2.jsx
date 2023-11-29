@@ -40,7 +40,7 @@ const HeaderType2 = () => {
             <Link to={'/cofa-points'} >Puntos COFA</Link>
             <Link to={'/assists'} >Asistencias</Link>
           </nav>
-          <button className='primary-btn mobible-nav-secondary-btn'>Quiero mi prestamo</button>
+          <button className='primary-btn mobible-nav-secondary-btn'>Quiero mi préstamo</button>
           
         </div>
         {

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import './FrecuentQuestion.css'
 import { frecuentQuestions } from '../../data/info'
-import {FaCircleChevronDown} from 'react-icons/fa6'
+import {FaCircleChevronUp} from 'react-icons/fa6'
 import {BsChevronDown} from 'react-icons/bs'
  
 
@@ -27,7 +27,7 @@ const FrecuentQuestion = () => {
                                     <p>{question.content}</p>
                                 </div>
                                 <div>
-                                    <FaCircleChevronDown/>
+                                    <FaCircleChevronUp/>
                                 </div>
                                 
                                 
