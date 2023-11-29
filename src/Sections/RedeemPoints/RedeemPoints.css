@@ -97,6 +97,26 @@
         width: calc(25% - 10px);
     }
 }
+@media screen and (max-width: 900px) {
+    .exchange{
+        flex-wrap: wrap;
+        width: 80%;
+    }
+    .exchange>h1{
+        width: 100%;
+    }
+    .exchange-cards{
+        width: 100%;
+        margin-top: 3%;
+    }
+    .restrictions-cards{
+        flex-wrap: wrap;
+    }
+    .info-card-exc{
+        margin-top: 3%;
+    }
+
+}
   
 @media screen and (max-width: 450px) {
     .shape {

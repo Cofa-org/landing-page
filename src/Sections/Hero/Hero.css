@@ -330,6 +330,9 @@
     justify-content: center;
     margin-bottom: 5%;
 }
+.background-icon:hover{
+    background: var(--primary-color);
+}
 .text-add{
     width: 80%;
 }
@@ -410,16 +413,13 @@
         color: var(--primary-color) ;
         position: absolute;
         z-index: -1;
-        /* height: 80vh; */
         top: 70px;
-        /* TO DO: FALTA OPACIDAD */
     }
     .hero-points{
         width: 100%;
     }
     .text-info{
         z-index: 1;
-  /*       color: white; */
         margin-top: 2%;
     }
     .hero-points h1{
