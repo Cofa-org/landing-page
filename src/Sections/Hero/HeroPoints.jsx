@@ -14,7 +14,7 @@ const HeroPoints = () => {
                     <span className='text-info'>¡TE DAMOS LA BIENVENIDA!</span>
                     <h1 className='text-info'>
                         Conocé los Puntos <br/>
-                        COFA
+                        COFA {/* TO DO:COFA EN VERDE */}
                     </h1>
                     <p><b className='text-info'>El programa de beneficios que premia a nuestros clientes</b></p>
                     <p className='text-info'>Sumá puntos y ahorrá con nosotros! Por ser cliente COFA acumulás puntos que podrás aplicar como descuento en el pago de tus productos COFA. ¡No pierdas la oportunidad de ahorrar!</p>

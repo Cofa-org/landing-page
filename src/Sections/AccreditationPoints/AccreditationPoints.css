@@ -42,7 +42,16 @@ p{
     .div-info{
         width: 60%;
     }
-    
+}
+
+@media screen and (max-width: 900px){
+    .accreditation-container{
+        padding: 50px 5vw;
+        flex-wrap: wrap;
+    }
+    .div-cards{
+        margin-top: 10%;
+    }
 }
 @media screen and (max-width: 450px){
     .accreditation-container{
