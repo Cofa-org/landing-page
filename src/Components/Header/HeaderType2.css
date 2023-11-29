@@ -68,7 +68,7 @@ header .mobible-navbar{
 
 }
 
-@media screen and (max-width: 1120px) {
+@media screen and (max-width: 1350px) {
     .header-type-2{
         padding-left: 30px;
         padding-right: 30px;

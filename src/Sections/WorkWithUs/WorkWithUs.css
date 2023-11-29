@@ -34,8 +34,8 @@
     align-items: center;
     text-align: center;
 }
-.info-work-form h1,p{
-    color: white;
+.info-work-form h1, .info-work-form p{
+/*     color: white; */
     width: 80%;
     margin-bottom: 2%;
 }

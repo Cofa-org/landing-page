@@ -20,31 +20,42 @@ const ValuePoints = () => {
             <div className='cards'>
                 <div className='style-card' style={{backgroundColor: '#F1EBFF'}}>
                     <BsCheckCircle />
-                    <h2>400 Puntos COFA</h2>
-                    <p>
-                    Por referido que toma una préstamo. 
-                    </p>
+                    <div>
+                        <h2>400 Puntos COFA</h2>
+                        <p>
+                        Por referido que toma una préstamo. 
+                        </p>
+                    </div>
                 </div>
-                <div className='style-card' style={{border: "1px solid #249557"}}>
+                <div className='style-card ' style={{border: "1px solid #249557"}}>
                     <BsCheckCircle />
-                    <h2>100 Puntos COFA</h2>
-                    <p>
-                    Por encuesta completada.
-                    </p>
+                    <div>
+                        <h2>100 Puntos COFA</h2>
+                        <p>
+                        Por encuesta completada.
+                        </p>
+                    </div>
+                    
                 </div>
                 <div className='style-card' style={{backgroundColor: '#FFF9EE'}}>
                     <BsCheckCircle />
-                    <h2>200 Puntos COFA</h2>
-                    <p>
-                    Una vez finalizado el  préstamo.
-                    </p>
+                    <div>
+                        <h2>200 Puntos COFA</h2>
+                        <p>
+                        Una vez finalizado el  préstamo.
+                        </p>
+                    </div>
+                    
                 </div>
                 <div className='style-card' style={{backgroundColor: '#F1EBFF'}}>
                     <BsCheckCircle />
-                    <h2>100 Puntos COFA</h2>
-                    <p>
-                    Por referido que toma una asistencia.
-                    </p>
+                    <div>
+                        <h2>100 Puntos COFA</h2>
+                        <p>
+                        Por referido que toma una asistencia.
+                        </p>
+                    </div>
+                  
                 </div>
             </div>
         </section>

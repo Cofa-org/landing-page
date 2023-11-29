@@ -24,6 +24,10 @@
     gap: 30px;
 }
 
+.hero-info p{
+    color: var(--text-color)
+}
+
 .animated-title{
     color: var(--primary-color);
 }
@@ -104,6 +108,7 @@
 
 /* 
 @media screen and (max-width: 100px){ */
+
 
 @media screen and (max-width: 900px){
     .hero-container .hero{
@@ -218,6 +223,9 @@
     z-index: -1;
 }
 
+
+
+
 .hero-img-points{
     position: absolute;
     top: 20%;
@@ -264,7 +272,17 @@
     color: var(--primary-color);
     border: none;
     width: 120%;
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.btn-score-points>svg>path{
+    color: var(--primary-color);
+}
+.btn-score-points>svg{
+    font-size: 24px;
 }
 
 .hero-buttons {
@@ -316,6 +334,58 @@
     width: 80%;
 }
 
+
+@media screen and (max-width: 1600px) {
+    .how-do-add-points{
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .how-do-add-points .info-cards-points{
+        justify-content: space-between;
+        margin-top: 50px;
+    }
+    .how-do-add-points .info-cards-points .card-points{
+        padding: 0;
+        flex-basis: 40%;
+
+
+    }
+
+    .how-do-add-points .info-cards-points .card-points p{
+        width: 100%;
+        
+    }
+    
+}
+
+
+@media screen and (max-width: 1300px){
+    .stain-hero-points-svg{
+        display: none;
+
+    }
+    .hero-overlay .hero-img-points{
+        position: static;
+        width: 100%;
+        border-radius: 20px;
+    }
+
+    .hero-points{
+        width: 100%;
+        margin-top: 50px;
+    }
+
+}
+
+
+@media screen and (max-width: 560px){
+    .hero-buttons{
+        flex-direction: column;
+    }
+    .btn-score-points{
+        width: 100%;
+    }
+}
 
 @media screen and (max-width: 450px){
     .hero-container{
