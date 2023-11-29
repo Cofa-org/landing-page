@@ -342,6 +342,7 @@
 }
 #btn-lend{
     width: 200px;
+    border: 1px solid white;
 }
 
 @media screen and (max-width: 1600px) {
