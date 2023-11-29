@@ -398,7 +398,7 @@
         color: var(--primary-color) ;
         position: absolute;
         z-index: -1;
-        height: 80vh;
+        /* height: 80vh; */
         top: 70px;
         /* TO DO: FALTA OPACIDAD */
     }
@@ -407,7 +407,7 @@
     }
     .text-info{
         z-index: 1;
-        color: white;
+  /*       color: white; */
         margin-top: 2%;
     }
     .hero-points h1{
