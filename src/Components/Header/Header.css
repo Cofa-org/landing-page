@@ -33,6 +33,11 @@ header nav a{
     right: -250px;
     transition: right 0.4s ease;
 }
+.mobible-navbar-points{
+    display: none;
+    right: -250px;
+    transition: right 0.4s ease;
+}
 .buttons-container{
     display: flex;
     align-items: center;
@@ -50,6 +55,85 @@ header nav a{
     }
     100% {
         right: 0;
+    }
+}
+
+@media screen and (max-width: 1500px) {
+    header>.nav-points{
+        display: none;
+    }   
+    .btn-show-links-points{
+        display: flex;
+        background-color: transparent;
+        border: none;
+
+    }
+    .btn-show-links svg{
+        font-size: 40px;
+        color: var(--primary-color);
+    }
+
+    .btn-show-links svg line{
+        color: var(--text-color);
+    }
+    .buttons-container-points{
+        display: flex;
+        align-items: center;
+        gap: 32px;
+    }
+    .open-points {
+        display: flex;
+        flex-direction: column;
+        transition: right 400ms ease; 
+        position: fixed;
+        top: 0;
+        width: 250px;
+        right: 0;
+        animation-name: to-right;
+        animation-duration: 400ms;
+        height: 100vh !important;
+        background-color: white;
+        z-index: 3;
+        padding: 10px;
+        gap: 20px;
+    }
+    .not-first-points{
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        right: -350px;
+        transition: 500ms;
+        height: 100vh;
+        top: 0;
+        background-color: white;
+        z-index: 3;
+        padding: 10px;
+        justify-content: space-between;
+        width: 250px;
+    }
+    .mobible-links-points{
+        display: flex;
+        flex-direction: column;
+    }
+    .btn-back-points{
+        background-color: transparent;
+        border: none;
+        font-size: 32px;
+        display: flex;
+        justify-content: end;
+    }
+    .background-layer-points{
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.158);
+        z-index: 1;
+    }
+    .mobible-navbar-points{
+        display: flex;
+
     }
 }
 

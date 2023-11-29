@@ -43,7 +43,7 @@ const HeaderPoints = () => {
         <Link to={'/home'}>
           <img src='/Logo.svg'/>
         </Link>
-        <nav>
+        <nav className='nav-points'>
           {
             inHome 
             ? (
@@ -69,17 +69,17 @@ const HeaderPoints = () => {
           }
            
         </nav>
-        <div className='buttons-container'>
+        <div className='buttons-container buttons-container-points'>
             <Link to={'/assists'}>
               <button className='secondary-btn' id='btn-points-assist'>Quiero mi Asistencia</button>
             </Link>
-            <button className='primary-btn' onClick={openModal}>Quiero mi Préstamo</button>
+            <button className='primary-btn' id='btn-lend' onClick={openModal}>Quiero mi Préstamo</button>
             {modalVisible && <Modal closeModal={closeModal} />}
             <button className='btn-show-links' onClick={openNavbar}><FiMenu/></button>
         </div>
-        <div className={isOpen ? 'mobible-navbar open' : (first ?  'mobible-navbar' : 'mobible-navbar not-first')}>
-          <nav className='mobible-links'>
-            <button onClick={() => setIsOpen(false)} className='btn-back'>
+        <div className={isOpen ? 'mobible-navbar-points open-points' : (first ?  'mobible-navbar' : 'mobible-navbar not-first-points')}>
+          <nav className='mobible-links-points'>
+            <button onClick={() => setIsOpen(false)} className='btn-back-points'>
               <IoMdArrowBack/>
             </button>
             <a href="#hero-points" className='link-selected'>Inicio</a>
@@ -93,11 +93,11 @@ const HeaderPoints = () => {
           <Link to={'/assists'}>
               <button className='secondary-btn mobible-nav-secondary-btn' id='btn-points-assist'>Quiero mi Asistencia</button>
             </Link>
-            <button className='primary-btn mobible-nav-secondary-btn' onClick={openModal}>Quiero mi Préstamo</button>
+            <button className='primary-btn mobible-nav-secondary-btn'  onClick={openModal}>Quiero mi Préstamo</button>
           
         </div>
         {
-          isOpen && <div className='background-layer' onClick={handleCloseNabvar}></div>
+          isOpen && <div className='background-layer-points' onClick={handleCloseNabvar}></div>
         }
         
     </header>  
