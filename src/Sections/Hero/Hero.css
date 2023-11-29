@@ -336,7 +336,13 @@
 .text-add{
     width: 80%;
 }
+#btn-points-assist{
 
+    width: 200px;
+}
+#btn-lend{
+    width: 200px;
+}
 
 @media screen and (max-width: 1600px) {
     .how-do-add-points{
@@ -360,6 +366,7 @@
     }
     
 }
+
 
 
 @media screen and (max-width: 1300px){
@@ -388,9 +395,14 @@
     .btn-score-points{
         width: 100%;
     }
+   
 }
 
 @media screen and (max-width: 450px){
+    #btn-points-assist{
+
+        display: none;
+    }
     .hero-container{
         margin-top: 13%;
     }
