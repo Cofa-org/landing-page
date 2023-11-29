@@ -1,23 +1,51 @@
-import React from 'react'
-import {ImQuotesLeft, ImQuotesRight} from 'react-icons/im'
-import './ClientReview.css'
+import React, { useState, useEffect } from 'react';
+import './ClientReview.css';
+import { ImQuotesLeft, ImQuotesRight } from 'react-icons/im';
+import { IoIosArrowRoundBack, IoIosArrowRoundForward } from 'react-icons/io';
+import { clientReview } from '../../data/info';
 
 const ClientReview = () => {
-  return (
-    <section className='clientReview'>
-        <h2>¿Qué dicen nuestros clientes sobre COFA?</h2>
-        <span className='quotes  open-quotes'>
-            <ImQuotesLeft/>
-        </span>
-        <p className='quote'>
-        Muy claros a la hora de atenderme. Siempre están bien predispuestos a explicar cuando uno tiene alguna pregunta.
-        </p>
-        <span className='quotes close-quotes'>
-            <ImQuotesRight/>
-        </span>
-        <span className='authorReview'>Pablo</span>
-    </section>
-  )
-}
+  const [currentReview, setCurrentReview] = useState(0);
 
-export default ClientReview
+  const nextReview = () => {
+    setCurrentReview((prevReview) => (prevReview + 1) % clientReview.length);
+  };
+
+  const prevReview = () => {
+    setCurrentReview((prevReview) =>
+      (prevReview - 1 + clientReview.length) % clientReview.length
+    );
+  };
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      nextReview();
+    }, 7000);
+
+    return () => clearInterval(intervalId);
+  }, [currentReview]);
+
+  return (
+    <section className="clientReview">
+      <div className="info-review">
+        <h2>¿Qué dicen nuestros clientes sobre COFA?</h2>
+        <span className="quotes open-quotes">
+          <ImQuotesLeft />
+        </span>
+        <div key={clientReview[currentReview].id} className="review">
+          <p className="quote">{clientReview[currentReview].content}</p>
+          <span className="authorReview">{clientReview[currentReview].author}</span>
+        </div>
+        <span className="quotes close-quotes">
+          <ImQuotesRight />
+        </span>
+      </div>
+      <div className="container-arrow-icon">
+        <IoIosArrowRoundBack onClick={prevReview} />
+        <IoIosArrowRoundForward onClick={nextReview} />
+      </div>
+    </section>
+  );
+};
+
+export default ClientReview;
