@@ -1,8 +1,6 @@
 import React from 'react'
-import { Footer,   } from '../../Components'
-import { AboutUs, Contact, FrecuentQuestion, HeroElMejorTrato, HeaderElMejorTrato } from '../../Sections'
-
-
+import { Footer, HeaderElMejorTrato,   } from '../../Components'
+import { AboutUs, Contact, FrecuentQuestion, HeroElMejorTrato } from '../../Sections'
 
 
 const ElMejorTratoScreen = () => {
