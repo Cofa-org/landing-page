@@ -4,11 +4,12 @@ import { ContactForm } from '../../Components';
 
 
 
-const HeroSuggestions= ({Title, paragraph}) => {
+const HeroSuggestions= ({Title, paragraph, type}) => {
+
   return (
     <>
         <section className='hero-container-type-2' id='header'>
-            <div className='hero-content-left'><ContactForm/></div>
+            <div className='hero-content-left'><ContactForm type={type}/></div>
             <div className='hero-content-rigth'>
                     <Title/>
                     <p>{paragraph}</p>

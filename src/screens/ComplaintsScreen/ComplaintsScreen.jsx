@@ -7,7 +7,7 @@ const ComplaintsScreen = () => {
   return (
     <div>
         <HeaderType2/>
-        <HeroSuggestions Title={() =><h1>Reclamos</h1>} paragraph={'También podés contactarte con nosotros para recibir ayuda.'}/>
+        <HeroSuggestions Title={() =><h1>Reclamos</h1>} paragraph={'También podés contactarte con nosotros para recibir ayuda.'} type='RECLAMO'/>
         <Contact/>
         <Footer/>
     </div>

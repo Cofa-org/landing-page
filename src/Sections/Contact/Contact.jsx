@@ -33,10 +33,21 @@ const Contact = () => {
 
                 <img src='/Logo.svg' />
                 <div className='socialMediaList'>
-                    <BsFacebook/>
-                    <BsInstagram/>
-                    <BsLinkedin/>
-                    <BsWhatsapp/>
+                    <Link to='https://www.facebook.com/cofa.cofa.5245'>
+                        <BsFacebook/>
+                    </Link>
+                    <Link to='https://instagram.com/cofa.arg?igshid=M2RkZGJiMzhjOQ=='>
+                        <BsInstagram/>
+                    </Link>
+                    
+                    <Link to={'https://www.linkedin.com/company/cofa-servicios-financieros/'}>
+                        <BsLinkedin/>
+                    </Link>
+                   
+                    <Link to='https://wa.me/5491154559017'>
+                        <BsWhatsapp/>
+                    </Link>
+                    
                 </div>
                 <div className='links'>
                     <Link className='linkRedirect' to={'/privacy-policies/#top'}>
