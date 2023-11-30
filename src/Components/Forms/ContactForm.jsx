@@ -74,7 +74,65 @@ const ContactForm = ({type}) => {
   };
 
 
-  const reasons = []
+  const reasons = [
+    {
+      title: 'Préstamos',
+      name: 'prestamos',
+      values:[
+        'Cargos/comisiones no precedentes o mal aplicados',
+        'Intereses mal aplicados',
+        'Aplicación de condiciones no pactadas',
+        'Producto no solicitado',
+        'Otros'
+      ]
+    },
+    {
+      title: 'Información de datos',
+      name: 'info-de-datos',
+      values:[
+        'Información crediticia incorrecta a burós de créditos',
+        'Información crediticia incorrecta a Central de deudores de BCRA',
+        'Información crediticia incorrecta a Central de cheques rechazados',
+        'Otros'
+      ]
+    },
+    {
+      title: 'Mala atención',
+      name: 'mala-atencion',
+      values:[
+        'Tiempos prolongados de espera en sucursales y centros de atención',
+        'Problemas en líneas de caja',
+        'Desconsideración, discriminación o modos inadecuados en el trato',
+        'Información errónea, sesgada o incompleta sobre condiciones de productos y servicios',
+        'Publicidad engañosa',
+        'Otros'
+      ]
+    },
+    {
+      title: 'Gestión de cobranza',
+      name: 'gestion-cobranza',
+      values:[
+        'Falta de respuesta al requerimiento de estados de cuenta o libre deuda',
+        'Trato indigno por terceros a cargo de las gestiones de cobro',
+        'Costos adicionales por la intervención de terceros en las gestiones de cobros',
+        'Otros'
+      ]
+    },
+    {
+      title: 'Otros',
+      name: 'otros',
+      values:[
+        'Retenciones y percepciones impositivas cuestionadas',
+        'Seguros contratados accesoriamente a productos financieros',
+        'Otros'
+      ]
+    }
+    
+  ]
+
+  const [reasonSelected, setReasonSelected] = useState({reason: null, value: null})
+  const [openSelector, setOpenSelector] = useState(false)
+  console.log(openSelector)
   return (
     <div className="quejas-sugerencias">
       <Formik
@@ -123,14 +181,26 @@ const ContactForm = ({type}) => {
             type == 'RECLAMO' && 
             <div className="input-container input-container-100">
             <label htmlFor="reason">Motivo:</label>
-              <div>
-                <span className=''>Selecciona tu motivo</span>
-                <div className='dropdown-list-reason'>
+              <div className='selector-input-container'>
+                <span 
+                  className='selector-input' 
+                  onClick={() => setOpenSelector(!openSelector)}
+                >Selecciona tu motivo</span>
+                <div className={openSelector ? 'dropdown-list-reason' : 'dropdown-list-reason no-visible'}>
                   {
                     reasons.map((reason) =>(
-                      <div className='reason-list'>
-                        <span>{reason}</span>
+                      <div className={openSelector ? 'reason-list' : 'reason-list no-visible'}>
+                        <span>{reason.title}</span>
                         <FaChevronRight />
+                        <div className='reason-list-values no-visible'>
+                          {
+                            reason.values.map(value =>(
+                              <div>
+                                {value}
+                              </div>
+                            ))
+                          }
+                        </div>
                       </div>
                     ))
                   }
