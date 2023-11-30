@@ -5,7 +5,7 @@ import { Contact, TermsAndConditionsPoints, TermsPoints } from '../../Sections'
 
 const TermsPointsScreen = () => {
   useEffect(() => {
-    window.scrollTo(0, 0); // Desplazarse al principio de la página
+    window.scrollTo(0, 0);
   }, []);
 
   return (

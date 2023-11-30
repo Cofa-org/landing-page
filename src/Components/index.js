@@ -7,6 +7,7 @@ import HeaderLend from "./Header/HeaderLend";
 import HeaderPoints from "./Header/HeaderPoints";
 import HeaderType2 from "./Header/HeaderType2";
 import OurServicesList from "./OurServicesList/OurServicesList";
+import HeaderElMejorTrato from './Header/HeaderElMejorTrato'
 
 
 export {
@@ -18,5 +19,6 @@ export {
     HeaderLend, 
     OurServicesList, 
     PersonalLendForm,
-    HeaderType2
+    HeaderType2,
+    HeaderElMejorTrato
 }

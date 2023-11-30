@@ -47,7 +47,6 @@ const HeroPoints = () => {
                     {
                         howDoAddPoints.map((info) =>(
                             <div className='card-points'>
-                                {/*TO DO: svg verde*/}
                                 <div className='background-icon'>
                                     <info.Icon className='info-icon'/>
                                 </div>

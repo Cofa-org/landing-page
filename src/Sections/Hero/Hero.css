@@ -504,92 +504,6 @@
     justify-content: flex-start;
 }
 
-
-/* Suggestions Hero */
-
-
-.email-info{
-    display: flex;
-    gap: 15px;
-}
-
-.email-info .email-circle{
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    background-color: #E6E6E6;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.email-info .email-circle svg {
-    font-size: 24px;
-}
-
-.email-info .email-circle svg path{
-    color: var(--primary-color);
-
-}
-
-.email-info .email-info-content{
-    display: flex;
-    flex-direction: column;
-    gap:6px;
-}
-
-.email-info .email-info-content h4{
-    color: #838383;
-    font-weight: 400;
-}
-
-.email-info .email-info-content span{
-    font-size: 18px;
-    font-weight: 700;
-}
-
-.social-media-list{
-    display: flex;
-    flex-direction: column;
-    gap: 10px
-}
-
-.social-media-list-title{
-    display: flex;
-    gap: 10px;
-    align-items: center;
-}
-.social-media-list-title .rect{
-    width: 25px;
-    background-color: var(--text-color);
-    height: 2px;
-}
-
-.social-media-list-title h4{
-    font-size: 12px;
-    font-weight: 500;
-}
-.social-media-list .social-media-container{
-    display: flex;
-    gap: 5px;
-}
-.social-media-list .social-media-container a{
-    width: 32px;
-    height: 32px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 5px;
-    background-color: var(--primary-color-10);
-
-}
-
-.social-media-list .social-media-container a svg path{
-    color: var(--primary-color);
-}
-
-
 /* Lend */
 
 .hero-info-lend{
@@ -721,5 +635,235 @@
         background-color: var(--primary-color);
         border: none;
         font-size: 18px
+    }
+}
+
+
+/* EL MEJOR TRATO */ /* Suggestions Hero */
+.container-el-mejor-trato{
+    padding: 100px 15vh;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+}
+
+.hero-el-mejor-trato{
+    margin-right: 10%;
+}
+
+.hero-el-mejor-trato p{
+    font-size: 20px;
+    margin-top: 3%;
+    margin-bottom: 3%;
+}
+
+.email-info{
+    display: flex;
+    gap: 15px;
+    margin-top: 10%;
+}
+
+.email-info .email-circle{
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background-color: #E6E6E6;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.email-info .email-circle svg {
+    font-size: 24px;
+}
+
+.email-info .email-circle svg path{
+    color: var(--primary-color);
+
+}
+
+.email-info .email-info-content{
+    display: flex;
+    flex-direction: column;
+    gap:6px;
+}
+
+.email-info .email-info-content h4{
+    color: #838383;
+    font-weight: 400;
+}
+
+.email-info .email-info-content span{
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.social-media-list{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10%;
+}
+
+.social-media-list-title{
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+.social-media-list-title .rect{
+    width: 25px;
+    background-color: var(--text-color);
+    height: 2px;
+}
+
+.social-media-list-title h4{
+    font-size: 12px;
+    font-weight: 500;
+}
+.social-media-list .social-media-container{
+    display: flex;
+    gap: 12px;
+}
+.social-media-list .social-media-container a{
+    width: 32px;
+    height: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    background-color: var(--primary-color-10);
+
+}
+
+.social-media-list .social-media-container a svg path{
+    color: var(--primary-color);
+}
+
+.services-el-mejor-trato{
+    padding: 80px 15vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.services-el-mejor-trato h1{
+    font-size: 50px;
+    font-weight: 500;
+}
+.cards-el-mejor-trato{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-content: center;
+    align-items: center;
+    width: 100%;
+    margin-top: 3%;
+}
+.card-el-mejor-trato h2{
+    color: var(--primary-color);
+    text-align: center;
+}
+
+.card-el-mejor-trato p{
+    margin-left: 3%;
+}
+
+.card-el-mejor-trato svg{
+    width: 24px;
+    height: 24px;
+    margin-right: 10px;
+}
+.card-el-mejor-trato svg path{
+    color: var(--primary-color);
+}
+
+@media screen and (max-width: 450px){
+    .container-el-mejor-trato{
+        padding: 50px 5vh;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+
+    }
+    .container-form-elmejortrato{
+        margin-top: 10% ;
+    }
+    .services-el-mejor-trato{
+        padding: 80px 5vh;
+        align-items: flex-start;
+        width: 100%;
+    }
+    .cards-el-mejor-trato{
+        flex-wrap: wrap
+    }
+    .card-el-mejor-trato{
+        margin-bottom: 3%;
+    }
+    .card-el-mejor-trato h2{
+        text-align: center;
+    }
+}
+
+@media screen and (max-width: 650px){
+    .container-el-mejor-trato{
+        padding: 50px 5vh;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+    }
+    .container-form-elmejortrato{
+        margin-top: 10% ;
+    }
+    .services-el-mejor-trato{
+        padding: 80px 5vh;
+        align-items: flex-start;
+        width: 100%;
+    }
+    .cards-el-mejor-trato{
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-content: center;
+        justify-content: center;
+        align-items: center
+    }
+    .card-el-mejor-trato{
+        margin-bottom: 3%;
+    }
+    .card-el-mejor-trato h2{
+        text-align: center;
+    }
+}
+
+@media screen and (max-width: 900px){
+    .container-el-mejor-trato{
+        padding: 50px 15vh;
+        flex-direction: column;
+
+    }
+    .services-el-mejor-trato{
+        padding: 80px 5vh;
+        width: 100%;
+    }
+    .container-form-elmejortrato{
+        margin-top: 10% ;
+    }
+    .cards-el-mejor-trato{
+        gap: 20px;
+    }
+}
+
+@media screen and (max-width: 1150px){
+    .container-el-mejor-trato{
+        padding: 50px 15vh;
+        flex-direction: column;
+
+    }
+    .services-el-mejor-trato{
+        padding: 80px 5vh;
+        width: 100%;
+    }
+    .container-form-elmejortrato{
+        margin-top: 10% ;
+    }
+    .cards-el-mejor-trato{
+        gap: 20px;
     }
 }
