@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import { useDropzone } from 'react-dropzone';
 import { PiCloudArrowUp } from "react-icons/pi";
+import { FaChevronRight } from "react-icons/fa";
 import './style.css'
 
 const MyDropzone = ({ field, form: { setFieldValue } }) => {
@@ -72,6 +73,8 @@ const ContactForm = ({type}) => {
     return errors;
   };
 
+
+  const reasons = []
   return (
     <div className="quejas-sugerencias">
       <Formik
@@ -116,6 +119,27 @@ const ContactForm = ({type}) => {
             <Field as="textarea" name="message" id="message" />
             <ErrorMessage name="message" component="div" />
           </div>
+          {
+            type == 'RECLAMO' && 
+            <div className="input-container input-container-100">
+            <label htmlFor="reason">Motivo:</label>
+              <div>
+                <span className=''>Selecciona tu motivo</span>
+                <div className='dropdown-list-reason'>
+                  {
+                    reasons.map((reason) =>(
+                      <div className='reason-list'>
+                        <span>{reason}</span>
+                        <FaChevronRight />
+                      </div>
+                    ))
+                  }
+                </div>
+              </div>
+              {/* <Field as="textarea" name="message" id="message" />
+              <ErrorMessage name="message" component="div" /> */}
+            </div>
+          }
 
           <div className="input-container input-container-100">
             <Field name="files" component={MyDropzone} />
