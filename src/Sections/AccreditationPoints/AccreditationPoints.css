@@ -4,7 +4,10 @@
     flex-wrap: nowrap;
     justify-content: space-around;
     gap: 10%;
-    align-items: center
+    align-items: baseline;
+}
+.div-info p{
+    font-size: 20px;
 }
 
 .accreditation-container h1{
@@ -19,7 +22,15 @@
     align-items: center;
     padding-bottom: 30px;
 }
-p{
+.accreditation-info svg {
+    width: 30px;
+    height: 30px;
+}
+.accreditation-info svg path,polyline{
+    color: var(--primary-color);
+}
+.accreditation-info p{
+    width: 90%;
     font-size: 20px;
 }
 

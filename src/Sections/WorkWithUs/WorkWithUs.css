@@ -1,13 +1,15 @@
 .container-work{
     padding: 40px 10vw;
     display: flex;
-    background-color: #84E1AE;
+    background-color: #EAFAF1;
 }
 .info-work{
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
+    width: 80%;
+    margin-right: 10%;
 }
 .info-work p{
     margin-top: 3%;
@@ -18,7 +20,6 @@
     width: 261px;
     font-size: 20px;
 }
-
 
 .container-form-work{
     padding: 40px 15vw;

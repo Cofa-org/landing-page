@@ -555,3 +555,18 @@ export const termsAndConditionsPoints = [
         content:'Jurisdicción: Para cualquier cuestión judicial que pudiera derivarse del Programa, los canjes de Puntos, etc., los Clientes y COFA se someterán a la jurisdicción exclusiva de los Tribunales Ordinarios en lo comercial con asiento en la Ciudad Autónoma de Buenos Aires, con renuncia a cualquier otro fuero o jurisdicción.'
     }
 ]
+
+export const clientReview = [
+    {
+        content: 'Muy claros a la hora de atenderme. Siempre están bien predispuestos a explicar cuando uno tiene alguna pregunta.',
+        author: 'Pablo'
+    },
+    {
+        content: 'La atención es muy buena; conozco el servicio y nunca tuve ningún problema.',
+        author: 'Laura'
+    },
+    {
+        content: 'Muy buena atención y excelente predisposición. Cumplieron con el préstamo y me depositaron en el día lo que necesitaba.',
+        author: 'Ricardo'
+    }
+]
