@@ -139,8 +139,11 @@
 
     visibility: visible;
     opacity: 1;
-
-    
+    border-bottom: 1px solid #B7B7B7;
+    border-left: 1px solid #B7B7B7;
+    border-right: 1px solid #B7B7B7;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
 }
 .dropdown-list-reason:hover {
         max-height: 300px; 
@@ -153,8 +156,10 @@
     justify-content: space-between;
 }
 
-.dropdown-list-reason .reason-list .reason-list-values{
-/*     display: none; */
+.reason-list-values{
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
 }
 
 .no-visible{

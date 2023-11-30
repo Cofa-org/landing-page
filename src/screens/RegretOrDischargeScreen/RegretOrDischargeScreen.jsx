@@ -6,7 +6,7 @@ const RegretOrDischargeScreen = () => {
   return (
     <div>
         <HeaderType2/>
-        <HeroSuggestions Title={()=><h1>Arrepentimeinto <br/> o Baja</h1>} paragraph={'También podés contactarte con nosotros para recibir ayuda.'}/>
+        <HeroSuggestions Title={()=><h1>Arrepentimeinto <br/> o Baja</h1>} paragraph={'También podés contactarte con nosotros para recibir ayuda.'} type={'BAJA'}/>
         <Contact/>
         <Footer/>
     </div>

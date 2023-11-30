@@ -3,26 +3,33 @@ import { Formik, Field, Form, ErrorMessage } from 'formik';
 import { useDropzone } from 'react-dropzone';
 import { PiCloudArrowUp } from "react-icons/pi";
 import { FaChevronRight } from "react-icons/fa";
-import './style.css'
+import './style.css';
 
 const MyDropzone = ({ field, form: { setFieldValue } }) => {
   const [fileNames, setFileNames] = useState([]);
 
   const { getRootProps, getInputProps } = useDropzone({
-    accept: 'image/*',
-    onDrop: (acceptedFiles) => {
-      // Guardar la información del archivo en el estado de Formik
-      setFieldValue(field.name, acceptedFiles);
-
-      // Actualizar el estado local con los nombres de los archivos
+    onDrop: async (acceptedFiles) => {
+      const file = acceptedFiles[0];
       const names = acceptedFiles.map(file => file.name);
+
       setFileNames(names);
+
+      try {
+        const buffer = await file.arrayBuffer();
+
+        setFieldValue(field.name, {
+          originalname: file.name,
+          buffer: buffer,
+        });
+      } catch (error) {
+        console.error(error);
+      }
     },
   });
 
   return (
     <div>
-
       {fileNames.length > 0 ? (
         <div {...getRootProps()} className='dropzone'>
           <PiCloudArrowUp />
@@ -34,33 +41,50 @@ const MyDropzone = ({ field, form: { setFieldValue } }) => {
             ))}
           </ul>
         </div>
-      )
-        : (
-          <div {...getRootProps()} className="dropzone">
-            <PiCloudArrowUp />
-            <h3>Importá acá tu archivo</h3>
-            <input {...getInputProps()} />
-            <p>Arrastrá o hacé click para seleccionar</p>
-          </div>
-        )
-      }
+      ) : (
+        <div {...getRootProps()} className="dropzone">
+          <PiCloudArrowUp />
+          <h3>Importá acá tu archivo</h3>
+          <input {...getInputProps()} />
+          <p>Arrastrá o hacé click para seleccionar</p>
+        </div>
+      )}
     </div>
   );
 };
 
+const ContactForm = ({ type }) => {
+  const sendMailRequest = async (values) => {
+    const formData = new FormData();
+    console.log(values)
+    formData.append('name', values.name);
+    formData.append('dni', values.dni);
+    formData.append('email', values.email);
+    formData.append('telephone', values.telephone);
+    formData.append('message', values.message);
+    formData.append('reason', values.reasonSelected.reason + ' > ' + values.reasonSelected.value)
 
-
-const ContactForm = ({type}) => {
-  const sendMailRequest  = async (values) =>{
-    const response = await fetch('http://localhost:1000/mail/' + type, {
-      headers: {
-        'Content-Type': 'application/json' 
-      },
-      body: JSON.stringify(values)
+    if (values.files && values.files.buffer) {
+      console.log('hola')
+      const file = values.files;
+      const blob = new Blob([new Uint8Array(file.buffer)], { type: 'application/pdf' });
+      console.log(blob)
+      formData.append('archivoPDF', blob, file.originalname);
+    }
+    formData.forEach((value, key) => {
+      console.log(key, value)
     })
-  }
-  const handleSubmit = async ( values) => {
-    sendMailRequest(values)
+    const response = await fetch('http://localhost:1000/mail/' + type, {
+      method: 'POST',
+      body: formData,
+    });
+
+    // Resto del código de manejo de la respuesta...
+  };
+
+  const handleSubmit = async (values) => {
+    const valuesWithSelection = { ...values, reasonSelected: { ...reasonSelected, reason: getReason().title } };
+    sendMailRequest(type === 'RECLAMO' ? valuesWithSelection : values);
   };
 
   const validate = (values) => {
@@ -73,12 +97,11 @@ const ContactForm = ({type}) => {
     return errors;
   };
 
-
   const reasons = [
     {
       title: 'Préstamos',
       name: 'prestamos',
-      values:[
+      values: [
         'Cargos/comisiones no precedentes o mal aplicados',
         'Intereses mal aplicados',
         'Aplicación de condiciones no pactadas',
@@ -89,7 +112,7 @@ const ContactForm = ({type}) => {
     {
       title: 'Información de datos',
       name: 'info-de-datos',
-      values:[
+      values: [
         'Información crediticia incorrecta a burós de créditos',
         'Información crediticia incorrecta a Central de deudores de BCRA',
         'Información crediticia incorrecta a Central de cheques rechazados',
@@ -99,7 +122,7 @@ const ContactForm = ({type}) => {
     {
       title: 'Mala atención',
       name: 'mala-atencion',
-      values:[
+      values: [
         'Tiempos prolongados de espera en sucursales y centros de atención',
         'Problemas en líneas de caja',
         'Desconsideración, discriminación o modos inadecuados en el trato',
@@ -111,7 +134,7 @@ const ContactForm = ({type}) => {
     {
       title: 'Gestión de cobranza',
       name: 'gestion-cobranza',
-      values:[
+      values: [
         'Falta de respuesta al requerimiento de estados de cuenta o libre deuda',
         'Trato indigno por terceros a cargo de las gestiones de cobro',
         'Costos adicionales por la intervención de terceros en las gestiones de cobros',
@@ -121,18 +144,30 @@ const ContactForm = ({type}) => {
     {
       title: 'Otros',
       name: 'otros',
-      values:[
+      values: [
         'Retenciones y percepciones impositivas cuestionadas',
         'Seguros contratados accesoriamente a productos financieros',
         'Otros'
       ]
     }
-    
+
   ]
 
-  const [reasonSelected, setReasonSelected] = useState({reason: null, value: null})
-  const [openSelector, setOpenSelector] = useState(false)
-  console.log(openSelector)
+  const [reasonSelected, setReasonSelected] = useState({ reason: null, value: null });
+  const [openSelector, setOpenSelector] = useState(false);
+
+  const handleSelectOption = (reason) => {
+    setReasonSelected({ ...reasonSelected, reason: reason, value: null });
+  };
+
+  const handleSelectOptionValue = (value) => {
+    setReasonSelected({ ...reasonSelected, value: value });
+  };
+
+  const getReason = () => {
+    return reasons.find(reason => reason.name === reasonSelected.reason);
+  };
+
   return (
     <div className="quejas-sugerencias">
       <Formik
@@ -142,7 +177,7 @@ const ContactForm = ({type}) => {
           email: '',
           telephone: '',
           message: '',
-          files: [], // Nuevo campo para almacenar archivos
+          files: [],
         }}
         onSubmit={handleSubmit}
         validate={validate}
@@ -156,7 +191,7 @@ const ContactForm = ({type}) => {
 
           <div className="input-container">
             <label>D.N.I</label>
-            <Field name="dni" type="number" />
+            <Field name="dni" type="number" placeholder='11222333' />
             <ErrorMessage name="dni" component="div" />
           </div>
 
@@ -168,7 +203,7 @@ const ContactForm = ({type}) => {
 
           <div className="input-container">
             <label htmlFor="telephone">Teléfono</label>
-            <Field name="telephone" type="number" id="telephone" />
+            <Field name="telephone" type="text" id="telephone" placeholder='+5401122223333' />
             <ErrorMessage name="telephone" component="div" />
           </div>
 
@@ -178,61 +213,83 @@ const ContactForm = ({type}) => {
             <ErrorMessage name="message" component="div" />
           </div>
           {
-            type == 'RECLAMO' && 
-            <div className="input-container input-container-100">
-            <label htmlFor="reason">Motivo:</label>
-              <div className='selector-input-container'>
-                <span 
-                  className='selector-input' 
-                  onClick={() => setOpenSelector(!openSelector)}
-                >Selecciona tu motivo</span>
-                <div className={openSelector ? 'dropdown-list-reason' : 'dropdown-list-reason no-visible'}>
-                  {
-                    reasons.map((reason) =>(
-                      <div className={openSelector ? 'reason-list' : 'reason-list no-visible'}>
-                        <span>{reason.title}</span>
-                        <FaChevronRight />
-                        <div className='reason-list-values no-visible'>
-                          {
-                            reason.values.map(value =>(
-                              <div>
-                                {value}
-                              </div>
-                            ))
-                          }
-                        </div>
-                      </div>
-                    ))
-                  }
-                </div>
-              </div>
-              {/* <Field as="textarea" name="message" id="message" />
-              <ErrorMessage name="message" component="div" /> */}
+            type === 'BAJA' &&
+            <>
+            <div className='input-container input-container-100'>
+              <Field as="select" name="reason" id="reason">
+                <option value="" label="Selecciona tu motivo" />
+                <option value="BAJA" label="Baja" />
+                <option value="ARREPENTIMIENTO" label="Arrepentimiento" />
+              </Field>
+              <ErrorMessage name="reason" component="div" />
             </div>
+          </>
           }
+      {
 
+        type === 'RECLAMO' && (
           <div className="input-container input-container-100">
-            <Field name="files" component={MyDropzone} />
-            <ErrorMessage name="files" component="div" />
+            <label htmlFor="reason">Motivo:</label>
+            <div className='selector-input-container'>
+              <span
+                className='selector-input'
+                onClick={() => setOpenSelector(!openSelector)}
+              >
+                {reasonSelected.reason && reasonSelected.value
+                  ? <span>{getReason().title} {'>'} {reasonSelected.value !== 'rollback' && reasonSelected.value} </span>
+                  : 'Selecciona tu motivo'
+                }
+              </span>
+              <div className={openSelector ? 'dropdown-list-reason' : 'dropdown-list-reason no-visible'}>
+                {reasonSelected.reason && reasonSelected.value !== 'rollback'
+                  ? <div className='reason-list-values'>
+                    {getReason()?.values.map(value => (
+                      <div onClick={() => handleSelectOptionValue(value)}>
+                        {value}
+                      </div>
+                    ))}
+                    <div onClick={() => handleSelectOptionValue('rollback')}>Volver</div>
+                  </div>
+                  : reasons.map((reason) => (
+                    <div className={openSelector ? 'reason-list' : 'reason-list no-visible'} onClick={() => handleSelectOption(reason.name)}>
+                      <span>{reason.title}</span>
+                      <FaChevronRight />
+                    </div>
+                  ))
+                }
+              </div>
+            </div>
           </div>
+        )}
+      {
+        type != 'RECLAMO' &&
+        (
+          <>
+            <div className="input-container input-container-100">
+              <Field name="files" component={MyDropzone} />
+              <ErrorMessage name="files" component="div" />
+            </div>
 
-          <div className="submit">
-            <button type="submit">Enviar </button>
-          </div>
-        </Form>
-      </Formik>
-    </div>
+            <div className="submit">
+              <button type="submit">Enviar </button>
+            </div>
+          </>
+        )
+
+      }
+
+    </Form>
+      </Formik >
+    </div >
   );
 };
 
 export default ContactForm;
 
-
-
 const ContactFormWithDropper = () => {
   return (
     <form>ContactForm</form>
-  )
-}
+  );
+};
 
-export { ContactForm, ContactFormWithDropper }
+export { ContactForm, ContactFormWithDropper };
