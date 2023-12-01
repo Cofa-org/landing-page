@@ -4,12 +4,24 @@ import {FiMenu} from 'react-icons/fi'
 import {IoMdArrowBack} from 'react-icons/io'
 import { Link, useLocation } from 'react-router-dom'
 import { useScrollContext } from '../../context'
+import Modal from '../Modal/Modal'
 
 const Header = () => {
   const location = useLocation()
   const [first, setFirst] = useState(true)
   const [isOpen, setIsOpen] = useState(false)
-  const [inHome, setInHome] = useState(location.pathname == '/') 
+  const [inHome, setInHome] = useState(location.pathname == '/')
+  const [modalVisible, setModalVisible] = useState(false); 
+
+   // Función para abrir el modal
+   const openModal = () => {
+    setModalVisible(true);
+  };
+  // Función para cerrar el modal
+  const closeModal = () => {
+    setModalVisible(false);
+  };
+
   const openNavbar = () =>{
     setIsOpen(true)
     setFirst(false)
@@ -57,7 +69,8 @@ const Header = () => {
            
         </nav>
         <div className='buttons-container'>
-          <button className='primary-btn'>Quiero mi préstamo</button>
+          <button className='primary-btn' onClick={openModal}>Quiero mi préstamo</button>
+          {modalVisible && <Modal closeModal={closeModal} />}
           <button className='btn-show-links' onClick={openNavbar}><FiMenu/></button>
         </div>
         <div className={isOpen ? 'mobible-navbar open' : (first ?  'mobible-navbar' : 'mobible-navbar not-first')}>
@@ -72,7 +85,7 @@ const Header = () => {
             <Link to={'/cofa-points'} >Puntos COFA</Link>
             <Link to={'/assists'} >Asistencias</Link>
           </nav>
-          <button className='primary-btn mobible-nav-secondary-btn'>Quiero mi préstamo</button>
+          <button className='primary-btn mobible-nav-secondary-btn' onClick={openModal}>Quiero mi préstamo</button>
           
         </div>
         {

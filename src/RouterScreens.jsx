@@ -1,8 +1,7 @@
 import React from 'react'
 import { Route, Routes } from 'react-router-dom'
-import { HomeScreen, TermsScreen, PrivacyPoliciesScreen, PointsScreen, LendScreen, RegretOrDischargeScreen, ComplaintsScreen, SuggestionsScreen, TermsPointsScreen } from './screens'
+import { HomeScreen, TermsScreen, PrivacyPoliciesScreen, PointsScreen, LendScreen, RegretOrDischargeScreen, ComplaintsScreen, SuggestionsScreen, TermsPointsScreen, ElMejorTratoScreen } from './screens'
 import { FormWorkWithUs } from './Sections'
-
 
 /* import SuggestionsScreen from './screens/SuggestionsScreen/SuggestionsScreen' */
 
@@ -22,6 +21,7 @@ const RouterScreens = () => {
         <Route path='/lend' element={<LendScreen/>}/>
         <Route path='/terms-and-conditions-cofa-points' element={<TermsPointsScreen/>} />
         <Route path='/work-with-us' element={<FormWorkWithUs/>}/>
+        <Route path='/el-mejor-trato' element={<ElMejorTratoScreen />}/>
     </Routes>
   )
 }

@@ -1,10 +1,22 @@
-import React from 'react'
+import React, {useState} from 'react'
 import './Hero.css'
 import { infoList } from '../../data/info'
 import { AnimatedTitle } from '../../Components'
+import Modal from '../../Components/Modal/Modal'
 
 
 const Hero = () => {
+    const [modalVisible, setModalVisible] = useState(false); 
+
+   // Función para abrir el modal
+   const openModal = () => {
+    setModalVisible(true);
+  };
+  // Función para cerrar el modal
+  const closeModal = () => {
+    setModalVisible(false);
+  };
+
   return (
     <section className='hero-container' id='header'>
         
@@ -15,7 +27,8 @@ const Hero = () => {
                     forma <AnimatedTitle/>
  
                 </h1>
-                <button className='primary-btn'>Quiero mi préstamo</button>
+                <button className='primary-btn' onClick={openModal}>Quiero mi préstamo</button>
+                {modalVisible && <Modal closeModal={closeModal} />}
             </div>
             <div className='hero-img'>
                 <img src='/img/hero-img.png' alt='minimos requisitos, toma tu préstamos, mas de 95000 clientes satisfechos, mas de 15 años de trayectoria'/>

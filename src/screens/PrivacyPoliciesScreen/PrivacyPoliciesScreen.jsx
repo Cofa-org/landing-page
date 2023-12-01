@@ -4,7 +4,7 @@ import { Contact, PrivacyPolicies, PrivacyHeader } from '../../Sections';
 
 const PrivacyPoliciesScreen = () => {
   useEffect(() => {
-    window.scrollTo(0, 0); // Desplazarse al principio de la página
+    window.scrollTo(0, 0);
   }, []);
 
   return (
