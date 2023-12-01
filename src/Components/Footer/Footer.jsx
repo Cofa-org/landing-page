@@ -1,7 +1,9 @@
 import React from 'react'
 
 import { BiRegistered } from 'react-icons/bi'
+import { FaWhatsapp } from "react-icons/fa";
 import './Footer.css'
+import { Link } from 'react-router-dom';
 const Footer = () => {
     return (
         <footer>
@@ -84,6 +86,11 @@ const Footer = () => {
                 <p><BiRegistered />COFA ES UNA MARCA REGISTRADA DE COBRO FÁCIL SRL. </p>
                 <p> CUIT 33-71133479-9</p>
             </div>
+
+            <Link to={'https://api.whatsapp.com/send/?phone=5491154559017&text&type=phone_number&app_absent=0'} className='wsp-contact'>
+
+                <FaWhatsapp />
+            </Link>
         </footer>
     )
 }

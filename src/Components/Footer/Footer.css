@@ -74,6 +74,27 @@ footer .registeredBrand{
     margin-top: 1%;
 }
 
+.wsp-contact{
+    position: fixed;
+    bottom: 50px;
+    right: 50px;
+    background-color: var(--primary-color);
+    width: 72px;
+    height: 72px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+   
+}
+
+.wsp-contact svg{
+    font-size: 34px;
+}
+
+.wsp-contact svg path{
+    color: white
+}
 @media screen and (max-width: 1100px) {
     footer{
         flex-direction: column;

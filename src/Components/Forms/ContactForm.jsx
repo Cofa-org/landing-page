@@ -3,7 +3,11 @@ import { Formik, Field, Form, ErrorMessage } from 'formik';
 import { useDropzone } from 'react-dropzone';
 import { PiCloudArrowUp } from "react-icons/pi";
 import { FaChevronRight } from "react-icons/fa";
+/* import dotenv from 'dotenv';
+dotenv.config(); */
 import './style.css';
+
+
 
 const MyDropzone = ({ field, form: { setFieldValue } }) => {
   const [fileNames, setFileNames] = useState([]);
@@ -62,7 +66,13 @@ const ContactForm = ({ type }) => {
     formData.append('email', values.email);
     formData.append('telephone', values.telephone);
     formData.append('message', values.message);
-    formData.append('reason', values.reasonSelected.reason + ' > ' + values.reasonSelected.value)
+    if(type== 'RECHAZO'){
+      formData.append('reason', values.reasonSelected.reason + ' > ' + values.reasonSelected.value)
+    }
+    if(type == 'BAJA'){
+      formData.append('reasonToRegret', values.reasonToRegret);
+    }
+    
 
     if (values.files && values.files.buffer) {
       console.log('hola')
@@ -74,17 +84,27 @@ const ContactForm = ({ type }) => {
     formData.forEach((value, key) => {
       console.log(key, value)
     })
-    const response = await fetch('http://localhost:1000/mail/' + type, {
+    console.log('prueba')
+    const response = await fetch('https://backend-landing-cofa-production.up.railway.app/mail/' + type, {
       method: 'POST',
+      headers: {
+
+        'Authorization': `Bearer clave-secreta-cofa`,
+      },
       body: formData,
     });
 
-    // Resto del código de manejo de la respuesta...
+
   };
 
   const handleSubmit = async (values) => {
-    const valuesWithSelection = { ...values, reasonSelected: { ...reasonSelected, reason: getReason().title } };
-    sendMailRequest(type === 'RECLAMO' ? valuesWithSelection : values);
+    if(type == 'RECLAMO'){
+      const valuesWithSelection = { ...values, reasonSelected: { ...reasonSelected, reason: getReason().title } };
+      sendMailRequest(valuesWithSelection );
+    }else{
+      sendMailRequest( values)
+    }
+    
   };
 
   const validate = (values) => {
@@ -167,7 +187,7 @@ const ContactForm = ({ type }) => {
   const getReason = () => {
     return reasons.find(reason => reason.name === reasonSelected.reason);
   };
-
+  
   return (
     <div className="quejas-sugerencias">
       <Formik
@@ -177,6 +197,7 @@ const ContactForm = ({ type }) => {
           email: '',
           telephone: '',
           message: '',
+          reasonToRegret: '',
           files: [],
         }}
         onSubmit={handleSubmit}
@@ -215,14 +236,16 @@ const ContactForm = ({ type }) => {
           {
             type === 'BAJA' &&
             <>
-            <div className='input-container input-container-100'>
-              <Field as="select" name="reason" id="reason">
-                <option value="" label="Selecciona tu motivo" />
-                <option value="BAJA" label="Baja" />
-                <option value="ARREPENTIMIENTO" label="Arrepentimiento" />
-              </Field>
-              <ErrorMessage name="reason" component="div" />
-            </div>
+           <div className="input-container input-container-100">
+            <label htmlFor="reasonToRegret">Motivo:</label>
+            <Field as="select" name="reasonToRegret" id="reasonToRegret">
+              <option value="" label="Selecciona tu motivo" />
+              <option value="Baja" label="Baja" />
+              <option value="Arrepentimiento" label="Arrepentimiento" />
+            </Field>
+            <ErrorMessage name="reasonToRegret" component="div" />
+          </div>
+
           </>
           }
       {
