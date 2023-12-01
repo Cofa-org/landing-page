@@ -27,7 +27,9 @@ const Hero = () => {
                     forma <AnimatedTitle/>
  
                 </h1>
-                <button className='primary-btn' onClick={openModal}>Quiero mi préstamo</button>
+                <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
+                    <button className='primary-btn' /* onClick={openModal} */>Quiero mi préstamo</button>
+                </a>
                 {modalVisible && <Modal closeModal={closeModal} />}
             </div>
             <div className='hero-img'>

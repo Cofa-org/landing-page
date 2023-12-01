@@ -178,3 +178,14 @@
 .selector-input-container{
     position: relative;
 }
+
+@media screen and (max-width: 450px) {
+    .form-container{
+        flex-direction: column;
+    }
+    .form-container .input-container{
+        width: 100%;
+    
+    }
+    
+}

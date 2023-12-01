@@ -13,8 +13,9 @@ const HeroSuggestions= ({Title, paragraph, type}) => {
             <div className='hero-content-rigth'>
                     <Title/>
                     <p>{paragraph}</p>
-                    <button className='secondary-btn'>Enviar mensaje</button>
-                
+                    <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
+                      <button className='secondary-btn'>Enviar Mensaje</button>
+                    </a>
             </div>
         </section>
         
