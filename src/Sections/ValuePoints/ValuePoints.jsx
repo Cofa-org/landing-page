@@ -15,6 +15,7 @@ const ValuePoints = () => {
                 <p>
                     Si el participante del programa refiere a 5 personas, cada una de las cuales obtiene un préstamo, al 6° referido consigue el doble de Puntos COFA.
                 </p>
+                {/* TO DO: TERMINAR */}
                 <button className='primary-btn btn-refer'>Referir A Un Amigo <GoArrowRight /></button>
             </div>
             <div className='cards'>

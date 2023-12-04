@@ -52,7 +52,7 @@ const Header = () => {
                 <a href="#frecuent-questions">Preguntas Frecuentes</a>
                 <a href="#contact">Contacto</a>
                 <Link to={'/cofa-points'} >Puntos COFA</Link>
-                <Link to={'/assists'} >Asistencias</Link>
+                <Link /* to={'/assists'} */ >Asistencias</Link>
               </>
             )
             : (
@@ -62,14 +62,16 @@ const Header = () => {
                 <Link to={'/#frecuent-questions'} >Preguntas Frecuentes</Link>
                 <Link to={'/#contact'} >Contacto</Link>
                 <Link to={'/cofa-points'} >Puntos COFA</Link>
-                <Link to={'/assists'} >Asistencias</Link>
+                <Link /* to={'/assists'} */ >Asistencias</Link>
               </>
             )
           }
            
         </nav>
         <div className='buttons-container'>
-          <button className='primary-btn' onClick={openModal}>Quiero mi préstamo</button>
+          <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
+            <button className='primary-btn header-primary-btn' /* onClick={openModal} */>Quiero mi préstamo</button>
+          </a>
           {modalVisible && <Modal closeModal={closeModal} />}
           <button className='btn-show-links' onClick={openNavbar}><FiMenu/></button>
         </div>
@@ -83,9 +85,11 @@ const Header = () => {
             <a href="#frecuent-questions" onClick={handleCloseNabvar} >Preguntas Frecuentes</a>
             <a href="#contact" onClick={handleCloseNabvar}>Contacto</a>
             <Link to={'/cofa-points'} >Puntos COFA</Link>
-            <Link to={'/assists'} >Asistencias</Link>
+            <Link /* to={'/assists'} */ >Asistencias</Link>
           </nav>
-          <button className='primary-btn mobible-nav-secondary-btn' onClick={openModal}>Quiero mi préstamo</button>
+          <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
+            <button className='primary-btn mobible-nav-secondary-btn' /* onClick={openModal} */>Quiero mi préstamo</button>
+          </a>
           
         </div>
         {

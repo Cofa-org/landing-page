@@ -50,5 +50,13 @@
     .container-work{
         flex-direction: row;
         flex-wrap: wrap;
+        justify-content: center;
+        width: 100%;
+    }
+    .container-work img{
+        margin-top: 10%;
+    }
+    .info-work{
+        width: 100%;
     }
 }

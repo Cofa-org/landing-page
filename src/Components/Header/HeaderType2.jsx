@@ -18,13 +18,16 @@ const HeaderType2 = () => {
   return (
     <header className='header-type-2'>
         <div>
-            <img src='/Logo.svg'  />
+          <Link to={'/home'}>
+            <img src='/Logo.svg'/>
+          </Link>
         </div>
         <nav className='normal-nav'>
-            <Link>Inicio</Link>
-            <Link>Sobre nosotros</Link>
-            <Link>Preguntas frecuentes</Link>
-            <Link>Contacto</Link>
+          {/* TO DO: LINKEAR AL LUGAR CORRECTO */}
+            <Link to={'/#header'} className='link-selected'>Inicio</Link>
+            <Link to={'/#about-us'} >Nosotros</Link>
+            <Link to={'/#frecuent-questions'} >Preguntas Frecuentes</Link>
+            <Link to={'/#contact'} >Contacto</Link>
             
         </nav>
         <button className='btn-show-links' onClick={openNavbar}><FiMenu/></button>
@@ -38,9 +41,11 @@ const HeaderType2 = () => {
             <a href="#frecuent-questions" onClick={handleCloseNabvar} >Preguntas Frecuentes</a>
             <a href="#contact" onClick={handleCloseNabvar}>Contacto</a>
             <Link to={'/cofa-points'} >Puntos COFA</Link>
-            <Link to={'/assists'} >Asistencias</Link>
+            <Link /* to={'/assists'} */ >Asistencias</Link>
           </nav>
-          <button className='primary-btn mobible-nav-secondary-btn'>Quiero mi préstamo</button>
+          <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
+            <button className='primary-btn mobible-nav-secondary-btn' /* onClick={openModal} */>Quiero mi préstamo</button>
+          </a>
           
         </div>
         {

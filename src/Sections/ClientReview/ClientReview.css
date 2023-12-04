@@ -63,4 +63,9 @@
     .quote{
         font-size: 18px;
     }
+    .container-arrow-icon svg{
+        margin-top: 2%;
+        margin-left: 0%;
+    
+    }
 }

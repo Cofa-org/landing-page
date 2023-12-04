@@ -59,7 +59,9 @@ const HeaderLend = () => {
         </nav>
         <div className='buttons-container'>
             <button className='secondary-btn' id='btn-points-assist'>Quiero mi Asistencia</button>
-            <button className='primary-btn'>Quiero mi Préstamo</button>
+            <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
+              <button className='primary-btn' /* onClick={openModal} */>Quiero mi préstamo</button>
+            </a>
             <button className='btn-show-links' onClick={openNavbar}><FiMenu/></button>
         </div>
         <div className={isOpen ? 'mobible-navbar open' : (first ?  'mobible-navbar' : 'mobible-navbar not-first')}>
@@ -76,7 +78,9 @@ const HeaderLend = () => {
             
           </nav>
           <button className='secondary-btn mobible-nav-secondary-btn'>Quiero mi Asistencia</button>
-          <button className='primary-btn mobible-nav-secondary-btn'>Quiero mi Préstamo</button>
+          <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
+            <button className='primary-btn mobible-nav-secondary-btn' /* onClick={openModal} */>Quiero mi préstamo</button>
+          </a>
           
         </div>
         {

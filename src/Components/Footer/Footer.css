@@ -79,8 +79,8 @@ footer .registeredBrand{
     bottom: 50px;
     right: 50px;
     background-color: var(--primary-color);
-    width: 72px;
-    height: 72px;
+    width: 50px;
+    height: 50px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -89,7 +89,7 @@ footer .registeredBrand{
 }
 
 .wsp-contact svg{
-    font-size: 34px;
+    font-size: 28px;
 }
 
 .wsp-contact svg path{
@@ -126,6 +126,12 @@ footer .registeredBrand{
         width: 90%;
     }
 
+    .contactMap{
+        order:1;
+    }
+    .cofaContact{
+        order: 2;
+    }
 }
 @media screen and (max-width:400px){
     .ssn-container div img{ 
