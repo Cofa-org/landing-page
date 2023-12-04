@@ -48,7 +48,7 @@ const HeaderPoints = () => {
             inHome 
             ? (
               <>
-                <a href="#hero-points"  className='link-selected'>Inicio</a>
+                <a href="/home"  className='link-selected'>Inicio</a>
                 <a href="#use-of-points">Uso de Puntos</a>
                 <a href="#accreditation">Acreditación</a>
                 <a href="#restrictions">Restricciones</a>
@@ -58,7 +58,7 @@ const HeaderPoints = () => {
             )
             : (
               <>
-                <Link to={'/#hero-points'} className='link-selected'>Inicio</Link>
+                <Link to={'/home'} className='link-selected'>Inicio</Link>
                 <Link to={'/#use-of-points'} >Uso de Puntos</Link>
                 <Link to={'/#accreditation'} >Acreditación</Link>
                 <Link to={'/#restrictions'} >Restricciones</Link>
@@ -84,7 +84,7 @@ const HeaderPoints = () => {
             <button onClick={() => setIsOpen(false)} className='btn-back-points'>
               <IoMdArrowBack/>
             </button>
-            <a href="#hero-points" className='link-selected'>Inicio</a>
+            <a href="/home" className='link-selected'>Inicio</a>
             <a href="#use-of-points" onClick={handleCloseNabvar}>Uso de Puntos</a>
             <a href="#accreditation" onClick={handleCloseNabvar}>Acreditación</a>
             <a href="#restrictions" onClick={handleCloseNabvar}>Restricciones</a>

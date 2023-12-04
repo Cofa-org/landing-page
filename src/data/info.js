@@ -86,7 +86,7 @@ export const frecuentQuestions = [
     },
     {
         name: '¿Cuáles son los requisitos para obtener mi préstamo?',
-        content: 'Para otorgarte un préstamo en línea el instante, todo lo que necesitás enviarnos es tu DNI para analizar tus antecedentes crediticios y tu CBU para transferirte el dinero.',
+        content: 'Para otorgarte un préstamo en línea al instante, todo lo que necesitás enviarnos es tu DNI para analizar tus antecedentes crediticios y tu CBU/CVU para transferirte el dinero.',
         id: 2
     },
     {
@@ -96,7 +96,7 @@ export const frecuentQuestions = [
     },
     {
         name: '¿Cómo cobro mi préstamo?',
-        content: 'A través de una transferencia al CBU informado.',
+        content: 'A través de una transferencia al CBU/CVU informado.',
         id: 4
     },
     {
