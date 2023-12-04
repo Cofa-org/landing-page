@@ -44,7 +44,7 @@ const HeaderType2 = () => {
             <Link /* to={'/assists'} */ >Asistencias</Link>
           </nav>
           <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
-            <button className='primary-btn mobible-nav-secondary-btn' /* onClick={openModal} */>Quiero mi préstamo</button>
+            <button className='primary-btn mobible-nav-secondary-btn' /* onClick={openModal} */>QUIERO MI PRÉSTAMO</button>
           </a>
           
         </div>

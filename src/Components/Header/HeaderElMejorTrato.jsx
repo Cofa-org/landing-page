@@ -67,10 +67,10 @@ const HeaderElMejorTrato = () => {
         </nav>
         <div className='buttons-container buttons-container-points'>
             <Link /* to={'/assists'} */>
-              <button className='secondary-btn' id='btn-points-assist'>Quiero mi Asistencia</button>
+              <button className='secondary-btn' id='btn-points-assist'>QUIERO MI ASISTENCIA</button>
             </Link>
             <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
-              <button className='primary-btn' /* onClick={openModal} */>Quiero mi préstamo</button>
+              <button className='primary-btn' /* onClick={openModal} */>QUIERO MI PRÉSTAMO</button>
             </a>
             {modalVisible && <Modal closeModal={closeModal} />}
             <button className='btn-show-links' onClick={openNavbar}><FiMenu/></button>
@@ -87,10 +87,10 @@ const HeaderElMejorTrato = () => {
             
           </nav>
           <Link /* to={'/assists'} */>
-              <button className='secondary-btn mobible-nav-secondary-btn' id='btn-points-assist'>Quiero mi Asistencia</button>
+              <button className='secondary-btn mobible-nav-secondary-btn' id='btn-points-assist'>QUIERO MI ASISTENCIA</button>
             </Link>
             <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
-              <button className='primary-btn mobible-nav-secondary-btn' /* onClick={openModal} */>Quiero mi préstamo</button>
+              <button className='primary-btn mobible-nav-secondary-btn' /* onClick={openModal} */>QUIERO MI PRÉSTAMO</button>
             </a>
           
         </div>
