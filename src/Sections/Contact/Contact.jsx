@@ -17,7 +17,9 @@ const Contact = () => {
             </span>
             <span>
                 <BsTelephone/>
-                <span>11-5455-9017</span>
+                <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
+                    <span>11-5455-9017</span>
+                </a>
             </span>
             <span>
                 <CiMail/>
