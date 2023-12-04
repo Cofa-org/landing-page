@@ -233,4 +233,7 @@ header nav a{
     .buttons-container>.secondary-btn{
         display: none;
     }
+    .header-primary-btn{
+        display: none;
+    }
 }

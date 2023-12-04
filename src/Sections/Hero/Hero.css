@@ -85,6 +85,8 @@
     box-shadow: 0 0 30px 30px #24955722;
 }
 
+
+
 .mq-title-wrap{
     display: none;
 }
@@ -154,6 +156,9 @@
     .hero-img img{
         width: 45%;
     }
+    .backgroundDecorationInfo{
+        display: none;
+    }
 }
 
 @media screen and (max-width: 700px){
@@ -190,6 +195,7 @@
     .info-card .info-icon{
         font-size: 40px;
     }
+    
 }
 
 @media screen and (max-width: 400px){
