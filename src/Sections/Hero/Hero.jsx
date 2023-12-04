@@ -28,7 +28,7 @@ const Hero = () => {
  
                 </h1>
                 <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
-                    <button className='primary-btn' /* onClick={openModal} */>QUIERO MI PRÉSTAMO</button>
+                    <button className='primary-btn btn-loan-main' /* onClick={openModal} */>QUIERO MI PRÉSTAMO</button>
                 </a>
                 {modalVisible && <Modal closeModal={closeModal} />}
             </div>

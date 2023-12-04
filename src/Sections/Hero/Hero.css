@@ -9,7 +9,10 @@
     padding: 100px 5vw;
 
 }
-
+.btn-loan-main{
+    font-size: 18px;
+    letter-spacing: 3px
+}
 .hero{
     display: flex;
     justify-content:space-between;

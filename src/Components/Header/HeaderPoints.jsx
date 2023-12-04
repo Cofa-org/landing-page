@@ -71,10 +71,10 @@ const HeaderPoints = () => {
         </nav>
         <div className='buttons-container buttons-container-points'>
             <Link /* to={'/assists'} */>
-              <button className='secondary-btn' id='btn-points-assist'>QUIERO MI ASISTENCIA</button>
+              <button className='secondary-btn' id='btn-points-assist'>Quiero mi Asistencia</button>
             </Link>
             <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
-              <button className='primary-btn' /* onClick={openModal} */>QUIERO MI PRÉSTAMO</button>
+              <button className='primary-btn' /* onClick={openModal} */>Quiero mi Préstamo</button>
             </a>
             {modalVisible && <Modal closeModal={closeModal} />}
             <button className='btn-show-links' onClick={openNavbar}><FiMenu/></button>
@@ -92,10 +92,10 @@ const HeaderPoints = () => {
             <a href="#contact" onClick={handleCloseNabvar}>Contacto</a>
           </nav>
           <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
-            <button className='primary-btn mobible-nav-secondary-btn' /* onClick={openModal} */>QUIERO MI PRÉSTAMO</button>
+            <button className='primary-btn mobible-nav-secondary-btn' /* onClick={openModal} */>Quiero mi Préstamo</button>
           </a>
           <Link /* to={'/assists'} */>
-            <button className='secondary-btn mobible-nav-secondary-btn' id='btn-points-assist'>QUIERO MI ASISTENCIA</button>
+            <button className='secondary-btn mobible-nav-secondary-btn' id='btn-points-assist'>Quiero mi Asistencia</button>
           </Link>
         </div>
         {

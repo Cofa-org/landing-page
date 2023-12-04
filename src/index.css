@@ -59,7 +59,6 @@ a{
     background-color: var(--primary-color);
     color: var(--white-text-color);
     border: none;
-    font-size: large;
 }
 
 .primary-btn>a{
