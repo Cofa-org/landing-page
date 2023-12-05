@@ -16,8 +16,12 @@ const Footer = () => {
                         <h3>
                             CONTRATOS DE ADHESIÓN LEY 24240 DE DEFENSA AL CONSUMIDOR
                         </h3>
-                        <p>Modelo contrato con suscripción electrónica</p>
-                        <p>Modelo contrato con suscripción presencial</p>
+                        <a href="/mod-contrato-electronica.pdf" target='_blank'>
+                            <p>Modelo contrato con suscripción electrónica</p>
+                        </a>
+                        <a href="/mod-contrato-presencial.pdf" target='_blank'>
+                            <p>Modelo contrato con suscripción presencial</p>
+                        </a>
                     </div>
                     <div>
                         <h3>
