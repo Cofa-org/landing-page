@@ -23,8 +23,12 @@ const Footer = () => {
                         <h3>
                             DEFENSA AL CONSUMIDOR
                         </h3>
-                        <p>Defensa Consumidor Nación</p>
-                        <p>Defensa Consumidor CABA </p>
+                        <a href="https://www.argentina.gob.ar/economia/comercio/defensadelconsumidor" target='_blank'>
+                            <p>Defensa Consumidor Nación</p>
+                        </a>
+                        <a href="https://buenosaires.gob.ar/jefaturadegabinete/atencion-ciudadana-y-gestion-comunal/defensa-al-consumidor" target='_blank'>
+                            <p>Defensa Consumidor CABA </p>
+                        </a>
                     </div>
                 </div>
                 <div className='footer-entities'>
