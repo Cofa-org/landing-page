@@ -223,7 +223,7 @@ const ContactForm = ({ type }) => {
           </div>
 
           <div className="input-container">
-            <label htmlFor="telephone">Teléfono</label>
+            <label htmlFor="telephone">Celular</label>
             <Field name="telephone" type="text" id="telephone" placeholder='+5401122223333' />
             <ErrorMessage name="telephone" component="div" />
           </div>

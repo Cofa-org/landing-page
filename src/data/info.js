@@ -1,13 +1,11 @@
 import {TbCheckupList, TbCarCrane} from 'react-icons/tb'
-import {CiMoneyBill} from 'react-icons/ci'
+import {CiMoneyBill, CiLocationArrow1} from 'react-icons/ci'
 import {BsCreditCard, BsHouse, BsShieldCheck} from 'react-icons/bs'
+import { PiUsersThreeLight, PiConfetti, PiBandaidsFill } from "react-icons/pi";
 import { WiStars} from 'react-icons/wi'
 import { MdComputer} from 'react-icons/md'
-import {PiBandaidsFill } from 'react-icons/pi'
-import { PiUsersThreeLight } from "react-icons/pi";
 import { LuClipboardCheck } from "react-icons/lu";
 import { IoRibbonOutline } from "react-icons/io5";
-import { PiConfetti } from "react-icons/pi";
 
 
 export const infoList = [
@@ -325,7 +323,12 @@ export const howDoAddPoints = [
         Icon: PiConfetti,
         title: 'Cumpleaños feliz',
         content: 'Para obtener puntos COFA, asegurate de tener al menos un producto activo el día de tu cumpleaños.'
-    }
+    },
+    {
+        Icon: CiLocationArrow1,
+        title: 'Seguirnos en las redes',
+        content: 'Seguir a COFA en Instagram y/o Facebook e informar por Whatsapp o por mail el nombre de usuario y la red en la que nos siguen.'
+    },
 ]
 
 export const termsAndConditionsPoints = [

@@ -20,7 +20,7 @@ const ValuePoints = () => {
                 </a>
             </div>
             <div className='cards'>
-                <div className='style-card' style={{backgroundColor: '#F1EBFF'}}>
+                <div className='style-card'>
                     <BsCheckCircle />
                     <div>
                         <h2>400 Puntos COFA</h2>
@@ -29,7 +29,7 @@ const ValuePoints = () => {
                         </p>
                     </div>
                 </div>
-                <div className='style-card ' style={{border: "1px solid #249557"}}>
+                <div className='style-card '>
                     <BsCheckCircle />
                     <div>
                         <h2>100 Puntos COFA</h2>
@@ -39,7 +39,7 @@ const ValuePoints = () => {
                     </div>
                     
                 </div>
-                <div className='style-card' style={{backgroundColor: '#FFF9EE'}}>
+                <div className='style-card'>
                     <BsCheckCircle />
                     <div>
                         <h2>200 Puntos COFA</h2>
@@ -49,12 +49,22 @@ const ValuePoints = () => {
                     </div>
                     
                 </div>
-                <div className='style-card' style={{backgroundColor: '#F1EBFF'}}>
+                <div className='style-card'>
                     <BsCheckCircle />
                     <div>
                         <h2>100 Puntos COFA</h2>
                         <p>
                         Por referido que toma una asistencia.
+                        </p>
+                    </div>
+                  
+                </div>
+                <div className='style-card'>
+                    <BsCheckCircle />
+                    <div>
+                        <h2>100 Puntos COFA</h2>
+                        <p>
+                            Por seguirnos en Instagram y/o Facebook.
                         </p>
                     </div>
                   

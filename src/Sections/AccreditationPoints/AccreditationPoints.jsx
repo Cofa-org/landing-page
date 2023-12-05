@@ -37,6 +37,10 @@ const AccreditationPoints = () => {
                     <FiCheckCircle />
                     <p>Tengas un producto activo el día de tu cumpleaños y  estés al día con el pago del mismo.</p>
                 </div>
+                <div className='accreditation-info'>
+                    <FiCheckCircle />
+                    <p>La fecha en que el cliente informe que comenzó a seguir a COFA en las redes sociales Instagram y/o Facebook.</p>
+                </div>
             </div> 
             
         </section>
