@@ -4,23 +4,12 @@ import {FiMenu} from 'react-icons/fi'
 import {IoMdArrowBack} from 'react-icons/io'
 import { Link, useLocation } from 'react-router-dom'
 import { useScrollContext } from '../../context'
-import Modal from '../Modal/Modal'
 
 const Header = () => {
   const location = useLocation()
   const [first, setFirst] = useState(true)
   const [isOpen, setIsOpen] = useState(false)
   const [inHome, setInHome] = useState(location.pathname == '/')
-  const [modalVisible, setModalVisible] = useState(false); 
-
-   // Función para abrir el modal
-   const openModal = () => {
-    setModalVisible(true);
-  };
-  // Función para cerrar el modal
-  const closeModal = () => {
-    setModalVisible(false);
-  };
 
   const openNavbar = () =>{
     setIsOpen(true)
@@ -70,9 +59,8 @@ const Header = () => {
         </nav>
         <div className='buttons-container'>
           <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
-            <button className='primary-btn header-primary-btn' /* onClick={openModal} */>Quiero mi Préstamo</button>
+            <button className='primary-btn header-primary-btn' >Quiero mi Préstamo</button>
           </a>
-          {modalVisible && <Modal closeModal={closeModal} />}
           <button className='btn-show-links' onClick={openNavbar}><FiMenu/></button>
         </div>
         <div className={isOpen ? 'mobible-navbar open' : (first ?  'mobible-navbar' : 'mobible-navbar not-first')}>
@@ -88,9 +76,8 @@ const Header = () => {
             <Link /* to={'/assists'} */ >Asistencias</Link>
           </nav>
           <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
-            <button className='primary-btn mobible-nav-secondary-btn' /* onClick={openModal} */>Quiero mi Préstamo</button>
+            <button className='primary-btn mobible-nav-secondary-btn' >Quiero mi Préstamo</button>
           </a>
-          
         </div>
         {
           isOpen && <div className='background-layer' onClick={handleCloseNabvar}></div>

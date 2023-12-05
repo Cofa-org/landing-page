@@ -47,7 +47,9 @@ header nav a{
     width: 100%;
     font-weight: 500;
 }
-
+#btn-loan-points{
+    border: 1px solid;
+}
 
 @keyframes to-right {
     0% {

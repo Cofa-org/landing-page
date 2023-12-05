@@ -209,6 +209,9 @@
 }
 
 /* HERO POINTS */
+.btn-consult{
+    font-size: 18px;
+}
 .info-icon{
     width: 24px;
     height: 24px;
