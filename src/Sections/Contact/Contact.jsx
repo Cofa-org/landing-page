@@ -23,7 +23,9 @@ const Contact = () => {
             </span>
             <span>
                 <CiMail/>
-                <span>consultas@cofa.com.ar</span>
+                <a href='mailto:consultas@cofa.com.ar'>
+                    <span>consultas@cofa.com.ar</span>
+                </a>
             </span>
             <span>
                 <CiLocationOn/>
@@ -35,10 +37,10 @@ const Contact = () => {
 
                 <img src='/Logo.svg' />
                 <div className='socialMediaList'>
-                    <Link to='https://www.facebook.com/cofa.cofa.5245'>
+                    <Link to={'https://www.facebook.com/cofa.cofa.5245'}>
                         <BsFacebook/>
                     </Link>
-                    <Link to='https://instagram.com/cofa.arg?igshid=M2RkZGJiMzhjOQ=='>
+                    <Link to={'https://instagram.com/cofa.arg?igshid=M2RkZGJiMzhjOQ=='}>
                         <BsInstagram/>
                     </Link>
                     
@@ -46,7 +48,7 @@ const Contact = () => {
                         <BsLinkedin/>
                     </Link>
                    
-                    <Link to='https://wa.me/5491154559017'>
+                    <Link to={'https://wa.me/5491154559017'}>
                         <BsWhatsapp/>
                     </Link>
                     
@@ -68,8 +70,8 @@ const Contact = () => {
         </div>
         <div className='contactListLink'>
             <Link to={'/suggestions'}>Quejas | Sugerencias</Link>
-            <Link to='/complaints'>Reclamos</Link>
-            <Link to='/regret-or-discharge'>Botón de arrepentimiento/baja</Link>
+            <Link to={'/complaints'}>Reclamos</Link>
+            <Link to={'/regret-or-discharge'}>Botón de arrepentimiento/baja</Link>
         </div>
     </section>
   )
