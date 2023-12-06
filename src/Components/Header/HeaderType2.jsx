@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import './HeaderType2.css'
 
@@ -15,6 +15,12 @@ const HeaderType2 = () => {
   const handleCloseNabvar = () =>{
     setIsOpen(false)
   }
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+
   return (
     <header className='header-type-2'>
         <div>

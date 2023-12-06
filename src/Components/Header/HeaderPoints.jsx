@@ -37,7 +37,7 @@ const HeaderPoints = () => {
             inHome 
             ? (
               <>
-                <a href="/home"  className='link-selected'>Inicio</a>
+                <Link to="/"  className='link-selected'>Inicio</Link>
                 <a href="#use-of-points">Uso de Puntos</a>
                 <a href="#accreditation">Acreditación</a>
                 <a href="#restrictions">Restricciones</a>
@@ -47,7 +47,7 @@ const HeaderPoints = () => {
             )
             : (
               <>
-                <Link to={'/home'} className='link-selected'>Inicio</Link>
+                <Link to={'/'} className='link-selected'>Inicio</Link>
                 <Link to={'/#use-of-points'} >Uso de Puntos</Link>
                 <Link to={'/#accreditation'} >Acreditación</Link>
                 <Link to={'/#restrictions'} >Restricciones</Link>
@@ -82,8 +82,8 @@ const HeaderPoints = () => {
           <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
             <button className='primary-btn mobible-nav-secondary-btn' >Quiero mi Préstamo</button>
           </a>
-          <Link /* to={'/assists'} */>
-            <button className='secondary-btn mobible-nav-secondary-btn' id='btn-points-assist'>Quiero mi Asistencia</button>
+          <Link /* to={'/assists'} */ className='secondary-btn mobible-nav-secondary-btn'>
+            Quiero mi Asistencia
           </Link>
         </div>
         {

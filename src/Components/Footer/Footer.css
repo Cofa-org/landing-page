@@ -34,7 +34,7 @@ footer{
     width: 50%;
 }
 .footer-box-right p{
-    border-left: var(--primary-color) 1px solid;
+
     padding-left: 20px;
     text-align: justify;
 }
@@ -60,13 +60,15 @@ footer .registeredBrand{
 
 .ssn-container{
     display: flex;
-    margin-top: 20px;
+    flex-direction: column;
     justify-content: center;
-}
-.ssn-container div{ 
     text-align: center;
     align-items: center;
+    margin-top: auto;
+    margin-bottom: 20px;
+
 }
+
 .ssn-container img{ 
     width: 60%;
 }
@@ -95,6 +97,39 @@ footer .registeredBrand{
 .wsp-contact svg path{
     color: white
 }
+
+.footer-box-right div:nth-child(1){
+
+    border-left: var(--primary-color) 1px solid;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 450px;
+}
+
+.footer-box-right div:nth-child(3){
+    border-left: var(--primary-color) 1px solid;
+
+}
+
+.ssn-container-mobible{
+    display: none;
+}
+
+@media screen and (max-width: 1400px) {
+    .footer-box-right div:nth-child(1){
+        height: 420px;
+        border-left: var(--primary-color) 1px solid;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+}
+@media screen and (max-width: 1200px) {
+    .footer-box-right div:nth-child(1){
+        height: 450px;
+    }
+}
 @media screen and (max-width: 1100px) {
     footer{
         flex-direction: column;
@@ -103,6 +138,25 @@ footer .registeredBrand{
         display: flex;
         flex-direction: column;
     }
+    .footer-box-right div:nth-child(1){
+        height: auto;
+    }
+    .ssn-container{
+        display: none;
+    }
+    .ssn-container-mobible{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+        align-items: center;
+        margin-top: auto;
+        margin-bottom: 20px;
+    
+    }
+}
+
+@media screen and (max-width:800px){
     
 }
 @media screen and (max-width:600px){
@@ -132,8 +186,9 @@ footer .registeredBrand{
     .cofaContact{
         order: 2;
     }
+
 }
-@media screen and (max-width:400px){
+@media screen and (max-width:600px){
     .ssn-container div img{ 
         width: 200px;
     }

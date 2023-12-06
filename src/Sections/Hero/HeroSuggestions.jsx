@@ -13,7 +13,7 @@ const HeroSuggestions= ({Title, paragraph, type}) => {
             <div className='hero-content-rigth'>
                     <Title/>
                     <p>{paragraph}</p>
-                    <button className='secondary-btn'>Enviar Mensaje</button>
+                    <a className='secondary-btn' href='mailto:consultas@cofa.com.ar'>Enviar Mensaje</a>
             </div>
         </section>
         

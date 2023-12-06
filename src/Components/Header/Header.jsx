@@ -10,7 +10,17 @@ const Header = () => {
   const [first, setFirst] = useState(true)
   const [isOpen, setIsOpen] = useState(false)
   const [inHome, setInHome] = useState(location.pathname == '/')
+  const { pathname, hash } = useLocation();
 
+  /* Este es que redirecciona a partir del id Anto */
+  useEffect(() => {
+    if (hash) {
+      const targetElement = document.getElementById(hash.substring(1));
+      if (targetElement) {
+        targetElement.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  }, [pathname, hash]);
   const openNavbar = () =>{
     setIsOpen(true)
     setFirst(false)
@@ -61,6 +71,7 @@ const Header = () => {
           <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
             <button className='primary-btn header-primary-btn' >Quiero mi Préstamo</button>
           </a>
+          <button className='secondary-btn'>Ingresar</button>
           <button className='btn-show-links' onClick={openNavbar}><FiMenu/></button>
         </div>
         <div className={isOpen ? 'mobible-navbar open' : (first ?  'mobible-navbar' : 'mobible-navbar not-first')}>
@@ -78,6 +89,7 @@ const Header = () => {
           <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
             <button className='primary-btn mobible-nav-secondary-btn' >Quiero mi Préstamo</button>
           </a>
+          <button className='secondary-btn'>Ingresar</button>
         </div>
         {
           isOpen && <div className='background-layer' onClick={handleCloseNabvar}></div>

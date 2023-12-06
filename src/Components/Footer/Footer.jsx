@@ -56,12 +56,9 @@ const Footer = () => {
                     </a>
                 </div>
                 <div className='ssn-container'>
-                    <div>
-                        <p>Inscripto como Agente Institorio ante la SSN bajo el registro Nro 334.</p>
-                        <span>Atención al asegurado 0800-666-8400</span>
-                        <img src='/ssn-logo.svg' />
-                    </div>
-
+                    <p>Inscripto como Agente Institorio ante la SSN bajo el registro Nro 334.</p>
+                    <span>Atención al asegurado 0800-666-8400</span>
+                    <img src='/ssn-logo.svg' />
                 </div>
 
             </div>
@@ -80,6 +77,11 @@ const Footer = () => {
                         Para cliente en situación 1 en la Central de deudores del BCRA, en relación de dependencia con antigüedad mayor a 1 año y con antecedentes crediticios en la empresa.
                     </p>
 
+                </div>
+                <div className='ssn-container-mobible'>
+                    <p>Inscripto como Agente Institorio ante la SSN bajo el registro Nro 334.</p>
+                    <span>Atención al asegurado 0800-666-8400</span>
+                    <img src='/ssn-logo.svg' />
                 </div>
                 <div>
                     <p>
