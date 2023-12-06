@@ -200,6 +200,16 @@ footer .registeredBrand{
     footer .registeredBrand svg{
         font-size: 30px;
     }
+    .wsp-contact{
+        bottom: 30px;
+        right: 30px;
+    }
+}
+@media screen and (max-width:450px){
+    .wsp-contact{
+        bottom: 12px;
+        right: 12px;
+    }
 }
 /* 
 
