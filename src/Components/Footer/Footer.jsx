@@ -58,7 +58,7 @@ const Footer = () => {
 
             </div>
             <div className='footer-box-right'>
-                <div>
+                <div >
                     <p>
                         La Tasa Nominal Anual (TNA), la Tasa Efectiva Anual (TEA), el Costo Financiero Total Anual (CFTA) y el Costo Financiero Total de la operación (CFTO) varían según el perfil crediticio del solicitante del préstamo, el plazo de financiación elegido y la situación del mercado. En todos los casos, la TNA, TEA, el CFTA y el CFTO aplicables serán informados al momento de ingresar la solicitud del préstamo y antes de su otorgamiento. Tasa Nominal Anual (TNA): Mínima: 110% - Máxima 402,20% | Costo Financiero Total Anual (CFTA) con IVA: Mínimo: 160% - Máximo 425% Ejemplo de préstamo (*): Monto solicitado de $10.000 a 3 meses | TNA (sin IVA): 160,33% - TEA (sin IVA): 350,36% -<span className='important-text'> CFTA (con IVA): 194% - CFTO (con IVA): 48,50%</span> | Cuota: $4.950 | Total a pagar: $14.850. Las cuotas del préstamo son mensuales, iguales (fijas) y consecutivas, que podrán ser abonadas mediante transferencia o depósito bancario, débito intrabancario o en tarjeta de débito y/o a través de los botones de pago habilitados.
                     </p>

@@ -34,7 +34,7 @@ footer{
     width: 50%;
 }
 .footer-box-right p{
-    border-left: var(--primary-color) 1px solid;
+    
     padding-left: 20px;
     text-align: justify;
 }
@@ -94,6 +94,17 @@ footer .registeredBrand{
 
 .wsp-contact svg path{
     color: white
+}
+
+.footer-box-right div:nth-child(1){
+    border-left: var(--primary-color) 1px solid;
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.footer-box-right div:nth-child(2){
+    border-left: var(--primary-color) 1px solid;
 }
 @media screen and (max-width: 1100px) {
     footer{
