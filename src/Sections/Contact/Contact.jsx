@@ -69,9 +69,22 @@ const Contact = () => {
             </div>
         </div>
         <div className='contactListLink'>
-            <Link to={'/suggestions'}>Quejas | Sugerencias</Link>
-            <Link to={'/complaints'}>Reclamos</Link>
-            <Link to={'/regret-or-discharge'}>Botón de arrepentimiento/baja</Link>
+            <div className='contact-box'>
+                <Link to={'/suggestions'}>Quejas | Sugerencias</Link>
+            </div>
+            <div className='contact-box'>
+                <Link to={'/complaints'}>Reclamos</Link>
+            </div>
+            <div className='contact-box'>
+                <Link to={'/regret'}>Boton de arrepentimiento</Link>
+            </div>
+            <div className='contact-box'>
+                <Link to={'/discharge'}>Botón de baja</Link>
+            </div>
+            
+           
+           
+            
         </div>
     </section>
   )

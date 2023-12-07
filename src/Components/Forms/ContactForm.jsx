@@ -6,6 +6,7 @@ import { FaChevronRight } from "react-icons/fa";
 /* import dotenv from 'dotenv';
 dotenv.config(); */
 import './style.css';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 
 
@@ -58,6 +59,8 @@ const MyDropzone = ({ field, form: { setFieldValue } }) => {
 };
 
 const ContactForm = ({ type }) => {
+  const pathname = useLocation()
+  const route = pathname.pathname.substring(1)
   const sendMailRequest = async (values) => {
     const formData = new FormData();
     console.log(values)
@@ -69,9 +72,15 @@ const ContactForm = ({ type }) => {
     if(type== 'RECHAZO'){
       formData.append('reason', values.reasonSelected.reason + ' > ' + values.reasonSelected.value)
     }
-    if(type == 'BAJA'){
-      formData.append('reasonToRegret', values.reasonToRegret);
+    if(route == 'regret'){
+      formData.append('reasonToRegret', 'Arrepentimiento');
     }
+    if(route == 'discharge'){
+      formData.append('reasonToRegret', 'Baja');
+    }
+   /*  if(type == 'BAJA'){
+      formData.append('reasonToRegret', values.reasonToRegret);
+    } */
     
 
     if (values.files && values.files.buffer) {
@@ -233,21 +242,7 @@ const ContactForm = ({ type }) => {
             <Field name="telephone" type="text" id="telephone" placeholder='+5401122223333' />
             <ErrorMessage name="telephone" component="div" />
           </div>
-          {
-            type === 'BAJA' &&
-            <>
-              <div className="input-container input-container-100">
-                <label htmlFor="reasonToRegret">Motivo:</label>
-                <Field as="select" name="reasonToRegret" id="reasonToRegret">
-                  <option value="" label="Selecciona tu motivo" disabled/>
-                  <option value="Baja" label="Baja" />
-                  <option value="Arrepentimiento" label="Arrepentimiento" />
-                </Field>
-                <ErrorMessage name="reasonToRegret" component="div" />
-              </div>
-
-            </>
-          }
+          
       {
 
         type === 'RECLAMO' && (
