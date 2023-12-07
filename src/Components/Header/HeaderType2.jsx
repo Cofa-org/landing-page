@@ -29,7 +29,6 @@ const HeaderType2 = () => {
           </Link>
         </div>
         <nav className='normal-nav'>
-          {/* TO DO: LINKEAR AL LUGAR CORRECTO */}
             <Link to={'/#header'} className='link-selected'>Inicio</Link>
             <Link to={'/#about-us'} >Nosotros</Link>
             <Link to={'/#frecuent-questions'} >Preguntas Frecuentes</Link>
