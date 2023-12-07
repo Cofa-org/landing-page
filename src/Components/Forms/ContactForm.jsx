@@ -6,6 +6,7 @@ import { FaChevronRight } from "react-icons/fa";
 /* import dotenv from 'dotenv';
 dotenv.config(); */
 import './style.css';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 
 
@@ -58,6 +59,8 @@ const MyDropzone = ({ field, form: { setFieldValue } }) => {
 };
 
 const ContactForm = ({ type }) => {
+  const pathname = useLocation()
+  const route = pathname.pathname.substring(1)
   const sendMailRequest = async (values) => {
     const formData = new FormData();
     console.log(values)
@@ -69,9 +72,15 @@ const ContactForm = ({ type }) => {
     if(type== 'RECHAZO'){
       formData.append('reason', values.reasonSelected.reason + ' > ' + values.reasonSelected.value)
     }
-    if(type == 'BAJA'){
-      formData.append('reasonToRegret', values.reasonToRegret);
+    if(route == 'regret'){
+      formData.append('reasonToRegret', 'Arrepentimiento');
     }
+    if(route == 'discharge'){
+      formData.append('reasonToRegret', 'Baja');
+    }
+   /*  if(type == 'BAJA'){
+      formData.append('reasonToRegret', values.reasonToRegret);
+    } */
     
 
     if (values.files && values.files.buffer) {
@@ -173,6 +182,12 @@ const ContactForm = ({ type }) => {
 
   ]
 
+  const MESSAGES = {
+    BAJA: 'Explicanos el motivo de tu elección.',
+    RECLAMO: 'Escribí acá tu reclamo',
+    SUGERENCIAS: 'Escribí acá tu  queja o sugerencia.'
+  }
+
   const [reasonSelected, setReasonSelected] = useState({ reason: null, value: null });
   const [openSelector, setOpenSelector] = useState(false);
 
@@ -223,31 +238,11 @@ const ContactForm = ({ type }) => {
           </div>
 
           <div className="input-container">
-            <label htmlFor="telephone">Teléfono</label>
+            <label htmlFor="telephone">Celular</label>
             <Field name="telephone" type="text" id="telephone" placeholder='+5401122223333' />
             <ErrorMessage name="telephone" component="div" />
           </div>
-
-          <div className="input-container input-container-100">
-            <label htmlFor="message">Mensaje:</label>
-            <Field as="textarea" name="message" id="message" />
-            <ErrorMessage name="message" component="div" />
-          </div>
-          {
-            type === 'BAJA' &&
-            <>
-           <div className="input-container input-container-100">
-            <label htmlFor="reasonToRegret">Motivo:</label>
-            <Field as="select" name="reasonToRegret" id="reasonToRegret">
-              <option value="" label="Selecciona tu motivo" />
-              <option value="Baja" label="Baja" />
-              <option value="Arrepentimiento" label="Arrepentimiento" />
-            </Field>
-            <ErrorMessage name="reasonToRegret" component="div" />
-          </div>
-
-          </>
-          }
+          
       {
 
         type === 'RECLAMO' && (
@@ -284,8 +279,15 @@ const ContactForm = ({ type }) => {
             </div>
           </div>
         )}
+
+          <div className="input-container input-container-100">
+            <label htmlFor="message">Mensaje:</label>
+            <Field as="textarea" name="message" id="message" placeholder={MESSAGES[type]} />
+            <ErrorMessage name="message" component="div" />
+          </div>
+        
       {
-        type != 'RECLAMO' &&
+        type != 'BAJA ' &&
         (
           <>
             <div className="input-container input-container-100">

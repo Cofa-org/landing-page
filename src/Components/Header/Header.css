@@ -47,7 +47,9 @@ header nav a{
     width: 100%;
     font-weight: 500;
 }
-
+#btn-loan-points{
+    border: 1px solid;
+}
 
 @keyframes to-right {
     0% {
@@ -57,6 +59,7 @@ header nav a{
         right: 0;
     }
 }
+
 
 @media screen and (max-width: 1500px) {
     header>.nav-points{
@@ -137,7 +140,7 @@ header nav a{
     }
 }
 
-@media screen and (max-width: 1350px){
+@media screen and (max-width: 1500px){
     header>nav{
         display: none;
     }   
@@ -159,6 +162,9 @@ header nav a{
         display: flex;
         align-items: center;
         gap: 32px;
+    }
+    .buttons-container .btn-show-links{
+        display: flex;
     }
     .open {
         display: flex;
@@ -214,7 +220,24 @@ header nav a{
         position: absolute;
         bottom: 10px;
     } */
+    .mobible-nav-secondary-btn{
+        text-align: center;
+    }
 }
+
+@media screen and (max-width: 800px){
+    .buttons-container #btn-points-assist{
+        display: none;
+    }
+    .buttons-container #btn-loan-points{
+        display: none;
+    }
+    .header-primary-btn{
+        display: none;
+    }
+}
+
+
 
 @media screen and (max-width: 700px){
     header{

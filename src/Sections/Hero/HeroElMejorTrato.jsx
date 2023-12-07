@@ -22,7 +22,9 @@ const HeroElMejorTrato = ({}) => {
                         </span>
                         <div className='email-info-content'>
                             <h4>Correo electrónico</h4>
-                            <span>consultas@cofa.com.ar</span>
+                            <a href='mailto:consultas@cofa.com.ar'>
+                                <span>consultas@cofa.com.ar</span>
+                            </a>
                         </div>
                     </div>
 

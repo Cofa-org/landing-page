@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import './HeaderType2.css'
 
@@ -15,6 +15,12 @@ const HeaderType2 = () => {
   const handleCloseNabvar = () =>{
     setIsOpen(false)
   }
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+
   return (
     <header className='header-type-2'>
         <div>
@@ -23,7 +29,6 @@ const HeaderType2 = () => {
           </Link>
         </div>
         <nav className='normal-nav'>
-          {/* TO DO: LINKEAR AL LUGAR CORRECTO */}
             <Link to={'/#header'} className='link-selected'>Inicio</Link>
             <Link to={'/#about-us'} >Nosotros</Link>
             <Link to={'/#frecuent-questions'} >Preguntas Frecuentes</Link>
@@ -44,7 +49,7 @@ const HeaderType2 = () => {
             <Link /* to={'/assists'} */ >Asistencias</Link>
           </nav>
           <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
-            <button className='primary-btn mobible-nav-secondary-btn' /* onClick={openModal} */>Quiero mi préstamo</button>
+            <button className='primary-btn mobible-nav-secondary-btn' >Quiero mi Préstamo</button>
           </a>
           
         </div>

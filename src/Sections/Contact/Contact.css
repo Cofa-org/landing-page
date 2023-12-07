@@ -19,7 +19,6 @@
 
 .contactMediaList{
     display: flex;
-
     gap: 20px;
     justify-content: space-between;
 }
@@ -57,6 +56,9 @@
     justify-content: space-around;
     width: 100%;
 }
+.socialMediaList svg path:hover{
+    color: var(--primary-color);
+}
 
 .linkRedirect{
     color: var(--primary-color)
@@ -90,6 +92,12 @@
 }
 .contactListLink a{
     color:rgba(64, 64, 64, 1);
+    font-weight: 500;
+}
+.contactListLink a:hover{
+    color:var(--primary-color);
+    font-weight: 500;
+    text-decoration: underline;
 }
 
 
@@ -100,6 +108,13 @@
     background-color: var(--primary-color);
     margin-bottom: 50px;
     display: block;
+}
+
+.contact-box{
+    border-top:3px solid var(--primary-color);
+    box-shadow: 3px 3px 5px 0px rgba(23, 148, 79, 0.25);
+    padding: 12px;
+    border-radius: 5px;
 }
 
 
@@ -123,9 +138,33 @@
     
 }
 
+@media screen and (max-width: 750px){
+    .contactListLink{
+        flex-direction: row;
+        flex-wrap: wrap;
+        text-align: center;
+        row-gap: 30px
+    }
+    .contactListLink .contact-box{
+        flex-basis: 48%;
+
+    }
+}
+
+
 @media screen and (max-width:550px){
     .contactListLink a{
         font-size: 14px;
+    }
+}
+@media screen and (max-width:500px){
+    .contactListLink{
+        flex-direction: column;
+        align-items: center;
+
+    }
+    .contactListLink .contact-box{
+        width: 200px;
     }
 }
 

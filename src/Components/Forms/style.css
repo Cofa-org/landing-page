@@ -46,6 +46,22 @@
     font-weight: 500;
 }
 
+select{
+    font-size: 16px;
+    font-weight: 500;
+    outline: none;
+    color:#757575;
+}
+
+option{
+    color: #757575;
+}
+
+textarea::placeholder{
+    font-size: 16px;
+    font-weight: 500;
+}
+
 .form-container .input-container-100{
     width: 100%;
 }

@@ -49,6 +49,7 @@ a{
     font-size: 14px;
     padding: 12px;
     color: var(--primary-color);
+    text-align: center;
 }
 
 .primary-btn{

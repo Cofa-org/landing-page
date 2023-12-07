@@ -14,16 +14,16 @@ const HeroPoints = () => {
                     <span className='text-info'>¡TE DAMOS LA BIENVENIDA!</span>
                     <h1 className='text-info'>
                         Conocé los Puntos <br/>
-                        COFA {/* TO DO:COFA EN VERDE */}
+                        COFA
                     </h1>
                     <p><b className='text-info'>El programa de beneficios que premia a nuestros clientes</b></p>
                     <p className='text-info'>Sumá puntos y ahorrá con nosotros! Por ser cliente COFA acumulás puntos que podrás aplicar como descuento en el pago de tus productos COFA. ¡No pierdas la oportunidad de ahorrar!</p>
                 </div>
                 <div className='hero-buttons'>
                     {/* TO DO: CAMBIAR COLOR LETRA BOTON */}
-                    <button className='primary-btn'>
-                        <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
-                            CONSULTAR
+                    <button className='primary-btn btn-consult'>
+                        <a href='mailto:consultas@cofa.com.ar'>
+                            Consultar
                         </a>
                     </button>
                     <a href='#score-points' className='primary-btn btn-score-points'>

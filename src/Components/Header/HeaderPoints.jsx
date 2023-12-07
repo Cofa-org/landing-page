@@ -4,23 +4,12 @@ import {FiMenu} from 'react-icons/fi'
 import {IoMdArrowBack} from 'react-icons/io'
 import { Link, useLocation } from 'react-router-dom'
 import { useScrollContext } from '../../context'
-import Modal from '../Modal/Modal'
 
 const HeaderPoints = () => {
   const location = useLocation()
   const [first, setFirst] = useState(true)
   const [isOpen, setIsOpen] = useState(false)
   const [inHome, setInHome] = useState(location.pathname == '/cofa-points') 
-  const [modalVisible, setModalVisible] = useState(false);
-
-  // Función para abrir el modal
-  const openModal = () => {
-    setModalVisible(true);
-  };
-  // Función para cerrar el modal
-  const closeModal = () => {
-    setModalVisible(false);
-  };
 
   const openNavbar = () =>{
     setIsOpen(true)
@@ -48,7 +37,7 @@ const HeaderPoints = () => {
             inHome 
             ? (
               <>
-                <a href="#hero-points"  className='link-selected'>Inicio</a>
+                <Link to="/"  className='link-selected'>Inicio</Link>
                 <a href="#use-of-points">Uso de Puntos</a>
                 <a href="#accreditation">Acreditación</a>
                 <a href="#restrictions">Restricciones</a>
@@ -58,7 +47,7 @@ const HeaderPoints = () => {
             )
             : (
               <>
-                <Link to={'/#hero-points'} className='link-selected'>Inicio</Link>
+                <Link to={'/'} className='link-selected'>Inicio</Link>
                 <Link to={'/#use-of-points'} >Uso de Puntos</Link>
                 <Link to={'/#accreditation'} >Acreditación</Link>
                 <Link to={'/#restrictions'} >Restricciones</Link>
@@ -74,9 +63,8 @@ const HeaderPoints = () => {
               <button className='secondary-btn' id='btn-points-assist'>Quiero mi Asistencia</button>
             </Link>
             <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
-              <button className='primary-btn' /* onClick={openModal} */>Quiero mi préstamo</button>
+              <button className='primary-btn' id='btn-loan-points'>Quiero mi Préstamo</button>
             </a>
-            {modalVisible && <Modal closeModal={closeModal} />}
             <button className='btn-show-links' onClick={openNavbar}><FiMenu/></button>
         </div>
         <div className={isOpen ? 'mobible-navbar-points open-points' : (first ?  'mobible-navbar' : 'mobible-navbar not-first-points')}>
@@ -84,7 +72,7 @@ const HeaderPoints = () => {
             <button onClick={() => setIsOpen(false)} className='btn-back-points'>
               <IoMdArrowBack/>
             </button>
-            <a href="#hero-points" className='link-selected'>Inicio</a>
+            <a href="/home" className='link-selected'>Inicio</a>
             <a href="#use-of-points" onClick={handleCloseNabvar}>Uso de Puntos</a>
             <a href="#accreditation" onClick={handleCloseNabvar}>Acreditación</a>
             <a href="#restrictions" onClick={handleCloseNabvar}>Restricciones</a>
@@ -92,10 +80,10 @@ const HeaderPoints = () => {
             <a href="#contact" onClick={handleCloseNabvar}>Contacto</a>
           </nav>
           <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
-            <button className='primary-btn mobible-nav-secondary-btn' /* onClick={openModal} */>Quiero mi préstamo</button>
+            <button className='primary-btn mobible-nav-secondary-btn' >Quiero mi Préstamo</button>
           </a>
-          <Link /* to={'/assists'} */>
-            <button className='secondary-btn mobible-nav-secondary-btn' id='btn-points-assist'>Quiero mi Asistencia</button>
+          <Link /* to={'/assists'} */ className='secondary-btn mobible-nav-secondary-btn'>
+            Quiero mi Asistencia
           </Link>
         </div>
         {

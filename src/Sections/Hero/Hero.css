@@ -9,7 +9,10 @@
     padding: 100px 5vw;
 
 }
-
+.btn-loan-main{
+    font-size: 18px;
+    letter-spacing: 3px
+}
 .hero{
     display: flex;
     justify-content:space-between;
@@ -102,6 +105,9 @@
     width: 0; /* Inicialmente no se muestra */
     animation: blink-caret 0.75s step-end infinite; /* Animación de parpadeo */
   }
+
+
+
   
   @keyframes blink-caret {
     50% {
@@ -109,10 +115,14 @@
     }
   }
 
-/* 
-@media screen and (max-width: 100px){ */
 
-
+@media screen and (max-width: 1200px){ 
+    .contact-secondary-button{
+        background-color: var(--primary-color) !important;
+        width: 80%;
+        margin: auto;
+    }
+}
 @media screen and (max-width: 900px){
     .hero-container .hero{
         display: flex;
@@ -159,6 +169,7 @@
     .backgroundDecorationInfo{
         display: none;
     }
+    
 }
 
 @media screen and (max-width: 700px){
@@ -206,6 +217,9 @@
 }
 
 /* HERO POINTS */
+.btn-consult{
+    font-size: 18px;
+}
 .info-icon{
     width: 24px;
     height: 24px;

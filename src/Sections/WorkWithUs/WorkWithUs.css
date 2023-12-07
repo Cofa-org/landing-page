@@ -36,7 +36,7 @@
     text-align: center;
 }
 .info-work-form h1, .info-work-form p{
-/*     color: white; */
+    color: white;
     width: 80%;
     margin-bottom: 2%;
 }
@@ -44,7 +44,6 @@
     font-size: 60px;
     font-weight: 500;
 }
-
 
 @media screen and (max-width:900px){
     .container-work{

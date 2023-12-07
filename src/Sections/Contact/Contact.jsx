@@ -17,11 +17,15 @@ const Contact = () => {
             </span>
             <span>
                 <BsTelephone/>
-                <span>11-5455-9017</span>
+                <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
+                    <span>11-5455-9017</span>
+                </a>
             </span>
             <span>
                 <CiMail/>
-                <span>consultas@cofa.com.ar</span>
+                <a href='mailto:consultas@cofa.com.ar'>
+                    <span>consultas@cofa.com.ar</span>
+                </a>
             </span>
             <span>
                 <CiLocationOn/>
@@ -33,10 +37,10 @@ const Contact = () => {
 
                 <img src='/Logo.svg' />
                 <div className='socialMediaList'>
-                    <Link to='https://www.facebook.com/cofa.cofa.5245'>
+                    <Link to={'https://www.facebook.com/cofa.cofa.5245'}>
                         <BsFacebook/>
                     </Link>
-                    <Link to='https://instagram.com/cofa.arg?igshid=M2RkZGJiMzhjOQ=='>
+                    <Link to={'https://instagram.com/cofa.arg?igshid=M2RkZGJiMzhjOQ=='}>
                         <BsInstagram/>
                     </Link>
                     
@@ -44,7 +48,7 @@ const Contact = () => {
                         <BsLinkedin/>
                     </Link>
                    
-                    <Link to='https://wa.me/5491154559017'>
+                    <Link to={'https://wa.me/5491154559017'}>
                         <BsWhatsapp/>
                     </Link>
                     
@@ -65,9 +69,22 @@ const Contact = () => {
             </div>
         </div>
         <div className='contactListLink'>
-            <Link to={'/suggestions'}>Quejas | Sugerencias</Link>
-            <Link to='/complaints'>Reclamos</Link>
-            <Link to='/regret-or-discharge'>Botón de arrepentimiento/baja</Link>
+            <div className='contact-box'>
+                <Link to={'/suggestions'}>Quejas | Sugerencias</Link>
+            </div>
+            <div className='contact-box'>
+                <Link to={'/complaints'}>Reclamos</Link>
+            </div>
+            <div className='contact-box'>
+                <Link to={'/regret'}>Boton de arrepentimiento</Link>
+            </div>
+            <div className='contact-box'>
+                <Link to={'/discharge'}>Botón de baja</Link>
+            </div>
+            
+           
+           
+            
         </div>
     </section>
   )

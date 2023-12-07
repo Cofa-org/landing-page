@@ -18,6 +18,7 @@
 }
 .btn-refer{
     font-size: 20px;
+    cursor: pointer;
 }
 .btn-refer svg path{
     color: white;
@@ -86,7 +87,8 @@
 }
 
 .btn-terms{
-    background: #F0F5FF;;
+    background: #F0F5FF;
+    cursor: pointer;
 }
 
 @media screen and (min-width: 1400px) {

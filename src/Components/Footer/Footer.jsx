@@ -16,15 +16,23 @@ const Footer = () => {
                         <h3>
                             CONTRATOS DE ADHESIÓN LEY 24240 DE DEFENSA AL CONSUMIDOR
                         </h3>
-                        <p>Modelo contrato con suscripción electrónica</p>
-                        <p>Modelo contrato con suscripción presencial</p>
+                        <a href="/mod-contrato-electronica.pdf" target='_blank'>
+                            <p>Modelo contrato con suscripción electrónica</p>
+                        </a>
+                        <a href="/mod-contrato-presencial.pdf" target='_blank'>
+                            <p>Modelo contrato con suscripción presencial</p>
+                        </a>
                     </div>
                     <div>
                         <h3>
                             DEFENSA AL CONSUMIDOR
                         </h3>
-                        <p>Defensa Consumidor Nación</p>
-                        <p>Defensa Consumidor CABA </p>
+                        <a href="https://www.argentina.gob.ar/economia/comercio/defensadelconsumidor" target='_blank'>
+                            <p>Defensa Consumidor Nación</p>
+                        </a>
+                        <a href="https://buenosaires.gob.ar/jefaturadegabinete/atencion-ciudadana-y-gestion-comunal/defensa-al-consumidor" target='_blank'>
+                            <p>Defensa Consumidor CABA </p>
+                        </a>
                     </div>
                 </div>
                 <div className='footer-entities'>
@@ -48,12 +56,9 @@ const Footer = () => {
                     </a>
                 </div>
                 <div className='ssn-container'>
-                    <div>
-                        <p>Inscripto como Agente Institorio ante la SSN bajo el registro Nro 334.</p>
-                        <span>Atención al asegurado 0800-666-8400</span>
-                        <img src='/ssn-logo.svg' />
-                    </div>
-
+                    <p>Inscripto como Agente Institorio ante la SSN bajo el registro Nro 334.</p>
+                    <span>Atención al asegurado 0800-666-8400</span>
+                    <img src='/ssn-logo.svg' />
                 </div>
 
             </div>
@@ -72,6 +77,11 @@ const Footer = () => {
                         *Para cliente en situación 1 en la Central de deudores del BCRA, en relación de dependencia con antigüedad mayor a 1 año y con antecedentes crediticios en la empresa.
                     </p>
 
+                </div>
+                <div className='ssn-container-mobible'>
+                    <p>Inscripto como Agente Institorio ante la SSN bajo el registro Nro 334.</p>
+                    <span>Atención al asegurado 0800-666-8400</span>
+                    <img src='/ssn-logo.svg' />
                 </div>
                 <div>
                     <p>
