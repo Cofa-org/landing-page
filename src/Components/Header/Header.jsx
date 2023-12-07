@@ -71,7 +71,7 @@ const Header = () => {
           <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
             <button className='primary-btn header-primary-btn' >Quiero mi Préstamo</button>
           </a>
-          <button className='secondary-btn'>Ingresar</button>
+          {/* <button className='secondary-btn'>Ingresar</button> */}
           <button className='btn-show-links' onClick={openNavbar}><FiMenu/></button>
         </div>
         <div className={isOpen ? 'mobible-navbar open' : (first ?  'mobible-navbar' : 'mobible-navbar not-first')}>
