@@ -2,6 +2,7 @@ import React from 'react'
 import { Route, Routes } from 'react-router-dom'
 import { HomeScreen, TermsScreen, PrivacyPoliciesScreen, PointsScreen, LendScreen, RegretOrDischargeScreen, ComplaintsScreen, SuggestionsScreen, TermsPointsScreen, ElMejorTratoScreen } from './screens'
 import { FormWorkWithUs } from './Sections'
+import DischargeScreen from './screens/DischargeScreen/DischargeScreen'
 
 /* import SuggestionsScreen from './screens/SuggestionsScreen/SuggestionsScreen' */
 
@@ -15,7 +16,8 @@ const RouterScreens = () => {
         <Route path='/privacy-policies' element={<PrivacyPoliciesScreen/>} />
         <Route path='/cofa-points' element={<PointsScreen/>}/>
         <Route path='/suggestions' element={<SuggestionsScreen/>} />
-        <Route path='/regret-or-discharge' element={<RegretOrDischargeScreen/>} />
+        <Route path='/discharge' element={<DischargeScreen/>} />
+        <Route path='/regret' element={<RegretOrDischargeScreen/>} />
         <Route path='/complaints' element={<ComplaintsScreen/>}/>
         {/* <Route path='/assists' element={<AssistenceScreen/>}/> */}
         <Route path='/lend' element={<LendScreen/>}/>
