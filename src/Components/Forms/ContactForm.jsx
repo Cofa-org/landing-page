@@ -287,7 +287,7 @@ const ContactForm = ({ type }) => {
           </div>
         
       {
-        type != 'BAJA ' &&
+        route != 'regret' && route != 'discharge' &&
         (
           <>
             <div className="input-container input-container-100">

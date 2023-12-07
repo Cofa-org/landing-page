@@ -23,6 +23,7 @@ import FormWorkWithUs from './WorkWithUs/FormWorkWithUs';
 import HeroElMejorTrato from './Hero/HeroElMejorTrato'
 
 
+
 export {
     Hero, 
     AboutUs, 
@@ -45,5 +46,6 @@ export {
     TermsPoints,
     TermsAndConditionsPoints,
     FormWorkWithUs,
-    HeroElMejorTrato
+    HeroElMejorTrato,
+
 }

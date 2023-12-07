@@ -9,6 +9,8 @@ import RegretOrDischargeScreen from "./RegretOrDischargeScreen/RegretOrDischarge
 import SuggestionsScreen from "./SuggestionsScreen/SuggestionsScreen";
 import TermsPointsScreen from './TermsScreen/TermsPointsScreen';
 import ElMejorTratoScreen from './ElMejorTratoScreen/ElMejorTratoScreen'
+import DischargeScreen from "./DischargeScreen/DischargeScreen";
+
 
 
 export  {
@@ -21,5 +23,6 @@ export  {
     RegretOrDischargeScreen,
     SuggestionsScreen,
     TermsPointsScreen,
-    ElMejorTratoScreen
+    DischargeScreen,
+    ElMejorTratoScreen,
 }
