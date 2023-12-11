@@ -28,7 +28,6 @@ const PersonalLendForm = () => {
             <h2>
                 Completa el formulario
             </h2>
-            <p>Te contactaremos a la brevedad</p>
             <Formik
                 initialValues={{
                     name: '',
@@ -70,22 +69,34 @@ const PersonalLendForm = () => {
                         <label htmlFor="mySelectField">Situacion Laboral:</label>
                         <Field as="select" name="situation" id="mySelectField">
                             <option value="no" label="Elija su situacion laboral" />
-                            <option value="empleado" label="Empleado" />
-                            <option value="monotributista" label="Monotribustista" />
-                            <option value="Desempleado" label="Desempleado" />
+                            <option value="relacion-dependencia" label="Relacion de dependencia" />
+                            <option value="monotributista" label="Monotribustista/Autónomo" />
+                            <option value="informal" label="Trabajo informal" />
+                            <option value="jubilado-pensionado" label="Jubilado/Pensionado" />
+                            <option value="estudiante" label="Estudiante" />
+                            <option value="freelancer" label="Freelancer" />
+                            <option value="desempleado" label="Desempleado" />
+                            <option value="otro" label="Otro" />
                         </Field>
                         <ErrorMessage name="mySelectField" component="div" />
                     </div>
 
                     <div className="input-container input-container-100">
                         <label htmlFor='amount'>Importe solicitado</label>
-                        <Field name='amount' id='amount' />
+                        <Field name='amount' id='amount' placeholder='$' />
                     </div>
-
+                    <div>
+                        <label htmlFor="">Al clickear en Enviar, estás aceptado los{' '}
+                            <a href='https://cofa.com.ar/terms-and-conditions' target='_blank' rel='noopener noreferrer' style={{textDecoration:"underline"}}>
+                             Términos y Condiciones
+                            </a>
+                        </label>
+                    </div>
                     <div className="submit">
-                        <button type='submit'>Enviar <FaArrowRightLong />
-</button>
+                        <button type='submit'>Enviar <FaArrowRightLong /></button>
+                        
                     </div>
+                    <p style={{justifyContent: "flex-end", marginTop: "2%"}}>Te contactaremos a la brevedad</p>
                 </Form>
 
 

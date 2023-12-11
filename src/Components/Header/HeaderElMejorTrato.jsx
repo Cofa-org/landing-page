@@ -37,7 +37,7 @@ const HeaderElMejorTrato = () => {
             inHome 
             ? (
               <>
-                <a href="#hero-elmejortrato"  className='link-selected'>Inicio</a>
+                <Link to="/"  className='link-selected'>Inicio</Link>
                 <a href="#about-us">Nosotros</a>
                 <a href="#frecuent-questions">Preguntas Frecuentes</a>
                 <a href="#contact">Contacto</a>
@@ -45,7 +45,7 @@ const HeaderElMejorTrato = () => {
             )
             : (
               <>
-                <Link to={'/#hero-elmejortrato'} className='link-selected'>Inicio</Link>
+                <Link to="/"  className='link-selected'>Inicio</Link>
                 <Link to={'/#about-us'} >Nosotros</Link>
                 <Link to={'/#frecuent-questions'} >Preguntas Frecuentes</Link>
                 <Link to={'/#contact'} >Contacto</Link>

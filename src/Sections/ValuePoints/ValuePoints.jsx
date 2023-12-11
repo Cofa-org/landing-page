@@ -62,7 +62,7 @@ const ValuePoints = () => {
                 <div className='style-card'>
                     <BsCheckCircle />
                     <div>
-                        <h2>100 Puntos COFA</h2>
+                        <h2>200 Puntos COFA</h2>
                         <p>
                             Por seguirnos en Instagram y/o Facebook.
                         </p>
