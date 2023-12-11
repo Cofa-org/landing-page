@@ -60,6 +60,13 @@ a{
     background-color: var(--primary-color);
     color: var(--white-text-color);
     border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.primary-btn>svg>path{
+    color: var(--white-text-color);
 }
 
 .primary-btn>a{

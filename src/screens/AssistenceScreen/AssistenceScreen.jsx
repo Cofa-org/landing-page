@@ -1,15 +1,52 @@
-import React from 'react'
+import React, { useState } from 'react'
+import './AssitenceScreen.css'
 /* import { HeaderAssistence } from '../../Components'
 import HeroAssistence from '../../Sections/Hero/HeroLend'
 import { ExploreMultiassist } from '../../Sections'
  */
+import { IoMdArrowRoundBack, IoMdArrowRoundForward } from "react-icons/io";
+import { FaAngleDown, FaAngleUp  } from "react-icons/fa6";
+import { asistencias, asistenciasDesempleo, asistenciasSalud } from '../../data/assistData';
+import { AssistSlider, Footer, HeaderAssist } from '../../Components';
+import { Contact, HeroAssist } from '../../Sections';
+import { Link } from 'react-router-dom';
+
+
 
 const AssistenceScreen = () => {
+
+ 
   return (
     <>
+      <HeaderAssist/>
+      <HeroAssist/>
         {/* <HeaderAssistence/>
         <HeroAssistence/>
         <ExploreMultiassist/> */}
+        <h2 id='multi-asistencia' className='subtitle-assist'>Explora los servicios de Multiasistencia</h2>
+        <span className='price-assist'><span className='price-strong'>$1400</span>/Mensuales</span>
+        <p className='description-assist'>Los servicios de Multiasistencia cubren asistencia del <strong>hogar</strong>, para <strong>mascotas</strong>, <strong>legal</strong>, <strong>informática</strong>, y asistencia <strong>vehicular</strong>. </p>
+        <AssistSlider asistencias={asistencias}/>
+        <Link className='go-to-terms'>
+          Términos y Condiciones Particulares de Multiasistencia <IoMdArrowRoundForward/>
+        </Link>
+        
+        <h2 id='salud' className='subtitle-assist'>Asistencia en Salud Integral</h2>
+        <span className='price-assist'><span className='price-strong'>$700</span>/Mensuales</span>
+        <p className='description-assist'>Los servicios cubren asistencia del <strong>Odontología</strong>, para <strong>Nutrición</strong>, <strong>Psicología</strong>, <strong>Clínica médica</strong>, <strong>Servicio de Acompañante</strong>, entre otros. 
+        </p>
+        <AssistSlider asistencias={asistenciasSalud}/>
+        <Link className='go-to-terms'>
+          Términos y Condiciones Particulares de Salud <IoMdArrowRoundForward/>
+        </Link>
+        <h2 id='desempleo' className='subtitle-assist'>Asistencia en Desempleo</h2>
+        <span className='price-assist'><span className='price-strong'>$700</span>/Mensuales</span>
+        <AssistSlider asistencias={asistenciasDesempleo}/>
+        <Link className='go-to-terms'>
+          Términos y Condiciones Particulares de Desempleo <IoMdArrowRoundForward/>
+        </Link>
+        <Contact/>
+        <Footer/>
     </>
   )
 }

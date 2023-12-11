@@ -282,26 +282,21 @@ const ContactForm = ({ type }) => {
 
           <div className="input-container input-container-100">
             <label htmlFor="message">Mensaje:</label>
+            <span className='message-item'><span className='circle-item'></span>Ingrese los detalles de su solicitud. Un integrante de COFA soporte responderá a la brevedad para proceder a su solicitud</span>
             <Field as="textarea" name="message" id="message" placeholder={MESSAGES[type]} />
             <ErrorMessage name="message" component="div" />
           </div>
         
-      {
-        route != 'regret' && route != 'discharge' &&
-        (
-          <>
-            <div className="input-container input-container-100">
-              <Field name="files" component={MyDropzone} />
-              <ErrorMessage name="files" component="div" />
-            </div>
 
-            <div className="submit">
-              <button type="submit">Enviar </button>
-            </div>
-          </>
-        )
+          <div className="input-container input-container-100">
+            <Field name="files" component={MyDropzone} />
+            <ErrorMessage name="files" component="div" />
+          </div>
 
-      }
+          <div className="submit">
+            <button type="submit">Enviar </button>
+          </div>
+
 
     </Form>
       </Formik >

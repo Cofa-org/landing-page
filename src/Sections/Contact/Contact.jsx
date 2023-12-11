@@ -69,23 +69,39 @@ const Contact = () => {
             </div>
         </div>
         <div className='contactListLink'>
-            <div className='contact-box'>
-                <Link to={'/suggestions'}>Quejas | Sugerencias</Link>
+            <div>
+                <Link to={'/suggestions'}>Quejas</Link>
             </div>
-            <div className='contact-box'>
+            <div>
+                <Link to={'/suggestions'}>Sugerencias</Link>
+            </div>
+            <div >
                 <Link to={'/complaints'}>Reclamos</Link>
             </div>
-            <div className='contact-box'>
-                <Link to={'/regret'}>Boton de arrepentimiento</Link>
-            </div>
-            <div className='contact-box'>
-                <Link to={'/discharge'}>Botón de baja</Link>
-            </div>
+            
             
            
            
             
         </div>
+        <div className='contactListLink'>
+            <div   div className='contact-box contact-box-special'>
+                <Link to={'/regret'}>Boton de arrepentimiento</Link>
+                <p>
+                Tenes el derecho de arrepentirte de la operación que realizaste. Informanos los datos de la misma así te contamos los pasos a seguir.<br/>
+                En el caso de que te arrepientas de un préstamo otorgado deberás devolver el dinero recibido.
+                </p>
+            </div>
+            <div className='contact-box contact-box-special'>
+                <Link to={'/discharge'}>Botón de baja</Link>
+                <p>
+                Tenes el derecho de dar de baja una operación que realizaste. Informanos los datos de la misma así te contamos los pasos a seguir.<br/>
+                En el caso de que quieras dar de baja de un préstamo otorgado deberás devolver el dinero recibido.
+                </p>
+            </div>
+        </div>
+        
+        
     </section>
   )
 }

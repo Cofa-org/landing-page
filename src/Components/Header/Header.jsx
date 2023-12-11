@@ -51,7 +51,7 @@ const Header = () => {
                 <a href="#frecuent-questions">Preguntas Frecuentes</a>
                 <a href="#contact">Contacto</a>
                 <Link to={'/cofa-points'} >Puntos COFA</Link>
-                <Link /* to={'/assists'} */ >Asistencias</Link>
+                <Link to={'/assists'} >Asistencias</Link>
               </>
             )
             : (
@@ -61,7 +61,7 @@ const Header = () => {
                 <Link to={'/#frecuent-questions'} >Preguntas Frecuentes</Link>
                 <Link to={'/#contact'} >Contacto</Link>
                 <Link to={'/cofa-points'} >Puntos COFA</Link>
-                <Link /* to={'/assists'} */ >Asistencias</Link>
+                <Link to={'/assists'} >Asistencias</Link>
               </>
             )
           }

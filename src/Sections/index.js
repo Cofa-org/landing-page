@@ -11,7 +11,7 @@ import PrivacyPolicies from "./PrivacyHeader/PrivacyPolicies";
 import HeroPoints from "./Hero/HeroPoints";
 /* import HeroAssistence from "./Hero/HeroAssistence"; */
 import ExploreMultiassist from "./ExploreMultiassist/ExploreMultiassist";
-import HeroLend from "./Hero/HeroLend";
+
 import HeroSuggestions from "./Hero/HeroSuggestions";
 import UsePoints from "./UsePoints/UsePoints";
 import AccreditationPoints from "./AccreditationPoints/AccreditationPoints";
@@ -21,6 +21,7 @@ import TermsPoints from './TermsHeader/TermsPoints';
 import TermsAndConditionsPoints from './TermsAndConditions/TermsAndConditionsPoints';
 import FormWorkWithUs from './WorkWithUs/FormWorkWithUs';
 import HeroElMejorTrato from './Hero/HeroElMejorTrato'
+import HeroAssist from "./Hero/HeroAssist";
 
 
 
@@ -36,7 +37,7 @@ export {
     PrivacyHeader, 
     PrivacyPolicies, 
     HeroPoints, 
-    HeroLend,
+    HeroAssist,
     ExploreMultiassist,
     HeroSuggestions,
     UsePoints, 

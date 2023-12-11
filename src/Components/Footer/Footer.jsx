@@ -45,7 +45,8 @@ const Footer = () => {
                     <a className="footer-entity-container" href='https://www.bcra.gob.ar/BCRAyVos/Regimen_de_transparencia.asp' target='_blank'>
                         <img src="/img/Transparencia.png" alt="Regimen de trasparencia del banco central de la republica argentina" />
                     </a>
-                    <a className="footer-entity-container" href='http://qr.afip.gob.ar/?qr=bC_FPNgu3wM23TMcwi2Nwg'  target='_blank'>
+                    <a className="footer-entity-container" href="http://qr.afip.gob.ar/?qr=bC_FPNgu3wM23TMcwi2Nwg,,"
+ >
                         <img src="/img/footer-datafiscal.png" alt="Data fiscal" />
                     </a>
                     <a className="footer-entity-container" href='https://www.argentina.gob.ar/aaip'  target='_blank'>

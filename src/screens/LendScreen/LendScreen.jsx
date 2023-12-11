@@ -1,4 +1,4 @@
-import React from 'react'
+/* import React from 'react'
 import { ContactForm, HeaderLend } from '../../Components'
 import { HeroLend} from '../../Sections'
 
@@ -12,4 +12,4 @@ const LendScreen = () => {
   )
 }
 
-export default LendScreen
+export default LendScreen */

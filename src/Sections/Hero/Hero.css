@@ -27,6 +27,11 @@
     gap: 30px;
 }
 
+.hero-info .primary-text-assist{
+    background-color: transparent;
+    color: var(--primary-color)
+}
+
 .hero-info p{
     color: var(--text-color)
 }
@@ -115,13 +120,23 @@
     }
   }
 
-
+  @media screen and (max-width: 1300px){
+    .assist-hero-img{
+        position: relative !important;
+        margin: auto;
+    }
+    .hero-assist-img-container{
+        display: none;
+        justify-content: center;
+    }
+  }
 @media screen and (max-width: 1200px){ 
     .contact-secondary-button{
         background-color: var(--primary-color) !important;
         width: 80%;
         margin: auto;
     }
+    
 }
 @media screen and (max-width: 900px){
     .hero-container .hero{
@@ -178,6 +193,9 @@
     }
     .hero-container{
         padding-bottom: 50px;
+    }
+    .hero-container .services-assist-list{
+        margin-top: 40px;
     }
 }
 

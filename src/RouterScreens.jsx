@@ -1,6 +1,6 @@
 import React from 'react'
 import { Route, Routes } from 'react-router-dom'
-import { HomeScreen, TermsScreen, PrivacyPoliciesScreen, PointsScreen, LendScreen, RegretOrDischargeScreen, ComplaintsScreen, SuggestionsScreen, TermsPointsScreen, ElMejorTratoScreen, DischargeScreen } from './screens'
+import { HomeScreen, TermsScreen, PrivacyPoliciesScreen, PointsScreen,/*  LendScreen */ RegretOrDischargeScreen, ComplaintsScreen, SuggestionsScreen, TermsPointsScreen, ElMejorTratoScreen, DischargeScreen, AssistenceScreen } from './screens'
 import { FormWorkWithUs } from './Sections'
 
 
@@ -19,8 +19,8 @@ const RouterScreens = () => {
         <Route path='/discharge' element={<DischargeScreen/>} />
         <Route path='/regret' element={<RegretOrDischargeScreen/>} />
         <Route path='/complaints' element={<ComplaintsScreen/>}/>
-        {/* <Route path='/assists' element={<AssistenceScreen/>}/> */}
-        <Route path='/lend' element={<LendScreen/>}/>
+        <Route path='/assists' element={<AssistenceScreen/>}/>
+      {/*   <Route path='/lend' element={<LendScreen/>}/> */}
         <Route path='/terms-and-conditions-cofa-points' element={<TermsPointsScreen/>} />
         <Route path='/work-with-us' element={<FormWorkWithUs/>}/>
         <Route path='/el-mejor-trato' element={<ElMejorTratoScreen />}/>

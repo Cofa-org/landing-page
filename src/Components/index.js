@@ -8,6 +8,8 @@ import HeaderPoints from "./Header/HeaderPoints";
 import HeaderType2 from "./Header/HeaderType2";
 import OurServicesList from "./OurServicesList/OurServicesList";
 import HeaderElMejorTrato from './Header/HeaderElMejorTrato'
+import HeaderAssist from "./Header/HeaderAssist";
+import AssistSlider from "./AssistSlider/AssistSlider";
 
 export {
     Header, 
@@ -20,4 +22,6 @@ export {
     PersonalLendForm,
     HeaderType2,
     HeaderElMejorTrato,
+    HeaderAssist,
+    AssistSlider
 }

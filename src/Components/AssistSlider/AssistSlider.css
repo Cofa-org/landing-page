@@ -1,0 +1,70 @@
+.controls-assitence{
+    display: flex;
+    justify-content: space-between;
+    padding: 0 40px;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.controls-assitence button{
+    background-color: #D6F5E4;
+    border: none;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.controls-assitence button svg{
+    font-size: 20px;
+}
+
+.controls-assitence button svg path{
+    color: var(--primary-color);
+}
+
+.controls-assitence h2{
+    font-size:32px;
+}
+
+.assist-section{
+    padding: 50px 3vw;
+}
+.services-list{
+    display: flex;
+    flex-direction: column;
+}
+
+.service-control{
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
+    
+}
+.service-control h3{
+    height: 45px;
+    display: flex;
+    align-items: center;
+}
+.btn-service{
+    background-color: transparent;
+    border: none;
+    width: 45px;
+    height: 45px; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+}
+.service-item-assist{
+    border-radius: 15px;
+    border-bottom: 4px solid  #249557;
+    padding: 24px 32px;
+
+/*     display: flex;
+    align-items: center;
+    flex-direction: column; */
+}

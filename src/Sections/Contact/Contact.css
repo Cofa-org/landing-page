@@ -89,6 +89,7 @@
 .contactListLink{
     display: flex;
     justify-content: space-between;
+    margin: 40px 0;
 }
 .contactListLink a{
     color:rgba(64, 64, 64, 1);
@@ -115,6 +116,13 @@
     box-shadow: 3px 3px 5px 0px rgba(23, 148, 79, 0.25);
     padding: 12px;
     border-radius: 5px;
+    max-width: 500px;
+}
+.contact-box-special{
+    border-top:3px solid rgb(250, 116, 116);
+}
+.contact-box p{
+    font-size: 14px;
 }
 
 
@@ -147,7 +155,14 @@
     }
     .contactListLink .contact-box{
         flex-basis: 48%;
+        
 
+    }
+    .contact-box-special{
+        width: 90% !important;
+    }
+    .contact-box a{
+        font-size: 17px !important;
     }
 }
 
