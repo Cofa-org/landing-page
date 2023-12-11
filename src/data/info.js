@@ -361,7 +361,7 @@ export const termsAndConditionsPoints = [
                         /* TO DO: este subcontent no se esta mostrando */
                         subcontent:[
                             {
-                                content:'Soliciten, obtengan y mantengan vigente por más de diez (10) días corridos contados a partir de la fecha de celebración del respectivo contrato, un primer préstamo y no sean o hayan sido clientes de COFA.'
+                                content:'Soliciten, obtengan y mantengan vigente por más de diez (10) días corridos contados a partir de la fecha de celebración del respectivo contrato, un primer préstamo y no sean o hayan sido clientes de COFA. '
                             },
                             {
                                 content:'Soliciten y mantengan vigente por el plazo de tres (03) meses contínuos una primera asistencia COFA (www.cofa.com.ar/asistencias).'
@@ -379,14 +379,17 @@ export const termsAndConditionsPoints = [
             },
             {
                 content:'Quienes siendo clientes de COFA tengan 1 (un) producto activo el día de su cumpleaños y se encuentren al día en el pago de sus obligaciones.'
+            },
+            {
+                content:'Sean seguidores de las cuentas de COFA en las Redes Sociales “Instagram” y/o “Facebook”. Para sumar puntos deben informar a COFA, vía whatsapp o mail, el nombre de usuario con el cual se ha comenzado a ser seguidor y en qué red social.'
             }
         ]
     },
     {
-        content: 'Validez y Vigencia: El Programa tendrá validez en todo el territorio de la República Argentina hasta el 31.12.2024, pudiendo ser prorrogado en forma automática por el término de 1 (un) año ante cada vencimiento, y, también, ser suspendido en los términos de la cláusula 11 del presente Reglamento. Los Puntos tendrán una vigencia máxima de doce (12) meses a partir de la fecha en que fueron otorgados; Los puntos COFA vencerán indefectiblemente si la Cuenta no registra movimientos por canje de puntos en un período de 12 (doce) meses. En caso de que el Programa se venciera y no fuera prorrogado por COFA, los Puntos susceptibles de ser canjeados que no hayan sido canjeados por los Clientes dentro del período de vigencia del Programa, podrán ser canjeados en los términos de lo dispuesto en la cláusula 11 más abajo, o en su defecto, se extinguirán de pleno derecho. Los restantes Puntos que no den derecho a un canje, no podrán ser canjeados ni otorgarán derecho alguno a sus titulares y se extinguirán de pleno derecho. Por el contrario, si el Programa fuera prorrogado, los Puntos de los Clientes que no hayan sido canjeados continuarán vigentes hasta lo primero entre (a) el vencimiento de su plazo de vigencia y (b) el vencimiento del plazo de vigencia del Programa.'
+        content: 'Validez y Vigencia: El Programa tendrá validez en todo el territorio de la República Argentina hasta el 31.12.2024, pudiendo ser prorrogado en forma automática por el término de 1 (un) año ante cada vencimiento, y, también, ser suspendido en los términos de la cláusula 11 del presente Reglamento. Los Puntos tendrán una vigencia máxima de doce (12) meses a partir de la fecha en que fueron otorgados; Los puntos COFA que no sean canjeados, vencerán indefectiblemente a los 12 (doce) meses de su acreditación. En caso de que el Programa se venciera y no fuera prorrogado por COFA, los Puntos susceptibles de ser canjeados que no hayan sido canjeados por los Clientes dentro del período de vigencia del Programa, podrán ser canjeados en los términos de lo dispuesto en la cláusula 11 más abajo, o en su defecto, se extinguirán de pleno derecho. Los restantes Puntos que no den derecho a un canje, no podrán ser canjeados ni otorgarán derecho alguno a sus titulares y se extinguirán de pleno derecho. Por el contrario, si el Programa fuera prorrogado, los Puntos de los Clientes que no hayan sido canjeados continuarán vigentes hasta lo primero entre (a) el vencimiento de su plazo de vigencia y (b) el vencimiento del plazo de vigencia del Programa. '
     },
     {
-        content: 'Acreditación y Vencimiento de Puntos: Los Puntos acumulados bajo el Programa sólo podrán ser canjeados y/o utilizados por los Clientes para obtener como premio:',
+        content: 'Acreditación y vencimiento de Puntos: Los Puntos acumulados bajo el Programa sólo podrán ser canjeados y/o utilizados por los Clientes para obtener como premio:',
         subcontent:[
             {
                 content:' ',
@@ -406,16 +409,19 @@ export const termsAndConditionsPoints = [
                         content:'La fecha en que el Referido haya firmado el contrato de préstamo con COFA.'
                     },
                     {
-                        content:'La fecha en que el Referido haya abonado la tercera (3ra) cuota de la primera asistencia COFA otorgada.'
+                        content:'La fecha en que el Referido haya abonado la tercera (3ra) cuota de la primera asistencia COFA otorgada. '
                     },
                     {
                         content:'La fecha en que completó y envió a COFA la encuesta de satisfacción.'
                     },
                     {
-                        content:'Que se cumplan los requisitos previstos en la cláusula 2.3. del presente con relación a la finalización de un préstamo'
+                        content:'Que se cumplan los requisitos previstos en la cláusula 2.3. del presente con relación a la finalización de un préstamo.'
                     },
                     {
                         content:'La fecha del cumpleaños de su natalicio.'
+                    },
+                    {
+                        content:'La fecha en que el cliente informe que comenzó a seguir a COFA en las Redes Sociales “Instagram” y/o “Facebook”.'
                     },
                 ]
             },
@@ -425,18 +431,18 @@ export const termsAndConditionsPoints = [
         ]
     },
     {
-        content:'Impedimentos: No podrán canjear sus Puntos aquellos Clientes que se encuentren en algún grado de incumplimiento con cualquiera de sus obligaciones contraídas con COFA (ej.: incumplimiento de pago, mora, causales de terminación o de exclusión, etc.).',
+        content:'Impedimentos: No podrán canjear sus Puntos aquellos Clientes que se encuentren en algún grado de incumplimiento con cualquiera de sus obligaciones contraídas con COFA (ej.: incumplimiento de pago, mora, causales de terminación o de exclusión, etc.). ',
         subcontent:[
             {
                 content:'Los Puntos no pueden ser canjeados para ser aplicados al pago de cuotas con más de 30 días de vencimiento.'
             },
             {
-                content:'No podrán participar el programa aquellas personas o empresas que sean empleados de COFA, no proveedores, ni comercializadores de algún producto.'
+                content:'No podrán participar el programa aquellas personas o empresas que sean empleados de COFA, ni proveedores, ni comercializadores de algún producto. '
             },
         ]
     },
     {
-        content: 'Intransferibilidad: Los Puntos son de carácter estrictamente personal y como tales, no son transferibles a ninguna otra cuenta o Cliente que participe del Programa, ni a ninguna otra persona humana o jurídica, bajo ningún título o causa (ej.: cesión, endoso, fallecimiento, disolución de la sociedad conyugal, etc.).'
+        content: 'Intransferibilidad: Los Puntos son de carácter estrictamente personal y como tales, no son transferibles a ninguna otra cuenta o Cliente que participe del Programa, ni a ninguna otra persona humana o jurídica, bajo ningún título o causa (ej.: cesión, endoso, fallecimiento, disolución de la sociedad conyugal, etc.)'
     },
     {
         content:'Descuento: COFA podrá descontar de la cuenta de los Clientes, sin notificación ni aviso previo, los Puntos acreditados por error o relacionados con una transacción que hubiere sido cancelada, revertida o ajustada, o que se hubieran sido obtenidos contrariando lo dispuesto en este Reglamento o de cualquier otra forma desleal, fraudulenta o engañosa.'
@@ -451,13 +457,13 @@ export const termsAndConditionsPoints = [
         content:'Modificación: COFA se reserva el derecho de modificar a su solo criterio, durante la vigencia del Programa, el Reglamento, como así también la grilla de productos y servicios que permiten sumar Puntos y el esquema de canje de Puntos. Dichas modificaciones, que se comunicarán en la forma prevista en la cláusula 11 más abajo, entrarán en vigor en forma inmediata, salvo que se estipule un plazo distinto, pero, en cualquier caso, no afectarán en forma adversa a los canjes de puntos ya recibidos por los Clientes con fecha anterior a su entrada en vigencia.'
     },
     {
-        content:'Suspensión del Programa: COFA se reserva el derecho de postergar, suspender o discontinuar a su sólo criterio el Programa, comunicándolo previamente a los Clientes mediante el envío de un correo electrónico y/o la publicación de avisos en la Página Web de COFA: www.cofa.com.ar, por lo que todos los Clientes, por el sólo hecho de participar en el Programa reconocen expresamente conocer y aceptar el derecho de COFA de ejercer tal reserva y su forma de comunicación, renunciando a efectuar a COFA cualquier reclamo fundado en dicha circunstancia. Los Clientes podrán canjear los Puntos acumulados por los beneficios disponibles, por un plazo de noventa (90) días corridos desde la notificación de la discontinuidad definitiva del Programa siempre que cumplan con las demás condiciones aplicables.'
+        content:'Suspensión del Programa: COFA se reserva el derecho de postergar, suspender o discontinuar a su sólo criterio el Programa, comunicándolo previamente a los Clientes mediante el envío de un correo electrónico y/o la publicación de avisos en la Página Web de COFA:  www.cofa.com.ar, por lo que todos los Clientes, por el sólo hecho de participar en el Programa reconocen expresamente conocer y aceptar el derecho de COFA de ejercer tal reserva y su forma de comunicación, renunciando a efectuar a COFA cualquier reclamo fundado en dicha circunstancia. Los Clientes podrán canjear los Puntos acumulados por los beneficios disponibles, por un plazo de noventa (90) días corridos desde la notificación de la discontinuidad definitiva del Programa siempre que cumplan con las demás condiciones aplicables.'
     },
     {
         content:'Autorización: La participación de los Clientes en el Programa implica la autorización expresa e irrevocable de los mismos a COFA para utilizar sus nombres, números de documentos, imágenes personales y/o voces para publicitar el Programa en cualquier medio, en la forma que COFA considere más conveniente y sin que esto genere derecho a compensación de ninguna especie, hasta transcurridos tres (3) años de su adhesión. COFA ejercerá este derecho en forma prudente y razonable, observando, en lo pertinente, las restricciones y prohibiciones que establezca la normativa aplicable vigente.'
     },
     {
-        content:'Aceptación: La participación en el Programa implica el conocimiento y aceptación de todas las condiciones que se encuentran contenidas en este Reglamento e implica asumir la obligación de informarse acerca de las condiciones vigentes aplicables al mismo en cada momento, las que podrán ser consultadas en la Página Web de COFA: www.cofa.com.ar.'
+        content:'Aceptación: La participación en el Programa implica el conocimiento y aceptación de todas las condiciones que se encuentran contenidas en este Reglamento e implica asumir la obligación de informarse acerca de las condiciones vigentes aplicables al mismo en cada momento, las que podrán ser consultadas en la Página Web de COFA:  www.cofa.com.ar.'
     },
     {
         content:'Canje: El canje de Puntos sólo podrá ser efectuado por los tomadores de algún producto o servicio vigentes a la fecha de canje.',
@@ -486,16 +492,28 @@ export const termsAndConditionsPoints = [
         ]
     },
     {
-        content: 'Valor de los Punto: 1 Punto canjeado equivale a un premio equivalente a la reducción en el pago del servicio elegido por la suma de ar$10. (sujeto a los requisitos detallados en el Reglamento).',
+        content: 'Valor de los Puntos: 1 Punto canjeado equivale a un premio equivalente a la reducción en el pago del servicio elegido por la suma de ar$10. (sujeto a los requisitos detallados en el Reglamento).',
         subcontent: [
             {
                 content:'Por cada referido que:',
                 subcontent: [
                     {
-                        content: 'Efectivamente solicite y firme un préstamo con COFA y mantenga vigente el mismo durante el plazo mínimo aplicable, sin ejercer derecho de arrepentimiento o revocación: 400 Puntos en el Programa.'
+                        content: 'Efectivamente solicite y firme un préstamo con COFA y mantenga vigente el mismo durante el plazo mínimo aplicable, sin ejercer derecho de arrepentimiento o revocación: 400 Puntos en el Programa.',
+                        subcontent: [
+                            {
+                                /* TO DO: no se ve */
+                                content: 'El cliente que haya referido a cinco (5) REFERIDOS que adquieran al menos un (1) préstamo cada uno, en el transcurso de un año calendario, recibirá el doble de puntos a partir del sexto Referido de préstamos. (conf. cláusula 15.1.a.)'
+                            }
+                        ]
                     },
                     {
-                        content: 'Efectivamente solicite una asistencia COFA y la mantenga activa y al día por al menos tres (03) meses consecutivos: 100 Puntos en el Programa.'
+                        content: 'Efectivamente solicite una asistencia COFA y la mantenga activa y al día por al menos tres (03) meses consecutivos: 100 Puntos en el Programa.',
+                        subcontent: [
+                            {
+                                /* TO DO: no se ve */
+                                content: 'El cliente que haya referido a cinco (5) REFERIDOS que adquieran al menos una (1) asistencia, en el transcurso de un año calendario, recibirá el doble de puntos a partir del sexto Referido de asistencias (conf. cláusula 15.1.b.)'
+                            }
+                        ]
                     },
                 ]
             },
@@ -503,16 +521,13 @@ export const termsAndConditionsPoints = [
                 content:'Por cada encuesta de satisfacción completada y enviada: 100 Puntos en el Programa.'
             },
             {
-                content:'Finalicen en tiempo y forma un préstamo: 200 Puntos en el Programa'
+                content:'Finalicen en tiempo y forma un préstamo: 200 Puntos en el Programa.'
             },
             {
-                content:'Por cumplir años de su natalicio mientras tiene un producto activo y al día siendo cliente COFA: 100 Puntos en el Programa'
+                content:'Por cumplir años de su natalicio mientras tiene un producto activo y al día siendo cliente COFA: 100 Puntos en el Programa.'
             },
             {
-                content:'El cliente que haya referido a cinco (5) REFERIDOS que adquieran al menos un (1) préstamo cada uno, en el transcurso de un año calendario, recibirá el doble de puntos a partir del sexto Referido de préstamos. (conf. cláusula 15.1.a.)'
-            },
-            {
-                content:'El cliente que haya referido a cinco (5) REFERIDOS que adquieran al menos una (1) asistencia, en el transcurso de un año calendario, recibirá el doble de puntos a partir del sexto Referido de asistencias (conf. cláusula 15.1.b.)'
+                content:'Por seguir a COFA en las Redes Sociales “Instagram” y/o “Facebook”: 200 puntos en el programa.'
             },
             {
                 content:'No se computarán fracciones de Puntos.'
@@ -536,17 +551,20 @@ export const termsAndConditionsPoints = [
             },
             {
                 content:'Las encuestas que estuvieran vacías o completadas en forma parcial, o que no sean enviadas al mail que se indica al momento de enviar el formulario.',
+            },
+            {
+                content:'Los seguidores en las Redes Sociales “Instagram” y/o “Facebook” que luego de informar que han comenzado a seguir, no continuaran siguiendo; en este caso, una vez detectado que han dejado de cumplir con este requisito, se quitarán los puntos otorgados.'
             }
         ]
     },
     {
-        content:'Baja del Programa: El Cliente podrá solicitar la baja del Programa en cualquier momento cuando lo crea conveniente, mediante el envío de una comunicación a COFA por correo electrónico a: contacto@cofa.com.ar; no siendo obligatorio para ello el canje de los Puntos acumulados no canjeados que existieran hasta el momento, los que ante el pedido de baja caducarán automáticamente y de pleno derecho, sin otorgar derecho al Cliente a compensación, premio o devolución de suma alguna. Una vez procesada la baja del Programa el Cliente podrá volver a adherirse y participar del mismo, si así lo dispone nuevamente y cumple con alguna de las condiciones para obtener Puntos, en las condiciones previstas en el Programa.'
+        content:'Baja del Programa:  El Cliente podrá solicitar la baja del Programa en cualquier momento cuando lo crea conveniente, mediante el envío de una comunicación a COFA por correo electrónico a: contacto@cofa.com.ar; no siendo obligatorio para ello el canje de los Puntos acumulados no canjeados que existieran hasta el momento, los que ante el pedido de baja caducarán automáticamente y de pleno derecho, sin otorgar derecho al Cliente a compensación, premio o devolución de suma alguna. Una vez procesada la baja del Programa el Cliente podrá volver a adherirse y participar del mismo, si así lo dispone nuevamente y cumple con alguna de las condiciones para obtener Puntos, en las condiciones previstas en el Programa.'
     },
     {
         content:'Reserva: COFA se reserva el derecho de establecer y pronunciarse sobre aquellas situaciones o circunstancias que no estén expresamente previstas en este Reglamento, y adaptar o modificar las reglas del Programa en consecuencia con la única obligación de notificar los eventuales cambios a los Clientes por correo electrónico y/o a través de su Página Web, www.cofa.com.ar.'
     },
     {
-        content:'Cesión: Cesión de datos. Los datos recopilados de los Clientes y Referidos son de utilización y aplicación de la actividad de COFA y/o cualquier sociedad que en el futuro sea vinculada y/o subsidiaria, para lo cual el Cliente presta su expresa conformidad. Los datos podrán ser incorporados a una base de datos en cualquier formato. El titular de los datos personales tiene la facultad de ejercer el derecho de acceso a los mismos en forma gratuita a intervalos no inferiores a seis meses, salvo que se acredite un interés legítimo al efecto conforme lo establece el artículo 14, inciso 3 de la ley n°25.326. Asimismo, el titular brinda su expreso consentimiento para que conforme lo establecido en el art. 27 de la ley de Protección de Datos Personales COFA pueda recopilar domicilios, repartir documentos, publicidad o venta directa y otras actividades análogas, mediante el tratamiento de datos que sean aptos para establecer perfiles determinados con fines promocionales, comerciales o publicitarios; o permitan establecer hábitos de consumo, así como conforme el art. 27 del decreto reglamentario 1558/01 el Cliente y/o Referido brinda su expreso consentimiento para que COFA pueda recopilar, tratar y ceder sus datos como así también el de sus consumos con fines de publicidad y ofrecimiento de productos para la formación de perfiles determinados, que categoricen preferencias y comportamientos similares de las personas. Asimismo, los titulares de los datos autorizan y consienten que los mismos sean utilizados y/o cedidos con fines de marketing de conformidad con el art. 4 inc. 1 y 3 de la ley de propiedad de datos personales. Con la aceptación de los presentes Términos y Condiciones, el Cliente está autorizando a COFA y a todos aquellos que resulten necesarios para la continuidad del Programa, para que en caso de que en el futuro el Programa tenga un nuevo propietario, se ceda la información sobre el desarrollo de su cuenta y su historia en Puntos COFA al nuevo propietario.'
+        content:'Cesión: Cesión de datos. Los datos recopilados de los Clientes y Referidos son de utilización y aplicación de la actividad de COFA y/o cualquier sociedad que en el futuro sea vinculada y/o subsidiaria, para lo cual el Cliente presta su expresa conformidad. Los datos podrán ser incorporados a una base de datos en cualquier formato. El titular de los datos personales tiene la facultad de ejercer el derecho de acceso a los mismos en forma gratuita a intervalos no inferiores a seis meses, salvo que se acredite un interés legítimo al efecto conforme lo establece el artículo 14, inciso 3 de la ley n°25.326. Asimismo, el titular brinda su expreso consentimiento para que conforme lo establecido en el art. 27 de la ley de Protección de Datos Personales COFA pueda recopilar domicilios, repartir documentos, publicidad o venta directa y otras actividades análogas, mediante el tratamiento de datos que sean aptos para establecer perfiles determinados con fines promocionales, comerciales o publicitarios; o permitan establecer hábitos de consumo, así como conforme el art. 27 del decreto reglamentario 1558/01 el Cliente y/o Referido brinda su expreso consentimiento para que COFA pueda recopilar, tratar y ceder sus datos como así también el de sus consumos con fines de publicidad y ofrecimiento de productos para la formación de perfiles determinados, que categoricen preferencias y comportamientos similares de las personas. Asimismo, los titulares de los datos autorizan y consienten que los mismos sean utilizados y/o cedidos con fines de marketing de conformidad con el art. 4 inc. 1 y 3 de la ley de propiedad de datos personales.Con la aceptación de los presentes Términos y Condiciones, el Cliente está autorizando a COFA y a todos aquellos que resulten necesarios para la continuidad del Programa, para que en caso de que en el futuro el Programa tenga un nuevo propietario, se ceda la información sobre el desarrollo de su cuenta y su historia en Puntos COFA al nuevo propietario.'
     },
     {
         content:'Derecho de Propiedad Intelectual: Los contenidos del Programa tales como texto, información, gráficos, imágenes, logos, marcas, programas de computación, bases de datos, diseños, arquitectura funcional, aplicaciones, páginas web y cualquier otro material, todos los derechos intelectuales e industriales, códigos, desarrollo, software, hardware, dominio, emblemas, logotipos, diseños, estructura, contenidos, información, etc. sobre Puntos COFA (el “Contenido"),son de propiedad de Cobro Fácil S.R.L, y están protegidos por las leyes vigentes en Argentina, incluyendo, pero sin limitación, las leyes sobre derechos de autor, patentes, marcas, modelos de utilidad, diseños industriales y nombres de dominio. El uso, adaptación, reproducción y/o comercialización del Contenido del programa Puntos COFA no se encuentra autorizada a terceros, lo que el Cliente reconoce y acepta. En ningún caso se entenderá que el Cliente, los Referidos, y/o algún otro tercero, tendrán algún tipo de derecho sobre el Contenido.'
@@ -555,7 +573,7 @@ export const termsAndConditionsPoints = [
         content:'Domicilio: Para todos los efectos legales del presente el Cliente constituye domicilio en el lugar establecido en el último préstamo que haya tomado con COFA, y COFA en Moreno 1628 piso 3° oficina 35 CABA. Ver x domicilio electrónico.'
     },
     {
-        content:'Jurisdicción: Para cualquier cuestión judicial que pudiera derivarse del Programa, los canjes de Puntos, etc., los Clientes y COFA se someterán a la jurisdicción exclusiva de los Tribunales Ordinarios en lo comercial con asiento en la Ciudad Autónoma de Buenos Aires, con renuncia a cualquier otro fuero o jurisdicción.'
+        content:'Jurisdicción. Para cualquier cuestión judicial que pudiera derivarse del Programa, los canjes de Puntos, etc., los Clientes y COFA se someterán a la jurisdicción exclusiva de los Tribunales Ordinarios en lo comercial con asiento en la Ciudad Autónoma de Buenos Aires, con renuncia a cualquier otro fuero o jurisdicción.'
     }
 ]
 
