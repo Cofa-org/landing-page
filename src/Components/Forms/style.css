@@ -195,6 +195,10 @@ textarea::placeholder{
     position: relative;
 }
 
+.submit p{
+    justify-content: flex-end;
+}
+
 @media screen and (max-width: 450px) {
     .form-container{
         flex-direction: column;
