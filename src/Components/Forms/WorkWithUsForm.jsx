@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import { useDropzone } from 'react-dropzone';
 import { PiCloudArrowUp } from "react-icons/pi";
-import { FaChevronRight } from "react-icons/fa";
+import { AiOutlineDelete } from "react-icons/ai";
 
 import './style.css';
 
@@ -10,6 +10,11 @@ import './style.css';
 
 const MyDropzone = ({ field, form: { setFieldValue } }) => {
   const [fileNames, setFileNames] = useState([]);
+
+  const handleDeleteFiles = () => {
+    // Lógica para eliminar los archivos
+    setFileNames([]);
+  };
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop: async (acceptedFiles) => {
@@ -34,7 +39,8 @@ const MyDropzone = ({ field, form: { setFieldValue } }) => {
   return (
     <div className='dropzone-container'>
       {fileNames.length > 0 ? (
-        <div {...getRootProps()} className='dropzone'>
+        <div className='dropzone-delete-container'>
+        <div {...getRootProps()} className='dropzone' >
           <PiCloudArrowUp />
           <h3>Archivo seleccionado</h3>
           <input {...getInputProps()} />
@@ -44,6 +50,8 @@ const MyDropzone = ({ field, form: { setFieldValue } }) => {
             ))}
           </ul>
         </div>
+        <AiOutlineDelete onClick={handleDeleteFiles}/>
+      </div>
       ) : (
         <div {...getRootProps()} className="dropzone">
           <PiCloudArrowUp />
@@ -96,6 +104,10 @@ const WorkWithUsForm = () => {
     const validate = (values) => {
       const errors = {};
   
+      if (!values.name) {
+        errors.name = 'El nombre no puede estar vacío';
+      }
+  
       if (!values.dni) {
         errors.dni = 'El DNI no puede estar vacío';
       }else if (String(values.dni).length !== 8) {
@@ -137,32 +149,32 @@ const WorkWithUsForm = () => {
           <div className="input-container">
             <label>Nombre Completo</label>
             <Field name="name" type="text" placeholder="Nombre(s) y apellido" />
-            <ErrorMessage name="name" component="div" />
+            <ErrorMessage name="name" component="div" className="error-message" />
           </div>
 
           <div className="input-container">
             <label>Correo electrónico</label>
             <Field name="email" type="email" placeholder="nombre123@gmail.com" />
-            <ErrorMessage name="email" component="div" />
+            <ErrorMessage name="email" component="div" className="error-message" />
           </div>
 
           <div className="input-container input-container-100">
             <label htmlFor="telephone">Celular</label>
             <Field name="telephone" type="text" id="telephone" placeholder='+5401122223333'  />
-            <ErrorMessage name="telephone" component="div" />
+            <ErrorMessage name="telephone" component="div"className="error-message" />
           </div>
           
      
           <div className="input-container input-container-100">
             <label htmlFor="message">Mensaje:</label>
             <Field as="textarea" name="message" id="message" placeholder={'Contanos de vos'} className='work-with-us-textarea' />
-            <ErrorMessage name="message" component="div" />
+            <ErrorMessage name="message" component="div"/>
           </div>
         
 
           <div className="input-container input-container-100">
             <Field name="files" component={MyDropzone} />
-            <ErrorMessage name="files" component="div" />
+            <ErrorMessage name="files" component="div" className="error-message"/>
           </div>
 
           <div className="submit">

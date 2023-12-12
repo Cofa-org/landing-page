@@ -3,11 +3,6 @@ import React from 'react'
 import './style.css'
 import { FaArrowRightLong } from "react-icons/fa6";
 
-
-
-
-
-
 const PersonalLendForm = () => {
 
     const handleSubmit = (values) => {
@@ -16,6 +11,10 @@ const PersonalLendForm = () => {
 
     const validate = (values) => {
         const errors = {};
+    
+        if (!values.name) {
+          errors.name = 'El nombre no puede estar vacío';
+        }
     
         if (!values.dni) {
           errors.dni = 'El DNI no puede estar vacío';
@@ -35,6 +34,14 @@ const PersonalLendForm = () => {
           errors.telephone = 'El celular no puede estar vacío';
         } else if (String(values.telephone).length !== 14) {
           errors.telephone = 'Debe ingresar un celular válido';
+        }
+
+        if(values.situation === "no"){
+            errors.situation = 'Debe elegir una situación laboral';
+        }
+
+        if(!values.amount){
+            errors.amount = 'El importe no puede estar vacío';
         }
     
         return errors;
@@ -61,29 +68,29 @@ const PersonalLendForm = () => {
                     <div className="input-container">
                         <label>Nombre Completo</label>
                         <Field name='name' type='text' placeholder='Nombre y apellido' />
-                        <ErrorMessage name='name' />
+                        <ErrorMessage name='name' component="div" className="error-message" />
                     </div>
 
                     <div className="input-container">
                         <label>D.N.I</label>
                         <Field name='dni' type='number' />
-                        <ErrorMessage name='dni' />
+                        <ErrorMessage name='dni' component="div" className="error-message" />
                     </div>
 
                     <div className="input-container">
                         <label>Correo electrónico</label>
                         <Field name='email' type='email' placeholder={'nombre123@gmail.com'} />
-                        <ErrorMessage name='email' />
+                        <ErrorMessage name='email' component="div" className="error-message"/>
                     </div>
 
                     <div className="input-container">
                         <label htmlFor='telephone'>Teléfono</label>
                         <Field name='telephone' type='number' id='telephone' />
-                        <ErrorMessage name='telephone' />
+                        <ErrorMessage name='telephone'component="div" className="error-message" />
                     </div>
 
                     <div className="input-container input-container-100">
-                        <label htmlFor="mySelectField">Situacion Laboral:</label>
+                        <label htmlFor="mySelectField">Situación Laboral:</label>
                         <Field as="select" name="situation" id="mySelectField">
                             <option value="no" label="Elija su situacion laboral" />
                             <option value="relacion-dependencia" label="Relacion de dependencia" />
@@ -95,12 +102,13 @@ const PersonalLendForm = () => {
                             <option value="desempleado" label="Desempleado" />
                             <option value="otro" label="Otro" />
                         </Field>
-                        <ErrorMessage name="mySelectField" component="div" />
+                        <ErrorMessage name="situation" component="div" className="error-message"/>
                     </div>
 
                     <div className="input-container input-container-100">
                         <label htmlFor='amount'>Importe solicitado</label>
                         <Field name='amount' id='amount' placeholder='$' />
+                        <ErrorMessage name='amount' component="div" className="error-message"/>
                     </div>
                     <div>
                         <label htmlFor="">Al clickear en Enviar, estás aceptado los{' '}

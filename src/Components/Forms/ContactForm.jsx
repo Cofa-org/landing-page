@@ -128,6 +128,10 @@ const ContactForm = ({ type }) => {
   const validate = (values) => {
     const errors = {};
 
+    if (!values.name) {
+      errors.name = 'El nombre no puede estar vacío';
+    }
+
     if (!values.dni) {
       errors.dni = 'El DNI no puede estar vacío';
     }else if (String(values.dni).length !== 8) {
@@ -247,25 +251,25 @@ const ContactForm = ({ type }) => {
           <div className="input-container">
             <label>Nombre Completo</label>
             <Field name="name" type="text" placeholder="Nombre y apellido" />
-            <ErrorMessage name="name" component="div" />
+            <ErrorMessage name="name" component="div" className="error-message"/>
           </div>
 
           <div className="input-container">
             <label>D.N.I</label>
             <Field name="dni" type="number" placeholder='11222333' />
-            <ErrorMessage name="dni" component="div" />
+            <ErrorMessage name="dni" component="div" className="error-message"/>
           </div>
 
           <div className="input-container">
             <label>Correo electrónico</label>
             <Field name="email" type="email" placeholder="nombre123@gmail.com" />
-            <ErrorMessage name="email" component="div" />
+            <ErrorMessage name="email" component="div" className="error-message"/>
           </div>
 
           <div className="input-container">
             <label htmlFor="telephone">Celular</label>
             <Field name="telephone" type="text" id="telephone" placeholder='+5401122223333' />
-            <ErrorMessage name="telephone" component="div" />
+            <ErrorMessage name="telephone" component="div" className="error-message"/>
           </div>
           
       {
