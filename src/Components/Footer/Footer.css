@@ -30,6 +30,11 @@ footer{
 .footer-contracts{
     display: flex;
 }
+.footer-contracts p:hover{
+    text-decoration: underline;
+    color: var(--primary-color);
+    font-weight: 500;
+}
 .footer-contracts div{
     width: 50%;
 }
