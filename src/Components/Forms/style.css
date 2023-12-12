@@ -30,6 +30,7 @@
     display: flex;
     flex-direction: column;
     gap: 15px;
+    text-align: left;
 
 }
 
@@ -61,10 +62,15 @@ textarea::placeholder{
     font-size: 16px;
     font-weight: 500;
 }
-
+.input-container .work-with-us-textarea{
+    height: 200px;
+}
 .form-container .input-container-100{
     width: 100%;
+    text-align: left;
 }
+
+
 
 .submit button{
     background-color: var(--primary-color);
@@ -80,7 +86,7 @@ textarea::placeholder{
 }
 
 .submit button svg path{
-    color: white;
+    color: orkhite;
 }
 
 .form-template{
@@ -92,6 +98,11 @@ textarea::placeholder{
 .form-container-type-2{
     position: static;
 }
+
+.dropzone-container .dropzone p{
+    color: var(--text-color);
+    text-align: center;
+} 
 
 .dropzone{
     width: 100%;
@@ -213,7 +224,17 @@ textarea::placeholder{
 .submit p{
     justify-content: flex-end;
 }
-
+@media screen and (max-width:750px){
+    .container-form-work{
+        padding: 40px 7vw !important;
+    }
+}
+@media screen and (max-width: 600px) {
+    .form-container .input-container{
+        width: 100%;
+    
+    }
+}
 @media screen and (max-width: 450px) {
     .form-container{
         flex-direction: column;

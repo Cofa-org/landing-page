@@ -10,6 +10,7 @@ import OurServicesList from "./OurServicesList/OurServicesList";
 import HeaderElMejorTrato from './Header/HeaderElMejorTrato'
 import HeaderAssist from "./Header/HeaderAssist";
 import AssistSlider from "./AssistSlider/AssistSlider";
+import { WorkWithUsForm } from "./Forms/WorkWithUsForm";
 
 export {
     Header, 
@@ -23,5 +24,7 @@ export {
     HeaderType2,
     HeaderElMejorTrato,
     HeaderAssist,
-    AssistSlider
+    AssistSlider,
+    WorkWithUsForm
+
 }

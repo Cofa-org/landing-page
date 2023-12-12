@@ -28,6 +28,8 @@
     position: absolute;
     z-index: -1;
     top: 0;
+    left: 0;
+    width: 100vw;
 }
 .info-work-form{
     display: flex;
@@ -60,5 +62,28 @@
     }
     .info-work{
         width: 100%;
+    }
+    .bg-form-work{
+
+        width: 200vw;
+    }
+}
+
+
+@media screen and (max-width:550px){
+    .quejas-sugerencias{
+        padding: 20px;
+    }
+    .bg-form-work{
+
+        width: 300vw;
+    }
+}
+
+
+@media screen and (max-width:370px){
+    .bg-form-work{
+
+        width: 400vw;
     }
 }
