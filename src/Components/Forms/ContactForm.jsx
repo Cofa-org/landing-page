@@ -7,11 +7,17 @@ import { FaChevronRight } from "react-icons/fa";
 dotenv.config(); */
 import './style.css';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { AiOutlineDelete } from "react-icons/ai";
 
 
 
 const MyDropzone = ({ field, form: { setFieldValue } }) => {
   const [fileNames, setFileNames] = useState([]);
+
+  const handleDeleteFiles = () => {
+    // Lógica para eliminar los archivos
+    setFileNames([]);
+  };
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop: async (acceptedFiles) => {
@@ -36,15 +42,18 @@ const MyDropzone = ({ field, form: { setFieldValue } }) => {
   return (
     <div>
       {fileNames.length > 0 ? (
-        <div {...getRootProps()} className='dropzone'>
-          <PiCloudArrowUp />
-          <h3>Archivo seleccionado</h3>
-          <input {...getInputProps()} />
-          <ul>
-            {fileNames.map((name, index) => (
-              <li key={index}>{name}</li>
-            ))}
-          </ul>
+        <div className='dropzone-delete-container'>
+          <div {...getRootProps()} className='dropzone' >
+            <PiCloudArrowUp />
+            <h3>Archivo seleccionado</h3>
+            <input {...getInputProps()} />
+            <ul>
+              {fileNames.map((name, index) => (
+                <li key={index}>{name}</li>
+              ))}
+            </ul>
+          </div>
+          <AiOutlineDelete onClick={handleDeleteFiles}/>
         </div>
       ) : (
         <div {...getRootProps()} className="dropzone">
@@ -282,7 +291,7 @@ const ContactForm = ({ type }) => {
 
           <div className="input-container input-container-100">
             <label htmlFor="message">Mensaje:</label>
-            <span className='message-item'><span className='circle-item'></span>Ingrese los detalles de su solicitud. Un integrante de COFA soporte responderá a la brevedad para proceder a su solicitud</span>
+            <span className='message-item'><span className='circle-item'></span>Proporcione los detalles de su solicitud, y un miembro del equipo de soporte de COFA responderá rápidamente para atender su requerimiento.</span>
             <Field as="textarea" name="message" id="message" placeholder={MESSAGES[type]} />
             <ErrorMessage name="message" component="div" />
           </div>
