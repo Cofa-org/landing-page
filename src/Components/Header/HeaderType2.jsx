@@ -29,10 +29,10 @@ const HeaderType2 = () => {
           </Link>
         </div>
         <nav className='normal-nav'>
-            <Link to={'/#header'} className='link-selected'>Inicio</Link>
-            <Link to={'/#about-us'} >Nosotros</Link>
-            <Link to={'/#frecuent-questions'} >Preguntas Frecuentes</Link>
-            <Link to={'/#contact'} >Contacto</Link>
+            <Link to={'/'} className='link-selected'>Inicio</Link>
+            <Link to={'/about-us'} >Nosotros</Link>
+            <Link to={'/frecuent-questions'} >Preguntas Frecuentes</Link>
+            <Link to={'/contact'} >Contacto</Link>
             
         </nav>
         <button className='btn-show-links' onClick={openNavbar}><FiMenu/></button>
@@ -41,12 +41,10 @@ const HeaderType2 = () => {
             <button onClick={() => setIsOpen(false)} className='btn-back'>
               <IoMdArrowBack/>
             </button>
-            <a href="#header" className='link-selected'>Inicio</a>
-            <a href="#about-us" onClick={handleCloseNabvar}>Nosotros</a>
-            <a href="#frecuent-questions" onClick={handleCloseNabvar} >Preguntas Frecuentes</a>
-            <a href="#contact" onClick={handleCloseNabvar}>Contacto</a>
-            <Link to={'/cofa-points'} >Puntos COFA</Link>
-            <Link /* to={'/assists'} */ >Asistencias</Link>
+            <Link to={'/'} className='link-selected' onClick={handleCloseNabvar}>Inicio</Link>
+            <Link to={'/about-us'} onClick={handleCloseNabvar}>Nosotros</Link>
+            <Link to={'/frecuent-questions'} onClick={handleCloseNabvar}>Preguntas Frecuentes</Link>
+            <Link to={'/contact'} onClick={handleCloseNabvar}>Contacto</Link>
           </nav>
           <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
             <button className='primary-btn mobible-nav-secondary-btn' >Quiero mi Préstamo</button>

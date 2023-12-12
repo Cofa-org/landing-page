@@ -26,6 +26,11 @@ const HeaderElMejorTrato = () => {
   }, [location.pathname])
 
   const {scrolled } = useScrollContext()
+  const [selectedLink, setSelectedLink] = useState('inicio');
+
+  const handleLinkClick = (link) => {
+    setSelectedLink(link);
+  };
   return (
     <>
     <header className={scrolled && 'solid'}>
@@ -37,10 +42,10 @@ const HeaderElMejorTrato = () => {
             inHome 
             ? (
               <>
-                <Link to="/"  className='link-selected'>Inicio</Link>
-                <a href="#about-us">Nosotros</a>
-                <a href="#frecuent-questions">Preguntas Frecuentes</a>
-                <a href="#contact">Contacto</a>
+                <Link to="/" className={selectedLink === 'inicio' ? 'link-selected' : ''} onClick={() => handleLinkClick('inicio')}>Inicio</Link>
+                <a href="#about-us" className={selectedLink === 'nosotros' ? 'link-selected' : ''} onClick={() => handleLinkClick('nosotros')}>Nosotros</a>
+                <a href="#frecuent-questions" className={selectedLink === 'preguntas' ? 'link-selected' : ''} onClick={() => handleLinkClick('preguntas')}>Preguntas Frecuentes</a>
+                <a href="#contact" className={selectedLink === 'contacto' ? 'link-selected' : ''} onClick={() => handleLinkClick('contacto')}>Contacto</a>
               </>
             )
             : (
@@ -55,7 +60,7 @@ const HeaderElMejorTrato = () => {
            
         </nav>
         <div className='buttons-container buttons-container-points'>
-            <Link /* to={'/assists'} */>
+            <Link to={'/assists'}>
               <button className='secondary-btn' id='btn-points-assist'>Quiero mi Asistencia</button>
             </Link>
             <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
@@ -68,13 +73,18 @@ const HeaderElMejorTrato = () => {
             <button onClick={() => setIsOpen(false)} className='btn-back-points'>
               <IoMdArrowBack/>
             </button>
-            <a href="#hero-elmejortrato" className='link-selected'>Inicio</a>
-            <a href="#about-us" onClick={handleCloseNabvar}>Nosotros</a>
-            <a href="#frecuent-questions" onClick={handleCloseNabvar}>Prefuntas Frecuentes</a>
-            <a href="#contact" onClick={handleCloseNabvar}>Contacto</a>
-            
+            <Link to="/" className={selectedLink === 'inicio' ? 'link-selected' : ''} onClick={() => handleLinkClick('inicio')}>Inicio</Link>
+            <a href="#about-us" className={selectedLink === 'nosotros' ? 'link-selected' : ''} onClick={() => { handleLinkClick('nosotros'); handleCloseNabvar(); }}>
+              Nosotros
+            </a>
+            <a href="#frecuent-questions" className={selectedLink === 'preguntas' ? 'link-selected' : ''} onClick={() => { handleLinkClick('preguntas'); handleCloseNabvar(); }}>
+              Preguntas Frecuentes
+            </a>
+            <a href="#contact" className={selectedLink === 'contacto' ? 'link-selected' : ''} onClick={() => { handleLinkClick('contacto'); handleCloseNabvar(); }}>
+              Contacto
+            </a>
           </nav>
-          <Link /* to={'/assists'} */>
+          <Link to={'/assists'}>
               <button className='secondary-btn mobible-nav-secondary-btn' id='btn-points-assist'>Quiero mi Asistencia</button>
             </Link>
             <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">

@@ -3,10 +3,7 @@ import { Formik, Field, Form, ErrorMessage } from 'formik';
 import { useDropzone } from 'react-dropzone';
 import { PiCloudArrowUp } from "react-icons/pi";
 import { AiOutlineDelete } from "react-icons/ai";
-
 import './style.css';
-
-
 
 const MyDropzone = ({ field, form: { setFieldValue } }) => {
   const [fileNames, setFileNames] = useState([]);
