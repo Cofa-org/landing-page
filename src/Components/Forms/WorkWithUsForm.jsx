@@ -93,15 +93,31 @@ const WorkWithUsForm = () => {
         sendMailRequest( values)
     };
 
-  const validate = (values) => {
-    const errors = {};
-
-    if (String(values.dni).length !== 8) {
-      errors.dni = 'El DNI debe tener 8 dígitos';
-    }
-
-    return errors;
-  };
+    const validate = (values) => {
+      const errors = {};
+  
+      if (!values.dni) {
+        errors.dni = 'El DNI no puede estar vacío';
+      }else if (String(values.dni).length !== 8) {
+        errors.dni = 'El DNI debe tener 8 dígitos';
+      }
+  
+      const emailPattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  
+      if (!values.email) {
+        errors.email = 'El email no puede estar vacío';
+      } else if (!emailPattern.test(values.email)) {
+        errors.email = 'Debe ingresar un email válido';
+      }
+  
+      if (!values.telephone) {
+        errors.telephone = 'El celular no puede estar vacío';
+      } else if (String(values.telephone).length !== 14) {
+        errors.telephone = 'Debe ingresar un celular válido';
+      }
+  
+      return errors;
+    };
 
 
   return (
