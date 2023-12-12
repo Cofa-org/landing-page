@@ -3,10 +3,8 @@ import { Formik, Field, Form, ErrorMessage } from 'formik';
 import { useDropzone } from 'react-dropzone';
 import { PiCloudArrowUp } from "react-icons/pi";
 import { FaChevronRight } from "react-icons/fa";
-/* import dotenv from 'dotenv';
-dotenv.config(); */
+
 import './style.css';
-import { useLocation, useNavigate } from 'react-router-dom';
 
 
 
@@ -58,7 +56,7 @@ const MyDropzone = ({ field, form: { setFieldValue } }) => {
   );
 };
 
-const WorkWithUsForm = ({ type }) => {
+const WorkWithUsForm = () => {
 
   const sendMailRequest = async (values) => {
     const formData = new FormData();
@@ -79,7 +77,7 @@ const WorkWithUsForm = ({ type }) => {
       console.log(key, value)
     })
     console.log('prueba')
-    const response = await fetch('https://backend-landing-cofa-production.up.railway.app/mail/' + type, {
+    const response = await fetch('https://backend-landing-cofa-production.up.railway.app/mail/' + 'TRABAJO', {
       method: 'POST',
       headers: {
 
@@ -111,14 +109,12 @@ const WorkWithUsForm = ({ type }) => {
       <Formik
         initialValues={{
           name: '',
-          dni: '',
           email: '',
           telephone: '',
           message: '',
-          reasonToRegret: '',
           files: [],
         }}
-       /*  onSubmit={handleSubmit} */
+        onSubmit={handleSubmit}
         validate={validate}
       >
         <Form className="form-container">
