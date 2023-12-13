@@ -36,6 +36,13 @@ const Header = () => {
   }, [location.pathname])
 
   const {scrolled } = useScrollContext()
+
+  const [selectedLink, setSelectedLink] = useState('inicio');
+
+  const handleLinkClick = (link) => {
+    setSelectedLink(link);
+  };
+
   return (
     <header  className={scrolled && 'solid'}>
         <Link to={'/home'}>
@@ -46,12 +53,12 @@ const Header = () => {
             inHome 
             ? (
               <>
-                <a href="#header"  className='link-selected'>Inicio</a>
-                <a href="#about-us">Nosotros</a>
-                <a href="#frecuent-questions">Preguntas Frecuentes</a>
-                <a href="#contact">Contacto</a>
-                <Link to={'/cofa-points'} >Puntos COFA</Link>
-                <Link to={'/assists'} >Asistencias</Link>
+                <a href="#header"  className={selectedLink === 'inicio' ? 'link-selected' : ''} onClick={() => handleLinkClick('inicio')}>Inicio</a>
+                <a href="#about-us" className={selectedLink === 'nosotros' ? 'link-selected' : ''} onClick={() => handleLinkClick('nosotros')}>Nosotros</a>
+                <a href="#frecuent-questions" className={selectedLink === 'preguntas' ? 'link-selected' : ''} onClick={() => handleLinkClick('preguntas')}>Preguntas Frecuentes</a>
+                <a href="#contact" className={selectedLink === 'contacto' ? 'link-selected' : ''} onClick={() => handleLinkClick('contacto')}>Contacto</a>
+                <Link to={'/cofa-points'}>Puntos COFA</Link>
+                <Link to={'/assists'}>Asistencias</Link>
               </>
             )
             : (
@@ -75,17 +82,30 @@ const Header = () => {
           <button className='btn-show-links' onClick={openNavbar}><FiMenu/></button>
         </div>
         <div className={isOpen ? 'mobible-navbar open' : (first ?  'mobible-navbar' : 'mobible-navbar not-first')}>
-          <nav className='mobible-links'>
-            <button onClick={() => setIsOpen(false)} className='btn-back'>
-              <IoMdArrowBack/>
-            </button>
-            <a href="#header" className='link-selected'>Inicio</a>
-            <a href="#about-us" onClick={handleCloseNabvar}>Nosotros</a>
-            <a href="#frecuent-questions" onClick={handleCloseNabvar} >Preguntas Frecuentes</a>
-            <a href="#contact" onClick={handleCloseNabvar}>Contacto</a>
-            <Link to={'/cofa-points'} >Puntos COFA</Link>
-            <Link to={'/assists'} >Asistencias</Link>
-          </nav>
+        <nav className='mobible-links'>
+          <button onClick={() => { setIsOpen(false); handleLinkClick(''); }} className='btn-back'>
+            <IoMdArrowBack/>
+          </button>
+          <a href="#header" className={selectedLink === 'inicio' ? 'link-selected' : ''} onClick={() => { handleLinkClick('inicio'); handleCloseNabvar(); }}>
+            Inicio
+          </a>
+          <a href="#about-us" className={selectedLink === 'nosotros' ? 'link-selected' : ''} onClick={() => { handleLinkClick('nosotros'); handleCloseNabvar(); }}>
+            Nosotros
+          </a>
+          <a href="#frecuent-questions" className={selectedLink === 'preguntas' ? 'link-selected' : ''} onClick={() => { handleLinkClick('preguntas'); handleCloseNabvar(); }}>
+            Preguntas Frecuentes
+          </a>
+          <a href="#contact" className={selectedLink === 'contacto' ? 'link-selected' : ''} onClick={() => { handleLinkClick('contacto'); handleCloseNabvar(); }}>
+            Contacto
+          </a>
+          <Link to={'/cofa-points'} onClick={handleCloseNabvar}>
+            Puntos COFA
+          </Link>
+          <Link to={'/assists'} onClick={handleCloseNabvar}>
+            Asistencias
+          </Link>
+        </nav>
+
           <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
             <button className='primary-btn mobible-nav-secondary-btn' >Quiero mi Préstamo</button>
           </a>

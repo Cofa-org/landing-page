@@ -78,27 +78,26 @@ const Contact = () => {
             <div >
                 <Link to={'/complaints'}>Reclamos</Link>
             </div>
-            
-            
-           
-           
-            
         </div>
         <div className='contactListLink'>
-            <div   div className='contact-box contact-box-special'>
-                <Link to={'/regret'}>Boton de arrepentimiento</Link>
-                <p>
-                Tenes el derecho de arrepentirte de la operación que realizaste. Informanos los datos de la misma así te contamos los pasos a seguir.<br/>
-                En el caso de que te arrepientas de un préstamo otorgado deberás devolver el dinero recibido.
-                </p>
-            </div>
-            <div className='contact-box contact-box-special'>
-                <Link to={'/discharge'}>Botón de baja</Link>
-                <p>
-                Tenes el derecho de dar de baja una operación que realizaste. Informanos los datos de la misma así te contamos los pasos a seguir.<br/>
-                En el caso de que quieras dar de baja de un préstamo otorgado deberás devolver el dinero recibido.
-                </p>
-            </div>
+            <Link to={'/regret'}>
+                <div className='contact-box contact-box-special'>
+                    Boton de arrepentimiento
+                    <p>
+                    Tenes el derecho de arrepentirte de la operación que realizaste. Informanos los datos de la misma así te contamos los pasos a seguir.<br/>
+                    En el caso de que te arrepientas de un préstamo otorgado deberás devolver el dinero recibido.
+                    </p>
+                </div>
+            </Link>
+            <Link to={'/discharge'}>
+                <div className='contact-box contact-box-special'>
+                    Botón de baja
+                    <p>
+                    Tenes el derecho de dar de baja una operación que realizaste. Informanos los datos de la misma así te contamos los pasos a seguir.<br/>
+                    En el caso de que quieras dar de baja de un préstamo otorgado deberás devolver el dinero recibido.
+                    </p>
+                </div>
+            </Link>
         </div>
         
         

@@ -26,6 +26,13 @@ const HeaderPoints = () => {
   }, [location.pathname])
 
   const {scrolled } = useScrollContext()
+
+  const [selectedLink, setSelectedLink] = useState('inicio');
+
+  const handleLinkClick = (link) => {
+    setSelectedLink(link);
+  };
+
   return (
     <>
     <header className={scrolled && 'solid'}>
@@ -37,12 +44,20 @@ const HeaderPoints = () => {
             inHome 
             ? (
               <>
-                <Link to="/"  className='link-selected'>Inicio</Link>
-                <a href="#use-of-points">Uso de Puntos</a>
-                <a href="#accreditation">Acreditación</a>
-                <a href="#restrictions">Restricciones</a>
-                <a href="#value">Valor</a>
-                <a href="#contact">Contacto</a>
+                <Link to="/" className={selectedLink === 'inicio' ? 'link-selected' : ''} onClick={() => handleLinkClick('inicio')}>Inicio</Link>
+                <a href="#use-of-points" className={selectedLink === 'use-of-points' ? 'link-selected' : ''} onClick={() => handleLinkClick('use-of-points')}>
+                  Uso de Puntos
+                </a>
+                <a href="#accreditation" className={selectedLink === 'accreditation' ? 'link-selected' : ''} onClick={() => handleLinkClick('accreditation')}>
+                  Acreditación
+                </a>
+                <a href="#restrictions" className={selectedLink === 'restrictions' ? 'link-selected' : ''} onClick={() => handleLinkClick('restrictions')}>
+                  Restricciones
+                </a>
+                <a href="#value" className={selectedLink === 'value' ? 'link-selected' : ''} onClick={() => handleLinkClick('value')}>
+                  Valor
+                </a>
+                <a href="#contact" className={selectedLink === 'contacto' ? 'link-selected' : ''} onClick={() => handleLinkClick('contacto')}>Contacto</a>
               </>
             )
             : (
@@ -59,7 +74,7 @@ const HeaderPoints = () => {
            
         </nav>
         <div className='buttons-container buttons-container-points'>
-            <Link /* to={'/assists'} */>
+            <Link to={'/assists'}>
               <button className='secondary-btn' id='btn-points-assist'>Quiero mi Asistencia</button>
             </Link>
             <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
@@ -72,17 +87,27 @@ const HeaderPoints = () => {
             <button onClick={() => setIsOpen(false)} className='btn-back-points'>
               <IoMdArrowBack/>
             </button>
-            <a href="/home" className='link-selected'>Inicio</a>
-            <a href="#use-of-points" onClick={handleCloseNabvar}>Uso de Puntos</a>
-            <a href="#accreditation" onClick={handleCloseNabvar}>Acreditación</a>
-            <a href="#restrictions" onClick={handleCloseNabvar}>Restricciones</a>
-            <a href="#value" onClick={handleCloseNabvar}>Valor</a>
-            <a href="#contact" onClick={handleCloseNabvar}>Contacto</a>
+            <Link to={'/'} className={selectedLink === 'inicio' ? 'link-selected' : ''} onClick={() => handleLinkClick('inicio')}>Inicio</Link>
+            <a href="#use-of-points" className={selectedLink === 'use-of-points' ? 'link-selected' : ''} onClick={() => { handleLinkClick('use-of-points'); handleCloseNabvar(); }}>
+              Uso de Puntos
+            </a>
+            <a href="#accreditation" className={selectedLink === 'accreditation' ? 'link-selected' : ''} onClick={() => { handleLinkClick('accreditation'); handleCloseNabvar(); }}>
+              Acreditación
+            </a>
+            <a href="#restrictions" className={selectedLink === 'restrictions' ? 'link-selected' : ''} onClick={() => { handleLinkClick('restrictions'); handleCloseNabvar(); }}>
+              Restricciones
+            </a>
+            <a href="#value" className={selectedLink === 'value' ? 'link-selected' : ''} onClick={() => { handleLinkClick('value'); handleCloseNabvar(); }}>
+              Valor
+            </a>
+            <a href="#contact" className={selectedLink === 'contacto' ? 'link-selected' : ''} onClick={() => { handleLinkClick('contacto'); handleCloseNabvar(); }}>
+              Contacto
+            </a>
           </nav>
           <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
             <button className='primary-btn mobible-nav-secondary-btn' >Quiero mi Préstamo</button>
           </a>
-          <Link /* to={'/assists'} */ className='secondary-btn mobible-nav-secondary-btn'>
+          <Link to={'/assists'} className='secondary-btn mobible-nav-secondary-btn'>
             Quiero mi Asistencia
           </Link>
         </div>

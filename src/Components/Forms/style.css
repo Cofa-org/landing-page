@@ -160,6 +160,11 @@ textarea::placeholder{
     font-size: 14px;
 }
 
+.error-message{
+    color: red;
+    font-size: 14px;
+}
+
 @keyframes to-dropdown {
     0% {
         max-height: 0;

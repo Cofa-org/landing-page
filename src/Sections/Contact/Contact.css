@@ -122,6 +122,7 @@
     border-top:3px solid rgb(250, 116, 116);
 }
 .contact-box p{
+    font-weight: 300;
     font-size: 14px;
 }
 
