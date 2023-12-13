@@ -12,6 +12,7 @@ footer{
    gap: 20px;
 }
 
+
 .footer-box-left{
     display: flex;
     flex-direction: column;
@@ -128,6 +129,40 @@ footer .registeredBrand{
         margin-top: auto;
         margin-bottom: 20px;
     
+    }
+}
+
+
+.footer-box-right div:nth-child(1){
+
+    border-left: var(--primary-color) 1px solid;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 450px;
+}
+
+.footer-box-right div:nth-child(3){
+    border-left: var(--primary-color) 1px solid;
+
+}
+
+.ssn-container-mobible{
+    display: none;
+}
+
+@media screen and (max-width: 1400px) {
+    .footer-box-right div:nth-child(1){
+        height: 420px;
+        border-left: var(--primary-color) 1px solid;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+}
+@media screen and (max-width: 1200px) {
+    .footer-box-right div:nth-child(1){
+        height: 450px;
     }
 }
 
