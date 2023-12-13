@@ -1,11 +1,11 @@
 import React from 'react'
 import './WorkWithUs.css'
-import { Header, HeaderType2, WorkWithUsForm } from '../../Components'
+import { Header, WorkWithUsForm } from '../../Components'
 
 const FormWorkWithUs = () => {
     return (
       <>
-        <HeaderType2/>
+        <Header/>
         <section className='container-form-work'>
             <img src="/img/bg-form-work.svg" alt="" className='bg-form-work' />
             <div className='info-work-form'>
