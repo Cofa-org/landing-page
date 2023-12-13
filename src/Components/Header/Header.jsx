@@ -84,7 +84,7 @@ const Header = () => {
             <a href="#frecuent-questions" onClick={handleCloseNabvar} >Preguntas Frecuentes</a>
             <a href="#contact" onClick={handleCloseNabvar}>Contacto</a>
             <Link to={'/cofa-points'} >Puntos COFA</Link>
-            <Link /* to={'/assists'} */ >Asistencias</Link>
+            <Link to={'/assists'} >Asistencias</Link>
           </nav>
           <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
             <button className='primary-btn mobible-nav-secondary-btn' >Quiero mi Préstamo</button>
