@@ -58,7 +58,7 @@ const Header = () => {
                 <a href="#frecuent-questions" className={selectedLink === 'preguntas' ? 'link-selected' : ''} onClick={() => handleLinkClick('preguntas')}>Preguntas Frecuentes</a>
                 <a href="#contact" className={selectedLink === 'contacto' ? 'link-selected' : ''} onClick={() => handleLinkClick('contacto')}>Contacto</a>
                 <Link to={'/cofa-points'}>Puntos COFA</Link>
-                <Link to={'/assists'}>Asistencias</Link>
+                <Link  >Asistencias</Link>
               </>
             )
             : (

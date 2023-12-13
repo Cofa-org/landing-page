@@ -6,7 +6,7 @@ const DischargeScreen = () => {
   return (
     <div>
         <HeaderType2/>
-        <HeroSuggestions Title={()=><h1>Baja</h1>} paragraph={'También podés contactarte con nosotros para recibir ayuda.'} type={'BAJA'}/>
+        <HeroSuggestions Title={()=><h1>Baja</h1>} paragraph={'Se considerará una solicitud de baja cuando quieras finalizar (rescindir) relaciones contractuales que tengas con COFA, en relación a cualquier producto y/o servicio.'} type={'BAJA'}/>
         <Contact/>
         <Footer/>
     </div>

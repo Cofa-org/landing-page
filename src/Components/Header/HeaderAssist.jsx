@@ -41,6 +41,11 @@ const HeaderAssist = () => {
   }, [location.pathname])
 
   const {scrolled } = useScrollContext()
+  const [selectedLink, setSelectedLink] = useState('inicio');
+
+  const handleLinkClick = (link) => {
+    setSelectedLink(link);
+  };
   return (
     <>
     <header className={scrolled && 'solid'}>
@@ -48,34 +53,11 @@ const HeaderAssist = () => {
           <img src='/Logo.svg'/>
         </Link>
         <nav className='nav-points'>
-          <Link to="/"  className='link-selected'>Inicio</Link>
-            <a href="#multi-asistencia">Multiasistencia</a>
-            <a href="#salud">Asistencia en Salud</a>
-            <a href="#desempleo">Asistencia en Desesmpleo</a>
-            <a href="#contact">Contacto</a>
-          {/* {
-            inHome 
-            ? (
-              <>
-                <Link to="/"  className='link-selected'>Inicio</Link>
-                <a href="#multi-assistencia">Multiasistencia</a>
-                <a href="#salud">Asistencia en Salud</a>
-                <a href="#desempleo">Asistencia en Desesmpleo</a>
-                <a href="/assist/#contact">Contacto</a>
-              </>
-            )
-            : (
-              <>
-                <Link to={'/'} className='link-selected'>Inicio</Link>
-                <Link to={'/#use-of-points'} >Uso de Puntos</Link>
-                <Link to={'/#accreditation'} >Acreditación</Link>
-                <Link to={'/#restrictions'} >Restricciones</Link>
-                <Link to={'/#value'} >Valor</Link>
-                <Link to={'/#contact'} >Contacto</Link>
-              </>
-            )
-          } */}
-           
+          <Link to="/" className={selectedLink === 'inicio' ? 'link-selected' : ''} onClick={() => handleLinkClick('inicio')}>Inicio</Link>
+          <a href="#multi-asistencia" className={selectedLink === 'multiasistencia' ? 'link-selected' : ''} onClick={() => handleLinkClick('multiasistencia')}>Multiasistencia</a>
+          <a href="#salud" className={selectedLink === 'salud' ? 'link-selected' : ''} onClick={() => handleLinkClick('salud')}>Asistencia en Salud</a>
+          <a href="#desempleo"className={selectedLink === 'desempleo' ? 'link-selected' : ''} onClick={() => handleLinkClick('desempleo')} >Asistencia en Desesmpleo</a>
+          <a href="#contact" className={selectedLink === 'contacto' ? 'link-selected' : ''} onClick={() => handleLinkClick('contacto')}>Contacto</a>
         </nav>
         <div className='buttons-container buttons-container-points'>
             <Link to={'https://api.whatsapp.com/send/?phone=5491154559017'} target='_blank'>
@@ -90,11 +72,13 @@ const HeaderAssist = () => {
               <IoMdArrowBack/>
             </button>
 
-            <Link to="/"  className='link-selected' onClick={handleCloseNabvar}>Inicio</Link>
-            <a href="#multi-asistencia" onClick={handleCloseNabvar}>Multiasistencia</a>
-            <a href="#salud" onClick={handleCloseNabvar}>Asistencia en Salud</a>
-            <a href="#desempleo" onClick={handleCloseNabvar}>Asistencia en Desesmpleo</a>
-            <a href="#contact" onClick={handleCloseNabvar}>Contacto</a>
+            <Link to="/" className={selectedLink === 'inicio' ? 'link-selected' : ''} onClick={() => {handleLinkClick('inicio'); handleCloseNabvar(); }}>Inicio</Link>
+            <a href="#multi-asistencia" className={selectedLink === 'multiasistencia' ? 'link-selected' : ''} onClick={() => {handleLinkClick('multiasistencia'); handleCloseNabvar(); }}>Multiasistencia</a>
+            <a href="#salud" className={selectedLink === 'salud' ? 'link-selected' : ''} onClick={() => {handleLinkClick('salud'); handleCloseNabvar(); }}>Asistencia en Salud</a>
+            <a href="#desempleo"className={selectedLink === 'desempleo' ? 'link-selected' : ''} onClick={() => {handleLinkClick('desempleo'); handleCloseNabvar(); }} >Asistencia en Desesmpleo</a>
+            <a href="#contact" className={selectedLink === 'contacto' ? 'link-selected' : ''} onClick={() => { handleLinkClick('contacto'); handleCloseNabvar(); }}>
+            Contacto
+          </a>
           </nav>
           
           <Link to={'https://api.whatsapp.com/send/?phone=5491154559017'} target='_blank' className='secondary-btn mobible-nav-secondary-btn'>
