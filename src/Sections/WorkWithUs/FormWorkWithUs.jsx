@@ -5,7 +5,9 @@ import { Header, WorkWithUsForm } from '../../Components'
 const FormWorkWithUs = () => {
     return (
       <>
-        <Header/>
+        <div style={{backgroundColor: "white"}}>
+          <Header/>
+        </div>
         <section className='container-form-work'>
             <img src="/img/bg-form-work.svg" alt="" className='bg-form-work' />
             <div className='info-work-form'>
