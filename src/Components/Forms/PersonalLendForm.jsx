@@ -1,13 +1,50 @@
 import { Field, Formik, Form, ErrorMessage } from 'formik'
-import React from 'react'
+import React, { useState } from 'react'
 import './style.css'
-import { FaArrowRightLong } from "react-icons/fa6";
+import { FaArrowRightLong,FaCheck  } from "react-icons/fa6";
+
+
 
 const PersonalLendForm = () => {
 
-    const handleSubmit = (values) => {
+    const [isSent, setIsSent] = useState(false)
+
+    const handleSubmit = async (values) => {
+        const formData = new FormData();
         console.log(values)
-    }
+        formData.append('name', values.name);
+        formData.append('email', values.email);
+        formData.append('telephone', values.telephone);
+        formData.append('sit_laboral', values.situacion)
+        formData.append('dni', values.dni)
+        formData.append('amount', values.amount)
+    
+        if (values.files && values.files.buffer) {
+          console.log('hola')
+          const file = values.files;
+          const blob = new Blob([new Uint8Array(file.buffer)], { type: 'application/pdf' });
+          formData.append('archivoPDF', blob, file.originalname);
+        }
+   
+        console.log('prueba')
+        /* https://backend-landing-cofa-production.up.railway.app/mail/ Production */
+        /* http://localhost:1000/mail/ */
+        const response = await fetch('https://backend-landing-cofa-production.up.railway.app/mail/' + 'EL-MEJOR-TRATO', {
+          method: 'POST',
+          headers: {
+    
+            'Authorization': `Bearer clave-secreta-cofa`,
+          },
+          body: formData,
+        }).then(res =>{
+            if(res.status == 200){
+                setIsSent(true)
+            }
+        })
+    
+    
+    };
+    
 
     const validate = (values) => {
         const errors = {};
@@ -44,10 +81,8 @@ const PersonalLendForm = () => {
             errors.telephone = '';
         }
 
-        if(values.situation === "no"){
-            errors.situation = 'Debe elegir una situación laboral';
-        }else {
-            errors.situation = '';
+        if(values.situacion === "no"){
+            errors.situacion = 'Debe elegir una situación laboral';
         }
 
         if(!values.amount){
@@ -97,13 +132,13 @@ const PersonalLendForm = () => {
 
                     <div className="input-container">
                         <label htmlFor='telephone'>Teléfono</label>
-                        <Field name='telephone' type='number' id='telephone' />
+                        <Field name='telephone'placeholder='+5491122334455' id='telephone' />
                         <ErrorMessage name='telephone'component="div" className="error-message" />
                     </div>
 
                     <div className="input-container input-container-100">
                         <label htmlFor="mySelectField">Situación Laboral:</label>
-                        <Field as="select" name="situation" id="mySelectField">
+                        <Field as="select" name="situacion" id="mySelectField">
                             <option value="no" label="Elija su situacion laboral" />
                             <option value="relacion-dependencia" label="Relacion de dependencia" />
                             <option value="monotributista" label="Monotribustista/Autónomo" />
@@ -114,7 +149,7 @@ const PersonalLendForm = () => {
                             <option value="desempleado" label="Desempleado" />
                             <option value="otro" label="Otro" />
                         </Field>
-                        <ErrorMessage name="situation" component="div" className="error-message"/>
+                        <ErrorMessage name="situacion" component="div" className="error-message"/>
                     </div>
 
                     <div className="input-container input-container-100">
@@ -130,7 +165,8 @@ const PersonalLendForm = () => {
                         </label>
                     </div>
                     <div className="submit">
-                        <button type='submit'>Enviar <FaArrowRightLong /></button>
+                        
+                        {isSent ?  <span className='sent-message'>Enviado <FaCheck /></span> : <button type='submit'>Enviar <FaArrowRightLong /></button>}
                         
                     </div>
                     <p style={{justifyContent: "flex-end", marginTop: "2%"}}>Te contactaremos a la brevedad</p>

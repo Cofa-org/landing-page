@@ -8,10 +8,12 @@ dotenv.config(); */
 import './style.css';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { AiOutlineDelete } from "react-icons/ai";
+import { FaArrowRightLong,FaCheck  } from "react-icons/fa6";
 
 
 
 const MyDropzone = ({ field, form: { setFieldValue } }) => {
+
   const [fileNames, setFileNames] = useState([]);
 
   const handleDeleteFiles = () => {
@@ -68,6 +70,7 @@ const MyDropzone = ({ field, form: { setFieldValue } }) => {
 };
 
 const ContactForm = ({ type }) => {
+  const [isSent, setIsSent] = useState(false)
   const pathname = useLocation()
   const route = pathname.pathname.substring(1)
   const sendMailRequest = async (values) => {
@@ -103,14 +106,20 @@ const ContactForm = ({ type }) => {
       console.log(key, value)
     })
     console.log('prueba')
-    const response = await fetch('https://backend-landing-cofa-production.up.railway.app/mail/' + type, {
+    /* https://backend-landing-cofa-production.up.railway.app/mail/ Production */
+    /* http://localhost:1000/mail */
+    const response = await fetch('https://backend-landing-cofa-production.up.railway.app/mail/' + type + '/', {
       method: 'POST',
       headers: {
 
         'Authorization': `Bearer clave-secreta-cofa`,
       },
       body: formData,
-    });
+    }).then(res =>{
+      if(res.status == 200){
+          setIsSent(true)
+      }
+  })
 
 
   };
@@ -343,7 +352,7 @@ const ContactForm = ({ type }) => {
           </div>
 
           <div className="submit">
-            <button type="submit">Enviar </button>
+          {isSent ?  <span className='sent-message'>Enviado <FaCheck /></span> : <button type='submit'>Enviar <FaArrowRightLong /></button>}
           </div>
 
 
