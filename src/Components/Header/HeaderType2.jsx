@@ -30,9 +30,9 @@ const HeaderType2 = () => {
         </div>
         <nav className='normal-nav'>
             <Link to={'/'} className='link-selected'>Inicio</Link>
-            <Link to={'/about-us'} >Nosotros</Link>
-            <Link to={'/frecuent-questions'} >Preguntas Frecuentes</Link>
-            <Link to={'/contact'} >Contacto</Link>
+            <Link to={'/#about-us'} >Nosotros</Link>
+            <Link to={'/#frecuent-questions'} >Preguntas Frecuentes</Link>
+            <Link to={'/#contact'} >Contacto</Link>
             
         </nav>
         <button className='btn-show-links' onClick={openNavbar}><FiMenu/></button>
@@ -42,9 +42,9 @@ const HeaderType2 = () => {
               <IoMdArrowBack/>
             </button>
             <Link to={'/'} className='link-selected' onClick={handleCloseNabvar}>Inicio</Link>
-            <Link to={'/about-us'} onClick={handleCloseNabvar}>Nosotros</Link>
-            <Link to={'/frecuent-questions'} onClick={handleCloseNabvar}>Preguntas Frecuentes</Link>
-            <Link to={'/contact'} onClick={handleCloseNabvar}>Contacto</Link>
+            <Link to={'/#about-us'} onClick={handleCloseNabvar}>Nosotros</Link>
+            <Link to={'/#frecuent-questions'} onClick={handleCloseNabvar}>Preguntas Frecuentes</Link>
+            <Link to={'/#contact'} onClick={handleCloseNabvar}>Contacto</Link>
           </nav>
           <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
             <button className='primary-btn mobible-nav-secondary-btn' >Quiero mi Préstamo</button>
