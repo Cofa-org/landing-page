@@ -138,19 +138,13 @@ const WorkWithUsForm = () => {
           errors.telephone = '';
       }
 
-      if(values.situation === "no"){
-          errors.situation = 'Debe elegir una situación laboral';
-      }else {
-          errors.situation = '';
-      }
-
-      if(!values.amount){
-          errors.amount = 'El importe no puede estar vacío';
-      }else {
-          errors.amount = '';
-      }
+    
   
-      return errors;
+      if(!errors.amount && !errors.telephone && !errors.email ){
+        return false
+    }else{
+        return errors;
+    }
     };
 
 

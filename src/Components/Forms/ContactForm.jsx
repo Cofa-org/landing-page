@@ -169,19 +169,13 @@ const ContactForm = ({ type }) => {
         errors.telephone = '';
     }
 
-    if(values.situation === "no"){
-        errors.situation = 'Debe elegir una situación laboral';
-    }else {
-        errors.situation = '';
-    }
 
-    if(!values.amount){
-        errors.amount = 'El importe no puede estar vacío';
-    }else {
-        errors.amount = '';
+   
+    if(!errors.amount && !errors.situacion && !errors.dni && !errors.email ){
+      return false
+    }else{
+        return errors;
     }
-
-    return errors;
   };
 
   const reasons = [

@@ -90,8 +90,12 @@ const PersonalLendForm = () => {
         }else {
             errors.amount = '';
         }
-    
-        return errors;
+        if(!errors.amount && !errors.situacion && !errors.telephone && !errors.email ){
+            return false
+        }else{
+            return errors;
+        }
+        
       };
 
     return (
