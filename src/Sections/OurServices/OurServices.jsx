@@ -16,7 +16,7 @@ const OurServices = () => {
         </p>
         <OurServicesList/>
         <button className='primary-btn btn-assist'>
-          <Link to={'/assists'}>Conocer Asistencias <GoArrowRight /></Link>
+          <Link to={'/assists'}>Conocer Asistencias <GoArrowRight className='arrow-right'/></Link>
         </button>
     </section>
   )

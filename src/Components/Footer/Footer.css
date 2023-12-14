@@ -196,6 +196,9 @@ footer .registeredBrand{
     .cofaContact{
         order: 2;
     }
+    .footer-box-right div:nth-child(1){
+        height: auto;
+    }
 
 }
 @media screen and (max-width:600px){
@@ -214,11 +217,41 @@ footer .registeredBrand{
         bottom: 30px;
         right: 30px;
     }
+    .registeredBrand p{
+        height: 100%;
+        display: flex;
+        align-items: center;
+        gap: 10px
+    }
+    .registeredBrand p svg{
+        font-size: 16px;
+    }
+    .footer-box-right div p{
+        width: 100%;
+    }
 }
+@media screen and (max-width: 550px) {
+    .footer-contracts{
+        gap: 10px
+    }
+}
+
 @media screen and (max-width:450px){
     .wsp-contact{
         bottom: 12px;
         right: 12px;
+    }
+    
+}
+
+@media screen and (max-width:380px){
+    .footer-contracts{
+        flex-direction: column;
+
+    }
+    .footer-contracts div{
+        width: 100%;
+        
     }
 }
 /* 

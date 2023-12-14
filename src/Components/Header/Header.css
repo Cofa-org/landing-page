@@ -260,3 +260,9 @@ header nav a{
         display: none;
     }
 }
+
+@media screen and (max-width: 450px) {
+    .buttons-container .header-primary-btn {
+        display: none;
+    }
+}

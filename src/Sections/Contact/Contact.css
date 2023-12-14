@@ -165,6 +165,17 @@
     .contact-box a{
         font-size: 17px !important;
     }
+    .contactListLink{
+        flex-direction: column;
+        align-items: center;
+
+    }
+    .contact-box-special{
+        margin: auto;
+    }
+    .contact{
+        padding-bottom: 20px;
+    }
 }
 
 
@@ -178,6 +189,9 @@
         flex-direction: column;
         align-items: center;
 
+    }
+    .contact-box-special{
+        margin: auto;
     }
     .contactListLink .contact-box{
         width: 200px;

@@ -8,7 +8,13 @@ import {BsChevronDown} from 'react-icons/bs'
 const FrecuentQuestion = () => {
     const [currentQuestionSelected, setCurrentQuestionSelected] = useState(1)
     const handleSelectQuestion = (id) =>{
-        setCurrentQuestionSelected(id)
+        if(id == currentQuestionSelected){
+            setCurrentQuestionSelected(null)
+        }
+        else{
+            setCurrentQuestionSelected(id)
+        }
+        
     }
   return (
     <section className='frecuentQuestions' id='frecuent-questions'>

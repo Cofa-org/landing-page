@@ -52,6 +52,8 @@
     z-index: 0;
 }
 
+
+
 @media screen and (max-width: 700px){
     .servicesContainer div svg{
         font-size: 16px;
@@ -78,5 +80,16 @@
         display: flex;
         justify-content: center;
         gap: 20px;
+    }
+}
+
+@media screen and (max-width: 450px){
+    .arrow-right{
+        display: none;
+    }
+    .servicesContainer{
+        display: flex;
+        justify-content: center;
+        gap: 5px;
     }
 }

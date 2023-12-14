@@ -163,7 +163,7 @@ const ContactForm = ({ type }) => {
 
     if (!values.telephone) {
       errors.telephone = 'El celular no puede estar vacío';
-    } else if (String(values.telephone).length !== 10) {
+    } else if (String(values.telephone).length !== 14) {
       errors.telephone = 'Debe ingresar un celular válido';
     }else {
         errors.telephone = '';
