@@ -234,6 +234,22 @@ textarea::placeholder{
 .submit p{
     justify-content: flex-end;
 }
+
+.sent-message{
+    display: flex;
+    width: 200px;
+    font-weight: 500;
+    font-size: 18px;
+    padding: 12px 12px 12px 0;
+    align-items: center;
+    gap: 10px;
+    color: var(--primary-color);
+}
+
+.sent-message svg path{
+    color: var(--primary-color)
+}
+
 @media screen and (max-width:750px){
     .container-form-work{
         padding: 40px 7vw !important;
