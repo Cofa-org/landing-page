@@ -61,14 +61,12 @@ header .mobible-navbar{
     }
 }
 
-@media screen and (max-width: 1300px) {
+
+
+@media screen and (max-width: 1500px) {
     .header-type-2 .normal-nav{
         width: 500px;
     }
-
-}
-
-@media screen and (max-width: 1350px) {
     .header-type-2{
         padding-left: 30px;
         padding-right: 30px;

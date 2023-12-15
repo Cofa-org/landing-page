@@ -124,7 +124,7 @@ const PersonalLendForm = () => {
 
                     <div className="input-container">
                         <label>D.N.I</label>
-                        <Field name='dni' type='number' />
+                        <Field name='dni' type='number' placeholder='11222333' />
                         <ErrorMessage name='dni' component="div" className="error-message" />
                     </div>
 
