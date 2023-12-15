@@ -75,7 +75,7 @@ const HeaderAssist = () => {
             <Link to="/" className={selectedLink === 'inicio' ? 'link-selected' : ''} onClick={() => {handleLinkClick('inicio'); handleCloseNabvar(); }}>Inicio</Link>
             <a href="#multi-asistencia" className={selectedLink === 'multiasistencia' ? 'link-selected' : ''} onClick={() => {handleLinkClick('multiasistencia'); handleCloseNabvar(); }}>Multiasistencia</a>
             <a href="#salud" className={selectedLink === 'salud' ? 'link-selected' : ''} onClick={() => {handleLinkClick('salud'); handleCloseNabvar(); }}>Asistencia en Salud</a>
-            <a href="#desempleo"className={selectedLink === 'desempleo' ? 'link-selected' : ''} onClick={() => {handleLinkClick('desempleo'); handleCloseNabvar(); }} >Asistencia en Desesmpleo</a>
+            <a href="#desempleo"className={selectedLink === 'desempleo' ? 'link-selected' : ''} onClick={() => {handleLinkClick('desempleo'); handleCloseNabvar(); }} >Asistencia en Desempleo</a>
             <a href="#contact" className={selectedLink === 'contacto' ? 'link-selected' : ''} onClick={() => { handleLinkClick('contacto'); handleCloseNabvar(); }}>
             Contacto
           </a>
