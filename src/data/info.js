@@ -107,16 +107,17 @@ export const frecuentQuestions = [
         content: 'Mejor! Ya te conocemos y obtener un nuevo préstamo es más fácil.',
         id: 6
     },
-    {
-        name: '¿Tenés otras preguntas?',
-        content: 'Si tenés otras preguntas, escribinos a consultas@cofa.com.ar y responderemos tus dudas a la brevedad.',
-        id: 7
-    },
+   
     {
         name: '¿Cuándo vencen las cuotas?',
         content: 'Podés optar por la fecha de vencimiento que más te convenga. Cuando solicitás el préstamo, nos avisas qué día te conviene pagar y ya queda registrado.',
+        id: 7
+    },
+    {
+        name: '¿Tenés otras preguntas?',
+        content: 'Si tenés otras preguntas, escribinos a consultas@cofa.com.ar y responderemos tus dudas a la brevedad.',
         id: 8
-    }
+    },
 ]
 
 
