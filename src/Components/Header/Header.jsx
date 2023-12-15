@@ -58,7 +58,7 @@ const Header = () => {
                 <a href="#frecuent-questions" className={selectedLink === 'preguntas' ? 'link-selected' : ''} onClick={() => handleLinkClick('preguntas')}>Preguntas Frecuentes</a>
                 <a href="#contact" className={selectedLink === 'contacto' ? 'link-selected' : ''} onClick={() => handleLinkClick('contacto')}>Contacto</a>
                 <Link to={'/cofa-points'}>Puntos COFA</Link>
-                <Link  >Asistencias</Link>
+                <Link to={'/assists'} >Asistencias</Link>
               </>
             )
             : (
@@ -109,7 +109,7 @@ const Header = () => {
           <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
             <button className='primary-btn mobible-nav-secondary-btn' >Quiero mi Préstamo</button>
           </a>
-          <button className='secondary-btn'>Ingresar</button>
+          {/* <button className='secondary-btn'>Ingresar</button> */}
         </div>
         {
           isOpen && <div className='background-layer' onClick={handleCloseNabvar}></div>

@@ -110,6 +110,9 @@
     .cards-container-use{
         margin-top: 3% ;
     }
+    .use-info-container {
+        width: 90%;
+    }
     .use-info h2{
         font-size: 20px;
     }
