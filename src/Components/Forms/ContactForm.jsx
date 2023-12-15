@@ -237,7 +237,8 @@ const ContactForm = ({ type }) => {
   const MESSAGES = {
     BAJA: 'Explicanos el motivo de tu elección.',
     RECLAMO: 'Escribí acá tu reclamo',
-    SUGERENCIAS: 'Escribí acá tu  queja o sugerencia.'
+    SUGERENCIAS: 'Escribí acá tu sugerencia.',
+    QUEJAS: 'Escribí acá tu queja.'
   }
 
   const [reasonSelected, setReasonSelected] = useState({ reason: null, value: null });
@@ -291,7 +292,7 @@ const ContactForm = ({ type }) => {
 
           <div className="input-container">
             <label htmlFor="telephone">Celular</label>
-            <Field name="telephone" type="text" id="telephone" placeholder='+5401122223333' />
+            <Field name="telephone" type="text" id="telephone" placeholder='1122223333' />
             <ErrorMessage name="telephone" component="div" className="error-message"/>
           </div>
           
@@ -334,7 +335,7 @@ const ContactForm = ({ type }) => {
 
           <div className="input-container input-container-100">
             <label htmlFor="message">Mensaje:</label>
-            <span className='message-item'><span className='circle-item'></span>Proporcione los detalles de su solicitud, y un miembro del equipo de soporte de COFA responderá rápidamente para atender su requerimiento.</span>
+            <span className='message-item'><span className='circle-item'></span>Si querés que COFA incorpore algún producto o te interesa que mejoremos algo, avisanos!</span>
             <Field as="textarea" name="message" id="message" placeholder={MESSAGES[type]} />
             <ErrorMessage name="message" component="div" />
           </div>

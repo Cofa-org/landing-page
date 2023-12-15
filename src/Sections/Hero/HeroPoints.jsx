@@ -20,7 +20,6 @@ const HeroPoints = () => {
                     <p className='text-info'>Sumá puntos y ahorrá con nosotros! Por ser cliente COFA acumulás puntos que podrás aplicar como descuento en el pago de tus productos COFA. ¡No pierdas la oportunidad de ahorrar!</p>
                 </div>
                 <div className='hero-buttons'>
-                    {/* TO DO: CAMBIAR COLOR LETRA BOTON */}
                     <button className='primary-btn btn-consult'>
                         <a href='mailto:consultas@cofa.com.ar'>
                             Consultar

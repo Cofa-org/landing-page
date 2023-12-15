@@ -70,7 +70,7 @@ const Contact = () => {
         </div>
         <div className='contactListLink'>
             <div>
-                <Link to={'/suggestions'}>Quejas</Link>
+                <Link to={'/complaints-book'}>Libro de quejas digital</Link>
             </div>
             <div>
                 <Link to={'/suggestions'}>Sugerencias</Link>

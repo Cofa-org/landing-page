@@ -75,7 +75,7 @@ const PersonalLendForm = () => {
     
         if (!values.telephone) {
           errors.telephone = 'El celular no puede estar vacío';
-        } else if (String(values.telephone).length !== 14) {
+        } else if (String(values.telephone).length !== 10) {
           errors.telephone = 'Debe ingresar un celular válido';
         }else {
             errors.telephone = '';
@@ -136,7 +136,7 @@ const PersonalLendForm = () => {
 
                     <div className="input-container">
                         <label htmlFor='telephone'>Teléfono</label>
-                        <Field name='telephone'placeholder='+5491122334455' id='telephone' />
+                        <Field name='telephone'placeholder='1122334455' id='telephone' />
                         <ErrorMessage name='telephone'component="div" className="error-message" />
                     </div>
 

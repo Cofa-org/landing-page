@@ -176,7 +176,7 @@ const WorkWithUsForm = () => {
 
           <div className="input-container input-container-100">
             <label htmlFor="telephone">Celular</label>
-            <Field name="telephone" type="text" id="telephone" placeholder='+5401122223333'  />
+            <Field name="telephone" type="text" id="telephone" placeholder='1122223333'  />
             <ErrorMessage name="telephone" component="div"className="error-message" />
           </div>
           
