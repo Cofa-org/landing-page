@@ -159,17 +159,28 @@ footer .registeredBrand{
         flex-direction: column;
         justify-content: space-between;
     }
+    .ssn-container-mobible{
+        display: flex;
+    }
+    .ssn-container-mobible img{
+        width: 60%;
+    }
+
 }
 @media screen and (max-width: 1200px) {
     .footer-box-right div:nth-child(1){
         height: 450px;
     }
+
 }
 
 @media screen and (max-width:800px){
     
 }
 @media screen and (max-width:600px){
+    .ssn-container-mobible img{
+        width: 100%;
+    }
     .footer-box-right{
         font-size: 14px;
     }
