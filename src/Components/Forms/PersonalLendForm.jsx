@@ -170,7 +170,7 @@ const PersonalLendForm = () => {
                     </div>
                     <div className="submit">
                         
-                        {isSent ?  <span className='sent-message'>Enviado <FaCheck /></span> : <button type='submit'>Enviar <FaArrowRightLong /></button>}
+                        {isSent ?  <span className='sent-message'>Enviado <FaCheck /></span> : <button type='submit' className='primary-btn'>Enviar <FaArrowRightLong /></button>}
                         
                     </div>
                     <p style={{justifyContent: "flex-end", marginTop: "2%"}}>Te contactaremos a la brevedad</p>
