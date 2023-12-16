@@ -131,19 +131,26 @@
     }
     .exchange{
         flex-wrap: wrap;
+        width: 100%;
     }
     .exchange h1 {
         font-size: 35px;
     }
+
+    .exchange-cards{
+        flex-direction: column;
+    }
     .exchange-cards .info-card-exc{
         margin-top: 5%;
+        width: 100%;
     }
     .restrictions-cards{
         flex-wrap: wrap;
+        flex-direction: column;
     }
     .restrictions-cards .info-card-exc {
         margin-top: 5%;
-        width: calc(50% - 10px);
+        width: 100%;
     }
 }
   

@@ -2,6 +2,7 @@ import React from 'react'
 import {GoArrowDown, GoArrowRight} from 'react-icons/go'
 import { OurServicesList } from '../../Components'
 import { Link } from 'react-router-dom'
+import { MdMailOutline } from "react-icons/md";
 
 const HeroAssist = () => {
   return (
@@ -27,6 +28,17 @@ const HeroAssist = () => {
                 <img src='/img/hero-points.svg' className='stain-hero-points-svg'/>
             </div>
             <div className='services-assist-list'>
+                <div className='email-info'>
+                    <span className="email-circle">
+                        <MdMailOutline />
+                    </span>
+                    <div className='email-info-content'>
+                        <h4>Correo electrónico</h4>
+                        <a href='mailto:asistencias@cofa.com.ar'>
+                            <span>asistencias@cofa.com.ar</span>
+                        </a>
+                    </div>
+                </div>
                 <h3><span className='rect'></span>Ofrecemos una amplia gama de prestaciones par acompañar a las personas </h3>
                 <OurServicesList/>
             </div>

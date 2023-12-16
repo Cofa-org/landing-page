@@ -136,6 +136,10 @@
         width: 80%;
         margin: auto;
     }
+    .hero-content-left{
+        padding-left: 0vw;
+        margin-top: 5%;
+    }
     
 }
 @media screen and (max-width: 900px){
@@ -482,6 +486,7 @@
         font-size: 40px;
     }
     .info-cards-points{
+        flex-direction: column;
         margin-top: 10%;
         justify-content: flex-start;
         width: 100%;
@@ -566,6 +571,7 @@
     height: calc(100vh - 100px);
     display: flex;
     align-items: center;
+    /* margin-top: 5%; */
 }
 
 .hero-content-rigth{
@@ -648,7 +654,6 @@
     }
     .hero-container-type-2 .hero-content-left, .hero-container-type-2 .hero-content-rigth{
         width: 100%;
-
     }
 
     .hero-container-type-2 .hero-content-rigth{
@@ -904,5 +909,9 @@
     }
     .cards-el-mejor-trato{
         gap: 20px;
+    }
+    .hero-content-left{
+        padding-left: 0vw;
+        margin-top: 5%;
     }
 }

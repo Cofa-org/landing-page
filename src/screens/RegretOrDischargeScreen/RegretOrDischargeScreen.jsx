@@ -6,7 +6,7 @@ const RegretScreen = () => {
   return (
     <div>
         <HeaderType2/>
-        <HeroSuggestions Title={()=><h1>Arrepentimeinto </h1>} paragraph={'Se considerará una solicitud de arrepentimiento si contrataste un producto por primera vez con COFA y decidís revocar su aceptación dentro de los 10 días hábiles contados desde la fecha de recibido el contrato o de la disponibilidad efectiva del producto.'} type={'ARREPENTIMIENTO'}/>
+        <HeroSuggestions Title={()=><h1>Arrepentimiento </h1>} paragraph={'Se considerará una solicitud de arrepentimiento si contrataste un producto por primera vez con COFA y decidís revocar su aceptación dentro de los 10 días hábiles contados desde la fecha de recibido el contrato o de la disponibilidad efectiva del producto.'} type={'ARREPENTIMIENTO'}/>
         <Contact/>
         <Footer/>
     </div>

@@ -52,6 +52,7 @@ input:-internal-autofill-selected{
     padding: 12px;
     color: var(--primary-color);
     text-align: center;
+    cursor: pointer;
 }
 
 .primary-btn{
@@ -65,6 +66,7 @@ input:-internal-autofill-selected{
     display: flex;
     justify-content: center;
     align-items: center;
+    cursor: pointer;
 }
 
 .primary-btn>a>svg>path{
