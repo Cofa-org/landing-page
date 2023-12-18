@@ -33,19 +33,19 @@ const HeroElMejorTrato = ({}) => {
                             <span className="rect"></span> Nuestras Redes Sociales
                         </span>
                         <div className='social-media-container'>
-                            <Link to={'https://www.facebook.com/cofa.cofa.5245'}>
+                            <Link to={'https://www.facebook.com/cofa.cofa.5245'} target='_blank'>
                                 <FaFacebookF/>
                             </Link>
-                            <Link to={'https://twitter.com/cofa_arg'}>
+                            <Link to={'https://twitter.com/cofa_arg'} target='_blank'>
                                 <FaTwitter/>
                             </Link>
-                            <Link to={'https://www.linkedin.com/company/cofa-servicios-financieros/'}>
+                            <Link to={'https://www.linkedin.com/company/cofa-servicios-financieros/'} target='_blank'>
                                 <FaLinkedinIn/>
                             </Link>
-                            <Link to={'https://instagram.com/cofa.arg?igshid=M2RkZGJiMzhjOQ=='}>
+                            <Link to={'https://instagram.com/cofa.arg?igshid=M2RkZGJiMzhjOQ=='} target='_blank'>
                                 <FaInstagram/>
                             </Link>
-                            <Link to={'https://cofa.ar/'}>
+                            <Link to={'https://cofa.com.ar/'} target='_blank'>
                                 <FaDribbble/>
                             </Link>
                         </div>

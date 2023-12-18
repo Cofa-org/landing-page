@@ -1,11 +1,6 @@
-import React, { useState } from 'react'
+import React, { useEffect } from 'react'
 import './AssitenceScreen.css'
-/* import { HeaderAssistence } from '../../Components'
-import HeroAssistence from '../../Sections/Hero/HeroLend'
-import { ExploreMultiassist } from '../../Sections'
- */
-import { IoMdArrowRoundBack, IoMdArrowRoundForward } from "react-icons/io";
-import { FaAngleDown, FaAngleUp  } from "react-icons/fa6";
+import { IoMdArrowRoundForward } from "react-icons/io";
 import { asistencias, asistenciasDesempleo, asistenciasSalud } from '../../data/assistData';
 import { AssistSlider, Footer, HeaderAssist } from '../../Components';
 import { Contact, HeroAssist } from '../../Sections';
@@ -15,14 +10,14 @@ import { Link } from 'react-router-dom';
 
 const AssistenceScreen = () => {
 
- 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <>
       <HeaderAssist/>
       <HeroAssist/>
-        {/* <HeaderAssistence/>
-        <HeroAssistence/>
-        <ExploreMultiassist/> */}
         <h2 id='multi-asistencia' className='subtitle-assist'>Explora los servicios de Multiasistencia</h2>
         <span className='price-assist'><span className='price-strong'>$1400</span>/Mensuales</span>
         <p className='description-assist'>Los servicios de Multiasistencia cubren asistencia del <strong>hogar</strong>, para <strong>mascotas</strong>, <strong>legal</strong>, <strong>informática</strong>, y asistencia <strong>vehicular</strong>. </p>

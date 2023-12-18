@@ -53,10 +53,10 @@ const AssistSlider = ({asistencias}) => {
         <div className='services-list'>
         {currentAsistence.services?.map(service => (
             <div className='service-item-assist'>
-            <div className='service-control'>
+            <div className='service-control' onClick={() => handleSelectService(service.title)}>
                 <h3>{service.title}</h3>
                 {
-                    service.description &&  <button onClick={() => handleSelectService(service.title)} className='btn-service'>
+                    service.description &&  <button  className='btn-service'>
                     {!(service.title == currentServiceSelected) ? <FaAngleDown/> : <FaAngleUp/>}
                     </button>
                 }
