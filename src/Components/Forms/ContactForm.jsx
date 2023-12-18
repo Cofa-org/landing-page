@@ -81,14 +81,17 @@ const ContactForm = ({ type }) => {
     formData.append('email', values.email);
     formData.append('telephone', values.telephone);
     formData.append('message', values.message);
-    if(type== 'RECHAZO'){
+    if(type == 'RECLAMO' || type == 'BAJA' || type == 'ARREPENTIMIENTO'){
       formData.append('reason', values.reasonSelected.reason + ' > ' + values.reasonSelected.value)
     }
-    if(route == 'regret'){
+    if(type == 'ARREPENTIMIENTO'){
       formData.append('reasonToRegret', 'Arrepentimiento');
     }
-    if(route == 'discharge'){
+    if(type == 'BAJA'){
       formData.append('reasonToRegret', 'Baja');
+    }
+    if(type == 'RECLAMO'){
+      formData.append('reasonToRegret', 'Reclamo')
     }
    /*  if(type == 'BAJA'){
       formData.append('reasonToRegret', values.reasonToRegret);
@@ -238,7 +241,15 @@ const ContactForm = ({ type }) => {
     BAJA: 'Explicanos el motivo de tu elección.',
     RECLAMO: 'Escribí acá tu reclamo',
     SUGERENCIAS: 'Escribí acá tu sugerencia.',
-    QUEJAS: 'Escribí acá tu queja.'
+    QUEJA: 'Escribí acá tu queja.',
+    ARREPENTIMIENTO: 'Explicanos el motivo de tu elección.'
+  }
+  const EXPLICACION_MENSAJE = {
+    BAJA: 'Proporcione los detalles de su solicitud, y un miembro de COFA responderá rápidamente para atender su requerimiento.',
+    RECLAMO: 'Proporcione los detalles de su solicitud, y un miembro de COFA responderá rápidamente para atender su requerimiento.',
+    SUGERENCIAS: 'Si querés que COFA incorpore algún producto o te interesa que mejoremos algo, avisanos!.',
+    QUEJA: 'Proporcione los detalles de su solicitud, y un miembro de COFA responderá rápidamente para atender su requerimiento.',
+    ARREPENTIMIENTO: 'Proporcione los detalles de su solicitud, y un miembro de COFA responderá rápidamente para atender su requerimiento.',
   }
 
   const [reasonSelected, setReasonSelected] = useState({ reason: null, value: null });
@@ -335,7 +346,8 @@ const ContactForm = ({ type }) => {
 
           <div className="input-container input-container-100">
             <label htmlFor="message">Mensaje:</label>
-            <span className='message-item'><span className='circle-item'></span>Si querés que COFA incorpore algún producto o te interesa que mejoremos algo, avisanos!</span>
+
+            <span className='message-item'><span className='circle-item'></span>{EXPLICACION_MENSAJE[type]}</span>
             <Field as="textarea" name="message" id="message" placeholder={MESSAGES[type]} />
             <ErrorMessage name="message" component="div" />
           </div>

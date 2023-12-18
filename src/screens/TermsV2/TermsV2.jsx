@@ -1,14 +1,17 @@
 import React from 'react'
 import { terminos } from '../../data/termsData'
+import './TermsV2.css'
+import { Contact } from '../../Sections'
+import { Footer } from '../../Components'
 
 const TermsV2 = ({type}) => {
   const termSelected = terminos[type]
   return (
+    <>
     <section id='terms' className='terms-list-container'>
         <h1>{termSelected.title}</h1>
         <p>{termSelected.initialDescription}</p>
-        <p>{termSelected.description}</p>
-
+        {termSelected.description.map(term =>(<p>{term}</p>))}
         <ul className='terms-list'>
             {
                 termSelected.terms.map((term, index) => (
@@ -16,48 +19,36 @@ const TermsV2 = ({type}) => {
                         <h2>
                             {term.title}
                         </h2>
-                        <ol>
+                        <ol className='terms-list terms-first'>
                             {term.content.map(content => (
-                                <li>
-                                    <span>{content.name}</span>{content.content}
-                                    <ol>
+                                <li className='terms-item-first'>
+                                    <span className='terms-title-first'>{content.name}{content.name ? ':' : ''}</span>{content.content}
+                                    <ol className='terms-list-second'>
                                         { content.subcontent && content.subcontent.map(subcontent =>(
                                             <li>
-                                                <span>{subcontent.name}</span>{subcontent.content}
+                                                <span className='terms-title-second'>{subcontent.name}{subcontent.name ? ':' : ''}</span>{subcontent.content}
+                                                {
+                                                subcontent.excluciones && 
+                                                    <>
+                                                        <h3 className='exclusiones-title'>Exclusiones</h3>
+                                                        {
+                                                        subcontent.length == 1 
+                                                        ? <p>{subcontent[0]}</p> 
+                                                        :<ol className='exclusiones-list'>
+                                                            {subcontent.excluciones.map(exclucion => (
+                                                                <li>{exclucion}</li>
+                                                            ))}
+                                                        </ol>
+                                                        
+                                                        }
+                                                    </>
+                                                }
                                             </li>
                                             )) 
                                         }
                                     </ol>
                                 </li>
                             ))}
-                           {/*  <li key={index} className='term-item'>
-                                <span className='term-name'>{term.name}</span>{term.content}
-                                {
-                                    term.subcontent && 
-                                    <ul className='subterm-list'>
-                                        {
-                                            term.subcontent.map((subterm, index) =>(
-                                                <li key={index} className='subterm-item'>
-                                                    <span className='subterm-name'>{subterm.name}</span>{subterm.content}
-                                                    {
-                                                        subterm.exclusiones && 
-                                                        <>
-                                                            <h3 className='exclusiones-title'>Exclusiones</h3>
-                                                            {
-                                                                subterm.exclusiones.map(exclusion => (
-                                                                    <p>{exclusion}</p>
-                                                                ))
-                                                            }
-                                                            <p></p>
-                                                        </>
-                                                    }
-                                                </li>
-                                            ))
-                                        }
-
-                                    </ul>   
-                                }
-                            </li> */}
                         </ol>
                         
                     </>
@@ -65,7 +56,11 @@ const TermsV2 = ({type}) => {
                 ))
             }
         </ul>
+        
     </section>
+    <Contact/>
+    <Footer/>
+    </>
   )
 }
 
