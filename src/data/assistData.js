@@ -71,7 +71,7 @@ export const asistencias = [
       services: [
         {
           title: 'Atención telefónica tecnológica',
-          description: 'Derecho laboral, derecho civil, derecho de familia y derecho comercial. '
+          description: 'Las 24 hs los 365 días del año. A requerimiento del Beneficiario un técnico especializado responderá sus preguntas y tratará de solucionar el problema vía telefónica. Contempla 5 eventos anuales. '
           
         },
         {
@@ -98,16 +98,19 @@ export const asistencias = [
       services: [
         {
           title: 'Chequeo General',
-          description: 'Derecho laboral, derecho civil, derecho de familia y derecho comercial. '
+          description: 'A efectos de lograr una buena prevención de enfermedades de la mascota, el servicio le brindará los chequeos rutinarios de acuerdo con la mascota y edad. Serán cubiertos 2 eventos anuales. '
         },
         {
           title: 'Urgencias 24 hs',
+          description:'En caso de un imprevisto, alteración del estado de salud del animal o accidente que amerite, el servicio coordinará la atención médica del caso. Serán cubiertos 2 eventos anuales, hasta $20.000.- por cada evento.'
         },
         {
-          title: 'Orientación legal veterinaria',
+          title: 'Orientación Veterinaria Telefónica',
+          description:'A solicitud del BENEFICIARIO, el servicio lo contactará telefónicamente con sus médicos veterinarios para que le den orientación sobre padecimientos y / o cuidados de la mascota. Estos eventos no tienen límites de cobertura.'
         },
         {
-          title: 'Orientación veterinaria telefónica',
+          title: 'Orientación Legal Veterinaria',
+          description:'En caso de que el BENEFICIARIO haya sido demando por daños a terceros causados por su mascota se lo contactará telefónicamente con un abogado para que lo asesore respecto del modo en que deberá proceder ante la demanda levantada en su contra. En caso de que la demanda realizada haya provocado que el BENEFICIARIO quede demorado por las autoridades, el servicio le brindará asesoramiento legal.'
         },
       ]
     },
@@ -168,7 +171,7 @@ export const asistenciasSalud = [
     ]
   },
   {
-    title: 'Asesoramiento Legal',
+    title: 'Médico a Domicilio',
     description: 'Atención médica en el domicilio del Beneficiario, para aquellos cuadros médicos sin riesgos de vida. El médico efectuará el diagnóstico y la correspondiente prescripción de la terapéutica indicada. Límite de cobertura: Limitado a 3 eventos anuales por grupo familiar.',
     services: [
       {
@@ -331,75 +334,6 @@ export const asistenciasDesempleo = [
     title: 'Apoyo escolar para hijos',
     description: 'En caso de que se presenten las condiciones de desempleo descritas en los Términos y Condiciones de asistencias por Desempleo (TyCpad), se podrá brindar un apoyo económico para los hijos menores de 12 años del Beneficiario, destinado exclusivamente a gastos de escolaridad de estos. Este apoyo económico es una ayuda valiosa para los padres que enfrentan dificultades financieras durante el desempleo. Además, el hecho de que esté destinado exclusivamente a gastos de escolaridad de los hijos menores de 12 años del Beneficiario, asegura que los niños puedan continuar con su educación sin interrupciones.',
    
-  },
-  {
-    title: 'Asesoramiento Legal',
-    description: 'A requerimiento del usuario se lo contactará telefónicamente con un abogado especializado para que pueda realizar: Límite de cobertura: El asesoramiento legal telefónico es limitado. La redacción de documentos y el asesoramiento legal in situ o durante procesos judiciales será a cargo del Beneficiario. ',
-    services: [
-      {
-        title: 'Consultas generales sobre: ',
-        description: 'Derecho laboral, derecho civil, derecho de familia y derecho comercial. '
-        
-      },
-      {
-        title: 'Asesoramiento en proceso como: Robos sufridos, fallecimientos, denuncias y accidentes.',
-
-      },
-      {
-        title: 'Información tributaria',
-      },
-      {
-        title: 'Orientación en la elaboración, revisión y presentación de documentos legales',
-        description: 'Contratos de trabajo, denuncia por robo o por pérdida de documentos personales, pérdida de bienes materiales, pérdida de licencia de conducir, etc. Minutas: Compra venta de bienes, poderes, generales y especiales, revocatoria de poderes, permisos de salida, hipotecas, cancelaciones de hipotecas, promesas de compraventa, posesión efectiva, garantías económicas.'
-      },
-    
-    ]
-  },
-  {
-    title: 'Asistencia Informática',
-    description: 'Bajo esta categoría se comprenden los siguientes servicios: ',
-    services: [
-      {
-        title: 'Atención telefónica tecnológica',
-        description: 'Derecho laboral, derecho civil, derecho de familia y derecho comercial. '
-        
-      },
-      {
-        title: 'Configuración de periféricos/equipamiento',
-
-      },
-      {
-        title: 'Consulta telefónica sobre software o hardware',
-      },
-      {
-        title: 'Instalación de antispyware',
-     
-      },
-      {
-        title: 'Técnico a domicilio con costo preferencial',
-        description:
-        'En caso de requerir un técnico a domicilio, el servicio enviará un técnico al domicilio del Beneficiario. El costo del servicio será a cargo del Beneficiario. El servicio coordinará a costos preferenciales para el Beneficiario en los siguientes rubros: limpieza de pc, cambio de partes, configuración de periféricos, formateo de disco duro, reinstalación de sistemas operativos, instalación de software, mantenimiento preventivo, reparaciones, implantación y gestión de copias de seguridad. Además, referencia, asesoramiento y coordinación para: hardware y software, diseño y montaje de redes, licencias, diseño de páginas web y gestión de dominios, ampliación de equipos. La solicitud por el servicio no tiene límites. '
-      },
-    ]
-  },
-  {
-    title: 'Mascotas',
-    description: 'Las siguientes prestaciones para mascotas, serán cubiertas hasta un tope máximo por cobertura:',
-    services: [
-      {
-        title: 'Chequeo General',
-        description: 'Derecho laboral, derecho civil, derecho de familia y derecho comercial. '
-      },
-      {
-        title: 'Urgencias 24 hs',
-      },
-      {
-        title: 'Orientación legal veterinaria',
-      },
-      {
-        title: 'Orientación veterinaria telefónica',
-      },
-    ]
-  },
+  }
 ]
 
