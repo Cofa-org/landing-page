@@ -1,6 +1,6 @@
 import React from 'react'
 import { Route, Routes } from 'react-router-dom'
-import { HomeScreen, TermsScreen, PrivacyPoliciesScreen, PointsScreen, RegretOrDischargeScreen, ComplaintsScreen, SuggestionsScreen, TermsPointsScreen, ElMejorTratoScreen, DischargeScreen, AssistenceScreen, QuejasScreen } from './screens'
+import { HomeScreen, TermsScreen, PrivacyPoliciesScreen, PointsScreen, RegretOrDischargeScreen, ComplaintsScreen, SuggestionsScreen, TermsPointsScreen, ElMejorTratoScreen, DischargeScreen, AssistenceScreen, QuejasScreen, TermsV2 } from './screens'
 import { FormWorkWithUs } from './Sections'
 
 
@@ -24,6 +24,7 @@ const RouterScreens = () => {
         <Route path='/terms-and-conditions-cofa-points' element={<TermsPointsScreen/>} />
         <Route path='/work-with-us' element={<FormWorkWithUs/>}/>
         <Route path='/el-mejor-trato' element={<ElMejorTratoScreen />}/>
+        <Route path='/terminos-multiasistencia' element={<TermsV2 type={'MULTIASISTENCIA'}/>}/>
     </Routes>
   )
 }

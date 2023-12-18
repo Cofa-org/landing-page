@@ -11,7 +11,7 @@ import TermsPointsScreen from './TermsScreen/TermsPointsScreen';
 import ElMejorTratoScreen from './ElMejorTratoScreen/ElMejorTratoScreen'
 import DischargeScreen from "./DischargeScreen/DischargeScreen";
 import QuejasScreen from "./QuejasScreen/QuejasScreen"
-
+import TermsV2 from "./TermsV2/TermsV2";
 
 
 export  {
@@ -27,5 +27,6 @@ export  {
     DischargeScreen,
     ElMejorTratoScreen,
     AssistenceScreen,
-    QuejasScreen
+    QuejasScreen,
+    TermsV2
 }
