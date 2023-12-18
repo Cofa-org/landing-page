@@ -28,7 +28,7 @@ const HeroAssist = () => {
                 <img src='/img/hero-points.svg' className='stain-hero-points-svg'/>
             </div>
             <div className='services-assist-list'>
-                <div className='email-info'>
+                <div className='email-info' style={{marginTop: '0%'}}>
                     <span className="email-circle">
                         <MdMailOutline />
                     </span>

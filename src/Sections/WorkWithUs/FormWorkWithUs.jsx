@@ -1,8 +1,12 @@
-import React from 'react'
+import React,{ useEffect } from 'react'
 import './WorkWithUs.css'
 import { Header, WorkWithUsForm } from '../../Components'
 
 const FormWorkWithUs = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0); // Desplazarse al principio de la página
+  }, []);
+
     return (
       <>
         <div style={{backgroundColor: "white"}}>
