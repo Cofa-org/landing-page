@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import { useDropzone } from 'react-dropzone';
 import { PiCloudArrowUp } from "react-icons/pi";
@@ -81,9 +81,9 @@ const ContactForm = ({ type }) => {
     formData.append('email', values.email);
     formData.append('telephone', values.telephone);
     formData.append('message', values.message);
-    if(type == 'RECLAMO' || type == 'BAJA' || type == 'ARREPENTIMIENTO'){
+ /*    if(type == 'RECLAMO' || type == 'BAJA' || type == 'ARREPENTIMIENTO'){
       formData.append('reason', values.reasonSelected.reason + ' > ' + values.reasonSelected.value)
-    }
+    } */
     if(type == 'ARREPENTIMIENTO'){
       formData.append('reasonToRegret', 'Arrepentimiento');
     }
@@ -266,6 +266,9 @@ const ContactForm = ({ type }) => {
   const getReason = () => {
     return reasons.find(reason => reason.name === reasonSelected.reason);
   };
+  useEffect(() =>{
+    setOpenSelector(false)
+  },[ reasonSelected.value] )
   
   return (
     <div className="quejas-sugerencias">
@@ -309,7 +312,7 @@ const ContactForm = ({ type }) => {
           
       {
 
-        type === 'RECLAMO' && (
+        type === 'RECLAMO'  && (
           <div className="input-container input-container-100">
             <label htmlFor="reason">Motivo:</label>
             <div className='selector-input-container'>
