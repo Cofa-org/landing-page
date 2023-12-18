@@ -25,6 +25,8 @@ const RouterScreens = () => {
         <Route path='/work-with-us' element={<FormWorkWithUs/>}/>
         <Route path='/el-mejor-trato' element={<ElMejorTratoScreen />}/>
         <Route path='/terminos-multiasistencia' element={<TermsV2 type={'MULTIASISTENCIA'}/>}/>
+        <Route path='/terminos-salud-integral' element={<TermsV2 type={'SALUDINTEGRAL'}/>}/>
+        <Route path='/terminos-' element={<TermsV2 type={'SALUDINTEGRAL'}/>}/>
     </Routes>
   )
 }
