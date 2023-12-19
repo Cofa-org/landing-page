@@ -46,6 +46,7 @@ const TermsAndConditions = () => {
                 ))
             }
         </ul>
+        <p>V1.8 – 21/11/2023.</p>
     </section>
   )
 }
