@@ -372,8 +372,13 @@ export const termsAndConditionsPoints = [
                         content:'Se aplica a los Referidos que:',
                         /* TO DO: este subcontent no se esta mostrando */
                         subcontent:[
+                            
                             {
-                                content:'Soliciten, obtengan y mantengan vigente por más de diez (10) días corridos contados a partir de la fecha de celebración del respectivo contrato, un primer préstamo y no sean o hayan sido clientes de COFA. '
+                                content:'Soliciten, obtengan y mantengan vigente por más de diez (10) días corridos contados a partir de la fecha de celebración del respectivo contrato, un primer préstamo y no sean o hayan sido clientes de COFA. ',
+                                subcontent:[
+                                    'Soliciten y mantengan vigente por el plazo de tres (03) meses contínuos una primera asistencia COFA (www.cofa.com.ar/asistencias).'
+                                ]
+
                             },
                             {
                                 content:'Soliciten y mantengan vigente por el plazo de tres (03) meses contínuos una primera asistencia COFA (www.cofa.com.ar/asistencias).'

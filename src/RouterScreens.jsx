@@ -24,8 +24,9 @@ const RouterScreens = () => {
         <Route path='/terms-and-conditions-cofa-points' element={<TermsPointsScreen/>} />
         <Route path='/work-with-us' element={<FormWorkWithUs/>}/>
         <Route path='/el-mejor-trato' element={<ElMejorTratoScreen />}/>
-        <Route path='/terminos-multiasistencia' element={<TermsV2 type={'MULTIASISTENCIA'}/>}/>
-        <Route path='/terminos-salud-integral' element={<TermsV2 type={'SALUDINTEGRAL'}/>}/>
+        <Route path='/assists/terminos-multiasistencia' element={<TermsV2 type={'MULTIASISTENCIA'}/>}/>
+        <Route path='/assists/terminos-salud-integral' element={<TermsV2 type={'SALUDINTEGRAL'}/>}/>
+        <Route path='/assists/terminos-desempleo' element={<TermsV2 type={'DESEMPLEO'}/>}/>
         <Route path='/terminos-' element={<TermsV2 type={'SALUDINTEGRAL'}/>}/>
     </Routes>
   )

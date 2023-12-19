@@ -1,1 +1,3 @@
--Hascer que se valide el number con la libreria del back
+-Hacer que se valide el number con la libreria del back
+
+-revisar el punto 15 A I que se parezca al figma

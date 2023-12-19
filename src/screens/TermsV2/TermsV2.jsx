@@ -1,13 +1,17 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { terminos } from '../../data/termsData'
 import './TermsV2.css'
 import { Contact } from '../../Sections'
-import { Footer } from '../../Components'
+import { Footer, HeaderAssist } from '../../Components'
 
 const TermsV2 = ({type}) => {
+    useEffect(() => {
+        window.scrollTo(0, 0);
+      }, []); 
   const termSelected = terminos[type]
   return (
     <>
+    <HeaderAssist/>
     <section id='terms' className='terms-list-container'>
         <h1>{termSelected.title}</h1>
         <p>{termSelected.initialDescription}</p>

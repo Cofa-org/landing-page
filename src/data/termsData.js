@@ -406,7 +406,7 @@ const saludintegral = {
                         },
                         {
                             name:'Cobertura de información sanitaria',
-                            content:`Esta información médica podrá versar sobre los siguientes aspectos: Procedimientos a seguir en determinadas patologías, consejos ante urgencias médicas, medicina preventiva, consejos de salud en general, consultas farmacológicas: posologías, interacciones. Centros sanitarios: públicos y privados. Embarazo, lactancia, infancia. Accidentes domésticos. Síndromes geriátricos. Enfermedades degenerativas. Consultas analíticas, vacunas. Ayuda en la comprensión de informes y diagnósticos.`
+                            content:`Esta información médica podrá versar sobre los siguientes aspectos: Procedimientos a seguir en determinadas patologías, consejos ante urgencias médicas, medicina preventiva, consejos de salud en general, consultas farmacológicas: psicologías, interacciones. Centros sanitarios: públicos y privados. Embarazo, lactancia, infancia. Accidentes domésticos. Síndromes geriátricos. Enfermedades degenerativas. Consultas analíticas, vacunas. Ayuda en la comprensión de informes y diagnósticos.`
                         },
                         {
                             name:'Descripción del personal y tratamiento técnico',
@@ -708,10 +708,14 @@ const desempleo = {
                     name:'Servicios de asistencia',
                     content:'Los servicios asistenciales que presta RUA a través de terceras empresas a los usuarios.'
                 },
+                {
+                    name:'Desempleo Involuntario',
+                    content:' Desvinculación laboral que produzca por alguna de las siguientes causas: Despido sin causa justificada, despido por fuerza mayor; excepto los casos de extensión del contrato de trabajo por quiebra o concurso del empleador, desvinculación laboral en contratos a término antes de la finalización de este.'
+                },
             ]
         },
         {
-            title: 'Segunda - Coberturas de Asistencia',
+            title: 'Segunda - Servicios de Plan Desempleo',
             content: [
                 {
                     name:'Canasta familiar',
@@ -796,19 +800,103 @@ const desempleo = {
                     name:'',
                     content:`El Beneficiario deberá notificar a la central telefónica de RUA ante cualquier suceso que dé lugar a una reclamación en un plazo máximo de quince (15) días desde la ocurrencia de este. RUA Asistencia enviará al Beneficiario el formulario de reclamaciones apropiado y le explicará el procedimiento de reclamación. Sin perjuicio de la libertad probatoria, el Beneficiario deberá presentar los siguientes documentos, sin que se constituyan los únicos por medio de los cuales se puede probar la ocurrencia del evento: Servicio de Desempleo
                     `,
+                    subcontent:[
+                        {
+                            name: 'Telegrama o carta documento de despido sin justa causa. '
+                        },
+                        {
+                            name: 'Fotocopia del documento de identidad del Beneficiario. '
+                        },
+                        {
+                            name: 'Factura de Luz, Agua y Gas, Materiales de estudio, alimentos, etc.'
+                        },
+                        {
+                            name: 'En caso de solicitud de asistencia, RUA podrá verificar: el despido con el empleador y corroborar que el Beneficiario se mantiene en situación de desempleo durante el uso de la asistencia. RUA tendrá derecho, siempre que lo juzgue conveniente, comprobar cualquier hecho o situación de la cual se derive para ella una obligación. La obstaculización por parte del Beneficiario para que se lleve a cabo esa comprobación liberará a RUA de cualquier obligación.'
+                        }
+
+                    ]
                 },
             ]
         },
         {
-            title: 'Quinta - Operativa de Servicio',
+            title: 'Quinta - Exclusiones Generales',
+            content: [
+                {
+                    name:'',
+                    content:`Cuando el beneficiario cuente con menos de 12 meses de antigüedad laboral al momento del despido sin justa causa.`,
+                },
+                {
+                    name:'',
+                    content:` Cuando el beneficiario esté sujeto al desempleo normal por temporadas o terminación de contrato (empleo por tiempo determinado, por temporada, eventual, etc.).`,
+                },
+                {
+                    name:'',
+                    content:`Los servicios que el beneficiario haya concertado por su cuenta.`,
+                },
+                {
+                    name:'',
+                    content:`Los gastos de asistencia médica y hospitalaria, que no se encuentren cubiertos en los presentes TyCpad, por ejemplo, estudios, internaciones, intervenciones quirúrgicas, medicamentos, etc.`,
+                },
+                {
+                    name:'',
+                    content:`Las asistencias médicas de rutina, consultas de control, con fines estéticos, así como cualquier prestación que resulte de un tratamiento.`,
+                },
+                {
+                    name:'',
+                    content:`Gastos de asistencia médica y hospitalaria.`,
+                },
+                {
+                    name:'',
+                    content:`Enfermedades o lesiones crónicas diagnosticadas con anterioridad.`,
+                },
+                {
+                    name:'',
+                    content:`Muerte o lesión originadas directa o indirectamente por hechos punibles o acciones dolosas del beneficiario.`,
+                },
+                {
+                    name:'',
+                    content:`Asistencia de gastos derivados de prácticas deportivas de competición.`,
+                },
+
+                {
+                    name:'',
+                    content:`Medicamento de uso ambulatorio sin receta.`,
+                },
+
+                {
+                    name:'',
+                    content:`Si el Beneficiario contratante ya hubiere cubierto el mismo interés y beneficio mediante la contratación de asistencias y/o seguros anteriores, el Beneficiario deberá comunicarlo a RUA bajo pena de nulidad. En tal caso, frente a un desempleo involuntario RUA contribuirá proporcionalmente al monto de su contrato hasta la concurrencia de la asistencia monetaria debida. El Beneficiario no puede pretender en el conjunto beneficiarse de un monto monetario que supere el correspondiente a abonar por una asistencia de desempleo. Si se celebró la contratación del servicio con la intención de un enriquecimiento indebido, los contratos celebrados son nulos; sin perjuicio del derecho de RUA a percibir la cuota devengada en el período durante el cual desconocieron esa intención sin exceder la de un año. Asimismo, el Beneficiario deberá dar aviso por escrito a RUA de la celebración posterior de cualquier contrato que cubra la prestación del mismo servicio. La omisión del Beneficiario de efectuar las comunicaciones exigidas determinará la exención de la prestación del servicio. A su vez, RUA tendrá derecho a exigir al beneficiario el reembolso inmediato de todos los gastos generados de haberse comprobado el pago por cualquier tercero o por RUA al Beneficiario.`,
+                },
+                {
+                    name:'',
+                    content:`Eventos masivos, fortuitos, de carácter inesperados que influyan en el accionar y sujeto de la Asistencia, esto es: pandemias, epidemias, guerras, conflictos armados o estado de emergencia general.`,
+                },
+
+
+            ]
+        },
+        {
+            title: 'Sexta - Forma de Prestar los Servicios',
+            content: [
+                {
+                    name:'',
+                    content:`Las prestaciones que se obliga a brindar RUA serán realizadas por empresas profesionales tercerizadas o proveedores idóneos designados por RUA. 
+                    El PRESTADOR no efectuará la prestación de los servicios cuando ello no sea posible por razones de fuerza mayor o cuando por situaciones imprevisibles o de estacionalidad, por contingencias de la naturaleza, se produzca una ocupación masiva, de carácter preferente de las empresas, profesionales o proveedores que habitualmente le prestan servicio; ni tampoco cuando, por causas ajenas a su voluntad, ellos no estén disponibles en la localidad en que esté ubicada la vivienda del Beneficiario. 
+                    No obstante, en estos casos, RUA quedará obligado a compensar los gastos que expresamente haya autorizado efectuar al Beneficiario, para obtener directamente por si, las prestaciones garantizadas en esta compensación adicional. En tal caso, RUA reembolsará los gastos efectivos hasta una suma que no exceda de la responsabilidad máxima por evento indicada en el presente para cada caso. 
+                    En estas situaciones, los servicios deberán prestarse por empresas, profesionales o proveedores expresamente aceptados por RUA, en caso contrario, serán de exclusivo cargo del Beneficiario los gastos correspondientes.`,
+                },
+            ]
+        },
+        {
+            title: 'Séptima - Operativa de Servicio',
             content: [
                 {
                     name:'Apertura del caso',
-                    content:`El Beneficiario se comunica con RUA para solicitar el servicio que estuviere necesitando, procediendo el Operador a la apertura informática del expediente. Se registrará automáticamente la fecha y hora de la solicitud, así como los detalles particulares del caso (tipo de servicio, situación general del beneficiario, hora para que solicite la asistencia, etc.).`,
+                    content:`El Beneficiario se comunica con RUA a la Central de alarma, al teléfono que informará COFA al momento de la contratación de servicio de asistencia de desempleo, para solicitar el servicio que estuviere necesitando, procediendo el Operador a la apertura informática del expediente. Se registrará automáticamente la fecha y hora de la solicitud, así como los detalles particulares del caso (tipo de servicio, situación general del beneficiario, hora para que solicite la asistencia, etc.).`,
                 },
                 {
                     name:'Asignación del servicio al proveedor',
-                    content:` El operador de RUA asignará el trabajo al proveedor/prestador más apropiado. Adicionalmente, le comunicará todos los datos del Beneficiario y los detalles relevantes al caso para una gestión más eficiente del servicio.`,
+                    content:`El operador de RUA asignará el trabajo al proveedor más apropiado. Adicionalmente, le comunicará todos los datos del Beneficiario y los detalles relevantes al caso para una gestión más eficiente del servicio.`,
                 },
                 {
                     name:'Seguimiento',
@@ -821,38 +909,14 @@ const desempleo = {
             ]
         },
         {
-            title: 'Sexta - Responsabilidad',
-            content: [
-                {
-                    name:'',
-                    content:`RUA contratará los servicios asistenciales de terceras empresas proveedoras. Sin perjuicio de ello, frente a COFA y frente a los Beneficiarios, RUA será responsable de cualquier daño o perjuicio causado en la prestación de dichos servicios, sin perjuicio de su derecho de repetir contra su proveedor.
-                    No obstante, RUA no será responsable de los daños o perjuicios que se ocasionen a los Beneficiarios cuando el servicio de asistencia prestado por RUA hubiera finalizado.
-                    Asimismo, en los servicios de Multiasistencia incluidos en el presente, RUA no asumirá responsabilidades médicas sobre las actuaciones, diagnósticos y tratamientos, responsabilidad que recaerá exclusivamente en las instituciones y/o profesionales actuantes. Las obligaciones
-                    que asume RUA conforme al presente contrato quedarán limitadas a la prestación de los servicios de asistencia previsto, excluyéndose en todo caso, daños morales, de imagen comercial, daños indirectos, lucro cesante (que ni RUA ni el Beneficiario podrán reclamarse entre sí, ni a COFA), multas o sanciones, el retraso de la presencia del Beneficiario en destino o en su domicilio, así como cualquier prestación establecida que tenga naturaleza punitiva o de ejemplaridad.
-                    La responsabilidad de RUA cesará automáticamente cuando cada uno de los beneficios previstos sea proporcionado. El Prestador queda relevado de toda responsabilidad cuando por casos fortuitos o de fuerza mayor, tales como huelgas, actos de sabotaje, guerras, catástrofes de la naturaleza, dificultades en los medios de comunicación o cualquier otro hecho que no ha podido preverse o que previsto no ha podido evitarse, no pueda efectuar cualquiera de las prestaciones específicamente previstas en este condicionado.
-                    Cuando elementos de esta índole interviniesen, RUA se compromete a ejecutar sus compromisos dentro del menor plazo que fuere posible, en el caso que a dicha fecha se mantenga la contingencia que la justifique.`,
-                },
-            ]
-        },
-        {
-            title: 'Séptima - Obligaciones',
-            content: [
-                {
-                    name:'',
-                    content:`RUA queda relevado de responsabilidad cuando por casos fortuitos o de fuerza mayor, tales como actos de sabotaje, guerras, pandemias, catástrofes de la naturaleza, dificultades en los medios de comunicación o cualquier otro hecho que no haya podido preverse o que previsto no ha podido evitarse, no pueda efectuar cualquiera de las prestaciones específicamente previstas en este condicionado. Cuando situaciones de esta naturaleza ocurrieran, RUA se compromete a ejecutar sus compromisos dentro del menor plazo posible.
-                    Cuando se produzca alguno de los hechos objeto de las prestaciones garantizadas por este Condicionado, el Beneficiario solicitará por teléfono la asistencia correspondiente, indicando sus datos identificatorios, el lugar y teléfono donde se encuentra y la clase de servicio que necesita antes de iniciar cualquier acción o efectuar cualquier pago.
-                    RUA tomará el lapso prudencial (según los casos) para determinar la asistencia, o en su caso determinar el alcance de la prestación, observando los tiempos de respuesta al auxilio. El Beneficiario conoce esta circunstancia y acepta el alcance de esta. RUA se reserva el derecho de solicitar al Beneficiario el reembolso de cualquier gasto realizado indebidamente, en caso de haberse prestado servicios no contratados o en forma diferente a lo establecido.
-                    Para poder acceder a los servicios de asistencia de desempleo, el beneficiario debe estar al día con el pago mensual del servicio.`,
-                },
-            ]
-        },
-        {
             title: 'Octava - Reintegros',
             content: [
                 {
                     name:'',
-                    content:`Todos los casos de reintegro arriba previstos deberán contar con la autorización previa de la Central Operativa de Para permitir la evaluación de este, el beneficiario deberá suministrar previamente toda la documentación original necesaria que acredite, al exclusivo criterio de la recepción del servicio y la procedencia de los gastos incurridos.
-                    Únicamente serán consideradas las solicitudes de reintegro cuyos comprobantes originales se presenten dentro de los treinta (30) días de la fecha de ocurrencia de los hechos. Pasado dicho plazo, cesará todo derecho del beneficiario para efectuar reclamo alguno`,
+                    content:`RUA contratará los servicios asistenciales de terceras empresas proveedoras. Sin perjuicio de ello, frente a COFA y frente a los Beneficiarios, RUA será responsable de cualquier daño o perjuicio causado en la prestación de dichos servicios, sin perjuicio de su derecho de repetir contra su proveedor. 
+                    No obstante, RUA no será responsable de los daños o perjuicios que se ocasionen a los Beneficiarios cuando el servicio de asistencia prestado por RUA hubiera finalizado. 
+                    Las obligaciones que asume RUA conforme a los presentes TyCpad quedarán limitadas a la prestación de los servicios de asistencia previsto, excluyéndose en todo caso, daños morales, de imagen comercial, daños indirectos, lucro cesante (que ni RUA ni el Beneficiario podrán reclamarse, ni entre sí, ni a COFA), multas o sanciones, el retraso de la presencia del Beneficiario en destino o en su domicilio, así como cualquier prestación establecida que tenga naturaleza punitiva o de ejemplaridad.
+                    La responsabilidad de RUA cesará automáticamente cuando cada uno de los beneficios previstos sea proporcionado. El Prestador queda relevado de toda responsabilidad cuando por casos fortuitos o de fuerza mayor, tales como huelgas, actos de sabotaje, guerras, catástrofes de la naturaleza, dificultades en los medios de comunicación o cualquier otro hecho que no ha podido preverse o que previsto no ha podido evitarse, no pueda efectuar cualquiera de las prestaciones específicamente previstas en este condicionado.`,
                 },
             ]
         },
@@ -860,8 +924,30 @@ const desempleo = {
             title: 'Novena - Normal Generales',
             content: [
                 {
+                    name:'',
+                    content:` RUA queda relevado de responsabilidad cuando por casos fortuitos o de fuerza mayor, tales como actos de sabotaje, guerras, pandemias, catástrofes de la naturaleza, dificultades en los medios de comunicación o cualquier otro hecho que no haya podido preverse o que previsto no ha podido evitarse, no pueda efectuar cualquiera de las prestaciones específicamente previstas en este condicionado. Cuando situaciones de esta naturaleza ocurrieran, RUA se compromete a ejecutar sus compromisos dentro del menor plazo posible, en el caso que a dicha fecha se mantenga la contingencia que la justifique. 
+                    Cuando se produzca alguno de los hechos objeto de las prestaciones garantizadas por estos TyCpad, el Beneficiario solicitará por teléfono la asistencia correspondiente, indicando sus datos identificatorios, el lugar y teléfono donde se encuentra y la clase de servicio que necesita antes de iniciar cualquier acción o efectuar cualquier pago. 
+                    RUA tomará el lapso prudencial (según los casos) para determinar la asistencia, o en su caso determinar el alcance de la prestación, observando los tiempos de respuesta al auxilio. El Beneficiario conoce esta circunstancia y acepta el alcance de esta. RUA se reserva el derecho de solicitar al Beneficiario el reembolso de cualquier gasto realizado indebidamente, en caso de haberse prestado servicios no contratados o en forma diferente a lo establecido. 
+                    Para poder acceder a los servicios de asistencia de desempleo, el beneficiario debe estar al día con el pago mensual del servicio.`,
+                },
+            ]
+        },
+        {
+            title: 'Decima - Reintegros',
+            content: [
+                {
+                    name:'',
+                    content:`Todos los casos de reintegro arriba previstos deberán contar con la autorización previa de la Central Operativa de RUA. Para permitir la evaluación de este, el beneficiario deberá suministrar previamente toda la documentación original necesaria que acredite, al exclusivo criterio de RUA la recepción del servicio y la procedencia de los gastos incurridos. 
+                    Únicamente serán consideradas las solicitudes de reintegro cuyos comprobantes originales se presenten dentro de los treinta (30) días de la fecha de ocurrencia de los hechos. Pasado dicho plazo, cesará todo derecho del beneficiario para efectuar reclamo alguno.`,
+                },
+            ]
+        },
+        {
+            title: 'Decima Primera - Normas Generales',
+            content: [
+                {
                     name:'Cooperación',
-                    content:` El Beneficiario cooperará con RUA, a los efectos de permitir el buen desarrollo de las asistencias previstas, y se entenderá que el Beneficiario renuncia a su derecho a recibir asistencia en caso de que no acepte cooperar, ni acepte las instrucciones que reciba por parte de RUA.`,
+                    content:`El Beneficiario cooperará con RUA, a los efectos de permitir el buen desarrollo de las asistencias previstas, y se entenderá que el Beneficiario renuncia a su derecho a recibir asistencia en caso de que no acepte cooperar, ni acepte las instrucciones que reciba por parte de RUA para el cumplimiento de su obligación.`,
                 },
                 {
                     name:'',
@@ -873,11 +959,11 @@ const desempleo = {
                 },
                 {
                     name:'Subrogación',
-                    content:` RUA se subrogará al Beneficiario hasta el límite de los gastos realizados o de las cantidades pagadas, en los derechos y acciones que correspondan al mismo contra cualquier responsable de un accidente que haya dado lugar a la prestación de alguna de las garantías descriptas.`,
+                    content:`RUA se subrogará al Beneficiario hasta el límite de los gastos realizados o de las cantidades pagadas, en los derechos y acciones que correspondan al mismo contra cualquier responsable de un accidente que haya dado lugar a la prestación de alguna de las garantías descriptas.`,
                 },
                 {
                     name:'Responsabilidad',
-                    content:` La mayor parte de los Prestadores de los Servicios asistenciales son contratistas independientes y no empleados ni subordinados de RUA ni COFA, por lo cual ni RUA ni COFA serán responsable de cualquier acto u omisión por parte de dichos proveedores que actúen en nombre de RUA. Se definen Prestadores a: farmacias; empresas prestadoras de servicios públicos; negocios de artículos escolares; supermercados, almacenes y similares; los médicos, hospitales, clínicas, ambulancias; hoteles, grúas, y cualquier otra persona o entidad proveedora de servicios o productos para el cumplimiento de la Multiasistencia.`,
+                    content:`La mayor parte de los Prestadores de los Servicios asistenciales son contratistas independientes y no empleados ni subordinados de RUA ni COFA, por lo cual ni RUA ni COFA serán responsable de cualquier acto u omisión por parte de dichos proveedores que actúen en nombre de RUA. Se definen Prestadores a: farmacias; empresas prestadoras de servicios públicos; negocios de artículos escolares; supermercados, almacenes y similares; los médicos, hospitales, clínicas, ambulancias; hoteles, grúas, y cualquier otra persona o entidad proveedora de servicios o productos para el cumplimiento de la asistencia de desempleo.`,
                 },
                 {
                     name:'',
@@ -885,34 +971,33 @@ const desempleo = {
                 },
                 {
                     name:'Cancelación',
-                    content:`RUA estará en pleno derecho de cancelar la prestación de las garantías previstas en los casos en que el Beneficiario causara o provocara intencionalmente un hecho que dé origen a la necesidad de prestar cualquiera de los servicios aquí descriptos, o si el Beneficiario omitiera información o proporcionará intencionalmente información falsa o errónea.`,
+                    content:` La mayor parte de los Prestadores de los Servicios asistenciales son contratistas independientes y no empleados ni subordinados de RUA ni COFA, por lo cual ni RUA ni COFA serán responsable de cualquier acto u omisión por parte de dichos proveedores que actúen en nombre de RUA. Se definen Prestadores a: farmacias; empresas prestadoras de servicios públicos; negocios de artículos escolares; supermercados, almacenes y similares; los médicos, hospitales, clínicas, ambulancias; hoteles, grúas, y cualquier otra persona o entidad proveedora de servicios o productos para el cumplimiento de la asistencia de desempleo.`,
                 },
                 {
                     name:'Declaración',
-                    content:`El uso del servicio de asistencia implica la conformidad con los presentes  TyCpasi.`,
+                    content:`El uso del servicio de asistencia implica la conformidad con los presentes TyCpad.`,
                 },
                 {
                     name:'Exclusiones generales',
-                    content:` No son objeto de la cobertura detallada en esta asistencia, ni darán lugar a reclamaciones, los servicios que el afiliado haya concertado por su cuenta y los gastos que no se encuentren cubiertos en los presentes TyCpasi.`,
+                    content:`No son objeto de la cobertura detallada en este anexo, ni darán lugar a reclamaciones, los servicios que el afiliado haya concertado por su cuenta y los gastos que no se encuentren cubiertos en las presentes TyCpad.`,
                 },
                 {
                     name:'Central de alarma',
-                    content:`En cuanto se produzca un accidente o incidente que pueda motivar la intervención asistencial, el Beneficiario podrá llamar a la central de alarma las 24 horas del día durante todo el año, al número 11-5258-2376.`,
+                    content:`En cuanto se produzca un evento que pueda motivar la intervención asistencial, el Beneficiario podrá llamar a la central de alarma las 24 horas del día durante todo el año, al número 11-5258-2376.`,
                 },
             ]
         },
         {
-            title: 'Decima - Aceptación de Términos y Condiciones',
+            title: 'Decima Segunda - Aceptación de Términos y Condiciones',
             content: [
                 {
                     name:'',
-                    content:`El Beneficiario antes de aceptar los TyCpasi ha tomado pleno conocimiento de estos, los ha tenido a la vista y leído con detenimiento y cuenta con copia de ellos a su disposición en www.cofa.com.ar .`,
+                    content:`El Beneficiario antes de aceptar los TyCpad ha tomado pleno conocimiento de estos, los ha tenido a la vista y leído con detenimiento y cuenta con copia de ellos a su disposición en www.cofa.com.ar.`,
                 },
                 {
                     name:'',
-                    content:`Estos TyCpasi estarán regidos en todos sus puntos por las leyes vigentes en la República Argentina. Para todos los efectos de la presente, las partes se someten a la competencia de la Justicia Nacional en lo Comercial de la Capital Federal. COBRO FACIL S.R.L. constituye domicilio especial en Moreno 1628 piso 3° oficina 35 de la Ciudad Autónoma de Buenos Aires y el usuario en el domicilio denunciado en el formulario de registración`,
+                    content:`Estos TyCpad estarán regidos en todos sus puntos por las leyes vigentes en la República Argentina. Para todos los efectos de la presente, las partes se someten a la competencia de la Justicia Nacional en lo Comercial de la Capital Federal. COBRO FACIL S.R.L. constituye domicilio especial en Moreno 1628 piso 3° oficina 35 de la Ciudad Autónoma de Buenos Aires y el usuario en el domicilio denunciado en el formulario de registración.`,
                 },
-
             ]
         },
     ]
@@ -923,5 +1008,6 @@ const desempleo = {
 
 export const terminos = {
     "MULTIASISTENCIA": multiasistencia,
-    'SALUDINTEGRAL': saludintegral
+    'SALUDINTEGRAL': saludintegral,
+    'DESEMPLEO': desempleo
 }
