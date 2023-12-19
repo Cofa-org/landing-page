@@ -199,6 +199,7 @@ import React, { useState } from 'react';
 import { Field, Formik, Form, ErrorMessage } from 'formik';
 import { FaArrowRightLong, FaCheck } from 'react-icons/fa6';
 import './style.css';
+import { Link } from 'react-router-dom';
 
 const PersonalLendForm = () => {
   const [isSent, setIsSent] = useState(false);
@@ -355,9 +356,9 @@ const PersonalLendForm = () => {
                     </div>
                     <div>
                         <label htmlFor="">Al clickear en Enviar, estás aceptado los{' '}
-                            <a href='https://cofa.com.ar/terms-and-conditions' target='_blank' rel='noopener noreferrer' style={{textDecoration:"underline"}}>
+                            <Link to='/terms-and-conditions'  style={{textDecoration:"underline"}}>
                              Términos y Condiciones
-                            </a>
+                            </Link>
                         </label>
                     </div>
 
