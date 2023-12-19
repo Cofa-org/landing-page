@@ -172,6 +172,16 @@ const ContactForm = ({ type }) => {
         errors.telephone = '';
     }
 
+    if(!values.message){
+      errors.message = 'No puedes dejar el mensaje vacio'
+    }
+    else if(values.message.split(' ').length < 10){
+      errors.message = 'El mensaje debe contener almenos 10 palabras.'
+    }
+    else{
+      errors.message = ''
+    }
+
 
    
     if(!errors.amount && !errors.situacion && !errors.dni && !errors.email ){
@@ -351,8 +361,8 @@ const ContactForm = ({ type }) => {
             <label htmlFor="message">Mensaje:</label>
 
             <span className='message-item'><span className='circle-item'></span>{EXPLICACION_MENSAJE[type]}</span>
-            <Field as="textarea" name="message" id="message" placeholder={MESSAGES[type]} />
-            <ErrorMessage name="message" component="div" />
+            <Field as="textarea" name="message" id="message" placeholder={MESSAGES[type]} /* maxLength={255} */  />
+            <ErrorMessage name="message" component="div" className="error-message" />
           </div>
         
 

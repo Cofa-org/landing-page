@@ -137,7 +137,15 @@ const WorkWithUsForm = () => {
       }else {
           errors.telephone = '';
       }
-
+      if(!values.message){
+        errors.message = 'No puedes dejar el mensaje vacio'
+      }
+      else if(values.message.split(' ').length < 10){
+        errors.message = 'El mensaje debe contener almenos 10 palabras.'
+      }
+      else{
+        errors.message = ''
+      }
     
   
       if(!errors.amount && !errors.telephone && !errors.email ){
@@ -184,7 +192,7 @@ const WorkWithUsForm = () => {
           <div className="input-container input-container-100">
             <label htmlFor="message">Mensaje:</label>
             <Field as="textarea" name="message" id="message" placeholder={'Contanos de vos'} className='work-with-us-textarea' />
-            <ErrorMessage name="message" component="div"/>
+            <ErrorMessage name="message" component="div" className="error-message" />
           </div>
         
 
