@@ -22,7 +22,20 @@ const TermsAndConditionsPoints = () => {
                                                 <ul className='subsubterm-list'>
                                                     {
                                                         subterm.subcontent.map((subsubContent) =>(
-                                                            <li className='subsubterm-item'>{subsubContent.content}</li>
+                                                            <li className='subsubterm-item'>{subsubContent.content}
+                                                            {
+                                                                
+                                                                subsubContent.subcontent && (
+                                                                <ol className='subsubsubterm-list'>
+                                                                    {
+                                                                        subsubContent.subcontent.map((subsubContent) =>(
+                                                                            <li className='subsubsubterm-item'>{subsubContent.content}</li>
+                                                                        ))
+                                                                    }
+                                                                </ol>
+                                                                )
+                                                            }
+                                                            </li>
                                                         ))
                                                     }
                                                 </ul>

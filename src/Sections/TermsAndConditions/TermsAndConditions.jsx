@@ -26,7 +26,10 @@ const TermsAndConditions = () => {
                                                     {console.log(subterm.subcontent)}
                                                     {
                                                         subterm.subcontent.map((subsubContent) =>(
-                                                            <li className='subsubterm-item'>{subsubContent.content} hola</li>
+                                                            
+                                                            <li className='subsubterm-item'>{console.log(subsubContent) }{subsubContent.content}
+                                                            
+                                                            </li>
                                                         ))
                                                     }
                                                 </ul>
