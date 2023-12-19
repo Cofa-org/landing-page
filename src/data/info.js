@@ -138,46 +138,51 @@ export const termsAndConditions = [
         content: 'El Usuario al registrarse elegirá un usuario y una contraseña, y cumplirá con la norma de seguridad expuesta en tal formulario. Seguidamente el Usuario podrá libremente optar por enviar, o no, una confirmación de sus datos y contraseña a COFA a través de www.cofa.com.ar. El envío implicará la emisión por el Usuario de su Pedido de Activación, el cual podrá ser aceptado, o no, por COFA En tanto que el no envío implicará el desistimiento automático del Usuario y no implicará, en modo alguno, responsabilidad de COFA en relación con la protección de tales datos atento que los mismos no habrán sido recibidos.'
     },
     {
+        /* 6 */
         content: 'CONSENTIMIENTO INFORMADO',
         subcontent: [
             {
-                content:'El usuario, en su carácter de TÍTULAR DE LOS DATOS presta su CONSENTIMIENTO para que COFA en su carácter de CESIONARIO confronte sus datos personales que se indican en párrafo siguiente con la base de datos del RENAPER, en forma directa o indirecta a través de proveedores debidamente registrados, conforme a las especificaciones que a continuación se detallan:'
-            },
-            {
-                content:'DATOS AUTORIZADOS: El presente consentimiento para el tratamiento de los datos personales alcanza a los incluidos en el Documento Nacional de Identidad (INCLUYENDO DATOS BIOMETRICOS DE HUELLA DACTILAR Y/O DE RECONOCIMIENTO FACIAL) en confronte con lo que informa el web service del REGISTRO NACIONAL DE LAS PERSONAS.'
-            },
-            {
-                content:'INFORMACIÓN SOBRE EL TRATAMIENTO:', /* esto no esta funcionando! */
-                subcontent: [
+                content:'El usuario, en su carácter de TÍTULAR DE LOS DATOS presta su CONSENTIMIENTO para que COFA en su carácter de CESIONARIO confronte sus datos personales que se indican en párrafo siguiente con la base de datos del RENAPER, en forma directa o indirecta a través de proveedores debidamente registrados, conforme a las especificaciones que a continuación se detallan:',
+                subcontent:[
                     {
-                        content: 'Los datos serán tratados con la exclusiva finalidad de validar, para COFA, la identidad y verificar la vigencia del Documento Nacional de Identidad del Usuario.'
+                    content: 'DATOS AUTORIZADOS: El presente consentimiento para el tratamiento de los datos personales alcanza a los incluidos en el Documento Nacional de Identidad (INCLUYENDO DATOS BIOMETRICOS DE HUELLA DACTILAR Y/O DE RECONOCIMIENTO FACIAL) en confronte con lo que informa el web service del REGISTRO NACIONAL DE LAS PERSONAS.'
                     },
                     {
-                        content: 'Los datos son facilitados con carácter obligatorio, por cuanto es imprescindible identificar fehacientemente al titular, para asegurar el correcto proceso de identificación.'
+                        content: 'INFORMACIÓN SOBRE EL TRATAMIENTO:',
+                        subcontent:[
+                            {
+                                content: 'Los datos serán tratados con la exclusiva finalidad de validar, para COFA, la identidad y verificar la vigencia del Documento Nacional de Identidad del Usuario.'
+                            },
+                            {
+                                content: 'Los datos son facilitados con carácter obligatorio, por cuanto es imprescindible identificar fehacientemente al titular, para asegurar el correcto proceso de identificación.'
+                            },
+                            {
+                                content: 'El titular de los datos podrá ejercer los derechos de acceso, rectificación y supresión de sus datos en cualquier momento y a su sola solicitud ante el RENAPER.'
+                            },
+                            {
+                                content: 'En cumplimiento de la Resolución AAIP Nº 14/2018, le hacemos saber que la AGENCIA DE ACCESO A LA INFORMACIÓN PÚBLICA, en su carácter de Órgano de Control de la Ley N° 25.326, tiene la atribución de atender las denuncias y reclamos que interpongan quienes resulten afectados en sus derechos por incumplimiento de las normas vigentes en materia de protección de datos personales.'
+                            },
+                            {
+                                content: 'COFA, a través de www.cofa.com.ar, comunicará al Usuario que ha remitido un enlace a la cuenta de correo electrónico designada por el Usuario, siempre que la funcionalidad de los sistemas de comunicación así se lo permitan, a fin de que éste proceda a Activar su Cuenta y esté en condiciones de proseguir con la utilización de los servicios ofrecidos.'
+                            },
+                            {
+                                content: 'El Usuario que emita una Solicitud de Préstamo garantizará y responderá en cualquier caso por la veracidad, exactitud, vigencia y autenticidad de los datos facilitados y se comprometerá a mantenerlos debidamente actualizados. Adicionalmente, autorizará a COFA a confirmar los datos suministrados acudiendo a entidades públicas, compañías especializadas o centrales de información crediticia.'
+                            },
+                            {
+                                content: 'COFA podrá solicitar al Usuario la presentación o envío de cualquier comprobante y/o dato adicional que considere necesario a efectos de corroborar, confirmar y/o verificar los datos personales o información provista por el Usuario, en igual sentido podrá verificar los datos personales y/o información suministrada – por si o a través de terceros- recurriendo a entidades públicas, compañías especializadas o centrales de información crediticia, entre otros, lo que el Usuario consiente expresamente. COFA podrá, en cualquier momento, suspender temporal o definitivamente al Usuario cuyos datos no hayan podido ser confirmados, sin que ello genere derecho alguno al Usuario.'
+                            },
+                            {
+                                content: 'Una vez acreditada la identidad del Usuario en los términos del punto 6 de estos términos, COFA habilitará una cuenta personal, única e intransferible, a través de la cual el Usuario podrá acceder a la plataforma y/o los servicios mediante la introducción de su usuario y contraseña (en adelante la “Cuenta”).'
+                            },
+                            
+                            {
+                                content: 'El Usuario podrá modificar o sustituir su contraseña en cualquier momento y se obliga a preservar tal contraseña bajo absoluta confidencialidad y a no revelarla o compartirla con otras personas bajo ningún concepto. A todo evento queda suficientemente establecido que el Usuario es exclusivo responsable por el uso de la contraseña y asume las consecuencias derivadas de ello. No obstante, el Usuario se obliga a notificar a COFA en forma inmediata y por medio fehaciente de cualquier uso no autorizado de su contraseña y/o del ingreso a su Cuenta por terceros no autorizados por él.'
+                            },
+                        ]
                     },
-                    {
-                        content: 'El titular de los datos podrá ejercer los derechos de acceso, rectificación y supresión de sus datos en cualquier momento y a su sola solicitud ante el RENAPER'
-                    },
-                    {
-                        content: 'En cumplimiento de la Resolución AAIP Nº 14/2018, le hacemos saber que la AGENCIA DE ACCESO A LA INFORMACIÓN PÚBLICA, en su carácter de Órgano de Control de la Ley N° 25.326, tiene la atribución de atender las denuncias y reclamos que interpongan quienes resulten afectados en sus derechos por incumplimiento de las normas vigentes en materia de protección de datos personales'
-                    },
-                    {
-                        content: 'COFA, a través de www.cofa.com.ar, comunicará al Usuario que ha remitido un enlace a la cuenta de correo electrónico designada por el Usuario, siempre que la funcionalidad de los sistemas de comunicación así se lo permitan, a fin de que éste proceda a Activar su Cuenta y esté en condiciones de proseguir con la utilización de los servicios ofrecidos.'
-                    },
-                    {
-                        content: 'El Usuario que emita una Solicitud de Préstamo garantizará y responderá en cualquier caso por la veracidad, exactitud, vigencia y autenticidad de los datos facilitados y se comprometerá a mantenerlos debidamente actualizados. Adicionalmente, autorizará a COFA a confirmar los datos suministrados acudiendo a entidades públicas, compañías especializadas o centrales de información crediticia.'
-                    },
-                    {
-                        content: 'COFA podrá solicitar al Usuario la presentación o envío de cualquier comprobante y/o dato adicional que considere necesario a efectos de corroborar, confirmar y/o verificar los datos personales o información provista por el Usuario, en igual sentido podrá verificar los datos personales y/o información suministrada – por si o a través de terceros- recurriendo a entidades públicas, compañías especializadas o centrales de información crediticia, entre otros, lo que el Usuario consiente expresamente. COFA podrá, en cualquier momento, suspender temporal o definitivamente al Usuario cuyos datos no hayan podido ser confirmados, sin que ello genere derecho alguno al Usuario.'
-                    },
-                    {
-                        content: 'Una vez acreditada la identidad del Usuario en los términos del punto 6 de estos términos, COFA habilitará una cuenta personal, única e intransferible, a través de la cual el Usuario podrá acceder a la plataforma y/o los servicios mediante la introducción de su usuario y contraseña (en adelante la “Cuenta”).'
-                    },
-                    {
-                        content: 'El Usuario podrá modificar o sustituir su contraseña en cualquier momento y se obliga a preservar tal contraseña bajo absoluta confidencialidad y a no revelarla o compartirla con otras personas bajo ningún concepto. A todo evento queda suficientemente establecido que el Usuario es exclusivo responsable por el uso de la contraseña y asume las consecuencias derivadas de ello. No obstante, el Usuario se obliga a notificar a COFA en forma inmediata y por medio fehaciente de cualquier uso no autorizado de su contraseña y/o del ingreso a su Cuenta por terceros no autorizados por él.'
-                    }
                 ]
             }
+           
         ]
     },
     {

@@ -81,9 +81,16 @@
 }
 
 
-@media screen and (max-width:370px){
+@media screen and (max-width:350px){
     .bg-form-work{
-
         width: 400vw;
+    }
+    .info-work{
+        margin-right: 0%;
+        align-items: center;
+    }
+    .container-work img {
+            width: 80%;
+        }
     }
 }
