@@ -68,3 +68,31 @@
     align-items: center;
     flex-direction: column; */
 }
+
+
+@media screen and (max-width: 570px ) {
+    .controls-assitence h2{
+        font-size: 24px;
+    }
+}
+
+@media screen and (max-width: 470px ) {
+    .controls-assitence{
+        padding: 0;
+    }
+}
+
+@media screen and (max-width: 400px ) {
+    .controls-assitence h2{
+        font-size: 20px;
+    }
+
+}
+
+
+@media screen and (max-width: 370px ) {
+    .controls-assitence h2{
+        font-size: 18px;
+    }
+
+}
