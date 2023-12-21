@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import './AssitenceScreen.css'
+import './AssistenceScreen.css'
 import { IoMdArrowRoundForward } from "react-icons/io";
 import { asistencias, asistenciasDesempleo, asistenciasSalud } from '../../data/assistData';
 import { AssistSlider, Footer, HeaderAssist } from '../../Components';
