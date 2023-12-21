@@ -28,7 +28,7 @@ const AssistenceScreen = () => {
       <HeaderAssist/>
       <HeroAssist/>
       <>
-        <h2 id='multi-asistencia'>Explora los servicios de Multiasistencia</h2>
+        <h2 id='multiasistencia'>Explora los servicios de Multiasistencia</h2>
         <span className='price-assist'><span className='price-strong'>$1400</span>/Mensuales</span>
         <p className='description-assist'>Los servicios de Multiasistencia cubren asistencia del <strong>hogar</strong>, para <strong>mascotas</strong>, <strong>legal</strong>, <strong>informática</strong>, y asistencia <strong>vehicular</strong>. </p>
         <AssistSlider asistencias={asistencias}/>

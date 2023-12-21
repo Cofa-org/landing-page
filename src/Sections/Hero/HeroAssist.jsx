@@ -18,7 +18,7 @@ const HeroAssist = () => {
                 </div>
                 <div className='hero-buttons'>
                     <Link className='primary-btn' to='https://api.whatsapp.com/send/?phone=5491154559017' target='_blank'>Pedir Asistencias <GoArrowRight /></Link> 
-                    <Link to={'/assists/#multi-asistencia'} className='primary-btn btn-score-points'>
+                    <Link to={'/assists/#multiasistencia'} className='primary-btn btn-score-points'>
                         Saber Más <GoArrowDown /> 
                     </Link>
                 </div>
