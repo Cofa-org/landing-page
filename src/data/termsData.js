@@ -328,7 +328,7 @@ const multiasistencia = {
                 },
                 {
                     name:'Central de alarma',
-                    content:`En cuanto se produzca un accidente o incidente que pueda motivar la intervención asistencial, el Beneficiario podrá llamar a la central de alarma las 24 horas del día durante todo el año, al número 11-5258-2376.`,
+                    content:`En cuanto se produzca un accidente o incidente que pueda motivar la intervención asistencial, el Beneficiario podrá llamar a la central de alarma las 24 horas del día durante todo el año, al número 1151996505.`,
                 },
             ]
         },
@@ -646,7 +646,7 @@ const saludintegral = {
                 },
                 {
                     name:'Central de alarma',
-                    content:`En cuanto se produzca un accidente o incidente que pueda motivar la intervención asistencial, el Beneficiario podrá llamar a la central de alarma las 24 horas del día durante todo el año, al número 11-5258-2376.`,
+                    content:`En cuanto se produzca un accidente o incidente que pueda motivar la intervención asistencial, el Beneficiario podrá llamar a la central de alarma las 24 horas del día durante todo el año, al número 1151996505.`,
                 },
             ]
         },
@@ -983,7 +983,7 @@ const desempleo = {
                 },
                 {
                     name:'Central de alarma',
-                    content:`En cuanto se produzca un evento que pueda motivar la intervención asistencial, el Beneficiario podrá llamar a la central de alarma las 24 horas del día durante todo el año, al número 11-5258-2376.`,
+                    content:`En cuanto se produzca un evento que pueda motivar la intervención asistencial, el Beneficiario podrá llamar a la central de alarma las 24 horas del día durante todo el año, al número 1151996505.`,
                 },
             ]
         },
