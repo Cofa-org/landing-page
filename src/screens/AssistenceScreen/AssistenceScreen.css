@@ -1,9 +1,29 @@
-.subtitle-assist{
+#multi-asistencia{
     text-align: center;
     font-size: 42px;
     margin-bottom: 30px;
     padding-top: 6%;
 }
+
+#salud{
+    text-align: center;
+    font-size: 42px;
+    margin-bottom: 30px;
+    padding-top: 6%;
+}
+
+#desempleo{
+    text-align: center;
+    font-size: 42px;
+    margin-bottom: 30px;
+    padding-top: 6%;
+}
+/* .subtitle-assist{
+    text-align: center;
+    font-size: 42px;
+    margin-bottom: 30px;
+    padding-top: 6%;
+} */
 
 .price-strong{
     font-size: 52px;
