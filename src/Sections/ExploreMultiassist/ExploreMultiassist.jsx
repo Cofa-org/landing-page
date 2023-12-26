@@ -6,7 +6,7 @@ const ExploreMultiassist = () => {
     <section className='explore-multiassist-section'>
         <div className='explore-multiassist-header'>
             <h2>Explora los servicios de Multiasistencia</h2>
-            <span className='price-assist'><span className='price'>$1400</span><span>/Mensuales</span></span>
+            <span className='price-assist'><span className='price'>$2000</span><span>/Mensuales</span></span>
             <p>Los servicios de Multiasistencia cubren asistencia del <strong>hogar</strong>, para <strong>mascotas</strong>, <strong>legal</strong>, <strong>informática</strong>, y asistencia <strong>vehicular</strong>.</p>
         </div>
         <div className='explore-multiassist-body'>

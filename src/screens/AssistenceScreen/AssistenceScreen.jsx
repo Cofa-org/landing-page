@@ -29,7 +29,7 @@ const AssistenceScreen = () => {
       <HeroAssist/>
       <>
         <h2 id='multiasistencia'>Explora los servicios de Multiasistencia</h2>
-        <span className='price-assist'><span className='price-strong'>$1400</span>/Mensuales</span>
+        <span className='price-assist'><span className='price-strong'>$2000</span>/Mensuales</span>
         <p className='description-assist'>Los servicios de Multiasistencia cubren asistencia del <strong>hogar</strong>, para <strong>mascotas</strong>, <strong>legal</strong>, <strong>informática</strong>, y asistencia <strong>vehicular</strong>. </p>
         <AssistSlider asistencias={asistencias}/>
         <Link className='go-to-terms' to={'/assists/terminos-multiasistencia'}>
@@ -38,7 +38,7 @@ const AssistenceScreen = () => {
       </>
       <>
         <h2 id='salud'>Asistencia en Salud Integral</h2>
-        <span className='price-assist'><span className='price-strong'>$700</span>/Mensuales</span>
+        <span className='price-assist'><span className='price-strong'>$2100</span>/Mensuales</span>
         <p className='description-assist'>Los servicios cubren asistencia del <strong>Odontología</strong>, para <strong>Nutrición</strong>, <strong>Psicología</strong>, <strong>Clínica médica</strong>, <strong>Servicio de Acompañante</strong>, entre otros. 
         </p>
         <AssistSlider asistencias={asistenciasSalud}/>
@@ -48,7 +48,7 @@ const AssistenceScreen = () => {
       </>
       <>
         <h2 id='desempleo'>Asistencia en Desempleo</h2>
-        <span className='price-assist'><span className='price-strong'>$700</span>/Mensuales</span>
+        <span className='price-assist'><span className='price-strong'>$1100</span>/Mensuales</span>
         <AssistSlider asistencias={asistenciasDesempleo}/>
         <Link className='go-to-terms' to={'/assists/terminos-desempleo'}>
           Términos y Condiciones Particulares de Desempleo <IoMdArrowRoundForward/>
