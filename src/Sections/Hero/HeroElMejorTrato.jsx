@@ -1,6 +1,7 @@
 import React from 'react'
 import './Hero.css'
-import { FaFacebookF,FaTwitter,FaLinkedinIn,FaInstagram,FaDribbble } from "react-icons/fa";
+import { FaFacebookF,FaTwitter,FaLinkedinIn,FaInstagram } from "react-icons/fa";
+import { RiGlobalLine } from "react-icons/ri";
 import { PersonalLendForm } from '../../Components';
 import { IoIosCheckmarkCircleOutline } from "react-icons/io"; 
 import { MdMailOutline } from "react-icons/md";
@@ -33,7 +34,7 @@ const HeroElMejorTrato = ({}) => {
                             <span className="rect"></span> Nuestras Redes Sociales
                         </span>
                         <div className='social-media-container'>
-                            <Link to={'https://www.facebook.com/cofa.cofa.5245'} target='_blank'>
+                            <Link to={'https://www..com/profile.php?id=61554421626317'} target='_blank'>
                                 <FaFacebookF/>
                             </Link>
                             <Link to={'https://twitter.com/cofa_arg'} target='_blank'>
@@ -42,11 +43,11 @@ const HeroElMejorTrato = ({}) => {
                             <Link to={'https://www.linkedin.com/company/cofa-servicios-financieros/'} target='_blank'>
                                 <FaLinkedinIn/>
                             </Link>
-                            <Link to={'https://instagram.com/cofa.arg?igshid=M2RkZGJiMzhjOQ=='} target='_blank'>
+                            <Link to={'https://www.instagram.com/cofa4.0/'} target='_blank'>
                                 <FaInstagram/>
                             </Link>
                             <Link to={'https://cofa.com.ar/'} target='_blank'>
-                                <FaDribbble/>
+                                <RiGlobalLine />
                             </Link>
                         </div>
                     </div>
