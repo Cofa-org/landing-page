@@ -4,6 +4,11 @@ import './TermsV2.css'
 import { Contact } from '../../Sections'
 import { Footer, HeaderAssist } from '../../Components'
 
+const obtenerParrafos = (texto ) => {
+    return texto.split('\n')
+}
+
+
 const TermsV2 = ({type}) => {
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -26,11 +31,12 @@ const TermsV2 = ({type}) => {
                         <ol className='terms-list terms-first'>
                             {term.content.map(content => (
                                 <li className='terms-item-first'>
-                                    <span className='terms-title-first'>{content.name}{content.name ? ':' : ''}</span>{content.content}
+                                    <span className='terms-title-first'>{content.name}{content.name ? ':' : ''}</span>
+                                    {obtenerParrafos(content.content).map((text,i) => <p key={i}>{text}</p>)}
                                     <ol className='terms-list-second'>
                                         { content.subcontent && content.subcontent.map(subcontent =>(
                                             <li>
-                                                <span className='terms-title-second'>{subcontent.name}{subcontent.name ? ':' : ''}</span>{subcontent.content}
+                                                <span className='terms-title-second'>{subcontent.name}{subcontent.name ? ':' : ''}</span>{obtenerParrafos(subcontent.content).map((text,i) => <p key={i}>{text}</p>)}
                                                 {
                                                 subcontent.excluciones && 
                                                     <>
