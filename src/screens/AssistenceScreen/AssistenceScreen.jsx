@@ -28,7 +28,7 @@ const AssistenceScreen = () => {
       <HeaderAssist/>
       <HeroAssist/>
       <div>
-        <h3 className='subtitulo-h2-asistencias'  id='multiasistencia'>Explora los servicios de Multiasistencia</h3>
+        <h3 style={{textAlign:"center", fontSize:"42px",marginBottom:"30px", paddingTop:"6%"}}  id='multiasistencia'>Explora los servicios de Multiasistencia</h3>
         <span className='price-assist'><span className='price-strong'>$2000</span>/Mensuales</span>
         <p className='description-assist'>Los servicios de Multiasistencia cubren asistencia del <strong>hogar</strong>, para <strong>mascotas</strong>, <strong>legal</strong>, <strong>informática</strong>, y asistencia <strong>vehicular</strong>. </p>
         <AssistSlider asistencias={asistencias}/>
@@ -37,7 +37,7 @@ const AssistenceScreen = () => {
         </Link>
       </div>
       <div>
-        <h3 className='subtitulo-h2-asistencias' id='salud'>Asistencia en Salud Integral</h3>
+        <h3 style={{textAlign:"center", fontSize:"42px",marginBottom:"30px", paddingTop:"6%"}} id='salud'>Asistencia en Salud Integral</h3>
         <span className='price-assist'><span className='price-strong'>$2100</span>/Mensuales</span>
         <p className='description-assist'>Los servicios cubren asistencia del <strong>Odontología</strong>, para <strong>Nutrición</strong>, <strong>Psicología</strong>, <strong>Clínica médica</strong>, <strong>Servicio de Acompañante</strong>, entre otros. 
         </p>
@@ -47,7 +47,7 @@ const AssistenceScreen = () => {
         </Link>
       </div>
       <div>
-        <h3 className='subtitulo-h2-asistencias' id='desempleo'>Asistencia en Desempleo</h3>
+        <h3 style={{textAlign:"center", fontSize:"42px",marginBottom:"30px", paddingTop:"6%"}} id='desempleo'>Asistencia en Desempleo</h3>
         <span className='price-assist'><span className='price-strong'>$1100</span>/Mensuales</span>
         <AssistSlider asistencias={asistenciasDesempleo}/>
         <Link className='go-to-terms' to={'/assists/terminos-desempleo'}>
