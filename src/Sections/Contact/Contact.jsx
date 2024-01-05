@@ -13,7 +13,7 @@ const Contact = () => {
         <div className='contactMediaList'>
             <span>
                 <AiOutlineClockCircle/>
-                <span>Lunes a Viernes, de 9:00 a 17:00 hs.</span>
+                <span style={{textAlign:"center"}}>Lunes a Viernes<br></br> de 9:00 a 17:00 hs.</span>
             </span>
             <span>
                 <BsTelephone/>
@@ -29,7 +29,7 @@ const Contact = () => {
             </span>
             <span>
                 <CiLocationOn/>
-                <span>Moreno 1628, C1093ABF, CABA</span>
+                <span style={{textAlign:"center"}}>Moreno 1628, C1093ABF, CABA. <br></br>Piso 3, oficina 35.</span>
             </span>
         </div>
         <div className='contactInfoItem'>
