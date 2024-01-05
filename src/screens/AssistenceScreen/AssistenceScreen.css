@@ -1,8 +1,8 @@
 .subtitulo-h2-asistencias {
-    text-align: center;
-    font-size: 42px;
-    margin-bottom: 30px;
-    padding-top: 6%;
+    text-align: center !important; 
+    font-size: 42px !important;
+    margin-bottom: 30px !important;
+    padding-top: 6% !important;
 }
 .price-strong{
     font-size: 52px;
