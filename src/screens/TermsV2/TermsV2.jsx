@@ -32,11 +32,11 @@ const TermsV2 = ({type}) => {
                             {term.content.map(content => (
                                 <li className='terms-item-first'>
                                     <span className='terms-title-first'>{content.name}{content.name ? ':' : ''}</span>
-                                    {obtenerParrafos(content.content).map((text,i) => <p key={i}>{text}</p>)}
+                                    {content.content && obtenerParrafos(content.content).map((text,i) => <p key={i}>{text}</p>)}
                                     <ol className='terms-list-second'>
                                         { content.subcontent && content.subcontent.map(subcontent =>(
                                             <li>
-                                                <span className='terms-title-second'>{subcontent.name}{subcontent.name ? ':' : ''}</span>{obtenerParrafos(subcontent.content).map((text,i) => <p key={i}>{text}</p>)}
+                                                <span className='terms-title-second'>{subcontent.name}{subcontent.name ? ':' : ''}</span>{subcontent.content && obtenerParrafos(subcontent.content).map((text,i) => <p key={i}>{text}</p>)}
                                                 {
                                                 subcontent.excluciones && 
                                                     <>

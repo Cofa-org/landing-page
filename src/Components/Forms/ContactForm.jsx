@@ -81,21 +81,11 @@ const ContactForm = ({ type }) => {
     formData.append('email', values.email);
     formData.append('telephone', values.telephone);
     formData.append('message', values.message);
- /*    if(type == 'RECLAMO' || type == 'BAJA' || type == 'ARREPENTIMIENTO'){
-      formData.append('reason', values.reasonSelected.reason + ' > ' + values.reasonSelected.value)
-    } */
-    if(type == 'ARREPENTIMIENTO'){
-      formData.append('reasonToRegret', 'Arrepentimiento');
-    }
-    if(type == 'BAJA'){
-      formData.append('reasonToRegret', 'Baja');
-    }
     if(type == 'RECLAMO'){
-      formData.append('reasonToRegret', 'Reclamo')
+      formData.append('reason', values.reasonSelected.reason + ' > ' + values.reasonSelected.value)
     }
-   /*  if(type == 'BAJA'){
-      formData.append('reasonToRegret', values.reasonToRegret);
-    } */
+
+
     
 
     if (values.files && values.files.buffer) {
@@ -270,7 +260,14 @@ const ContactForm = ({ type }) => {
   };
 
   const handleSelectOptionValue = (value) => {
-    setReasonSelected({ ...reasonSelected, value: value });
+
+    if(value == 'rollback'){
+      setReasonSelected({reason: null, value: null})
+    }
+    else{
+      setReasonSelected({ ...reasonSelected, value: value });
+    }
+    
   };
 
   const getReason = () => {
@@ -330,10 +327,11 @@ const ContactForm = ({ type }) => {
                 className='selector-input'
                 onClick={() => setOpenSelector(!openSelector)}
               >
-                {reasonSelected.reason && reasonSelected.value
-                  ? <span>{getReason().title} {'>'} {reasonSelected.value !== 'rollback' && reasonSelected.value} </span>
-                  : 'Selecciona tu motivo'
+                {reasonSelected.reason ? <span>{getReason().title} {'>'}</span> : <span>Selecciona tu motivo</span>}
+                <span>{
+                reasonSelected.value &&  reasonSelected.value !== 'rollback' && reasonSelected.value
                 }
+                </span>
               </span>
               <div className={openSelector ? 'dropdown-list-reason' : 'dropdown-list-reason no-visible'}>
                 {reasonSelected.reason && reasonSelected.value !== 'rollback'
