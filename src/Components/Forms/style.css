@@ -95,7 +95,7 @@ textarea::placeholder{
     display: flex;
     align-items: center;
     gap: 15px;
-
+    cursor: pointer;
 }
 
 .submit button svg path{
@@ -266,6 +266,15 @@ textarea::placeholder{
 
 .sent-message svg path{
     color: var(--primary-color)
+}
+
+.checkbox{
+    margin: 10px;
+    width: 18px;
+    height: 18px;
+}
+.checkbox:checked{
+    color: var(--primary-color);
 }
 
 @media screen and (max-width:750px){

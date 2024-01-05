@@ -57,7 +57,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    
+    cursor: pointer;
 }
 .service-item-assist{
     border-radius: 15px;

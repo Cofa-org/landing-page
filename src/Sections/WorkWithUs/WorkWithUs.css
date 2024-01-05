@@ -19,6 +19,7 @@
     border: none;
     width: 261px;
     font-size: 20px;
+    cursor: pointer;
 }
 
 .container-form-work{
@@ -90,7 +91,6 @@
         align-items: center;
     }
     .container-work img {
-            width: 80%;
-        }
+        width: 80%;
     }
 }

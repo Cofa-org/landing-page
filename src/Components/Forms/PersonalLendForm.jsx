@@ -6,7 +6,12 @@ import { Link } from 'react-router-dom';
 
 const PersonalLendForm = () => {
   const [isSent, setIsSent] = useState(false);
+  const [aceptoTerminos, setAceptoTerminos] = useState(false);
 
+  const handleAceptoCambio = () => {
+    setAceptoTerminos(!aceptoTerminos);
+  };
+  
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     const formData = new FormData();
     console.log(values);
@@ -80,8 +85,10 @@ const PersonalLendForm = () => {
             errors.telephone = '';
         }
 
-        if(values.situacion === "no"){
-            errors.situacion = 'Debe elegir una situación laboral';
+        if (!values.situacion || values.situacion === "no") {
+          errors.situacion = 'Debe elegir una situación laboral válida';
+        } else {
+          errors.situacion = '';
         }
 
         if(!values.amount){
@@ -89,6 +96,7 @@ const PersonalLendForm = () => {
         }else {
             errors.amount = '';
         }
+
     // Verificar si todos los campos están completos
     const isFormValid = Object.values(errors).every((error) => error === '');
 
@@ -157,19 +165,27 @@ const PersonalLendForm = () => {
                         <Field name='amount' id='amount' placeholder='$' />
                         <ErrorMessage name='amount' component="div" className="error-message"/>
                     </div>
-                    <div>
-                        <label htmlFor="">Al clickear en Enviar, estás aceptado los{' '}
-                            <Link to='/terms-and-conditions'  style={{textDecoration:"underline"}}>
-                             Términos y Condiciones
-                            </Link>
-                        </label>
+                    <div className='input-container-100'>
+                    <input
+                      type="checkbox"
+                      id="aceptarTerminos"
+                      className='checkbox'
+                      checked={aceptoTerminos}
+                      onChange={handleAceptoCambio}
+                    />
+                      <label htmlFor="aceptarTerminos">
+                        Acepto los{' '}
+                        <Link to='/terms-and-conditions' style={{ textDecoration: "underline" }}>
+                          Términos y Condiciones
+                        </Link>
+                      </label>
                     </div>
 
             <div className="submit">
               {isSent ? (
                 <span className='sent-message'>Enviado <FaCheck /></span>
               ) : (
-                <button type='submit' className={`primary-btn ${isSubmitting || !isValid ? 'disabled-btn' : ''}`} disabled={isSubmitting || !isValid}>
+                <button type='submit' className={`primary-btn ${isSubmitting || !isValid || !aceptoTerminos ? 'disabled-btn' : ''}`} disabled={isSubmitting || !isValid || !aceptoTerminos}>
                   Enviar <FaArrowRightLong />
                 </button>
               )}

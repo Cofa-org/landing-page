@@ -42,6 +42,7 @@
 .btn-assist{
     width: 40%;
     margin-top: 2%;
+    cursor: pointer;
 }
 
 .elipse-main {
