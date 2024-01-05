@@ -374,15 +374,10 @@ export const termsAndConditionsPoints = [
                     },
                     {
                         content:'Se aplica a los Referidos que:',
-                        /* TO DO: este subcontent no se esta mostrando */
                         subcontent:[
                             
                             {
-                                content:'Soliciten, obtengan y mantengan vigente por más de diez (10) días corridos contados a partir de la fecha de celebración del respectivo contrato, un primer préstamo y no sean o hayan sido clientes de COFA. ',
-                                subcontent:[
-                                    'Soliciten y mantengan vigente por el plazo de tres (03) meses contínuos una primera asistencia COFA (www.cofa.com.ar/asistencias).'
-                                ]
-
+                                content:'Soliciten, obtengan y mantengan vigente por más de diez (10) días corridos contados a partir de la fecha de celebración del respectivo contrato, un primer préstamo y no sean o hayan sido clientes de COFA. '
                             },
                             {
                                 content:'Soliciten y mantengan vigente por el plazo de tres (03) meses contínuos una primera asistencia COFA (www.cofa.com.ar/asistencias).'
@@ -522,7 +517,6 @@ export const termsAndConditionsPoints = [
                         content: 'Efectivamente solicite y firme un préstamo con COFA y mantenga vigente el mismo durante el plazo mínimo aplicable, sin ejercer derecho de arrepentimiento o revocación: 400 Puntos en el Programa.',
                         subcontent: [
                             {
-                                /* TO DO: no se ve */
                                 content: 'El cliente que haya referido a cinco (5) REFERIDOS que adquieran al menos un (1) préstamo cada uno, en el transcurso de un año calendario, recibirá el doble de puntos a partir del sexto Referido de préstamos. (conf. cláusula 15.1.a.)'
                             }
                         ]
@@ -531,7 +525,6 @@ export const termsAndConditionsPoints = [
                         content: 'Efectivamente solicite una asistencia COFA y la mantenga activa y al día por al menos tres (03) meses consecutivos: 100 Puntos en el Programa.',
                         subcontent: [
                             {
-                                /* TO DO: no se ve */
                                 content: 'El cliente que haya referido a cinco (5) REFERIDOS que adquieran al menos una (1) asistencia, en el transcurso de un año calendario, recibirá el doble de puntos a partir del sexto Referido de asistencias (conf. cláusula 15.1.b.)'
                             }
                         ]
