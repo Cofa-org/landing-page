@@ -17,7 +17,7 @@ export const infoList = [
     {
         Icon: CiMoneyBill,
         title: 'Elegí las cuotas',
-        content: 'Simulá tu préstamo y elegí la opción que más se adapte a vos.\nDevolvé el préstamo en cuotas fijas y en pesos. Sin sorpresas.'
+        content: 'Elegí la opción que más se adapte a vos.\nDevolvé el préstamo en cuotas fijas y en pesos. Sin sorpresas.'
     },
     {
         Icon: BsCreditCard,
