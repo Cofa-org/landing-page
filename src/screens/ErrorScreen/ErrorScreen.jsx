@@ -8,8 +8,8 @@ const ErrorScreen = () => {
         <h2>Ups! Algo salió mal</h2>
         <p>Recargá la página. Si el error persiste, comunicate con nosotros para resolverlo.</p>
         <div>
-            <span style={{marginRight:"4%"}}>consultas@cofa.com.ar</span>
-            <span style={{marginLeft:"4%"}}>+5491154559017</span>
+            <span className='email-error'>consultas@cofa.com.ar</span>
+            <span className='tel-error'>+5491154559017</span>
         </div>
         
         

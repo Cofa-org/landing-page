@@ -13,8 +13,15 @@
 .container-error p{
     margin: 2%;
 }
-span{
+.email-error{
     color: var(--primary-color);
     font-weight: 600;
     font-size: 18px;
+    margin-right: 4%
+}
+.tel-error{
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: 18px;
+    margin-left: 4%
 }

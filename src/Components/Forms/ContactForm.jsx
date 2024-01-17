@@ -392,7 +392,7 @@ const ContactForm = ({ type }) => {
                 {
                   (isSelectorOpen && !openSelector) && (!reasonSelected.reason || !reasonSelected.value) &&
                   <div className="error-message" >
-                    Debes seleccionar una razon.
+                    Debes seleccionar una razón.
                   </div>
                 }
               </div>
