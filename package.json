@@ -8,6 +8,7 @@
     "dev": "vite",
     "build": "vite build --base=./",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "subir": "npm run build && git checkout produccion && git merge origin/produccion && git add dist && git commit -m 'Actualizar producción' && git push origin produccion && git checkout main",
     "preview": "vite preview"
   },
   "dependencies": {
