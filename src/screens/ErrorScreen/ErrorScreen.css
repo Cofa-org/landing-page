@@ -1,0 +1,27 @@
+.container-error{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin-top: 5%;
+}
+.container-error h2{
+    margin-top: 2%;
+}
+.container-error p{
+    margin: 2%;
+}
+.email-error{
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: 18px;
+    margin-right: 4%
+}
+.tel-error{
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: 18px;
+    margin-left: 4%
+}

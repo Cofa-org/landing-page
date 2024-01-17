@@ -12,7 +12,7 @@ import ElMejorTratoScreen from './ElMejorTratoScreen/ElMejorTratoScreen'
 import DischargeScreen from "./DischargeScreen/DischargeScreen";
 import QuejasScreen from "./QuejasScreen/QuejasScreen"
 import TermsV2 from "./TermsV2/TermsV2";
-
+import ErrorScreen from "./ErrorScreen/ErrorScreen"
 
 export  {
     HomeScreen, 
@@ -28,5 +28,6 @@ export  {
     ElMejorTratoScreen,
     AssistenceScreen,
     QuejasScreen,
-    TermsV2
+    TermsV2,
+    ErrorScreen
 }

@@ -9,9 +9,11 @@ const Footer = () => {
     return (
         <footer>
             <div className='footer-box-left'>
-                <p>
-                    INSCRIPTO EN EL REGISTRO DE PROVEEDORES NO FINANCIEROS DE CRÉDITOS ANTE EL BCRA, BAJO EL NRO. 55287.
-                </p>
+                <Link to={'https://www.bcra.gob.ar/SistemasFinancierosYdePagos/Proveedores_no_financieros.asp'} target='_blank'>
+                    <p>
+                        INSCRIPTO EN EL REGISTRO DE PROVEEDORES NO FINANCIEROS DE CRÉDITOS ANTE EL BCRA, BAJO EL NRO. 55287.
+                    </p>
+                </Link>
                 <div className='footer-contracts'>
                     <div>
                         <h3>
