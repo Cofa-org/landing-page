@@ -4,6 +4,7 @@ import { BiRegistered } from 'react-icons/bi'
 import { FaWhatsapp } from "react-icons/fa";
 import './Footer.css'
 import { Link } from 'react-router-dom';
+/*  */
 const Footer = () => {
     return (
         <footer>
