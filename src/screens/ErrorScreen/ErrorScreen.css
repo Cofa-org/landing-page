@@ -1,0 +1,20 @@
+.container-error{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin-top: 10%;
+}
+.container-error h2{
+    margin-top: 2%;
+}
+.container-error p{
+    margin: 2%;
+}
+span{
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: 18px;
+}

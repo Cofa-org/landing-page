@@ -186,29 +186,32 @@ const ContactForm = ({ type }) => {
 
     if (!values.telephone) {
       errors.telephone = 'El celular no puede estar vacío';
-    } else if (String(values.telephone).length !== 14) {
+    } else if (String(values.telephone).length !== 10) {
       errors.telephone = 'Debe ingresar un celular válido';
     } else {
       errors.telephone = '';
     }
 
     if (!values.message) {
-      errors.message = 'No puedes dejar el mensaje vacio'
+      errors.message = 'El mensaje no puede estar vacío.'
     }
     else if (values.message.split(' ').length < 10) {
-      errors.message = 'El mensaje debe contener almenos 10 palabras.'
+      errors.message = 'El mensaje debe contener al menos 10 palabras.'
     }
     else {
       errors.message = ''
     }
 
+    // Verificar si todos los campos están completos
+    const isFormValid = Object.values(errors).every((error) => error === '');
 
+    return isFormValid ? false : errors;
 
-    if (!errors.amount && !errors.situacion && !errors.dni && !errors.email) {
+    /* if (!errors.amount && !errors.situacion && !errors.dni && !errors.email) {
       return false
     } else {
       return errors;
-    }
+    } */
   };
 
   const reasons = [
@@ -324,6 +327,7 @@ const ContactForm = ({ type }) => {
         onSubmit={handleSubmit}
         validate={validate}
       >
+        {({ isSubmitting, isValid }) => (
         <Form className="form-container">
           <div className="input-container">
             <label>Nombre Completo</label>
@@ -410,11 +414,18 @@ const ContactForm = ({ type }) => {
           </div>
 
           <div className="submit">
-            {isSent ? <span className='sent-message'>Enviado <FaCheck /></span> : <button type='submit'>Enviar <FaArrowRightLong /></button>}
+              {isSent ? (
+                <span className='sent-message'>Enviado <FaCheck /></span>
+              ) : (
+                <button type='submit' className={`primary-btn ${isSubmitting || !isValid ? 'disabled-btn' : ''}`} disabled={isSubmitting || !isValid}>
+                  Enviar <FaArrowRightLong />
+                </button>
+              )}
           </div>
 
 
         </Form>
+        )}
       </Formik >
     </div >
   );
