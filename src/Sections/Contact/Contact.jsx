@@ -12,10 +12,6 @@ const Contact = () => {
         <h2>Contacto</h2>
         <div className='contactMediaList'>
             <span>
-                <AiOutlineClockCircle/>
-                <span style={{textAlign:"center"}}>Lunes a Viernes<br></br> de 9:00 a 17:00 hs.</span>
-            </span>
-            <span>
                 <BsTelephone/>
                 <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
                     <span>11-5455-9017</span>
@@ -29,7 +25,7 @@ const Contact = () => {
             </span>
             <span>
                 <CiLocationOn/>
-                <span style={{textAlign:"center"}}>Moreno 1628, C1093ABF, CABA. <br></br>Piso 3, oficina 35.</span>
+                <span style={{textAlign:"center"}}>Moreno 1628, Piso 3, oficina 35, CABA, Argentina. <br></br></span>
             </span>
         </div>
         <div className='contactInfoItem'>

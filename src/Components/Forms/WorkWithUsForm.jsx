@@ -138,10 +138,10 @@ const WorkWithUsForm = () => {
           errors.telephone = '';
       }
       if(!values.message){
-        errors.message = 'No puedes dejar el mensaje vacio'
+        errors.message = 'No podés dejar el mensaje vacío.'
       }
       else if(values.message.split(' ').length < 10){
-        errors.message = 'El mensaje debe contener almenos 10 palabras.'
+        errors.message = 'El mensaje debe contener al menos 10 palabras.'
       }
       else{
         errors.message = ''
@@ -150,10 +150,10 @@ const WorkWithUsForm = () => {
   
       if(!errors.amount && !errors.telephone && !errors.email ){
         return false
-    }else{
-        return errors;
-    }
-    };
+      }else{
+          return errors;
+      }
+      };
 
 
   return (

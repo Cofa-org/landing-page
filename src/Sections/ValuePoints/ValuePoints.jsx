@@ -13,13 +13,13 @@ const ValuePoints = () => {
                     Valor de los Puntos COFA
                 </h1>
                 <p>
-                    Si el participante del programa refiere a 5 personas, cada una de las cuales obtiene un préstamo, al 6° referido consigue el doble de Puntos COFA.
+                    Si el participante del programa refiere a 5 personas, cada una de las cuales obtiene un préstamo, a partir del 6° referido consigue el doble de Puntos COFA.
                 </p>
                 <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
                     <button className='primary-btn btn-refer'>Referir A Un Amigo <GoArrowRight /></button>
                 </a>
             </div>
-            <div className='cards'>
+            <div className='cards-value-points'>
                 <div className='style-card'>
                     <BsCheckCircle />
                     <div>

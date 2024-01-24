@@ -23,31 +23,22 @@
 .btn-refer svg path{
     color: white;
 }
-.cards{
+.cards-value-points{
     display: flex;
     flex-direction: row;
-    /* width: 120%; */
     flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 5%;
-   /*  align-items: flex-end; */
+    gap: 12px;
     width: 1080px;
 }
 .style-card{
     display: flex;
     flex-basis: 45%;
-    padding: 21px;
+    padding: 15px;
+    gap: 16px;
     align-items: center;
-    gap: 17px;
-    border-radius: 10px;
-    margin-bottom: 3%;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    
 }
 
-.style-card:nth-child(2){
+/* .style-card:nth-child(2){
     position: relative;
     top: 20px;
 }
@@ -55,7 +46,7 @@
 .style-card:nth-child(4){
     position: relative;
     top: 20px
-}
+} */
 
 .style-card h2{
     font-size: 20px;
@@ -65,17 +56,12 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+    width: 70%;
 }
-.style-card>div>p{
-    font-size: 16px;
-    width: 100%;
-}
-
 .style-card svg{
     width: 48px;
     height: 48px;
 }
-
 .style-card svg path{
     color: var(--primary-color);
 }
@@ -88,7 +74,8 @@
 .btn-terms{
     background: #F0F5FF;
     cursor: pointer;
-    width: 90%;
+    width: auto;
+
 }.btn-terms svg path{
     width: 24px;
     height: 24px;
@@ -110,7 +97,7 @@
         justify-content: center;
         align-items: center
     }
-    .cards{
+    .cards-value-points{
         display: flex;
         flex-direction: row;
     }
@@ -129,13 +116,13 @@
         flex-direction: column;
         align-items: center;
     }
-    .cards{
-        display: flex;
+    .cards-value-points{
         flex-direction: column;
         align-items: center;
         width: 100%;
-        align-content: center;
-        margin-top: 6%;
+    }
+    .style-card{
+        width: 90%;
     }
     .info{
         width: 100%;
@@ -146,8 +133,3 @@
         margin-bottom: 3%;
     }
 }
-
-/* @media screen and (min-width: 1400px)
-@media screen and (max-width: 950px)
-@media screen and (max-width:550px)
-@media screen and (max-width:450px) */

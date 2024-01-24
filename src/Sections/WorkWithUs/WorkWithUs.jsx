@@ -9,7 +9,7 @@ const WorkWithUs = () => {
         <div className='container-work'>
             <div className='info-work'>
                 <h1>Trabajá con nosotros</h1>
-                <p>En COFA estamos buscando gente talentosa y apasionada para unirse a nuestro equipo. Si te gusta trabajar en equipo, sos proactivo y tenés ganas de aprender, ¡queremos conocerte!</p>
+                <p>En COFA estamos buscando gente talentosa y apasionada para unirse a nuestro equipo. Si queres trabajar en el mundo fintech y tenés ganas de aprender, ¡queremos conocerte!</p>
                 <Link to={'/work-with-us'}>
                     <button className='primary-btn btn-work'>Unirme a COFA <GoArrowRight /></button>
                 </Link>
