@@ -425,7 +425,7 @@ export const termsAndConditionsPoints = [
                 content:'La acreditación de Puntos será efectuada en la cuenta personal otorgada por COFA a cada cliente, a los quince (15) días hábiles contados a partir de:',
                 subcontent:[
                     {
-                        content:'La fecha en que el Referido haya firmado el contrato del su primero préstamo con COFA.'
+                        content:'La fecha en que el Referido haya firmado el contrato de su primer préstamo con COFA.'
                     },
                     {
                         content:'La fecha en que el Referido haya abonado la tercera (3ra) cuota de la primera asistencia COFA otorgada. '
