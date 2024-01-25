@@ -61,7 +61,7 @@ const Footer = () => {
                 <div className='ssn-container'>
                     <p>Inscripto como Agente Institorio ante la SSN bajo el registro Nro 334.</p>
                     <span>Atención al asegurado 0800-666-8400</span>
-                    <img src='/ssn-logo.svg' />
+                    <img src='/img/ssn-logo.svg' />
                 </div>
 
             </div>
@@ -84,7 +84,7 @@ const Footer = () => {
                 <div className='ssn-container-mobible'>
                     <p>Inscripto como Agente Institorio ante la SSN bajo el registro Nro 334.</p>
                     <span>Atención al asegurado 0800-666-8400</span>
-                    <img src='/ssn-logo.svg' />
+                    <img src='/img/ssn-logo.svg' />
                 </div>
                 <div>
                     <p>
@@ -167,7 +167,7 @@ const DeprecatedFooter = () => {
                     </p>
                 </div>
                 <div className='footer-box-4__right'>
-                    <img src='/ssn-logo.svg' />
+                    <img src='/img/ssn-logo.svg' />
                     <p>Atención al asegurado 0800-666-8400</p>
                 </div>
             </div>

@@ -9,7 +9,7 @@ const AboutUs = () => {
         <h2>Sobre Nosotros</h2>
         <div className='about-us-content'>
             <div>
-                <img src='/about-us-img.svg'/>
+                <img src='/img/about-us-img.svg'/>
             </div>
             <div className='info-about-us'>
                 <p>
