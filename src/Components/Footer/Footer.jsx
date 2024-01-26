@@ -61,14 +61,14 @@ const Footer = () => {
                 <div className='ssn-container'>
                     <p>Inscripto como Agente Institorio ante la SSN bajo el registro Nro 334.</p>
                     <span>Atención al asegurado 0800-666-8400</span>
-                    <img src='/ssn-logo.svg' />
+                    <img src='/img/ssn-logo.svg' />
                 </div>
 
             </div>
             <div className='footer-box-right'>
                 <div >
                     <p>
-                        La Tasa Nominal Anual (TNA), la Tasa Efectiva Anual (TEA), el Costo Financiero Total Anual (CFTA) y el Costo Financiero Total de la operación (CFTO) varían según el perfil crediticio del solicitante del préstamo, el plazo de financiación elegido y la situación del mercado. En todos los casos, la TNA, TEA, el CFTA y el CFTO aplicables serán informados al momento de ingresar la solicitud del préstamo y antes de su otorgamiento. Tasa Nominal Anual (TNA): Mínima: 110% - Máxima 402,20% | Costo Financiero Total Anual (CFTA) con IVA: Mínimo: 160% - Máximo 425% Ejemplo de préstamo (*): Monto solicitado de $10.000 a 3 meses | TNA (sin IVA): 160,33% - TEA (sin IVA): 350,36% -<span className='important-text'> CFTA (con IVA): 194% - CFTO (con IVA): 48,50%</span> | Cuota: $4.950 | Total a pagar: $14.850. Las cuotas del préstamo son mensuales, iguales (fijas) y consecutivas, que podrán ser abonadas mediante transferencia o depósito bancario, débito intrabancario o en tarjeta de débito y/o a través de los botones de pago habilitados. Período para devolver el préstamo; mínimo 2 mes - máximo 18 meses.
+                        La Tasa Nominal Anual (TNA), la Tasa Efectiva Anual (TEA), el Costo Financiero Total Anual (CFTA) y el Costo Financiero Total de la operación (CFTO) varían según el perfil crediticio del solicitante del préstamo, el plazo de financiación elegido y la situación del mercado. En todos los casos, la TNA, TEA, el CFTA y el CFTO aplicables serán informados al momento de ingresar la solicitud del préstamo y antes de su otorgamiento. Tasa Nominal Anual (TNA): Mínima: 110% - Máxima 402,20% | Costo Financiero Total Anual (CFTA) con IVA: Mínimo: 160% - Máximo 425% Ejemplo de préstamo (*): Monto solicitado de $10.000 a 3 meses | TNA (sin IVA): 190,08% - TEA (sin IVA): 483,87% - <span className='important-text'>CFTA (con IVA): 230% - CFTO (con IVA): 57,50%</span> | Cuota: $5.250 | Total a pagar: $15.750. Las cuotas del préstamo son mensuales, iguales, fijas y consecutivas, y podrán ser abonadas mediante transferencia o depósito bancario, débito intrabancario o en tarjeta de débito y/o a través de los botones de pago habilitados. Período para devolver el préstamo; mínimo 2 meses - máximo 18 meses.
                     </p>
                     <p>
                         Sistema de amortización directo.
@@ -84,7 +84,7 @@ const Footer = () => {
                 <div className='ssn-container-mobible'>
                     <p>Inscripto como Agente Institorio ante la SSN bajo el registro Nro 334.</p>
                     <span>Atención al asegurado 0800-666-8400</span>
-                    <img src='/ssn-logo.svg' />
+                    <img src='/img/ssn-logo.svg' />
                 </div>
                 <div>
                     <p>
@@ -167,7 +167,7 @@ const DeprecatedFooter = () => {
                     </p>
                 </div>
                 <div className='footer-box-4__right'>
-                    <img src='/ssn-logo.svg' />
+                    <img src='/img/ssn-logo.svg' />
                     <p>Atención al asegurado 0800-666-8400</p>
                 </div>
             </div>

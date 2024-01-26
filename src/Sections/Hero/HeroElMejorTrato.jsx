@@ -65,7 +65,7 @@ const HeroElMejorTrato = ({}) => {
                         <p><IoIosCheckmarkCircleOutline />Mínimos Requisitos</p>
                         <p><IoIosCheckmarkCircleOutline />En el día</p>
                         <p><IoIosCheckmarkCircleOutline />100% Online</p>
-                        <p><IoIosCheckmarkCircleOutline />Adelantos de hasta $150.000</p>
+                        <p><IoIosCheckmarkCircleOutline />Adelantos de hasta $180.000</p>
                     </div>
                     <div className='info-card-exc card-el-mejor-trato'>
                         <h2>Seguros</h2>

@@ -25,7 +25,7 @@ const Hero = () => {
         </div>
         <div className='info-container'>
             <h2>
-                Te adelantamos hasta $150.000
+                Te adelantamos hasta $180.000
             </h2>
             <div className='info-list'>
                 {
