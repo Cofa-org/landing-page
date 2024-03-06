@@ -42,7 +42,7 @@ const MyDropzone = ({ field, form: { setFieldValue } }) => {
         <div className='dropzone-delete-container'>
         <div {...getRootProps()} className='dropzone' >
           <PiCloudArrowUp />
-          <h3>Archivo seleccionado</h3>
+          <h3>Archivo cargado</h3>
           <input {...getInputProps()} />
           <ul>
             {fileNames.map((name, index) => (
@@ -55,7 +55,7 @@ const MyDropzone = ({ field, form: { setFieldValue } }) => {
       ) : (
         <div {...getRootProps()} className="dropzone">
           <PiCloudArrowUp />
-          <h3>Importá acá tu archivo</h3>
+          <h3>Importá acá tu CV</h3>
           <input {...getInputProps()} />
           <p>Arrastrá o hacé click para seleccionar</p>
         </div>
@@ -148,12 +148,19 @@ const WorkWithUsForm = () => {
       }
     
   
-      if(!errors.amount && !errors.telephone && !errors.email ){
-        return false
-      }else{
-          return errors;
+      // Validar el campo de archivos
+      if (!values.files || values.files.length === 0) {
+        errors.files = 'Debés cargar tu CV.';
+      } else {
+        errors.files = '';
       }
-      };
+
+      // Verificar si todos los campos están completos
+      const isFormValid = Object.values(errors).every((error) => error === '');
+
+      return isFormValid ? false : errors;
+    
+    };
 
 
   return (
@@ -169,6 +176,7 @@ const WorkWithUsForm = () => {
         onSubmit={handleSubmit}
         validate={validate}
       >
+        {({ isSubmitting, isValid }) => (
         <Form className="form-container">
           <div className="input-container">
             <label>Nombre Completo</label>
@@ -202,11 +210,16 @@ const WorkWithUsForm = () => {
           </div>
 
           <div className="submit">
-            {isSent ?  <span className='sent-message'>Enviado <FaCheck /></span> : <button type='submit'>Enviar <FaArrowRightLong /></button>}
+            {isSent ? (
+                <span className='sent-message'>Enviado <FaCheck /></span>
+              ) : (
+                <button type='submit' className={`primary-btn ${isSubmitting || !isValid ? 'disabled-btn' : ''}`} disabled={isSubmitting || !isValid}>
+                  Enviar <FaArrowRightLong />
+                </button>
+              )}
           </div>
-
-
-    </Form>
+        </Form>
+        )}
       </Formik >
     </div >
   );

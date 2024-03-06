@@ -352,7 +352,7 @@ export const howDoAddPoints = [
 
 export const termsAndConditionsPoints = [
     {
-        content: 'Participantes. Adhesión: Podrán participar del Programa las personas humanas mayores de edad titulares de, al menos, un (1) producto vigente con COFA (Clientes). La adhesión al Programa se efectúa con la primera acreditación de Puntos.'
+        content: 'Participantes. Adhesión: Podrán participar del Programa las personas humanas mayores de edad titulares de, al menos, un (1) producto vigente con COFA (Clientes). La adhesión al Programa se efectúa con la primera acreditación de Puntos; es gratuita y no necesita renovación.'
     },
     {
         content: 'Puntos: COFA premiará a los Clientes que:',
@@ -507,6 +507,15 @@ export const termsAndConditionsPoints = [
             },
             {
                 content:'Todo impuesto, gravamen, carga, retención o similar (actual o futuro) que deba tributarse o se origine sobre o en relación con los puntos otorgados serán a cargo de los participantes.'
+            },
+            {
+                content:'Para que proceda el canje se deberá cumplir con todos los requisitos al momento de la solicitud.'
+            },
+            {
+                content:'No se efectuará el canje si al momento de solicitarlo, o luego de su solicitud y antes de hacerse efectivo, el cliente se encuentra en mora con cualquiera de los productos que tenga activos.'
+            },
+            {
+                content:'Si luego de efectivizado un canje el cliente solicitara la reversión y/o baja y/o arrepentimiento de algún cobro ya realizado o de un producto otorgado, el canje se tendrá por no efectuado, el cliente perderá los puntos canjeados y el monto sujeto al canje dejado sin efecto se sumará a las cuotas adeudadas y generará los intereses y gastos pactados al momento del alta del producto.'
             },
         ]
     },

@@ -59,7 +59,7 @@ const TermsAndConditionsPoints = () => {
             COFA es una marca registrada de COBRO FACIL S.R.L.
             </p>
             <p>
-            V1.7 - 22/01/2024.
+            V1.9 - 23/02/2024.
             </p>
         </div>
     </section>
