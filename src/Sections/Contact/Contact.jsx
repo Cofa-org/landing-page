@@ -33,14 +33,14 @@ const Contact = () => {
 
                 <img src='/Logo.svg' />
                 <div className='socialMediaList'>
-                    <Link to={'https://www.facebook.com/profile.php?id=61554421626317'} target='_blank'>
+                    <Link to={'https://www.facebook.com/cofa.ar'} target='_blank'>
                         <BsFacebook/>
                     </Link>
-                    <Link to={'https://www.instagram.com/cofa4.0/'} target='_blank'>
+                    <Link to={'https://www.instagram.com/cofa.ar'} target='_blank'>
                         <BsInstagram/>
                     </Link>
                     
-                    <Link to={'https://www.linkedin.com/company/cofa-servicios-financieros/'} target='_blank'>
+                    <Link to={'https://www.linkedin.com/company/cofa-ar/'} target='_blank'>
                         <BsLinkedin/>
                     </Link>
                    
