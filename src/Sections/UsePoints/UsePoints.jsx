@@ -6,7 +6,7 @@ import { TbDiscount2 } from "react-icons/tb";
 const UsePoints = () => {
   return (
     <>
-        <section className='use-container' id='use-of-points'>
+        <section className='use-container' id='uso-de-puntos'>
             <div className='use-info-container'>
                 <h1>
                     ¿Cómo uso los Puntos COFA?

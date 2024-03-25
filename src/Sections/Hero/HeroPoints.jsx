@@ -39,7 +39,7 @@ const HeroPoints = () => {
                 <div className='text-add'>
                     <h1>¿Cómo sumo puntos con COFA?</h1>
                     <p>Cada acción que realices te otorgará puntos que podrás canjear por descuentos. Cada forma de conseguir puntos es independiente de las demás, por lo que podés sumarlos de manera independiente y acumularlos en tu cuenta.</p>
-                    <a href='#value' className='primary-btn'>Valor De Los Puntos COFA <GoArrowDown /></a> 
+                    <a href='#valor' className='primary-btn'>Valor De Los Puntos COFA <GoArrowDown /></a> 
                 </div>
 
                 < div className='info-cards-points'>

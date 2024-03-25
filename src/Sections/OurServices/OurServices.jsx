@@ -12,11 +12,12 @@ const OurServices = () => {
         ¿Ya conocés nuestros servicios de asistencia?
         </h2>
         <p>
-        COFA ofrece una amplia gama de prestaciones para acompañar a las personas y brindarles más seguridad y tranquilidad 
+        COFA ofrece una amplia gama de prestaciones para acompañar a las personas y brindarles más seguridad y tranquilidad. 
         </p>
         <OurServicesList/>
         <button className='primary-btn btn-assist'>
-          <Link to={'/assists'}>Conocer Asistencias <GoArrowRight className='arrow-right'/></Link>
+          <Link to={'/asistencias'}>Conocer asistencias</Link>
+          <GoArrowRight className='arrow-right'/>
         </button>
     </section>
   )

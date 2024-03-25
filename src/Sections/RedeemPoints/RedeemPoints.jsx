@@ -7,7 +7,7 @@ const RedeemPoints = () => {
   return (
     <>
         <img src="/img/shape-redeem-points.svg" className='shape' />
-        <section className='redeem-container' id='restrictions'>
+        <section className='redeem-container' id='restricciones'>
             <div className='exchange'>
                 <h1>
                     Canje y uso de los Puntos COFA

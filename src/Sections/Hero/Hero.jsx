@@ -6,29 +6,27 @@ import { AnimatedTitle } from '../../Components'
 
 const Hero = () => {
   return (
-    <section className='hero-container' id='header'>
+    <section className='hero-container' id='prestamos'>
         
         <div className='hero'>
             <div className='hero-info'>
-                <h1>
-                    Sacalo de <br />
-                    forma <AnimatedTitle/>
- 
+                <h1> 
+                    Préstamos <br/> <AnimatedTitle/>
                 </h1>
                 <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
                     <button className='primary-btn btn-loan-main' >QUIERO MI PRÉSTAMO</button>
                 </a>
             </div>
             <div className='hero-img'>
-                <img src='/img/hero-img.png' alt='minimos requisitos, toma tu préstamos, mas de 95000 clientes satisfechos, mas de 15 años de trayectoria'/>
+                <img src='/img/hero-img.png' alt='Para sacar tus préstamos, definimos mínimos requisitos. Somos una empresa fintech con más de 16 años de trayectoria y más de 95.000 clientes satisfechos. Préstamos y asistencias que simplifican tu vida.'/>
             </div>
         </div>
-        <div className='info-container'>
-            <h2>
-                Te adelantamos hasta $180.000
+        <div className='info-container'> 
+            <h2>   
+                Te prestamos hasta $180.000
             </h2>
             <div className='info-list'>
-                {
+                { 
                     infoList.map((info) =>(
                         <div className='info-card'>
                             <info.Icon className='info-icon'/>

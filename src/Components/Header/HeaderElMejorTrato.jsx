@@ -43,24 +43,24 @@ const HeaderElMejorTrato = () => {
             ? (
               <>
                 <Link to="/" className={selectedLink === 'inicio' ? 'link-selected' : ''} onClick={() => handleLinkClick('inicio')}>Inicio</Link>
-                <a href="#about-us" className={selectedLink === 'nosotros' ? 'link-selected' : ''} onClick={() => handleLinkClick('nosotros')}>Nosotros</a>
-                <a href="#frecuent-questions" className={selectedLink === 'preguntas' ? 'link-selected' : ''} onClick={() => handleLinkClick('preguntas')}>Preguntas Frecuentes</a>
-                <a href="#contact" className={selectedLink === 'contacto' ? 'link-selected' : ''} onClick={() => handleLinkClick('contacto')}>Contacto</a>
+                <a href="#nosotros" className={selectedLink === 'nosotros' ? 'link-selected' : ''} onClick={() => handleLinkClick('nosotros')}>Nosotros</a>
+                <a href="#preguntas-frecuentes" className={selectedLink === 'preguntas' ? 'link-selected' : ''} onClick={() => handleLinkClick('preguntas')}>Preguntas Frecuentes</a>
+                <a href="#contacto" className={selectedLink === 'contacto' ? 'link-selected' : ''} onClick={() => handleLinkClick('contacto')}>Contacto</a>
               </>
             )
             : (
               <>
                 <Link to="/"  className='link-selected'>Inicio</Link>
-                <Link to={'/#about-us'} >Nosotros</Link>
-                <Link to={'/#frecuent-questions'} >Preguntas Frecuentes</Link>
-                <Link to={'/#contact'} >Contacto</Link>
+                <Link to={'/#nosotros'} >Nosotros</Link>
+                <Link to={'/#preguntas-frecuentes'} >Preguntas Frecuentes</Link>
+                <Link to={'/#contacto'} >Contacto</Link>
               </>
             )
           }
            
         </nav>
         <div className='buttons-container buttons-container-points'>
-            <Link to={'/assists'}>
+            <Link to={'/asistencias'}>
               <button className='secondary-btn' id='btn-points-assist'>Quiero mi Asistencia</button>
             </Link>
             <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
@@ -74,17 +74,17 @@ const HeaderElMejorTrato = () => {
               <IoMdArrowBack/>
             </button>
             <Link to="/" className={selectedLink === 'inicio' ? 'link-selected' : ''} onClick={() => handleLinkClick('inicio')}>Inicio</Link>
-            <a href="#about-us" className={selectedLink === 'nosotros' ? 'link-selected' : ''} onClick={() => { handleLinkClick('nosotros'); handleCloseNabvar(); }}>
+            <a href="#nosotros" className={selectedLink === 'nosotros' ? 'link-selected' : ''} onClick={() => { handleLinkClick('nosotros'); handleCloseNabvar(); }}>
               Nosotros
             </a>
-            <a href="#frecuent-questions" className={selectedLink === 'preguntas' ? 'link-selected' : ''} onClick={() => { handleLinkClick('preguntas'); handleCloseNabvar(); }}>
+            <a href="#preguntas-frecuentes" className={selectedLink === 'preguntas' ? 'link-selected' : ''} onClick={() => { handleLinkClick('preguntas'); handleCloseNabvar(); }}>
               Preguntas Frecuentes
             </a>
-            <a href="#contact" className={selectedLink === 'contacto' ? 'link-selected' : ''} onClick={() => { handleLinkClick('contacto'); handleCloseNabvar(); }}>
+            <a href="#contacto" className={selectedLink === 'contacto' ? 'link-selected' : ''} onClick={() => { handleLinkClick('contacto'); handleCloseNabvar(); }}>
               Contacto
             </a>
           </nav>
-          <Link to={'/assists'}>
+          <Link to={'/asistencias'}>
               <button className='secondary-btn mobible-nav-secondary-btn' id='btn-points-assist'>Quiero mi Asistencia</button>
             </Link>
             <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">

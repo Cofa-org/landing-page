@@ -12,7 +12,6 @@ const Header = () => {
   const [inHome, setInHome] = useState(location.pathname == '/')
   const { pathname, hash } = useLocation();
 
-  /* Este es que redirecciona a partir del id Anto */
   useEffect(() => {
     if (hash) {
       const targetElement = document.getElementById(hash.substring(1));
@@ -53,22 +52,22 @@ const Header = () => {
             inHome 
             ? (
               <>
-                <a href="#header"  className={selectedLink === 'inicio' ? 'link-selected' : ''} onClick={() => handleLinkClick('inicio')}>Inicio</a>
-                <a href="#about-us" className={selectedLink === 'nosotros' ? 'link-selected' : ''} onClick={() => handleLinkClick('nosotros')}>Nosotros</a>
-                <a href="#frecuent-questions" className={selectedLink === 'preguntas' ? 'link-selected' : ''} onClick={() => handleLinkClick('preguntas')}>Preguntas Frecuentes</a>
-                <a href="#contact" className={selectedLink === 'contacto' ? 'link-selected' : ''} onClick={() => handleLinkClick('contacto')}>Contacto</a>
-                <Link to={'/cofa-points'}>Puntos COFA</Link>
-                <Link to={'/assists'} >Asistencias</Link>
+                <a href="#prestamos"  className={selectedLink === 'inicio' ? 'link-selected' : ''} onClick={() => handleLinkClick('inicio')}>Inicio</a>
+                <a href="#nosotros" className={selectedLink === 'nosotros' ? 'link-selected' : ''} onClick={() => handleLinkClick('nosotros')}>Nosotros</a>
+                <a href="#preguntas-frecuentes" className={selectedLink === 'preguntas' ? 'link-selected' : ''} onClick={() => handleLinkClick('preguntas')}>Preguntas frecuentes</a>
+                <a href="#contacto" className={selectedLink === 'contacto' ? 'link-selected' : ''} onClick={() => handleLinkClick('contacto')}>Contacto</a>
+                <Link to={'/puntos-cofa'}>Puntos COFA</Link>
+                <Link to={'/asistencias'} >Asistencias</Link>
               </>
             )
             : (
               <>
-                <Link to={'/#header'} className='link-selected'>Inicio</Link>
-                <Link to={'/#about-us'} >Nosotros</Link>
-                <Link to={'/#frecuent-questions'} >Preguntas Frecuentes</Link>
-                <Link to={'/#contact'} >Contacto</Link>
-                <Link to={'/cofa-points'} >Puntos COFA</Link>
-                <Link to={'/assists'} >Asistencias</Link>
+                <Link to={'/#prestamo'} className='link-selected'>Inicio</Link>
+                <Link to={'/#nosotros'} >Nosotros</Link>
+                <Link to={'/#preguntas-frecuentes'} >Preguntas frecuentes</Link>
+                <Link to={'/#contacto'} >Contacto</Link>
+                <Link to={'/puntos-cofa'} >Puntos COFA</Link>
+                <Link to={'/asistencias'} >Asistencias</Link>
               </>
             )
           }
@@ -76,7 +75,7 @@ const Header = () => {
         </nav>
         <div className='buttons-container'>
           <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
-            <button className='primary-btn header-primary-btn' >Quiero mi Préstamo</button>
+            <button className='primary-btn header-primary-btn' >Quiero mi préstamo</button>
           </a>
           {/* <button className='secondary-btn'>Ingresar</button> */}
           <button className='btn-show-links' onClick={openNavbar}><FiMenu/></button>
@@ -86,28 +85,28 @@ const Header = () => {
           <button onClick={() => { setIsOpen(false); handleLinkClick(''); }} className='btn-back'>
             <IoMdArrowBack/>
           </button>
-          <a href="#header" className={selectedLink === 'inicio' ? 'link-selected' : ''} onClick={() => { handleLinkClick('inicio'); handleCloseNabvar(); }}>
+          <a href="#prestamos" className={selectedLink === 'inicio' ? 'link-selected' : ''} onClick={() => { handleLinkClick('inicio'); handleCloseNabvar(); }}>
             Inicio
           </a>
-          <a href="#about-us" className={selectedLink === 'nosotros' ? 'link-selected' : ''} onClick={() => { handleLinkClick('nosotros'); handleCloseNabvar(); }}>
+          <a href="#nosotros" className={selectedLink === 'nosotros' ? 'link-selected' : ''} onClick={() => { handleLinkClick('nosotros'); handleCloseNabvar(); }}>
             Nosotros
           </a>
-          <a href="#frecuent-questions" className={selectedLink === 'preguntas' ? 'link-selected' : ''} onClick={() => { handleLinkClick('preguntas'); handleCloseNabvar(); }}>
-            Preguntas Frecuentes
+          <a href="#preguntas-frecuentes" className={selectedLink === 'preguntas' ? 'link-selected' : ''} onClick={() => { handleLinkClick('preguntas'); handleCloseNabvar(); }}>
+            Preguntas frecuentes
           </a>
-          <a href="#contact" className={selectedLink === 'contacto' ? 'link-selected' : ''} onClick={() => { handleLinkClick('contacto'); handleCloseNabvar(); }}>
+          <a href="#contacto" className={selectedLink === 'contacto' ? 'link-selected' : ''} onClick={() => { handleLinkClick('contacto'); handleCloseNabvar(); }}>
             Contacto
           </a>
-          <Link to={'/cofa-points'} onClick={handleCloseNabvar}>
+          <Link to={'/puntos-cofa'} onClick={handleCloseNabvar}>
             Puntos COFA
           </Link>
-          <Link to={'/assists'} onClick={handleCloseNabvar}>
+          <Link to={'/asistencias'} onClick={handleCloseNabvar}>
             Asistencias
           </Link>
         </nav>
 
           <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
-            <button className='primary-btn mobible-nav-secondary-btn' >Quiero mi Préstamo</button>
+            <button className='primary-btn mobible-nav-secondary-btn' >Quiero mi préstamo</button>
           </a>
           {/* <button className='secondary-btn'>Ingresar</button> */}
         </div>

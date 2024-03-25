@@ -17,7 +17,7 @@ const FrecuentQuestion = () => {
         
     }
   return (
-    <section className='frecuentQuestions' id='frecuent-questions'>
+    <section className='frecuentQuestions' id='preguntas-frecuentes'>
         <h2>Preguntas frecuentes</h2>
         <div className='frecuentQuestionsList'>
             {frecuentQuestions.map((question) =>(

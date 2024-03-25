@@ -32,7 +32,7 @@ const AssistenceScreen = () => {
         <span className='price-assist'><span className='price-strong'>$2000</span>/Mensuales</span>
         <p className='description-assist'>Los servicios de Multiasistencia cubren asistencia del <strong>hogar</strong>, para <strong>mascotas</strong>, <strong>legal</strong>, <strong>informática</strong>, y asistencia <strong>vehicular</strong>. </p>
         <AssistSlider asistencias={asistencias}/>
-        <Link className='go-to-terms' to={'/assists/terminos-multiasistencia'}>
+        <Link className='go-to-terms' to={'/asistencias/terminos-multiasistencia'}>
           Términos y Condiciones Particulares de Multiasistencia <IoMdArrowRoundForward/>
         </Link>
       </div>
@@ -42,7 +42,7 @@ const AssistenceScreen = () => {
         <p className='description-assist'>Los servicios cubren asistencia del <strong>Odontología</strong>, para <strong>Nutrición</strong>, <strong>Psicología</strong>, <strong>Clínica médica</strong>, <strong>Servicio de Acompañante</strong>, entre otros. 
         </p>
         <AssistSlider asistencias={asistenciasSalud}/>
-        <Link className='go-to-terms' to={'/assists/terminos-salud-integral'}>
+        <Link className='go-to-terms' to={'/asistencias/terminos-salud-integral'}>
           Términos y Condiciones Particulares de Salud <IoMdArrowRoundForward/>
         </Link>
       </div>
@@ -50,7 +50,7 @@ const AssistenceScreen = () => {
         <h3 style={{textAlign:"center", fontSize:"42px",marginBottom:"30px", paddingTop:"6%"}} id='desempleo'>Asistencia en Desempleo</h3>
         <span className='price-assist'><span className='price-strong'>$1100</span>/Mensuales</span>
         <AssistSlider asistencias={asistenciasDesempleo}/>
-        <Link className='go-to-terms' to={'/assists/terminos-desempleo'}>
+        <Link className='go-to-terms' to={'/asistencias/terminos-desempleo'}>
           Términos y Condiciones Particulares de Desempleo <IoMdArrowRoundForward/>
         </Link>
       </div>

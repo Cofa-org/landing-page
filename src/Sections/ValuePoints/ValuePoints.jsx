@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 const ValuePoints = () => {
   return (
     <>
-        <section className='value-container' id='value'>
+        <section className='value-container' id='valor'>
             <div className='info'>
                 <h1>
                     Valor de los Puntos COFA

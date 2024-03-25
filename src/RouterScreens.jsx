@@ -14,19 +14,19 @@ const RouterScreens = () => {
         <Route path='/home' element={<HomeScreen/>}/>
         <Route path='/terms-and-conditions' element={<TermsScreen/>} />
         <Route path='/privacy-policies' element={<PrivacyPoliciesScreen/>} />
-        <Route path='/cofa-points' element={<PointsScreen/>}/>
+        <Route path='/puntos-cofa' element={<PointsScreen/>}/>
         <Route path='/suggestions' element={<SuggestionsScreen/>} /> {/* sugerencias */}
         <Route path='/discharge' element={<DischargeScreen/>} /> {/* baja */}
         <Route path='/regret' element={<RegretOrDischargeScreen/>} /> {/* arrepentimiento */}
         <Route path='/complaints' element={<ComplaintsScreen/>}/> {/* reclamos */}
         <Route path='/complaints-book' element={<QuejasScreen/>}/> {/* quejas */}
-        <Route path='/assists' element={<AssistenceScreen/>}/>
+        <Route path='/asistencias' element={<AssistenceScreen/>}/>
         <Route path='/terms-and-conditions-cofa-points' element={<TermsPointsScreen/>} />
         <Route path='/work-with-us' element={<FormWorkWithUs/>}/>
         <Route path='/el-mejor-trato' element={<ElMejorTratoScreen />}/>
-        <Route path='/assists/terminos-multiasistencia' element={<TermsV2 type={'MULTIASISTENCIA'}/>}/>
-        <Route path='/assists/terminos-salud-integral' element={<TermsV2 type={'SALUDINTEGRAL'}/>}/>
-        <Route path='/assists/terminos-desempleo' element={<TermsV2 type={'DESEMPLEO'}/>}/>
+        <Route path='/asistencias/terminos-multiasistencia' element={<TermsV2 type={'MULTIASISTENCIA'}/>}/>
+        <Route path='/asistencias/terminos-salud-integral' element={<TermsV2 type={'SALUDINTEGRAL'}/>}/>
+        <Route path='/asistencias/terminos-desempleo' element={<TermsV2 type={'DESEMPLEO'}/>}/>
         <Route path='/terminos-' element={<TermsV2 type={'SALUDINTEGRAL'}/>}/>
         <Route path='*' element={<ErrorScreen/>}/>
     </Routes>

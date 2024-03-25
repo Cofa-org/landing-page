@@ -8,7 +8,7 @@ const HeroAssist = () => {
   return (
     <>
         <img src="/img/line-background-points.svg" className='line-background-points'/>
-        <section className='hero-container' id='header'>
+        <section className='hero-container' id='prestamos'>
             <div className='hero-points'>
                 <div className='hero-info'>
                     <h1 className='hero-assist-h1'>
@@ -18,7 +18,7 @@ const HeroAssist = () => {
                 </div>
                 <div className='hero-buttons'>
                     <Link className='primary-btn' to='https://api.whatsapp.com/send/?phone=5491154559017' target='_blank'>Pedir Asistencias <GoArrowRight /></Link> 
-                    <Link to={'/assists/#multiasistencia'} className='primary-btn btn-score-points'>
+                    <Link to={'/asistencias/#multiasistencia'} className='primary-btn btn-score-points'>
                         Saber Más <GoArrowDown /> 
                     </Link>
                 </div>

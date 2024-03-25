@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom'
 
 const Contact = () => {
   return (
-    <section className='contact' id='contact'>
+    <section className='contact' id='contacto'>
         <span className="border-footer"></span>
         <h2>Contacto</h2>
         <div className='contactMediaList'>

@@ -10,7 +10,7 @@ const HeaderAssist = () => {
   const location = useLocation()
   const [first, setFirst] = useState(true)
   const [isOpen, setIsOpen] = useState(false)
-  const [inHome, setInHome] = useState(location.pathname == '/assists') 
+  const [inHome, setInHome] = useState(location.pathname == '/asistencias') 
 
 
   /* useEffect(() => {
@@ -37,7 +37,7 @@ const HeaderAssist = () => {
 
   /* useEffect(() =>{
     console.log(location.pathname)
-    setInHome(location.pathname == '/assists')
+    setInHome(location.pathname == '/asistencias')
 
   }, [location.pathname])
  */
@@ -56,10 +56,10 @@ const HeaderAssist = () => {
         </Link>
         <nav className='nav-points'>
           <Link to="/" className={selectedLink === 'inicio' ? 'link-selected' : ''} onClick={() => handleLinkClick('inicio')}>Inicio</Link>
-          <a href="/assists#multiasistencia" className={selectedLink === 'multiasistencia' ? 'link-selected' : ''} onClick={() => handleLinkClick('multiasistencia')}>Multiasistencia</a>
-          <a href="/assists#salud" className={selectedLink === 'salud' ? 'link-selected' : ''} onClick={() => handleLinkClick('salud')}>Asistencia en Salud</a>
-          <a href="/assists#desempleo"className={selectedLink === 'desempleo' ? 'link-selected' : ''} onClick={() => handleLinkClick('desempleo')} >Asistencia en Desempleo</a>
-          <a href="/assists#contact" className={selectedLink === 'contacto' ? 'link-selected' : ''} onClick={() => handleLinkClick('contacto')}>Contacto</a>
+          <a href="/asistencias#multiasistencia" className={selectedLink === 'multiasistencia' ? 'link-selected' : ''} onClick={() => handleLinkClick('multiasistencia')}>Multiasistencia</a>
+          <a href="/asistencias#salud" className={selectedLink === 'salud' ? 'link-selected' : ''} onClick={() => handleLinkClick('salud')}>Asistencia en Salud</a>
+          <a href="/asistencias#desempleo"className={selectedLink === 'desempleo' ? 'link-selected' : ''} onClick={() => handleLinkClick('desempleo')} >Asistencia en Desempleo</a>
+          <a href="/asistencias#contacto" className={selectedLink === 'contacto' ? 'link-selected' : ''} onClick={() => handleLinkClick('contacto')}>Contacto</a>
         </nav>
         <div className='buttons-container buttons-container-points'>
             <Link to={'https://api.whatsapp.com/send/?phone=5491154559017'} target='_blank'>
@@ -75,10 +75,10 @@ const HeaderAssist = () => {
             </button>
 
             <Link to="/" className={selectedLink === 'inicio' ? 'link-selected' : ''} onClick={() => {handleLinkClick('inicio'); handleCloseNabvar(); }}>Inicio</Link>
-            <a href="/assists#multiasistencia" className={selectedLink === 'multiasistencia' ? 'link-selected' : ''} onClick={() => {handleLinkClick('multiasistencia'); handleCloseNabvar(); }}>Multiasistencia</a>
-            <a href="/assists#salud" className={selectedLink === 'salud' ? 'link-selected' : ''} onClick={() => {handleLinkClick('salud'); handleCloseNabvar(); }}>Asistencia en Salud</a>
-            <a href="/assists#desempleo"className={selectedLink === 'desempleo' ? 'link-selected' : ''} onClick={() => {handleLinkClick('desempleo'); handleCloseNabvar(); }} >Asistencia en Desempleo</a>
-            <a href="/assists#contact" className={selectedLink === 'contacto' ? 'link-selected' : ''} onClick={() => { handleLinkClick('contacto'); handleCloseNabvar(); }}>
+            <a href="/asistencias#multiasistencia" className={selectedLink === 'multiasistencia' ? 'link-selected' : ''} onClick={() => {handleLinkClick('multiasistencia'); handleCloseNabvar(); }}>Multiasistencia</a>
+            <a href="/asistencias#salud" className={selectedLink === 'salud' ? 'link-selected' : ''} onClick={() => {handleLinkClick('salud'); handleCloseNabvar(); }}>Asistencia en Salud</a>
+            <a href="/asistencias#desempleo"className={selectedLink === 'desempleo' ? 'link-selected' : ''} onClick={() => {handleLinkClick('desempleo'); handleCloseNabvar(); }} >Asistencia en Desempleo</a>
+            <a href="/asistencias#contacto" className={selectedLink === 'contacto' ? 'link-selected' : ''} onClick={() => { handleLinkClick('contacto'); handleCloseNabvar(); }}>
             Contacto
           </a>
           </nav>

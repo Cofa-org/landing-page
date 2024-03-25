@@ -9,7 +9,7 @@ const HeaderPoints = () => {
   const location = useLocation()
   const [first, setFirst] = useState(true)
   const [isOpen, setIsOpen] = useState(false)
-  const [inHome, setInHome] = useState(location.pathname == '/cofa-points') 
+  const [inHome, setInHome] = useState(location.pathname == '/puntos-cofa') 
 
   const openNavbar = () =>{
     setIsOpen(true)
@@ -21,7 +21,7 @@ const HeaderPoints = () => {
 
   useEffect(() =>{
     console.log(location.pathname)
-    setInHome(location.pathname == '/cofa-points')
+    setInHome(location.pathname == '/puntos-cofa')
 
   }, [location.pathname])
 
@@ -45,36 +45,36 @@ const HeaderPoints = () => {
             ? (
               <>
                 <Link to="/" className={selectedLink === 'inicio' ? 'link-selected' : ''} onClick={() => handleLinkClick('inicio')}>Inicio</Link>
-                <a href="#use-of-points" className={selectedLink === 'use-of-points' ? 'link-selected' : ''} onClick={() => handleLinkClick('use-of-points')}>
+                <a href="#uso-de-puntos" className={selectedLink === 'use-of-points' ? 'link-selected' : ''} onClick={() => handleLinkClick('use-of-points')}>
                   Uso de Puntos
                 </a>
-                <a href="#accreditation" className={selectedLink === 'accreditation' ? 'link-selected' : ''} onClick={() => handleLinkClick('accreditation')}>
+                <a href="#acreditacion" className={selectedLink === 'accreditation' ? 'link-selected' : ''} onClick={() => handleLinkClick('accreditation')}>
                   Acreditación
                 </a>
-                <a href="#restrictions" className={selectedLink === 'restrictions' ? 'link-selected' : ''} onClick={() => handleLinkClick('restrictions')}>
+                <a href="#restricciones" className={selectedLink === 'restrictions' ? 'link-selected' : ''} onClick={() => handleLinkClick('restrictions')}>
                   Restricciones
                 </a>
-                <a href="#value" className={selectedLink === 'value' ? 'link-selected' : ''} onClick={() => handleLinkClick('value')}>
+                <a href="#valor" className={selectedLink === 'value' ? 'link-selected' : ''} onClick={() => handleLinkClick('value')}>
                   Valor
                 </a>
-                <a href="#contact" className={selectedLink === 'contacto' ? 'link-selected' : ''} onClick={() => handleLinkClick('contacto')}>Contacto</a>
+                <a href="#contacto" className={selectedLink === 'contacto' ? 'link-selected' : ''} onClick={() => handleLinkClick('contacto')}>Contacto</a>
               </>
             )
             : (
               <>
                 <Link to={'/'} className='link-selected'>Inicio</Link>
-                <Link to={'/#use-of-points'} >Uso de Puntos</Link>
-                <Link to={'/#accreditation'} >Acreditación</Link>
-                <Link to={'/#restrictions'} >Restricciones</Link>
-                <Link to={'/#value'} >Valor</Link>
-                <Link to={'/#contact'} >Contacto</Link>
+                <Link to={'/#uso-de-puntos'} >Uso de Puntos</Link>
+                <Link to={'/#acreditacion'} >Acreditación</Link>
+                <Link to={'/#restricciones'} >Restricciones</Link>
+                <Link to={'/#valor'} >Valor</Link>
+                <Link to={'/#contacto'} >Contacto</Link>
               </>
             )
           }
            
         </nav>
         <div className='buttons-container buttons-container-points'>
-            <Link to={'/assists'}>
+            <Link to={'/asistencias'}>
               <button className='secondary-btn' id='btn-points-assist'>Quiero mi Asistencia</button>
             </Link>
             <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
@@ -88,26 +88,26 @@ const HeaderPoints = () => {
               <IoMdArrowBack/>
             </button>
             <Link to={'/'} className={selectedLink === 'inicio' ? 'link-selected' : ''} onClick={() => handleLinkClick('inicio')}>Inicio</Link>
-            <a href="#use-of-points" className={selectedLink === 'use-of-points' ? 'link-selected' : ''} onClick={() => { handleLinkClick('use-of-points'); handleCloseNabvar(); }}>
+            <a href="#uso-de-puntos" className={selectedLink === 'use-of-points' ? 'link-selected' : ''} onClick={() => { handleLinkClick('use-of-points'); handleCloseNabvar(); }}>
               Uso de Puntos
             </a>
-            <a href="#accreditation" className={selectedLink === 'accreditation' ? 'link-selected' : ''} onClick={() => { handleLinkClick('accreditation'); handleCloseNabvar(); }}>
+            <a href="#acreditacion" className={selectedLink === 'accreditation' ? 'link-selected' : ''} onClick={() => { handleLinkClick('accreditation'); handleCloseNabvar(); }}>
               Acreditación
             </a>
-            <a href="#restrictions" className={selectedLink === 'restrictions' ? 'link-selected' : ''} onClick={() => { handleLinkClick('restrictions'); handleCloseNabvar(); }}>
+            <a href="#restricciones" className={selectedLink === 'restrictions' ? 'link-selected' : ''} onClick={() => { handleLinkClick('restrictions'); handleCloseNabvar(); }}>
               Restricciones
             </a>
-            <a href="#value" className={selectedLink === 'value' ? 'link-selected' : ''} onClick={() => { handleLinkClick('value'); handleCloseNabvar(); }}>
+            <a href="#valor" className={selectedLink === 'value' ? 'link-selected' : ''} onClick={() => { handleLinkClick('value'); handleCloseNabvar(); }}>
               Valor
             </a>
-            <a href="#contact" className={selectedLink === 'contacto' ? 'link-selected' : ''} onClick={() => { handleLinkClick('contacto'); handleCloseNabvar(); }}>
+            <a href="#contacto" className={selectedLink === 'contacto' ? 'link-selected' : ''} onClick={() => { handleLinkClick('contacto'); handleCloseNabvar(); }}>
               Contacto
             </a>
           </nav>
           <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
             <button className='primary-btn mobible-nav-secondary-btn' >Quiero mi Préstamo</button>
           </a>
-          <Link to={'/assists'} className='secondary-btn mobible-nav-secondary-btn'>
+          <Link to={'/asistencias'} className='secondary-btn mobible-nav-secondary-btn'>
             Quiero mi Asistencia
           </Link>
         </div>

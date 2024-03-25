@@ -98,8 +98,8 @@ export const frecuentQuestions = [
         id: 4
     },
     {
-        name: '¿Cómo pago mi cuota?',
-        content: 'Las cuotas podrán ser abonadas mediante transferencia o depósito bancario, débito intrabancario o en tarjeta de débito y/o a través de los botones de pago habilitados.',
+        name: '¿Cómo pago la cuota de mi préstamo?',
+        content: 'Las cuotas del préstamo podrán ser abonadas mediante transferencia o depósito bancario, débito intrabancario o en tarjeta de débito y/o a través de los botones de pago habilitados.',
         id: 5
     },
     {
@@ -109,9 +109,9 @@ export const frecuentQuestions = [
     },
    
     {
-        name: '¿Cuándo vencen las cuotas?',
+        name: '¿Cuándo vencen las cuotas de mi préstamo?',
         content: 'Podés optar por la fecha de vencimiento que más te convenga. Cuando solicitás el préstamo, nos avisas qué día te conviene pagar y ya queda registrado.',
-        id: 7
+        id: 7 
     },
     {
         name: '¿Tenés otras preguntas?',
@@ -197,7 +197,7 @@ export const termsAndConditions = [
                 content: 'COFA, en un fiel reflejo de su responsabilidad empresarial, informa al Usuario que el acceso a www.cofa.com.ar es de acceso voluntario, sujeto a estos Términos y Condiciones y a la Política de Privacidad, para el uso y/o goce de los servicios, información o entretenimientos que COFA contiene y brinda. En consecuencia, COFA informa al Usuario que no asume ninguna responsabilidad adicional a las que se fijan específicamente en los Términos y Condiciones y la Política de Privacidad.'
             },
             {
-                content: 'COFA establece un sistema de beneficios para sus clientes denominado Puntos COFA el cual tiene sus propios términos y condiciones que podrán ser visitados en https://cofa.com.ar/cofa-points . Ante cualquier duda, consulta o queja referida al programa de puntos, puede comunicarse a consultas@cofa.com.ar.'
+                content: 'COFA establece un sistema de beneficios para sus clientes denominado Puntos COFA el cual tiene sus propios términos y condiciones que podrán ser visitados en https://cofa.com.ar/puntos-cofa . Ante cualquier duda, consulta o queja referida al programa de puntos, puede comunicarse a consultas@cofa.com.ar.'
             }
         ]
     },
@@ -265,7 +265,7 @@ export const termsAndConditions = [
         content: 'La Empresa ofrece la intermediación de pólizas de seguros con entidades aseguradoras, la asesoría a las partes intervinientes en la contratación de seguros en la forma que establece la ley 22.400.- y los respectivos reglamentos, de pólizas de seguro, evaluaciones de riesgos y en general la asesoría amplia en la contratación de seguros y en la cobertura de riesgos. Se deja expresamente aclarado que LA EMPRESA NO ES UNA COMPAÑÍA DE SEGUROS, SINO QUE ES UNA EMPRESA HABILITADA PARA INTERMEDIAR ENTRE LAS ASEGURADORAS Y LOS ASEGURABLES / ASEGURADOS PARA LA CELEBRACION DE CONTRATOS DE SEGURO CUYA UNICA OBLIGADA AL CUMPLIMIENTO ES LA ASEGURADORA ELEGIDA POR EL USUARIO.'
     },
     {
-        content: 'Actividad de Multiasistencias. La Empresa ofrece la intermediación de servicios de asistencia al automotor, motos, hogar y salud, entre otras, quedando la prestación de los servicios a cargo de las compañías contratadas a tal efecto y siendo estas las responsables por el cumplimiento de las asistencias contratadas, según lo dispuesto en los Términos y Condiciones especiales de cada asistencia (ver www.cofa.com.ar/assists).'
+        content: 'Actividad de Multiasistencias. La Empresa ofrece la intermediación de servicios de asistencia al automotor, motos, hogar y salud, entre otras, quedando la prestación de los servicios a cargo de las compañías contratadas a tal efecto y siendo estas las responsables por el cumplimiento de las asistencias contratadas, según lo dispuesto en los Términos y Condiciones especiales de cada asistencia (ver www.cofa.com.ar/asistencias).'
     },
     {
         content: 'Conformidad para ceder.',

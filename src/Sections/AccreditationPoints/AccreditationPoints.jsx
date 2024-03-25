@@ -6,7 +6,7 @@ import { FiCheckCircle } from "react-icons/fi";
 const AccreditationPoints = () => {
   return (
     <>
-        <section className='accreditation-container' id='accreditation'>
+        <section className='accreditation-container' id='acreditacion'>
             <div className='div-info'>
                 <h1>
                     Acreditación de los Puntos COFA
