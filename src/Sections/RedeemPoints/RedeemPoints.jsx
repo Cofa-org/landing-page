@@ -55,7 +55,7 @@ const RedeemPoints = () => {
                         <div className='background-icon-redeem'>
                             <PiWarningOctagon className='icon' />
                         </div>
-                        <p>Se pueden realizar como máximo 2 canjes por préstamo. En el caso de las asistencias es ilimitado.
+                        <p>Se pueden realizar como máximo 2 canjes por préstamo.
                         </p>
                     </div>
                 </div>

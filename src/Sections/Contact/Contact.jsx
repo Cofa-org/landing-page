@@ -50,10 +50,10 @@ const Contact = () => {
                     
                 </div>
                 <div className='links'>
-                    <Link className='linkRedirect' to={'/privacy-policies/#top'}>
+                    <Link className='linkRedirect' to={'/politicas-de-privacidad/#top'}>
                         Politicas de privacidad
                     </Link>
-                    <Link className='linkRedirect' to={'/terms-and-conditions/#top'}>
+                    <Link className='linkRedirect' to={'/terminos-y-condiciones/#top'}>
                     Términos y Condiciones
                     </Link>
                 </div>
@@ -66,17 +66,17 @@ const Contact = () => {
         </div>
         <div className='contactListLink'>
             <div>
-                <Link to={'/complaints-book'}>Libro de quejas digital</Link>
+                <Link to={'/quejas'}>Libro de quejas digital</Link>
             </div>
             <div>
-                <Link to={'/suggestions'}>Sugerencias</Link>
+                <Link to={'/sugerencias'}>Sugerencias</Link>
             </div>
             <div >
-                <Link to={'/complaints'}>Reclamos</Link>
+                <Link to={'/reclamos'}>Reclamos</Link>
             </div>
         </div>
         <div className='contactListLink'>
-            <Link to={'/regret'}>
+            <Link to={'/arrepentimiento'}>
                 <div className='contact-box contact-box-special'>
                     Boton de arrepentimiento
                     <p>
@@ -85,7 +85,7 @@ const Contact = () => {
                     </p>
                 </div>
             </Link>
-            <Link to={'/discharge'}>
+            <Link to={'/baja'}>
                 <div className='contact-box contact-box-special'>
                     Botón de baja
                     <p>

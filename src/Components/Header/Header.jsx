@@ -44,7 +44,7 @@ const Header = () => {
 
   return (
     <header  className={scrolled && 'solid'}>
-        <Link to={'/home'}>
+        <Link to={'/inicio'}>
           <img src='/Logo.svg'/>
         </Link>
         <nav>
@@ -57,7 +57,7 @@ const Header = () => {
                 <a href="#preguntas-frecuentes" className={selectedLink === 'preguntas' ? 'link-selected' : ''} onClick={() => handleLinkClick('preguntas')}>Preguntas frecuentes</a>
                 <a href="#contacto" className={selectedLink === 'contacto' ? 'link-selected' : ''} onClick={() => handleLinkClick('contacto')}>Contacto</a>
                 <Link to={'/puntos-cofa'}>Puntos COFA</Link>
-                <Link to={'/asistencias'} >Asistencias</Link>
+                {/* <Link to={'/asistencias'} >Asistencias</Link> */}
               </>
             )
             : (
@@ -67,7 +67,7 @@ const Header = () => {
                 <Link to={'/#preguntas-frecuentes'} >Preguntas frecuentes</Link>
                 <Link to={'/#contacto'} >Contacto</Link>
                 <Link to={'/puntos-cofa'} >Puntos COFA</Link>
-                <Link to={'/asistencias'} >Asistencias</Link>
+                {/* <Link to={'/asistencias'} >Asistencias</Link> */}
               </>
             )
           }
@@ -100,9 +100,9 @@ const Header = () => {
           <Link to={'/puntos-cofa'} onClick={handleCloseNabvar}>
             Puntos COFA
           </Link>
-          <Link to={'/asistencias'} onClick={handleCloseNabvar}>
+          {/* <Link to={'/asistencias'} onClick={handleCloseNabvar}>
             Asistencias
-          </Link>
+          </Link> */}
         </nav>
 
           <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">

@@ -16,7 +16,7 @@ const HeroElMejorTrato = ({}) => {
                         <span className='primary-text'>Préstamos </span><br/> Personales
                     </h1>
                     <p>Hola! Llegaste a la mejor Fintech de préstamos! Con nosotros tenés infinitas posibilidades. Completá el formulario y en pocos minutos resolvemos tu préstamo y te avisamos.</p>
-                    
+                    <p>Mínimos Requisitos - 100% Online - Adelantos de hasta $180.000 - En el día</p>
                     <div className='email-info'>
                         <span className="email-circle">
                             <MdMailOutline />
@@ -57,7 +57,7 @@ const HeroElMejorTrato = ({}) => {
                     <img src='/img/hero-points.svg' className='stain-hero-points-svg'/>
                 </div>
             </section>
-            <section className='services-el-mejor-trato'>
+            {/* <section className='services-el-mejor-trato'>
                 <h1>Servicios</h1>
                 <div className='cards-el-mejor-trato'>
                     <div className='info-card-exc card-el-mejor-trato'>
@@ -82,7 +82,7 @@ const HeroElMejorTrato = ({}) => {
                         <p><IoIosCheckmarkCircleOutline />Desempleo</p>
                     </div>
                 </div>
-            </section>
+            </section> */}
         </>
     )
 }

@@ -175,7 +175,7 @@ const PersonalLendForm = () => {
                     />
                       <label htmlFor="aceptarTerminos">
                         Acepto los{' '}
-                        <Link to='/terms-and-conditions' style={{ textDecoration: "underline" }}>
+                        <Link to='/terminos-y-condiciones' style={{ textDecoration: "underline" }}>
                           Términos y Condiciones
                         </Link>
                       </label>

@@ -24,7 +24,7 @@ const HeaderType2 = () => {
   return (
     <header className='header-type-2'>
         <div>
-          <Link to={'/home'}>
+          <Link to={'/inicio'}>
             <img src='/Logo.svg'/>
           </Link>
         </div>

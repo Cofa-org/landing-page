@@ -51,7 +51,7 @@ const HeaderAssist = () => {
   return (
     <>
     <header className={scrolled && 'solid'}>
-        <Link to={'/home'}>
+        <Link to={'/inicio'}>
           <img src='/Logo.svg'/>
         </Link>
         <nav className='nav-points'>

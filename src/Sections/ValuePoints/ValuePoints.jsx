@@ -72,7 +72,7 @@ const ValuePoints = () => {
             </div>
         </section>
         <div className='container-btn-temrs'>
-            <Link to={'/terms-and-conditions-cofa-points'} className='secondary-btn btn-terms' >
+            <Link to={'/terminos-y-condiciones-puntos-cofa'} className='secondary-btn btn-terms' >
                 Términos y Condiciones Particulares de Puntos COFA <GoArrowRight />
             </Link>
         </div>

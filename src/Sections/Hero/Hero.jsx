@@ -18,7 +18,7 @@ const Hero = () => {
                 </a>
             </div>
             <div className='hero-img'>
-                <img src='/img/hero-img.png' alt='Para sacar tus préstamos, definimos mínimos requisitos. Somos una empresa fintech con más de 16 años de trayectoria y más de 95.000 clientes satisfechos. Préstamos y asistencias que simplifican tu vida.'/>
+                <img src='/img/hero-img.png' alt='Para sacar tus préstamos, definimos mínimos requisitos. Somos una empresa fintech con más de 16 años de trayectoria y más de 95.000 clientes satisfechos. Préstamos que simplifican tu vida.'/>
             </div>
         </div>
         <div className='info-container'> 

@@ -15,7 +15,7 @@ const AboutUs = () => {
                 <p>
                 Somos una empresa fintech con más de 16 años de trayectoria.
                 Estamos para ayudarte y acompañarte en tus proyectos.
-                Brindamos préstamos y asistencias que simplifican tu vida. Mínimos requisitos, en el día, 100% online.
+                Brindamos préstamos que simplifican tu vida. Mínimos requisitos, en el día, 100% online.
                 </p>
                 <div className='reasons-to-chose'>
                     <h3>¿Por qué elegirnos?</h3>

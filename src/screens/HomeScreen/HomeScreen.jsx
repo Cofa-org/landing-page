@@ -12,7 +12,7 @@ const HomeScreen = () => {
         <Header/>
         <Hero />
         <AboutUs/>
-        <OurServices/>
+        {/* <OurServices/> */}
         <ClientReview/>
         <FrecuentQuestion/>
         <WorkWithUs/>

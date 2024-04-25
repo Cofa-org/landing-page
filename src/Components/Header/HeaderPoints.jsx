@@ -36,7 +36,7 @@ const HeaderPoints = () => {
   return (
     <>
     <header className={scrolled && 'solid'}>
-        <Link to={'/home'}>
+        <Link to={'/inicio'}>
           <img src='/Logo.svg'/>
         </Link>
         <nav className='nav-points'>
@@ -74,9 +74,9 @@ const HeaderPoints = () => {
            
         </nav>
         <div className='buttons-container buttons-container-points'>
-            <Link to={'/asistencias'}>
+            {/* <Link to={'/asistencias'}>
               <button className='secondary-btn' id='btn-points-assist'>Quiero mi Asistencia</button>
-            </Link>
+            </Link> */}
             <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
               <button className='primary-btn' id='btn-loan-points'>Quiero mi Préstamo</button>
             </a>
@@ -107,9 +107,9 @@ const HeaderPoints = () => {
           <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
             <button className='primary-btn mobible-nav-secondary-btn' >Quiero mi Préstamo</button>
           </a>
-          <Link to={'/asistencias'} className='secondary-btn mobible-nav-secondary-btn'>
+          {/* <Link to={'/asistencias'} className='secondary-btn mobible-nav-secondary-btn'>
             Quiero mi Asistencia
-          </Link>
+          </Link> */}
         </div>
         {
           isOpen && <div className='background-layer-points' onClick={handleCloseNabvar}></div>
