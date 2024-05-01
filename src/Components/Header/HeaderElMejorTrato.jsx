@@ -63,7 +63,7 @@ const HeaderElMejorTrato = () => {
             {/* <Link to={'/asistencias'}>
               <button className='secondary-btn' id='btn-points-assist'>Quiero mi Asistencia</button>
             </Link> */}
-            <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
+            <a href='http://wa.me/5491137570853' target="_blank" rel="noopener noreferrer">
               <button className='primary-btn' >Quiero mi Préstamo</button>
             </a>
             <button className='btn-show-links' onClick={openNavbar}><FiMenu/></button>
@@ -87,7 +87,7 @@ const HeaderElMejorTrato = () => {
           {/* <Link to={'/asistencias'}>
               <button className='secondary-btn mobible-nav-secondary-btn' id='btn-points-assist'>Quiero mi Asistencia</button>
             </Link> */}
-            <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
+            <a href='http://wa.me/5491137570853' target="_blank" rel="noopener noreferrer">
               <button className='primary-btn mobible-nav-secondary-btn' >Quiero mi Préstamo</button>
             </a>
           

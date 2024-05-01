@@ -62,7 +62,7 @@ const HeaderAssist = () => {
           <a href="/asistencias#contacto" className={selectedLink === 'contacto' ? 'link-selected' : ''} onClick={() => handleLinkClick('contacto')}>Contacto</a>
         </nav>
         <div className='buttons-container buttons-container-points'>
-            <Link to={'https://api.whatsapp.com/send/?phone=5491154559017'} target='_blank'>
+            <Link to={'http://wa.me/5491137570853'} target='_blank'>
               <button className='secondary-btn' id='btn-points-assist'>Quiero mi Asistencia</button>
             </Link>
             
@@ -83,7 +83,7 @@ const HeaderAssist = () => {
           </a>
           </nav>
           
-          <Link to={'https://api.whatsapp.com/send/?phone=5491154559017'} target='_blank' className='secondary-btn mobible-nav-secondary-btn'>
+          <Link to={'http://wa.me/5491137570853'} target='_blank' className='secondary-btn mobible-nav-secondary-btn'>
             Quiero mi Asistencia
           </Link>
         </div>

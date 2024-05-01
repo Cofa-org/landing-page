@@ -13,7 +13,7 @@ const ErrorScreen = () => {
             <p>Recargá la página. Si el error persiste, comunicate con nosotros para resolverlo.</p>
             <div>
                 <span className='email-error'>consultas@cofa.com.ar</span>
-                <span className='tel-error'>+5491154559017</span>
+                <span className='tel-error'>+5491137570853</span>
             </div>
             
             

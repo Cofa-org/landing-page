@@ -13,7 +13,7 @@ const Contact = () => {
         <div className='contactMediaList'>
             <span>
                 <BsTelephone/>
-                <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
+                <a href='http://wa.me/5491137570853' target="_blank" rel="noopener noreferrer">
                     <span>11-5455-9017</span>
                 </a>
             </span>
@@ -44,7 +44,7 @@ const Contact = () => {
                         <BsLinkedin/>
                     </Link>
                    
-                    <Link to={'https://wa.me/5491154559017'} target='_blank'>
+                    <Link to={'http://wa.me/5491137570853'} target='_blank'>
                         <BsWhatsapp/>
                     </Link>
                     

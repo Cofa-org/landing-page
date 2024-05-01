@@ -17,7 +17,7 @@ const HeroAssist = () => {
                     <p>Tu red de seguridad en situaciones imprevistas. Ya sea que necesites atención médica de emergencia, asistencia en el hogar o ayuda para encontrar un médico, COFA Asistencias está acá para ayudarte.</p>
                 </div>
                 <div className='hero-buttons'>
-                    <Link className='primary-btn' to='https://api.whatsapp.com/send/?phone=5491154559017' target='_blank'>Pedir Asistencias <GoArrowRight /></Link> 
+                    <Link className='primary-btn' to='http://wa.me/5491137570853' target='_blank'>Pedir Asistencias <GoArrowRight /></Link> 
                     <Link to={'/asistencias/#multiasistencia'} className='primary-btn btn-score-points'>
                         Saber Más <GoArrowDown /> 
                     </Link>

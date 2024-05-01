@@ -13,7 +13,7 @@ const Hero = () => {
                 <h1> 
                     Préstamos <br/> <AnimatedTitle/>
                 </h1>
-                <a href='http://wa.me/5491154559017' target="_blank" rel="noopener noreferrer">
+                <a href='http://wa.me/5491137570853' target="_blank" rel="noopener noreferrer">
                     <button className='primary-btn btn-loan-main' >QUIERO MI PRÉSTAMO</button>
                 </a>
             </div>
@@ -23,7 +23,7 @@ const Hero = () => {
         </div>
         <div className='info-container'> 
             <h2>   
-                Te prestamos hasta $180.000
+                Te prestamos hasta $300.000
             </h2>
             <div className='info-list'>
                 { 
