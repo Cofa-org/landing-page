@@ -76,19 +76,12 @@ const WorkWithUsForm = () => {
     formData.append('message', values.message);
 
     if (values.files && values.files.buffer) {
-      console.log('hola')
       const file = values.files;
       const blob = new Blob([new Uint8Array(file.buffer)], { type: 'application/pdf' });
-      console.log(blob)
       formData.append('archivoPDF', blob, file.originalname);
     }
-    formData.forEach((value, key) => {
-      console.log(key, value)
-    })
-    console.log('prueba')
-    /* https://backend-landing-cofa-production.up.railway.app/mail/ Production */
-    /* http://localhost:1000/mail/ */
-    const response = await fetch('https://backend-landing-cofa-production.up.railway.app/mail/' + 'TRABAJO', {
+
+    const response = await fetch('https://backend-landing-cofa-production-81e9.up.railway.app/mail/' + 'TRABAJO', {
       method: 'POST',
       headers: {
 

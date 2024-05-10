@@ -31,7 +31,7 @@ const PersonalLendForm = () => {
         }
 
     try {
-      const response = await fetch('https://backend-landing-cofa-production.up.railway.app/mail/' + 'EL-MEJOR-TRATO', {
+      const response = await fetch('https://backend-landing-cofa-production-81e9.up.railway.app/mail/' + 'EL-MEJOR-TRATO', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer clave-secreta-cofa`,
