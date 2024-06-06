@@ -43,7 +43,7 @@ const HeaderAssist = () => {
  */
  
   const {scrolled } = useScrollContext()
-  const [selectedLink, setSelectedLink] = useState('inicio');
+  const [selectedLink, setSelectedLink] = useState('prestamos');
 
   const handleLinkClick = (link) => {
     setSelectedLink(link);
@@ -51,11 +51,11 @@ const HeaderAssist = () => {
   return (
     <>
     <header className={scrolled && 'solid'}>
-        <Link to={'/inicio'}>
+        <Link to={'/prestamos'}>
           <img src='/Logo.svg'/>
         </Link>
         <nav className='nav-points'>
-          <Link to="/" className={selectedLink === 'inicio' ? 'link-selected' : ''} onClick={() => handleLinkClick('inicio')}>Inicio</Link>
+          <Link to="/prestamos" className={selectedLink === 'prestamos' ? 'link-selected' : ''} onClick={() => handleLinkClick('prestamos')}>Inicio</Link>
           <a href="/asistencias#multiasistencia" className={selectedLink === 'multiasistencia' ? 'link-selected' : ''} onClick={() => handleLinkClick('multiasistencia')}>Multiasistencia</a>
           <a href="/asistencias#salud" className={selectedLink === 'salud' ? 'link-selected' : ''} onClick={() => handleLinkClick('salud')}>Asistencia en Salud</a>
           <a href="/asistencias#desempleo"className={selectedLink === 'desempleo' ? 'link-selected' : ''} onClick={() => handleLinkClick('desempleo')} >Asistencia en Desempleo</a>

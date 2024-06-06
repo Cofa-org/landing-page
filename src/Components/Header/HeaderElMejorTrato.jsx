@@ -34,7 +34,7 @@ const HeaderElMejorTrato = () => {
   return (
     <>
     <header className={scrolled && 'solid'}>
-        <Link to={'/inicio'}>
+        <Link to={'/prestamos'}>
           <img src='/Logo.svg'/>
         </Link>
         <nav className='nav-points'>

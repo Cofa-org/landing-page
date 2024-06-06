@@ -24,12 +24,12 @@ const HeaderType2 = () => {
   return (
     <header className='header-type-2'>
         <div>
-          <Link to={'/inicio'}>
+          <Link to={'/prestamos'}>
             <img src='/Logo.svg'/>
           </Link>
         </div>
         <nav className='normal-nav'>
-            <Link to={'/'} className='link-selected'>Inicio</Link>
+            <Link to={'/prestamos'} className='link-selected'>Inicio</Link>
             <Link to={'/#nosotros'} >Nosotros</Link>
             <Link to={'/#preguntas-frecuentes'} >Preguntas Frecuentes</Link>
             <Link to={'/#contacto'} >Contacto</Link>
@@ -41,7 +41,7 @@ const HeaderType2 = () => {
             <button onClick={() => setIsOpen(false)} className='btn-back'>
               <IoMdArrowBack/>
             </button>
-            <Link to={'/'} className='link-selected' onClick={handleCloseNabvar}>Inicio</Link>
+            <Link to={'/prestamos'} className='link-selected' onClick={handleCloseNabvar}>Inicio</Link>
             <Link to={'/#nosotros'} onClick={handleCloseNabvar}>Nosotros</Link>
             <Link to={'/#preguntas-frecuentes'} onClick={handleCloseNabvar}>Preguntas Frecuentes</Link>
             <Link to={'/#contacto'} onClick={handleCloseNabvar}>Contacto</Link>

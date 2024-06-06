@@ -27,7 +27,7 @@ const HeaderPoints = () => {
 
   const {scrolled } = useScrollContext()
 
-  const [selectedLink, setSelectedLink] = useState('inicio');
+  const [selectedLink, setSelectedLink] = useState('prestamos');
 
   const handleLinkClick = (link) => {
     setSelectedLink(link);
@@ -36,7 +36,7 @@ const HeaderPoints = () => {
   return (
     <>
     <header className={scrolled && 'solid'}>
-        <Link to={'/inicio'}>
+        <Link to={'/prestamos'}>
           <img src='/Logo.svg'/>
         </Link>
         <nav className='nav-points'>
@@ -44,7 +44,7 @@ const HeaderPoints = () => {
             inHome 
             ? (
               <>
-                <Link to="/" className={selectedLink === 'inicio' ? 'link-selected' : ''} onClick={() => handleLinkClick('inicio')}>Inicio</Link>
+                <Link to="/prestamos" className={selectedLink === 'prestamos' ? 'link-selected' : ''} onClick={() => handleLinkClick('prestamos')}>Inicio</Link>
                 <a href="#uso-de-puntos" className={selectedLink === 'use-of-points' ? 'link-selected' : ''} onClick={() => handleLinkClick('use-of-points')}>
                   Uso de Puntos
                 </a>
@@ -62,7 +62,7 @@ const HeaderPoints = () => {
             )
             : (
               <>
-                <Link to={'/'} className='link-selected'>Inicio</Link>
+                <Link to={'/prestamos'} className='link-selected'>Inicio</Link>
                 <Link to={'/#uso-de-puntos'} >Uso de Puntos</Link>
                 <Link to={'/#acreditacion'} >Acreditación</Link>
                 <Link to={'/#restricciones'} >Restricciones</Link>
@@ -71,7 +71,7 @@ const HeaderPoints = () => {
               </>
             )
           }
-           
+
         </nav>
         <div className='buttons-container buttons-container-points'>
             {/* <Link to={'/asistencias'}>
@@ -87,7 +87,7 @@ const HeaderPoints = () => {
             <button onClick={() => setIsOpen(false)} className='btn-back-points'>
               <IoMdArrowBack/>
             </button>
-            <Link to={'/'} className={selectedLink === 'inicio' ? 'link-selected' : ''} onClick={() => handleLinkClick('inicio')}>Inicio</Link>
+            <Link to={'/prestamos'} className={selectedLink === 'prestamos' ? 'link-selected' : ''} onClick={() => handleLinkClick('prestamos')}>Inicio</Link>
             <a href="#uso-de-puntos" className={selectedLink === 'use-of-points' ? 'link-selected' : ''} onClick={() => { handleLinkClick('use-of-points'); handleCloseNabvar(); }}>
               Uso de Puntos
             </a>

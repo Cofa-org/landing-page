@@ -23,6 +23,17 @@ header nav a{
 
 .link-selected{
     color: var(--primary-color);
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    row-gap: 1px;
+}
+
+.link-selected::after{
+    content: "";
+    padding: 5px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
 }
 
 .btn-show-links{

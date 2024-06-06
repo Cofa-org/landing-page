@@ -9,7 +9,7 @@ const Header = () => {
   const location = useLocation()
   const [first, setFirst] = useState(true)
   const [isOpen, setIsOpen] = useState(false)
-  const [inHome, setInHome] = useState(location.pathname == '/')
+  const [inHome, setInHome] = useState(location.pathname == '/prestamos')
   const { pathname, hash } = useLocation();
 
   useEffect(() => {
@@ -30,13 +30,13 @@ const Header = () => {
 
   useEffect(() =>{
     console.log(location.pathname)
-    setInHome(location.pathname == '/')
+    setInHome(location.pathname == '/prestamos')
 
   }, [location.pathname])
 
   const {scrolled } = useScrollContext()
 
-  const [selectedLink, setSelectedLink] = useState('inicio');
+  const [selectedLink, setSelectedLink] = useState('prestamos');
 
   const handleLinkClick = (link) => {
     setSelectedLink(link);
@@ -44,7 +44,7 @@ const Header = () => {
 
   return (
     <header  className={scrolled && 'solid'}>
-        <Link to={'/inicio'}>
+        <Link to={'/prestamos'}>
           <img src='/Logo.svg'/>
         </Link>
         <nav>
@@ -52,7 +52,7 @@ const Header = () => {
             inHome 
             ? (
               <>
-                <a href="#prestamos"  className={selectedLink === 'inicio' ? 'link-selected' : ''} onClick={() => handleLinkClick('inicio')}>Inicio</a>
+                <a href="#prestamos"  className={selectedLink === 'prestamos' ? 'link-selected' : ''} onClick={() => handleLinkClick('prestamos')}>Inicio</a>
                 <a href="#nosotros" className={selectedLink === 'nosotros' ? 'link-selected' : ''} onClick={() => handleLinkClick('nosotros')}>Nosotros</a>
                 <a href="#preguntas-frecuentes" className={selectedLink === 'preguntas' ? 'link-selected' : ''} onClick={() => handleLinkClick('preguntas')}>Preguntas frecuentes</a>
                 <a href="#contacto" className={selectedLink === 'contacto' ? 'link-selected' : ''} onClick={() => handleLinkClick('contacto')}>Contacto</a>
@@ -71,7 +71,7 @@ const Header = () => {
               </>
             )
           }
-           
+
         </nav>
         <div className='buttons-container'>
           <a href='http://wa.me/5491137570853' target="_blank" rel="noopener noreferrer">

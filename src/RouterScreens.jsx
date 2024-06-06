@@ -10,24 +10,23 @@ import { FormWorkWithUs } from './Sections'
 const RouterScreens = () => {
   return (
     <Routes>
-        <Route path='/' element={<HomeScreen/>}/> {/* TO DO: /prestamos */}
-        <Route path='/inicio' element={<HomeScreen/>}/> {/* TO DO: /prestamos */}
-        <Route path='/terminos-y-condiciones' element={<TermsScreen/>} />
-        <Route path='/politicas-de-privacidad' element={<PrivacyPoliciesScreen/>} />
-        <Route path='/puntos-cofa' element={<PointsScreen/>}/>
-        <Route path='/sugerencias' element={<SuggestionsScreen/>} /> {/* sugerencias */}
-        <Route path='/baja' element={<DischargeScreen/>} /> {/* baja */}
-        <Route path='/arrepentimiento' element={<RegretOrDischargeScreen/>} /> {/* arrepentimiento */}
-        <Route path='/reclamos' element={<ComplaintsScreen/>}/> {/* reclamos */}
-        <Route path='/quejas' element={<QuejasScreen/>}/> {/* quejas */}
-        <Route path='/terminos-y-condiciones-puntos-cofa' element={<TermsPointsScreen/>} />
-        <Route path='/trabaja-con-nosotros' element={<FormWorkWithUs/>}/>
-        <Route path='/el-mejor-trato' element={<ElMejorTratoScreen />}/>
-        {/* <Route path='/asistencias' element={<AssistenceScreen/>}/> */}
-        {/* <Route path='/asistencias/terminos-multiasistencia' element={<TermsV2 type={'MULTIASISTENCIA'}/>}/>
+        <Route path='/prestamos' element={<HomeScreen/>}/>{/* Prestamos  */}
+        <Route path='/terminos-y-condiciones' element={<TermsScreen/>} />{/* Terminos y Condiciones */}
+        <Route path='/politicas-de-privacidad' element={<PrivacyPoliciesScreen/>} />{/* Politicas de Privacidad */}
+        <Route path='/puntos-cofa' element={<PointsScreen/>}/>{/* Puntos COFA */}
+        <Route path='/sugerencias' element={<SuggestionsScreen/>} /> {/* Sugerencias */}
+        <Route path='/baja' element={<DischargeScreen/>} /> {/* Baja */}
+        <Route path='/arrepentimiento' element={<RegretOrDischargeScreen/>} /> {/* Arrepentimiento */}
+        <Route path='/reclamos' element={<ComplaintsScreen/>}/> {/* Reclamos */}
+        <Route path='/quejas' element={<QuejasScreen/>}/> {/* Quejas */}
+        <Route path='/terminos-y-condiciones-puntos-cofa' element={<TermsPointsScreen/>} /> {/* Terminos y Condiciones Puntos COFA */}
+        <Route path='/trabaja-con-nosotros' element={<FormWorkWithUs/>}/> {/* Trabaja con Nosotros */}
+        <Route path='/el-mejor-trato' element={<ElMejorTratoScreen />}/> {/* El Mejor Trato */}
+        {/* <Route path='/asistencias' element={<AssistenceScreen/>}/> */} {/* Asistencias */}
+        {/* <Route path='/asistencias/terminos-multiasistencia' element={<TermsV2 type={'MULTIASISTENCIA'}/>}/> 
         <Route path='/asistencias/terminos-salud-integral' element={<TermsV2 type={'SALUDINTEGRAL'}/>}/>
         <Route path='/asistencias/terminos-desempleo' element={<TermsV2 type={'DESEMPLEO'}/>}/> */}
-        <Route path='*' element={<ErrorScreen/>}/>
+        <Route path='*' element={<ErrorScreen/>}/> {/* Error */}
     </Routes>
   )
 }
