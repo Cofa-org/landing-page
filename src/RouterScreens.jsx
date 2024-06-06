@@ -10,6 +10,7 @@ import { FormWorkWithUs } from './Sections'
 const RouterScreens = () => {
   return (
     <Routes>
+        <Route path='/' element={<HomeScreen/>}/>{/* Prestamos  */}
         <Route path='/prestamos' element={<HomeScreen/>}/>{/* Prestamos  */}
         <Route path='/terminos-y-condiciones' element={<TermsScreen/>} />{/* Terminos y Condiciones */}
         <Route path='/politicas-de-privacidad' element={<PrivacyPoliciesScreen/>} />{/* Politicas de Privacidad */}

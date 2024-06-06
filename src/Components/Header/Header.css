@@ -8,9 +8,11 @@ header{
     top: 0;
     background-color: rgba(255, 255, 255, 0);
     z-index: 100;
+
 }
 .solid{
     background-color: white;
+    border-bottom: 1px solid #d6d6d6;
 }
 header nav{
     display: flex;
@@ -31,7 +33,7 @@ header nav a{
 
 .link-selected::after{
     content: "";
-    padding: 5px;
+    padding: 3px;
     border-radius: 50%;
     background-color: var(--primary-color);
 }
