@@ -100,7 +100,7 @@ const Footer = () => {
                 <p> CUIT 33-71133479-9</p>
             </div>
 
-            <Link to={'http://wa.me/5491137570853'} className='wsp-contact' target='_blank'>
+            <Link to={'http://wa.me/5491137570853'} className='wsp-contact' target='_blank' id='btn-whatsapp'>
 
                 <FaWhatsapp />
             </Link>

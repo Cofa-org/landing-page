@@ -75,7 +75,7 @@ const Header = () => {
       </nav>
       <div className='buttons-container'>
         <a href='http://wa.me/5491137570853' target="_blank" rel="noopener noreferrer">
-          <button className='primary-btn header-primary-btn' >Quiero mi préstamo</button>
+          <button className='primary-btn header-primary-btn' id='btn-header-prestamo' >Quiero mi préstamo</button>
         </a>
         {/* <button className='secondary-btn'>Ingresar</button> */}
         <button className='btn-show-links' onClick={openNavbar}><FiMenu /></button>

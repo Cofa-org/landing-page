@@ -47,7 +47,7 @@ const HeaderType2 = () => {
             <Link to={'/#contacto'} onClick={handleCloseNabvar}>Contacto</Link>
           </nav>
           <a href='http://wa.me/5491137570853' target="_blank" rel="noopener noreferrer">
-            <button className='primary-btn mobible-nav-secondary-btn' >Quiero mi Préstamo</button>
+            <button className='primary-btn mobible-nav-secondary-btn' id='btn-header-type-2-prestamo' >Quiero mi Préstamo</button>
           </a>
           
         </div>

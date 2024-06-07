@@ -14,7 +14,7 @@ const Hero = () => {
                     Préstamos <br/> <AnimatedTitle/>
                 </h1>
                 <a href='http://wa.me/5491137570853' target="_blank" rel="noopener noreferrer">
-                    <button className='primary-btn btn-loan-main' >QUIERO MI PRÉSTAMO</button>
+                    <button className='primary-btn btn-loan-main' id='btn-hero-prestamo'>QUIERO MI PRÉSTAMO</button>
                 </a>
             </div>
             <div className='hero-img'>
