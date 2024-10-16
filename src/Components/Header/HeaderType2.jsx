@@ -29,7 +29,7 @@ const HeaderType2 = () => {
           </Link>
         </div>
         <nav className='normal-nav'>
-            <Link to={'/prestamos'} className='link-selected'>Inicio</Link>
+            <Link to={'/prestamos'} >Inicio</Link>
             <Link to={'/#nosotros'} >Nosotros</Link>
             <Link to={'/#preguntas-frecuentes'} >Preguntas Frecuentes</Link>
             <Link to={'/#contacto'} >Contacto</Link>

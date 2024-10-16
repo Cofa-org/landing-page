@@ -243,11 +243,25 @@ textarea::placeholder{
     border: 1px solid #B7B7B7;
     background: #FFF;
     padding: 18px 12px;
+    position: relative;
+    cursor: pointer;
+}
 
+.flecha-abajo-input{
+    position: absolute;
+    right: 12px;
+    top: 40%;
 }
 
 .selector-input-container{
     position: relative;
+}
+
+.option-item{
+    cursor: pointer;
+}
+.option-item:hover span{
+    color: var(--primary-color)  ;
 }
 
 .submit p{

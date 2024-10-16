@@ -18,12 +18,12 @@ const Hero = () => {
                 </a>
             </div>
             <div className='hero-img'>
-                <img src='/img/hero-img.png' alt='Para sacar tus préstamos, definimos mínimos requisitos. Somos una empresa fintech con más de 16 años de trayectoria y más de 95.000 clientes satisfechos. Préstamos que simplifican tu vida.'/>
+                <img src='/img/hero-img.png' alt='Para sacar tus préstamos, definimos mínimos requisitos. Somos una empresa fintech con más de 17 años de trayectoria y más de 140.000 clientes satisfechos. Préstamos que simplifican tu vida.'/>
             </div>
         </div>
         <div className='info-container'> 
             <h2>   
-                Te prestamos hasta $300.000
+                Te prestamos hasta $500.000
             </h2>
             <div className='info-list'>
                 { 

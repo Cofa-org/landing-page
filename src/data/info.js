@@ -34,7 +34,7 @@ export const infoList = [
 export const reasonsToChose = [
     {
         id: 1,
-        content: 'Más de 95.000 clientes satisfechos.'
+        content: 'Más de 140.000 clientes satisfechos.'
     },
     {
         id: 2,

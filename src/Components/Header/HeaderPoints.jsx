@@ -9,7 +9,45 @@ const HeaderPoints = () => {
   const location = useLocation()
   const [first, setFirst] = useState(true)
   const [isOpen, setIsOpen] = useState(false)
-  const [inHome, setInHome] = useState(location.pathname == '/puntos-cofa') 
+  const [inHome, setInHome] = useState(location.pathname == '/puntos-cofa')
+  const {scrolled} = useScrollContext()
+  const [selectedLink, setSelectedLink] = useState('prestamos');
+  
+  const sections = [
+    { id: 'uso-de-puntos', name: 'use-of-points' },
+    { id: 'acreditacion', name: 'accreditation' },
+    { id: 'restricciones', name: 'restrictions' },
+    { id: 'valor', name: 'value' },
+    { id: 'contacto', name: 'contacto' },
+  ];
+
+  // Scroll spy functionality to update selected link based on visible section
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY + 100; // Offset to consider when section becomes "active"
+
+      for (let section of sections) {
+        const element = document.getElementById(section.id);
+        if (element) {
+          const { top, bottom } = element.getBoundingClientRect();
+
+          // Check if the section is within the viewport
+          if (top <= scrollPosition && bottom > scrollPosition) {
+            setSelectedLink(section.name);
+            break;
+          }
+        }
+      }
+    };
+
+    // Add scroll event listener
+    window.addEventListener('scroll', handleScroll);
+
+    // Cleanup event listener on unmount
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   const openNavbar = () =>{
     setIsOpen(true)
@@ -25,9 +63,6 @@ const HeaderPoints = () => {
 
   }, [location.pathname])
 
-  const {scrolled } = useScrollContext()
-
-  const [selectedLink, setSelectedLink] = useState('prestamos');
 
   const handleLinkClick = (link) => {
     setSelectedLink(link);

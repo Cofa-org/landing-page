@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import { useDropzone } from 'react-dropzone';
 import { PiCloudArrowUp } from "react-icons/pi";
-import { FaChevronRight } from "react-icons/fa";
+import { FaChevronRight, FaChevronLeft, FaChevronDown, FaChevronUp } from "react-icons/fa";
 /* import dotenv from 'dotenv';
 dotenv.config(); */
 import './style.css';
@@ -183,12 +183,8 @@ const ContactForm = ({ type }) => {
     } else {
       errors.telephone = '';
     }
-
     if (!values.message) {
       errors.message = 'El mensaje no puede estar vacío.'
-    }
-    else if (values.message.split(' ').length < 10) {
-      errors.message = 'El mensaje debe contener al menos 10 palabras.'
     }
     else {
       errors.message = ''
@@ -365,20 +361,21 @@ const ContactForm = ({ type }) => {
                     {reasonSelected.reason && reasonSelected.value !== 'rollback'
                       ? <div className='reason-list-values'>
                         {getReason()?.values.map(value => (
-                          <div onClick={() => handleSelectOptionValue(value)}>
+                          <div className='option-item' onClick={() => handleSelectOptionValue(value)}>
                             {value}
                           </div>
                         ))}
                         <div onClick={() => handleSelectOptionValue('rollback')}>Volver</div>
                       </div>
                       : reasons.map((reason) => (
-                        <div className={openSelector ? 'reason-list' : 'reason-list no-visible'} onClick={() => handleSelectOption(reason.name)}>
+                        <div className={openSelector ? 'option-item reason-list' : 'option-item reason-list no-visible'} onClick={() => handleSelectOption(reason.name)}>
                           <span>{reason.title}</span>
                           <FaChevronRight />
                         </div>
                       ))
                     }
                   </div>
+                    <FaChevronDown onClick={() => setOpenSelector(!openSelector)} className='flecha-abajo-input' />
                 </div>
 
                 {
