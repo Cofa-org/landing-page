@@ -20,6 +20,7 @@ const PersonalLendForm = () => {
         formData.append('email', values.email);
         formData.append('telephone', values.telephone);
         formData.append('sit_laboral', values.situacion)
+        formData.append('ingresos', values.ingresos)
         formData.append('dni', values.dni)
         formData.append('amount', values.amount)
     
@@ -91,6 +92,12 @@ const PersonalLendForm = () => {
           errors.situacion = '';
         }
 
+        if (!values.ingresos || values.ingresos === "no") {
+          errors.ingresos = 'Debe elegir un nivel de ingresos válido';
+        } else {
+          errors.ingresos = '';
+        }
+
         if(!values.amount){
             errors.amount = 'El importe no puede estar vacío';
         }else {
@@ -113,6 +120,7 @@ const PersonalLendForm = () => {
           email: '',
           telephone: '',
           situacion: '',
+          ingresos: '',
           amount: '',
         }}
         onSubmit={handleSubmit}
@@ -158,6 +166,19 @@ const PersonalLendForm = () => {
                             <option value="otro" label="Otro" />
                         </Field>
                         <ErrorMessage name="situacion" component="div" className="error-message"/>
+                    </div>
+
+
+                    <div className="input-container input-container-100">
+                        <label htmlFor="mySelectField">Ingresos promedio:</label>
+                        <Field as="select" name="ingresos" id="mySelectField">
+                            <option value="no" label="Elija su nivel de ingresos" />
+                            <option value="A" label="Menos de $300.000" />
+                            <option value="B" label="De $300.001 a $600.000" />
+                            <option value="C" label="De 600.001 a $1.000.000" />
+                            <option value="D" label="Más de $1.000.000" />
+                        </Field>
+                        <ErrorMessage name="ingresos" component="div" className="error-message"/>
                     </div>
 
                     <div className="input-container input-container-100">
