@@ -15,8 +15,8 @@ const HeroElMejorTrato = ({}) => {
                     <h1 className='hero-assist-h1'>
                         <span className='primary-text'>Préstamos </span><br/> Personales
                     </h1>
-                    <p>Hola! Llegaste a la mejor Fintech de préstamos! Con nosotros tenés infinitas posibilidades. Completá el formulario y en pocos minutos resolvemos tu préstamo y te avisamos.</p>
-                    <p>Mínimos Requisitos - 100% Online - Adelantos de hasta $300.000 - En el día</p>
+                    <p>¡Hola! Bienvenido a la mejor Fintech de préstamos. Con nosotros, las posibilidades son infinitas. Solo completá el formulario y en pocos minutos te ayudaremos a obtener tu préstamo.</p>
+                    <p>Mínimos Requisitos - 100% Online - Adelantos de hasta $500.000 - En el día</p>
                     <div className='email-info'>
                         <span className="email-circle">
                             <MdMailOutline />

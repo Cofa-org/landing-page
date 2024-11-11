@@ -896,10 +896,18 @@
 
 @media screen and (max-width: 1150px){
     .container-el-mejor-trato{
-        padding: 50px 15vh;
+        padding: 50px 30px;
         flex-direction: column;
-
     }
+
+    .hero-assist-h1{
+        font-size: 50px;
+    }
+
+    .container-form-elmejortrato p{
+        font-size: 16px;
+    }
+
     .services-el-mejor-trato{
         padding: 80px 5vh;
         width: 100%;

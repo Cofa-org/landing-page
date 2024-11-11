@@ -304,6 +304,10 @@ textarea::placeholder{
     }
 }
 @media screen and (max-width: 450px) {
+    .form-template{
+        width: auto;
+        padding: 30px;
+    }
     .form-container{
         flex-direction: column;
     }

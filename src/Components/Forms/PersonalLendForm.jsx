@@ -112,7 +112,6 @@ const PersonalLendForm = () => {
 
   return (
     <div className='form-template'>
-      <h2>Completa el formulario</h2>
       <Formik
         initialValues={{
           name: '',
