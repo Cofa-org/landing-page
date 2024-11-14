@@ -174,7 +174,7 @@ const PersonalLendForm = () => {
                             <option value="no" label="Elija su nivel de ingresos" />
                             <option value="A" label="Menos de $300.000" />
                             <option value="B" label="De $300.001 a $600.000" />
-                            <option value="C" label="De 600.001 a $1.000.000" />
+                            <option value="C" label="De $600.001 a $1.000.000" />
                             <option value="D" label="Más de $1.000.000" />
                         </Field>
                         <ErrorMessage name="ingresos" component="div" className="error-message"/>
