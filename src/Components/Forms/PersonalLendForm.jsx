@@ -32,7 +32,7 @@ const PersonalLendForm = () => {
 
     try {
       const response = await fetch(
-        `https://backend-landing-cofa-production-81e9.up.railway.app/mail/` + "EL-MEJOR-TRATO",
+        "https://backend-landing-cofa-production-81e9.up.railway.app/mail/" + "EL-MEJOR-TRATO",
         {
           method: "POST",
           headers: {
@@ -106,6 +106,11 @@ const PersonalLendForm = () => {
       errors.amount = "El importe no puede estar vacío";
     } else {
       errors.amount = "";
+    }
+    if (!values.terminos_y_condiciones) {
+      errors.terminos_y_condiciones = "Debe aceptar los términos y condiciones";
+    } else {
+      errors.terminos_y_condiciones = "";
     }
 
     // Verificar si todos los campos están completos
@@ -288,13 +293,16 @@ const PersonalLendForm = () => {
               />
             </div>
             <div className="input-container-100">
-              <input
+              <Field
                 name="terminos_y_condiciones"
                 type="checkbox"
                 id="aceptarTerminos"
                 className="checkbox"
-                checked={aceptoTerminos}
-                onChange={handleAceptoCambio}
+              />
+              <ErrorMessage
+                name="terminos_y_condiciones"
+                component="div"
+                className="error-message"
               />
               <label htmlFor="aceptarTerminos">
                 Acepto los{" "}
@@ -315,10 +323,8 @@ const PersonalLendForm = () => {
               ) : (
                 <button
                   type="submit"
-                  className={`primary-btn ${
-                    isSubmitting || !isValid || !aceptoTerminos ? "disabled-btn" : ""
-                  }`}
-                  disabled={isSubmitting || !isValid || !aceptoTerminos}
+                  className={`primary-btn ${isSubmitting || !isValid ? "disabled-btn" : ""}`}
+                  disabled={isSubmitting || !isValid}
                 >
                   Enviar <FaArrowRightLong />
                 </button>
