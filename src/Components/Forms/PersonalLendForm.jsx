@@ -22,6 +22,7 @@ const PersonalLendForm = () => {
     formData.append("ingresos", values.ingresos);
     formData.append("cuit", values.cuit);
     formData.append("amount", values.amount);
+    formData.append("terminos_y_condiciones", values.terminos_y_condiciones);
 
     if (values.files && values.files.buffer) {
       const file = values.files;
@@ -124,6 +125,7 @@ const PersonalLendForm = () => {
           situacion: "",
           ingresos: "",
           amount: "",
+          terminos_y_condiciones: false,
         }}
         onSubmit={handleSubmit}
         validate={validate}
@@ -287,6 +289,7 @@ const PersonalLendForm = () => {
             </div>
             <div className="input-container-100">
               <input
+                name="terminos_y_condiciones"
                 type="checkbox"
                 id="aceptarTerminos"
                 className="checkbox"
