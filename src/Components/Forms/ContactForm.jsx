@@ -97,7 +97,7 @@ const ContactForm = ({ type }) => {
     if (type === 'RECLAMO') {
  
       if (reasonSelected.reason && reasonSelected.value) {
-        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/mail/${type}/`, {
+        const response = await fetch(`https://backend-landing-cofa-production-81e9.up.railway.app/mail/${type}/`, {
           method: 'POST',
           headers: {
 
@@ -113,7 +113,7 @@ const ContactForm = ({ type }) => {
       }
     }
     else{
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/mail/${type}/`, {
+      const response = await fetch(`https://backend-landing-cofa-production-81e9.up.railway.app/mail/${type}/`, {
           method: 'POST',
           headers: {
 

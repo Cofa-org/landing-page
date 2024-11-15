@@ -80,7 +80,7 @@ const WorkWithUsForm = () => {
       formData.append('archivoPDF', blob, file.originalname);
     }
 
-    const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/mail/` + 'TRABAJO', {
+    const response = await fetch(`https://backend-landing-cofa-production-81e9.up.railway.app/mail/` + 'TRABAJO', {
       method: 'POST',
       headers: {
 

@@ -31,7 +31,7 @@ const PersonalLendForm = () => {
 
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_BACKEND_URL}/mail/` + "EL-MEJOR-TRATO",
+        `https://backend-landing-cofa-production-81e9.up.railway.app/mail/` + "EL-MEJOR-TRATO",
         {
           method: "POST",
           headers: {
