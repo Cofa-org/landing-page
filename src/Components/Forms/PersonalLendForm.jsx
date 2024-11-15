@@ -35,8 +35,9 @@ const PersonalLendForm = () => {
         {
           method: "POST",
           headers: {
-            Authorization: `Bearer clave-secreta-cofa`,
+            "x-api-key": "4b2129b4-c4f6-4551-8d1c-934af49f5309",
           },
+          credentials: "include",
           body: formData,
         }
       );
