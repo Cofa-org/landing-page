@@ -62,9 +62,9 @@ const PersonalLendForm = () => {
     }
 
     if (!values.cuit) {
-      errors.cuit = "El cuit no puede estar vacío";
-    } else if (String(values.cuit).length !== 8) {
-      errors.cuit = "El cuit debe tener 8 dígitos numéricos";
+      errors.cuit = "El CUIL|CUIT no puede estar vacío";
+    } else if (String(values.cuit).length !== 11) {
+      errors.cuit = "El CUIL|CUIT debe tener 11 dígitos numéricos";
     } else {
       errors.cuit = "";
     }
@@ -148,7 +148,7 @@ const PersonalLendForm = () => {
               <Field
                 name="cuit"
                 type="number"
-                placeholder="11222333"
+                placeholder="00112223330"
               />
               <ErrorMessage
                 name="cuit"
@@ -272,7 +272,7 @@ const PersonalLendForm = () => {
             </div>
 
             <div className="input-container input-container-100">
-              <label htmlFor="amount">Importe solicitado</label>
+              <label htmlFor="amount">Importe solicitado:</label>
               <Field
                 name="amount"
                 id="amount"
