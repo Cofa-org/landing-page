@@ -76,7 +76,6 @@ const ContactForm = ({ type }) => {
   const route = pathname.pathname.substring(1)
   const sendMailRequest = async (values) => {
     const formData = new FormData();
-    console.log(values)
     formData.append('name', values.name);
     formData.append('dni', values.dni);
     formData.append('email', values.email);
@@ -98,7 +97,7 @@ const ContactForm = ({ type }) => {
     if (type === 'RECLAMO') {
  
       if (reasonSelected.reason && reasonSelected.value) {
-        const response = await fetch('https://backend-landing-cofa-production-81e9.up.railway.app/mail/' + type + '/', {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/mail/${type}/`, {
           method: 'POST',
           headers: {
 
@@ -114,7 +113,7 @@ const ContactForm = ({ type }) => {
       }
     }
     else{
-      const response = await fetch('https://backend-landing-cofa-production-81e9.up.railway.app/mail/' + type + '/', {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/mail/${type}/`, {
           method: 'POST',
           headers: {
 
@@ -161,7 +160,6 @@ const ContactForm = ({ type }) => {
 
     const emailPattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
-    console.log(values)
     if (type === 'RECLAMO') {
       if (isSelectorOpen && !reasonSelected.reason && !reasonSelected.value) {
         errors.reason = 'Debe seleccionar una razon'
@@ -298,8 +296,6 @@ const ContactForm = ({ type }) => {
   useEffect(() => {
     setOpenSelector(false)
   }, [reasonSelected.value])
-  console.log(isSelectorOpen, !openSelector, reasonSelected.reason, reasonSelected.value)
-  console.log((isSelectorOpen && !openSelector) && (!reasonSelected.reason || !reasonSelected.value))
   return (
     <div className="quejas-sugerencias">
       <Formik

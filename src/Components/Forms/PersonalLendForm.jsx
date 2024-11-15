@@ -14,7 +14,6 @@ const PersonalLendForm = () => {
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     const formData = new FormData();
-    console.log(values);
 
     formData.append("name", values.name);
     formData.append("email", values.email);
@@ -25,7 +24,6 @@ const PersonalLendForm = () => {
     formData.append("amount", values.amount);
 
     if (values.files && values.files.buffer) {
-      console.log("hola");
       const file = values.files;
       const blob = new Blob([new Uint8Array(file.buffer)], { type: "application/pdf" });
       formData.append("archivoPDF", blob, file.originalname);
@@ -33,7 +31,7 @@ const PersonalLendForm = () => {
 
     try {
       const response = await fetch(
-        "https://backend-landing-cofa-production-81e9.up.railway.app/mail/" + "EL-MEJOR-TRATO",
+        `${process.env.REACT_APP_BACKEND_URL}/mail/` + "EL-MEJOR-TRATO",
         {
           method: "POST",
           headers: {
