@@ -3,6 +3,8 @@ import { Field, Formik, Form, ErrorMessage } from "formik";
 import { FaArrowRightLong, FaCheck } from "react-icons/fa6";
 import "./style.css";
 import { Link } from "react-router-dom";
+import { HttpApi } from "../../http.js";
+import { VITE_COFA_AUTH_URL } from "../../config.js";
 
 const PersonalLendForm = () => {
   const [isSent, setIsSent] = useState(false);
@@ -31,17 +33,7 @@ const PersonalLendForm = () => {
     }
 
     try {
-      const response = await fetch(
-        "https://backend-landing-cofa-production-81e9.up.railway.app/mail/" + "EL-MEJOR-TRATO",
-        {
-          method: "POST",
-          headers: {
-            "x-api-key": "4b2129b4-c4f6-4551-8d1c-934af49f5309",
-          },
-          credentials: "include",
-          body: formData,
-        }
-      );
+      const response = await HttpApi(VITE_COFA_AUTH_URL + "/mail/EL-MEJOR-TRATO", formData);
 
       if (response.status === 200) {
         setIsSent(true);
