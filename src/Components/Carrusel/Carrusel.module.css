@@ -1,0 +1,25 @@
+.carrusel {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.slides {
+    display: flex;
+    /* La transición solo se aplica cuando está habilitada */
+    transition: transform 0.5s ease-in-out;
+    will-change: transform;
+}
+
+.slides.transition {
+    transition: transform 0.5s ease-in-out;
+}
+
+.image {
+    width: 100%;
+    flex-shrink: 0;
+    object-fit: contain;
+}
