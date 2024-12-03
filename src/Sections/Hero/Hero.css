@@ -1,7 +1,7 @@
 
 @media screen and (min-width: 1400px) {
     .hero-container{
-        padding: 100px 15vw !important;
+        padding: 50px 15vw 100px 15vw !important;
     }
 }
 .hero-container{
