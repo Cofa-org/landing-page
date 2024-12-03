@@ -8,7 +8,7 @@ const Hero = () => {
 
     const arrImages = [
         '/img/hero-img.png',
-        '/img/hero-carrusel2.webp',
+        '/img/banner-cofa.png',
     ]
 
     return (
