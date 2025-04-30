@@ -20,7 +20,6 @@ const HeaderElMejorTrato = () => {
   }
 
   useEffect(() =>{
-    console.log(location.pathname)
     setInHome(location.pathname == '/el-mejor-trato')
 
   }, [location.pathname])

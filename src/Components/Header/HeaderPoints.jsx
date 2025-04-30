@@ -58,7 +58,6 @@ const HeaderPoints = () => {
   }
 
   useEffect(() =>{
-    console.log(location.pathname)
     setInHome(location.pathname == '/puntos-cofa')
 
   }, [location.pathname])

@@ -10,6 +10,7 @@ import HeaderElMejorTrato from './Header/HeaderElMejorTrato'
 import HeaderAssist from "./Header/HeaderAssist";
 import AssistSlider from "./AssistSlider/AssistSlider";
 import { WorkWithUsForm } from "./Forms/WorkWithUsForm";
+import Carrusel from "./Carrusel/Carrusel";
 
 export {
     Header, 
@@ -23,6 +24,6 @@ export {
     HeaderElMejorTrato,
     HeaderAssist,
     AssistSlider,
-    WorkWithUsForm
-
+    WorkWithUsForm,
+    Carrusel
 }

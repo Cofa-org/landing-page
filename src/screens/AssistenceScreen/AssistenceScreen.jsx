@@ -15,7 +15,6 @@ const AssistenceScreen = () => {
   useEffect(() => {
     if (hash) {
       const targetElement = document.getElementById(hash.substring(1));
-      console.log(targetElement)
       if (targetElement) {
         targetElement.scrollIntoView({ behavior: 'smooth' });
       }
