@@ -26,5 +26,6 @@ jobs:
         username: ${{ secrets.FTP_USER }}
         password: ${{ secrets.FTP_PASS }}
         local-dir: dist/
-        server-dir: /
-        delete-removed: true
+        server-dir: public_html/
+        dangerous-clean-slate: true
+
