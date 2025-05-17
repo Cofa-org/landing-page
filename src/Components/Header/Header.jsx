@@ -1,22 +1,22 @@
-import React, { useEffect, useState } from 'react';
-import './Header.css';
-import { FiMenu } from 'react-icons/fi';
-import { IoMdArrowBack } from 'react-icons/io';
-import { Link, useLocation } from 'react-router-dom';
-import { useScrollContext } from '../../context';
+import React, { useEffect, useState } from "react";
+import "./Header.css";
+import { FiMenu } from "react-icons/fi";
+import { IoMdArrowBack } from "react-icons/io";
+import { Link, useLocation } from "react-router-dom";
+import { useScrollContext } from "../../context";
 
 const Header = () => {
   const location = useLocation();
   const [first, setFirst] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
-  const [inHome, setInHome] = useState(location.pathname === '/prestamos');
+  const [inHome, setInHome] = useState(location.pathname === "/prestamos");
   const { pathname, hash } = useLocation();
   const { scrolled } = useScrollContext();
-  const [selectedLink, setSelectedLink] = useState('prestamos');
+  const [selectedLink, setSelectedLink] = useState("prestamos");
 
   // Lógica para el scroll spy
   useEffect(() => {
-    const sections = ['prestamos', 'nosotros', 'preguntas-frecuentes', 'contacto'];
+    const sections = ["prestamos", "nosotros", "preguntas-frecuentes", "contacto"];
     const observerOptions = { threshold: 0.6 };
 
     const observer = new IntersectionObserver((entries) => {
@@ -50,80 +50,148 @@ const Header = () => {
   };
 
   useEffect(() => {
-    setInHome(location.pathname === '/prestamos');
+    setInHome(location.pathname === "/prestamos");
   }, [location.pathname]);
 
   return (
-    <header className={scrolled && 'solid'}>
-      <Link to={'/prestamos'}>
-        <img src='/Logo.svg' alt='Logo' />
+    <header className={scrolled ? "solid" : ""}>
+      <Link to={"/prestamos"}>
+        <img
+          src='/Logo.svg'
+          alt='Logo'
+        />
       </Link>
       <nav>
         {inHome ? (
           <>
-            <a href="#prestamos" className={selectedLink === 'prestamos' ? 'link-selected' : ''}>
+            <a
+              href='#prestamos'
+              className={selectedLink === "prestamos" ? "link-selected" : ""}
+            >
               Inicio
             </a>
-            <a href="#nosotros" className={selectedLink === 'nosotros' ? 'link-selected' : ''}>
+            <a
+              href='#nosotros'
+              className={selectedLink === "nosotros" ? "link-selected" : ""}
+            >
               Nosotros
             </a>
-            <a href="#preguntas-frecuentes" className={selectedLink === 'preguntas-frecuentes' ? 'link-selected' : ''}>
+            <a
+              href='#preguntas-frecuentes'
+              className={selectedLink === "preguntas-frecuentes" ? "link-selected" : ""}
+            >
               Preguntas frecuentes
             </a>
-            <a href="#contacto" className={selectedLink === 'contacto' ? 'link-selected' : ''}>
+            <a
+              href='#contacto'
+              className={selectedLink === "contacto" ? "link-selected" : ""}
+            >
               Contacto
             </a>
-            <Link to={'/puntos-cofa'}>Puntos COFA</Link>
+            <Link to={"/puntos-cofa"}>Puntos COFA</Link>
           </>
         ) : (
           <>
-            <Link to={'/#prestamos'} className={selectedLink === 'prestamos' ? 'link-selected' : ''}>
+            <Link
+              to={"/#prestamos"}
+              className={selectedLink === "prestamos" ? "link-selected" : ""}
+            >
               Inicio
             </Link>
-            <Link to={'/#nosotros'} className={selectedLink === 'nosotros' ? 'link-selected' : ''}>
+            <Link
+              to={"/#nosotros"}
+              className={selectedLink === "nosotros" ? "link-selected" : ""}
+            >
               Nosotros
             </Link>
-            <Link to={'/#preguntas-frecuentes'} className={selectedLink === 'preguntas-frecuentes' ? 'link-selected' : ''}>
+            <Link
+              to={"/#preguntas-frecuentes"}
+              className={selectedLink === "preguntas-frecuentes" ? "link-selected" : ""}
+            >
               Preguntas frecuentes
             </Link>
-            <Link to={'/#contacto'} className={selectedLink === 'contacto' ? 'link-selected' : ''}>
+            <Link
+              to={"/#contacto"}
+              className={selectedLink === "contacto" ? "link-selected" : ""}
+            >
               Contacto
             </Link>
-            <Link to={'/puntos-cofa'}>Puntos COFA</Link>
+            <Link to={"/puntos-cofa"}>Puntos COFA</Link>
           </>
         )}
       </nav>
       <div className='buttons-container'>
-        <a href='http://wa.me/5491137570853' target="_blank" rel="noopener noreferrer">
+        <a
+          href='http://wa.me/5491137570853'
+          target='_blank'
+          rel='noopener noreferrer'
+        >
           <button className='primary-btn header-primary-btn'>Quiero mi préstamo</button>
         </a>
-        <button className='btn-show-links' onClick={openNavbar}>
+        <button
+          className='btn-show-links'
+          onClick={openNavbar}
+        >
           <FiMenu />
         </button>
       </div>
-      <div className={isOpen ? 'mobible-navbar open' : first ? 'mobible-navbar' : 'mobible-navbar not-first'}>
+      <div
+        className={
+          isOpen ? "mobible-navbar open" : first ? "mobible-navbar" : "mobible-navbar not-first"
+        }
+      >
         <nav className='mobible-links'>
-          <button onClick={() => { setIsOpen(false); setSelectedLink(''); }} className='btn-back'>
+          <button
+            onClick={() => {
+              setIsOpen(false);
+              setSelectedLink("");
+            }}
+            className='btn-back'
+          >
             <IoMdArrowBack />
           </button>
-          <a href="#prestamos" className={selectedLink === 'prestamos' ? 'link-selected' : ''} onClick={handleCloseNabvar}>
+          <a
+            href='#prestamos'
+            className={selectedLink === "prestamos" ? "link-selected" : ""}
+            onClick={handleCloseNabvar}
+          >
             Inicio
           </a>
-          <a href="#nosotros" className={selectedLink === 'nosotros' ? 'link-selected' : ''} onClick={handleCloseNabvar}>
+          <a
+            href='#nosotros'
+            className={selectedLink === "nosotros" ? "link-selected" : ""}
+            onClick={handleCloseNabvar}
+          >
             Nosotros
           </a>
-          <a href="#preguntas-frecuentes" className={selectedLink === 'preguntas-frecuentes' ? 'link-selected' : ''} onClick={handleCloseNabvar}>
+          <a
+            href='#preguntas-frecuentes'
+            className={selectedLink === "preguntas-frecuentes" ? "link-selected" : ""}
+            onClick={handleCloseNabvar}
+          >
             Preguntas frecuentes
           </a>
-          <a href="#contacto" className={selectedLink === 'contacto' ? 'link-selected' : ''} onClick={handleCloseNabvar}>
+          <a
+            href='#contacto'
+            className={selectedLink === "contacto" ? "link-selected" : ""}
+            onClick={handleCloseNabvar}
+          >
             Contacto
           </a>
-          <Link to={'/puntos-cofa'} onClick={handleCloseNabvar}>
+          <Link
+            to={"/puntos-cofa"}
+            onClick={handleCloseNabvar}
+          >
             Puntos COFA
           </Link>
         </nav>
       </div>
-      {isOpen && <div className='background-layer' onClick={handleCloseNabvar}></div>}
+      {isOpen && (
+        <div
+          className='background-layer'
+          onClick={handleCloseNabvar}
+        ></div>
+      )}
     </header>
   );
 };

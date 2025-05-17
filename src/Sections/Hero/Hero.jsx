@@ -18,9 +18,8 @@ const Hero = () => {
     >
       <div className='hero'>
         <div className='hero-info'>
-          <h1>
-            Préstamos <br /> <AnimatedTitle />
-          </h1>
+          <h1>Préstamos</h1>
+          <AnimatedTitle />
           <a
             href='http://wa.me/5491137570853'
             target='_blank'
@@ -43,7 +42,10 @@ const Hero = () => {
         <h2>Te prestamos hasta $500.000</h2>
         <div className='info-list'>
           {infoList.map((info) => (
-            <div className='info-card'>
+            <div
+              className='info-card'
+              key={info.title}
+            >
               <info.Icon className='info-icon' />
               <h3>{info.title}</h3>
               <p>{info.content}</p>
