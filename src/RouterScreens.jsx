@@ -14,7 +14,7 @@ const RouterScreens = () => {
         <Route path='/prestamos' element={<HomeScreen/>}/>{/* Prestamos  */}
         <Route path='/terminos-y-condiciones' element={<TermsScreen/>} />{/* Terminos y Condiciones */}
         <Route path='/politicas-de-privacidad' element={<PrivacyPoliciesScreen/>} />{/* Politicas de Privacidad */}
-        <Route path='/puntos-cofa' element={<PointsScreen/>}/>{/* Puntos COFA */}
+        {/* <Route path='/puntos-cofa' element={<PointsScreen/>}/>Puntos COFA */}
         <Route path='/sugerencias' element={<SuggestionsScreen/>} /> {/* Sugerencias */}
         <Route path='/baja' element={<DischargeScreen/>} /> {/* Baja */}
         <Route path='/arrepentimiento' element={<RegretOrDischargeScreen/>} /> {/* Arrepentimiento */}

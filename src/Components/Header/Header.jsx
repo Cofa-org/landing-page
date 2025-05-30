@@ -88,7 +88,7 @@ const Header = () => {
             >
               Contacto
             </a>
-            <Link to={"/puntos-cofa"}>Puntos COFA</Link>
+            {/* <Link to={"/puntos-cofa"}>Puntos COFA</Link> */}
           </>
         ) : (
           <>
@@ -116,7 +116,7 @@ const Header = () => {
             >
               Contacto
             </Link>
-            <Link to={"/puntos-cofa"}>Puntos COFA</Link>
+            {/* <Link to={"/puntos-cofa"}>Puntos COFA</Link> */}
           </>
         )}
       </nav>
