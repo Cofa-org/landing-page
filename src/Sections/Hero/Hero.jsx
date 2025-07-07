@@ -5,10 +5,10 @@ import { AnimatedTitle, Carrusel } from "../../Components";
 
 const Hero = () => {
   const arrImages = [
-    "/img/hero-img.png",
-    "/img/videos cofa-2-dinero contando.gif",
-    "/img/videos cofa-3-dinero contando.gif",
-    "/img/videos cofa-4-dinero contando.gif",
+    // "/img/hero-img.png",
+    "/img/cofa-2-dinero_contando.mp4",
+    "/img/cofa-3-dinero_contando.mp4",
+    "/img/cofa-4-dinero_contando.mp4",
   ];
 
   return (

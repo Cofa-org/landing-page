@@ -7,7 +7,7 @@ import { GoArrowDown } from "react-icons/go";
 const HeroPoints = () => {
   return (
     <>
-        <img src="/img/line-background-points.svg" className='line-background-points'/>
+        <img src="/img/line-background-points.svg" alt='background line points' className='line-background-points'/>
         <section className='hero-container' id='hero-points'>
             <div className='hero-points'>
                 <div className='hero-info'>
@@ -31,8 +31,8 @@ const HeroPoints = () => {
                 </div>
             </div>
             <div className='hero-overlay'>
-                <img src="/img/img-hero-points.png" className="hero-img-points" />
-                <img src='/img/hero-points.svg' className='stain-hero-points-svg'/>
+                <img src="/img/img-hero-points.png" alt='img-hero-points' className="hero-img-points" />
+                <img src='/img/hero-points.svg' alt='hero-points' className='stain-hero-points-svg'/>
             </div>
 
             <div className='how-do-add-points' id='score-points'>

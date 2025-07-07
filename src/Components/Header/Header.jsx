@@ -131,6 +131,7 @@ const Header = () => {
         <button
           className='btn-show-links'
           onClick={openNavbar}
+          aria-label="Abrir menu de navegación"
         >
           <FiMenu />
         </button>

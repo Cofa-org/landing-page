@@ -3,51 +3,43 @@ import style from "./Carrusel.module.css";
 
 const Carrusel = ({ images }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(false);
+  const videoRef = useRef(null);
   const timeoutRef = useRef(null);
 
-  const startTimeout = (duration) => {
+  useEffect(() => {
     timeoutRef.current = setTimeout(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
-    }, duration);
-  };
+    }, 8000); // 8 segundos
+
+    return () => clearTimeout(timeoutRef.current);
+  }, [currentIndex, images.length]);
 
   useEffect(() => {
-    const isFirstImage = currentIndex === 0;
-    const delay = isFirstImage ? 1500 : 7000;
-
-    startTimeout(delay);
-
-    // Trigger animation class
-    setIsAnimating(true);
-    const animationTimeout = setTimeout(() => {
-      setIsAnimating(false);
-    }, 1000); // duración de la animación (1s)
-
-    return () => {
-      clearTimeout(timeoutRef.current);
-      clearTimeout(animationTimeout);
-    };
-  }, [currentIndex, images.length]);
+    if (videoRef.current) {
+      videoRef.current.currentTime = 0;
+      videoRef.current.play().catch((err) => {
+        console.error("Error playing video:", err);
+      });
+    }
+  }, [currentIndex]);
 
   return (
     <div className={style.carrusel}>
-      <div
-        className={`${style.slides} ${isAnimating ? style.fadeIn : ""}`}
-        style={{
-          transform: `translateX(-${currentIndex * 100}%)`,
-          transition: "transform 1s ease-in-out",
-        }}
+      <video
+        key={currentIndex} // Forzar reinicio al cambiar de slide
+        ref={videoRef}
+        autoPlay
+        muted
+        playsInline
+        className={style.image}
+        // style={{ width: "100%", height: "auto", maxHeight: "400px", borderRadius: "8px" }}
       >
-        {images.map((src, index) => (
-          <img
-            key={index}
-            src={src}
-            alt={`Slide ${index + 1}`}
-            className={style.image}
-          />
-        ))}
-      </div>
+        <source
+          type='video/mp4'
+          src={images[currentIndex]}
+        />
+        Tu navegador no soporta videos.
+      </video>
     </div>
   );
 };

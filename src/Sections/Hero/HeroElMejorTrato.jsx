@@ -54,7 +54,7 @@ const HeroElMejorTrato = ({}) => {
                 </div>
                 <div className='container-form-elmejortrato'>
                     <PersonalLendForm/>
-                    <img src='/img/hero-points.svg' className='stain-hero-points-svg'/>
+                    <img src='/img/hero-points.svg' alt='hero-points' className='stain-hero-points-svg'/>
                 </div>
             </section>
             {/* <section className='services-el-mejor-trato'>

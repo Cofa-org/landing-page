@@ -26,7 +26,7 @@ const UsePoints = () => {
                 </div>
             </div>
             <div className='img-container'>
-                <img src="/img/img-use-points.png" className="use-img-points" />
+                <img src="/img/img-use-points.png" alt="img-use-points" className="use-img-points" />
             </div>
         </section>
         

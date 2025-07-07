@@ -121,7 +121,7 @@ const Footer = () => {
         <div className="ssn-container">
           <p>Inscripto como Agente Institorio ante la SSN bajo el registro Nro 334.</p>
           <span>Atención al asegurado 0800-666-8400</span>
-          <img src="/img/ssn-logo.svg" />
+          <img src="/img/ssn-logo.svg" alt="logo ssn"/>
         </div>
       </div>
       <div className="footer-box-right">
@@ -151,7 +151,7 @@ const Footer = () => {
         <div className="ssn-container-mobible">
           <p>Inscripto como Agente Institorio ante la SSN bajo el registro Nro 334.</p>
           <span>Atención al asegurado 0800-666-8400</span>
-          <img src="/img/ssn-logo.svg" />
+          <img src="/img/ssn-logo.svg" alt="logo ssn"/>
         </div>
         <div>
           <p>
@@ -181,6 +181,7 @@ const Footer = () => {
         className="wsp-contact"
         target="_blank"
         id="btn-whatsapp"
+        aria-label="whatsapp"
       >
         <FaWhatsapp />
       </Link>
@@ -264,7 +265,7 @@ const DeprecatedFooter = () => {
           </p>
         </div>
         <div className="footer-box-4__right">
-          <img src="/img/ssn-logo.svg" />
+          <img src="/img/ssn-logo.svg" alt="logo-ssn"/>
           <p>Atención al asegurado 0800-666-8400</p>
         </div>
       </div>
