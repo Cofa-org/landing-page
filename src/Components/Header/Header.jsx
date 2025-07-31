@@ -87,12 +87,12 @@ const Header = () => {
             >
               Preguntas frecuentes
             </a>
-            <a
-              href={"/cofa-tips"}
+            <Link
+              to={"/cofa-tips"}
               className={selectedLink === "cofa-tips" ? "link-selected" : ""}
             >
               Cofa tips
-            </a>
+            </Link>
             <a
               href='#contacto'
               className={selectedLink === "contacto" ? "link-selected" : ""}
