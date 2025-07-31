@@ -31,11 +31,14 @@ const CofaTipsSection = () => {
           {/* Featured content card */}
           <div className='card cofa-tips-featured-card'>
             <div className='card-content'>
-              <img className="card-image" src="../../../public/img/cofa-tips.webp" alt="Card Image" />
+              <img
+                className='card-image'
+                src='../../../img/cofa-tips.webp'
+                alt='Card Image'
+              />
             </div>
           </div>
         </div>
-
       </div>
     </section>
   );

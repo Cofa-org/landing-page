@@ -7,7 +7,9 @@ export class BlogService {
         .from("landing_blog_posts")
         .select("*")
         .eq("published", true)
-        .order("published_date", { ascending: false });
+        .order("published_date", { ascending: false })
+        .is("deleted_at", null);
+
 
       if (error) {
         console.error("Error fetching blog posts:", error);
@@ -20,7 +22,7 @@ export class BlogService {
       return [];
     }
   }
-
+  
   static async getPostBySlug(slug) {
     try {
       const { data, error } = await supabase

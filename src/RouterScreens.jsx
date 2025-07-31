@@ -13,8 +13,8 @@ import {
   TermsPointsScreen,
   TermsScreen
 } from "./screens";
-import { BlogDetailPage } from "./screens/blogDetailScreen/BlogDetailPage.jsx";
 import { FormWorkWithUs } from "./Sections";
+import { BlogDetailScreen } from "./screens/blogDetailScreen/BlogDetailScreen.jsx";
 
 /* import SuggestionsScreen from './screens/SuggestionsScreen/SuggestionsScreen' */
 
@@ -88,7 +88,7 @@ const RouterScreens = () => {
       />{" "}
       <Route
         path='/blog/:slug'
-        element={<BlogDetailPage />}
+        element={<BlogDetailScreen />}
       />
       {/* Cofa Tips */}
       {/* <Route path='/asistencias' element={<AssistenceScreen/>}/> */} {/* Asistencias */}

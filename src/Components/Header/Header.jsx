@@ -9,10 +9,15 @@ const Header = () => {
   const location = useLocation();
   const [first, setFirst] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
-  const [inHome, setInHome] = useState(location.pathname === "/prestamos");
+  const [inHome, setInHome] = useState(
+    location.pathname === "/prestamos" || location.pathname === "/"
+  );
+  const [inBlog, setInBlog] = useState(
+    location.pathname.split("/").includes("cofa-tips") || location.pathname.includes("blog")
+  );
   const { pathname, hash } = useLocation();
   const { scrolled } = useScrollContext();
-  const [selectedLink, setSelectedLink] = useState("prestamos");
+  const [selectedLink, setSelectedLink] = useState(inBlog ? "cofa-tips" : "prestamos");
 
   // Lógica para el scroll spy
   useEffect(() => {
@@ -50,7 +55,7 @@ const Header = () => {
   };
 
   useEffect(() => {
-    setInHome(location.pathname === "/prestamos");
+    setInHome(location.pathname === "/prestamos" || location.pathname === "/");
   }, [location.pathname]);
 
   return (
@@ -83,12 +88,52 @@ const Header = () => {
               Preguntas frecuentes
             </a>
             <a
+              href={"/cofa-tips"}
+              className={selectedLink === "cofa-tips" ? "link-selected" : ""}
+            >
+              Cofa tips
+            </a>
+            <a
               href='#contacto'
               className={selectedLink === "contacto" ? "link-selected" : ""}
             >
               Contacto
             </a>
             {/* <Link to={"/puntos-cofa"}>Puntos COFA</Link> */}
+          </>
+        ) : inBlog ? (
+          <>
+            <Link
+              to={"/#prestamos"}
+              className={selectedLink === "prestamos" ? "link-selected" : ""}
+            >
+              Inicio
+            </Link>
+            <Link
+              to={""}
+              className={"link-disabled"}
+              aria-disabled={true}
+            >
+              Nosotros
+            </Link>
+            <Link
+              to={""}
+              className={"link-disabled"}
+            >
+              Preguntas frecuentes
+            </Link>
+            <Link
+              to={"/cofa-tips"}
+              className={selectedLink === "cofa-tips" ? "link-selected" : ""}
+            >
+              Cofa tips
+            </Link>
+            <Link
+              to={""}
+              className={"link-disabled"}
+            >
+              Contacto
+            </Link>
           </>
         ) : (
           <>
@@ -116,7 +161,6 @@ const Header = () => {
             >
               Cofa tips
             </Link>
-
             <Link
               to={"/#contacto"}
               className={selectedLink === "contacto" ? "link-selected" : ""}

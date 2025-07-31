@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Footer, Header } from "../../Components";
+import { Footer, Header } from "../../Components/index.js";
 import { BlogDetailSection } from "../../Sections/blogDetailSection/BlogDetailSection.jsx";
 
-export const BlogDetailPage = () => {
+export const BlogDetailScreen = () => {
   const { slug } = useParams();
 
   useEffect(() => {
