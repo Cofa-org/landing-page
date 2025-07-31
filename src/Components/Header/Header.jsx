@@ -55,7 +55,7 @@ const Header = () => {
 
   return (
     <header className={scrolled ? "solid" : ""}>
-      <Link to={"/prestamos"}>
+      <Link to={"/"}>
         <img
           src='/Logo.svg'
           alt='Logo'
@@ -111,6 +111,13 @@ const Header = () => {
               Preguntas frecuentes
             </Link>
             <Link
+              to={"/cofa-tips"}
+              className={selectedLink === "cofa-tips" ? "link-selected" : ""}
+            >
+              Cofa tips
+            </Link>
+
+            <Link
               to={"/#contacto"}
               className={selectedLink === "contacto" ? "link-selected" : ""}
             >
@@ -131,7 +138,7 @@ const Header = () => {
         <button
           className='btn-show-links'
           onClick={openNavbar}
-          aria-label="Abrir menu de navegación"
+          aria-label='Abrir menu de navegación'
         >
           <FiMenu />
         </button>
@@ -171,6 +178,12 @@ const Header = () => {
             onClick={handleCloseNabvar}
           >
             Preguntas frecuentes
+          </a>
+          <a
+            href='/cofa-tips'
+            className={selectedLink === "cofa-tips" ? "link-selected" : ""}
+          >
+            Cofa tips
           </a>
           <a
             href='#contacto'

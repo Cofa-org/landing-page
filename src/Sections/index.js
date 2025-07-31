@@ -22,6 +22,8 @@ import TermsAndConditionsPoints from './TermsAndConditions/TermsAndConditionsPoi
 import FormWorkWithUs from './WorkWithUs/FormWorkWithUs';
 import HeroElMejorTrato from './Hero/HeroElMejorTrato'
 import HeroAssist from "./Hero/HeroAssist";
+import BlogSection from "./BlogSection/BlogSection.jsx"
+import CofaTipsSection from "./CofaTipsSection/CofaTipsSection.jsx"
 
 
 
@@ -48,5 +50,7 @@ export {
     TermsAndConditionsPoints,
     FormWorkWithUs,
     HeroElMejorTrato,
+    BlogSection,
+    CofaTipsSection
 
 }
