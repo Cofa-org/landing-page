@@ -1,255 +1,152 @@
-import React, { useEffect, useState } from "react";
-import "./Header.css";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { FiMenu } from "react-icons/fi";
 import { IoMdArrowBack } from "react-icons/io";
-import { Link, useLocation } from "react-router-dom";
 import { useScrollContext } from "../../context";
+import "./Header.css";
+
+const NAV_SECTIONS = ["prestamos", "nosotros", "preguntas-frecuentes", "contacto"];
+
+// Componente para los enlaces de navegación, para evitar duplicación
+const NavLinks = ({ pageType, selectedLink, onLinkClick }) => {
+  const linksConfig = {
+    home: [
+      { href: "#prestamos", text: "Inicio", id: "prestamos" },
+      { href: "#nosotros", text: "Nosotros", id: "nosotros" },
+      { href: "#preguntas-frecuentes", text: "Preguntas frecuentes", id: "preguntas-frecuentes" },
+      { to: "/cofa-tips", text: "Cofa tips", id: "cofa-tips" },
+      { href: "#contacto", text: "Contacto", id: "contacto" },
+    ],
+    blog: [
+      { to: "/#prestamos", text: "Inicio", id: "prestamos" },
+      { to: "", text: "Nosotros", disabled: true },
+      { to: "", text: "Preguntas frecuentes", disabled: true },
+      { to: "/cofa-tips", text: "Cofa tips", id: "cofa-tips" },
+      { to: "", text: "Contacto", disabled: true },
+    ],
+    other: [
+      { to: "/#prestamos", text: "Inicio", id: "prestamos" },
+      { to: "/#nosotros", text: "Nosotros", id: "nosotros" },
+      { to: "/#preguntas-frecuentes", text: "Preguntas frecuentes", id: "preguntas-frecuentes" },
+      { to: "/cofa-tips", text: "Cofa tips", id: "cofa-tips" },
+      { to: "/#contacto", text: "Contacto", id: "contacto" },
+    ],
+  };
+
+  const links = linksConfig[pageType] || linksConfig.other;
+
+  return (
+    <>
+      {links.map(({ href, to, text, id, disabled }) => {
+        const className = `${selectedLink === id ? "link-selected" : ""} ${disabled ? "link-disabled" : ""}`;
+        
+        if (href) {
+          return (
+            <a key={text} href={href} className={className} onClick={onLinkClick}>
+              {text}
+            </a>
+          );
+        }
+        
+        return (
+          <Link key={text} to={to || ""} className={className} onClick={disabled ? (e) => e.preventDefault() : onLinkClick} aria-disabled={disabled}>
+            {text}
+          </Link>
+        );
+      })}
+    </>
+  );
+};
 
 const Header = () => {
-  const location = useLocation();
-  const [first, setFirst] = useState(true);
-  const [isOpen, setIsOpen] = useState(false);
-  const [inHome, setInHome] = useState(
-    location.pathname === "/prestamos" || location.pathname === "/"
-  );
-  const [inBlog, setInBlog] = useState(
-    location.pathname.split("/").includes("cofa-tips") || location.pathname.includes("blog")
-  );
-  const { pathname, hash } = useLocation();
+  const { pathname } = useLocation();
   const { scrolled } = useScrollContext();
-  const [selectedLink, setSelectedLink] = useState(inBlog ? "cofa-tips" : "prestamos");
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedLink, setSelectedLink] = useState("");
 
-  // Lógica para el scroll spy
+  const pageType = useMemo(() => {
+    if (pathname === "/" || pathname === "/prestamos") return "home";
+    if (pathname.includes("/cofa-tips") || pathname.includes("/blog")) return "blog";
+    return "other";
+  }, [pathname]);
+
+  // Efecto para el scroll spy
   useEffect(() => {
-    const sections = ["prestamos", "nosotros", "preguntas-frecuentes", "contacto"];
-    const observerOptions = { threshold: 0.6 };
+    if (pageType !== 'home') return;
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          setSelectedLink(entry.target.id);
-        }
-      });
-    }, observerOptions);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setSelectedLink(entry.target.id);
+          }
+        });
+      },
+      { threshold: 0.6 }
+    );
 
-    sections.forEach((sectionId) => {
-      const sectionElement = document.getElementById(sectionId);
-      if (sectionElement) observer.observe(sectionElement);
+    NAV_SECTIONS.forEach((id) => {
+      const element = document.getElementById(id);
+      if (element) observer.observe(element);
     });
 
     return () => {
-      sections.forEach((sectionId) => {
-        const sectionElement = document.getElementById(sectionId);
-        if (sectionElement) observer.unobserve(sectionElement);
+      NAV_SECTIONS.forEach((id) => {
+        const element = document.getElementById(id);
+        if (element) observer.unobserve(element);
       });
     };
-  }, []);
-
-  const openNavbar = () => {
-    setIsOpen(true);
-    setFirst(false);
-  };
-
-  const handleCloseNabvar = () => {
-    setIsOpen(false);
-  };
-
+  }, [pageType]);
+  
+  // Setea el link activo inicial
   useEffect(() => {
-    setInHome(location.pathname === "/prestamos" || location.pathname === "/");
-  }, [location.pathname]);
+    if (pageType === 'blog') {
+      setSelectedLink('cofa-tips');
+    } else if (pageType === 'home') {
+      setSelectedLink('prestamos');
+    } else {
+        setSelectedLink('');
+    }
+  }, [pageType]);
+
+
+  const handleToggleNavbar = (open) => {
+    setIsOpen(open);
+  };
+
+  const handleCloseNavbar = useCallback(() => {
+    handleToggleNavbar(false);
+  }, []);
 
   return (
     <header className={scrolled ? "solid" : ""}>
       <Link to={"/"}>
-        <img
-          src='/Logo.svg'
-          alt='Logo'
-        />
+        <img src='/Logo.svg' alt='Logo de COFA' />
       </Link>
-      <nav>
-        {inHome ? (
-          <>
-            <a
-              href='#prestamos'
-              className={selectedLink === "prestamos" ? "link-selected" : ""}
-            >
-              Inicio
-            </a>
-            <a
-              href='#nosotros'
-              className={selectedLink === "nosotros" ? "link-selected" : ""}
-            >
-              Nosotros
-            </a>
-            <a
-              href='#preguntas-frecuentes'
-              className={selectedLink === "preguntas-frecuentes" ? "link-selected" : ""}
-            >
-              Preguntas frecuentes
-            </a>
-            <Link
-              to={"/cofa-tips"}
-              className={selectedLink === "cofa-tips" ? "link-selected" : ""}
-            >
-              Cofa tips
-            </Link>
-            <a
-              href='#contacto'
-              className={selectedLink === "contacto" ? "link-selected" : ""}
-            >
-              Contacto
-            </a>
-            {/* <Link to={"/puntos-cofa"}>Puntos COFA</Link> */}
-          </>
-        ) : inBlog ? (
-          <>
-            <Link
-              to={"/#prestamos"}
-              className={selectedLink === "prestamos" ? "link-selected" : ""}
-            >
-              Inicio
-            </Link>
-            <Link
-              to={""}
-              className={"link-disabled"}
-              aria-disabled={true}
-            >
-              Nosotros
-            </Link>
-            <Link
-              to={""}
-              className={"link-disabled"}
-            >
-              Preguntas frecuentes
-            </Link>
-            <Link
-              to={"/cofa-tips"}
-              className={selectedLink === "cofa-tips" ? "link-selected" : ""}
-            >
-              Cofa tips
-            </Link>
-            <Link
-              to={""}
-              className={"link-disabled"}
-            >
-              Contacto
-            </Link>
-          </>
-        ) : (
-          <>
-            <Link
-              to={"/#prestamos"}
-              className={selectedLink === "prestamos" ? "link-selected" : ""}
-            >
-              Inicio
-            </Link>
-            <Link
-              to={"/#nosotros"}
-              className={selectedLink === "nosotros" ? "link-selected" : ""}
-            >
-              Nosotros
-            </Link>
-            <Link
-              to={"/#preguntas-frecuentes"}
-              className={selectedLink === "preguntas-frecuentes" ? "link-selected" : ""}
-            >
-              Preguntas frecuentes
-            </Link>
-            <Link
-              to={"/cofa-tips"}
-              className={selectedLink === "cofa-tips" ? "link-selected" : ""}
-            >
-              Cofa tips
-            </Link>
-            <Link
-              to={"/#contacto"}
-              className={selectedLink === "contacto" ? "link-selected" : ""}
-            >
-              Contacto
-            </Link>
-            {/* <Link to={"/puntos-cofa"}>Puntos COFA</Link> */}
-          </>
-        )}
+      
+      <nav className="desktop-nav">
+        <NavLinks pageType={pageType} selectedLink={selectedLink} />
       </nav>
+
       <div className='buttons-container'>
-        <a
-          href='http://wa.me/5491137570853'
-          target='_blank'
-          rel='noopener noreferrer'
-        >
+        <a href='http://wa.me/5491137570853' target='_blank' rel='noopener noreferrer'>
           <button className='primary-btn header-primary-btn'>Quiero mi préstamo</button>
         </a>
-        <button
-          className='btn-show-links'
-          onClick={openNavbar}
-          aria-label='Abrir menu de navegación'
-        >
+        <button className='btn-show-links' onClick={() => handleToggleNavbar(true)} aria-label='Abrir menú de navegación'>
           <FiMenu />
         </button>
       </div>
-      <div
-        className={
-          isOpen ? "mobible-navbar open" : first ? "mobible-navbar" : "mobible-navbar not-first"
-        }
-      >
+
+      <div className={`mobible-navbar ${isOpen ? "open" : ""}`}>
         <nav className='mobible-links'>
-          <button
-            onClick={() => {
-              setIsOpen(false);
-              setSelectedLink("");
-            }}
-            className='btn-back'
-          >
+          <button onClick={handleCloseNavbar} className='btn-back' aria-label="Cerrar menú de navegación">
             <IoMdArrowBack />
           </button>
-          <a
-            href='#prestamos'
-            className={selectedLink === "prestamos" ? "link-selected" : ""}
-            onClick={handleCloseNabvar}
-          >
-            Inicio
-          </a>
-          <a
-            href='#nosotros'
-            className={selectedLink === "nosotros" ? "link-selected" : ""}
-            onClick={handleCloseNabvar}
-          >
-            Nosotros
-          </a>
-          <a
-            href='#preguntas-frecuentes'
-            className={selectedLink === "preguntas-frecuentes" ? "link-selected" : ""}
-            onClick={handleCloseNabvar}
-          >
-            Preguntas frecuentes
-          </a>
-          <a
-            href='/cofa-tips'
-            className={selectedLink === "cofa-tips" ? "link-selected" : ""}
-          >
-            Cofa tips
-          </a>
-          <a
-            href='#contacto'
-            className={selectedLink === "contacto" ? "link-selected" : ""}
-            onClick={handleCloseNabvar}
-          >
-            Contacto
-          </a>
-          <Link
-            to={"/puntos-cofa"}
-            onClick={handleCloseNabvar}
-          >
-            Puntos COFA
-          </Link>
+          <NavLinks pageType={pageType} selectedLink={selectedLink} onLinkClick={handleCloseNavbar} />
         </nav>
       </div>
-      {isOpen && (
-        <div
-          className='background-layer'
-          onClick={handleCloseNabvar}
-        ></div>
-      )}
+
+      {isOpen && <div className='background-layer' onClick={handleCloseNavbar}></div>}
     </header>
   );
 };

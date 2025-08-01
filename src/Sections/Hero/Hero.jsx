@@ -33,9 +33,6 @@ const Hero = () => {
             </button>
           </a>
         </div>
-        {/*                 <div className='hero-img'>
-                    <img src='/img/hero-img.png' alt='Para sacar tus préstamos, definimos mínimos requisitos. Somos una empresa fintech con más de 17 años de trayectoria y más de 140.000 clientes satisfechos. Préstamos que simplifican tu vida.' />
-                </div> */}
         <Carrusel images={arrImages}></Carrusel>
       </div>
       <div className='info-container'>

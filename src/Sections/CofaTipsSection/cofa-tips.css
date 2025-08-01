@@ -54,9 +54,8 @@
 }
 
 .cofa-tips-featured-card {
-  width: 592px;
-  height: 361px;
-  background-color: var(--primary-color);
+  max-width: 592px;
+  max-height: 361px;
   border-radius: var(--border-radius-lg);
   border: none;
 }
