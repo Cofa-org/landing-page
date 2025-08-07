@@ -27,3 +27,4 @@ export {
     WorkWithUsForm,
     Carrusel
 }
+export { default as ImageCarousel } from "./ImageCarousel/ImageCarousel";

@@ -8,11 +8,11 @@ const Carrusel = ({ images }) => {
 
   useEffect(() => {
     timeoutRef.current = setTimeout(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % images?.length);
     }, 8000); // 8 segundos
 
     return () => clearTimeout(timeoutRef.current);
-  }, [currentIndex, images.length]);
+  }, [currentIndex, images?.length]);
 
   useEffect(() => {
     if (videoRef.current) {

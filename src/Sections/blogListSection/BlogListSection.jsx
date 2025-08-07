@@ -63,14 +63,6 @@ export const BlogListSection = () => {
   return (
     <div className='blog-list-page'>
       <div className='blog-list-container'>
-        <div className='blog-list-header'>
-          <h1 className='blog-list-title'>En COFA la seguridad es lo primero</h1>
-          <p className='blog-list-subtitle'>
-            Descubre consejos financieros, noticias y guías para tomar las mejores decisiones con tu
-            dinero
-          </p>
-        </div>
-
         {posts.length === 0 ? (
           <div className='blog-list-empty'>
             <h2 className='blog-list-empty-title'>No hay artículos disponibles</h2>
