@@ -4,9 +4,9 @@ import { ImageCarousel } from "../../Components/index.js";
 
 const CofaTipsSection = () => {
   const carouselImages = [
-    { src: "../../../img/cofa-tips.webp", alt: "Imagen de Cofa Tips 1" },
-    { src: "../../../img/cofa-2-dinero_contando.mp4", alt: "Imagen de Cofa Tips 2" },
-    { src: "../../../img/cofa-3-dinero_contando.mp4", alt: "Imagen de Cofa Tips 3" },
+    { src: "../../../img/cofa-tips-2.webp", alt: "Imagen de Cofa Tips 1" },
+    { src: "../../../img/cofa-tips-3.webp", alt: "Imagen de Cofa Tips 2" },
+    { src: "../../../img/cofa-tips-4.webp", alt: "Imagen de Cofa Tips 3" },
   ];
 
   return (
@@ -39,12 +39,12 @@ const CofaTipsSection = () => {
         </div>
 
         {/* Blog List Header */}
-        <div className='blog-list-header'>
-          <h1 className='blog-list-title'>En COFA la seguridad es lo primero</h1>
-          <p className='blog-list-subtitle'>
+        <div className='cofa-tips-header'>
+          <h1 className='blog-tips-title'>La seguridad es lo primero</h1>
+          {/* <p className='blog-list-subtitle'>
             Descubre consejos financieros, noticias y guías para tomar las mejores decisiones con tu
             dinero
-          </p>
+          </p> */}
         </div>
 
         {/* Banner */}

@@ -12,7 +12,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 56px;
+  gap: 3rem;
   position: relative;
   border-radius: var(--border-radius-sm);
 }
@@ -72,6 +72,7 @@
 .cofa-tips-header {
   text-align: center;
   width: 100%;
+  padding: 0px var(--spacing-lg);
 }
 
 .cofa-tips-title {
@@ -79,6 +80,7 @@
   font-weight: 700;
   color: var(--color-text-primary);
   font-family: "Roboto", Helvetica;
+  padding: 0px var(--spacing-lg);
 }
 
 .cofa-tips-subtitle {
@@ -93,6 +95,7 @@
 .cofa-tips-banner {
   width: 100%;
   max-width: 1200px;
+  padding: 0px var(--spacing-lg);
 }
 
 .cofa-tips-banner img {
