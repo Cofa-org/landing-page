@@ -15,6 +15,20 @@ export const BlogListSection = () => {
       try {
         setLoading(true);
         const blogPosts = await BlogService.getAllPosts();
+        if (!blogPosts || blogPosts.length === 0) {
+          setError("No se encontraron artículos del blog");
+          setLoading(false);
+          return;
+        }
+        blogPosts.forEach((post) => {
+          if (!post.featured_image) {
+            return;
+          }
+          const slices = Object.values(post?.featured_image);
+          if (slices && slices.length > 0) {
+            post.featured_image = slices;
+          }
+        });
 
         setPosts(blogPosts);
       } catch (err) {
@@ -81,7 +95,9 @@ export const BlogListSection = () => {
               >
                 <img
                   src={
-                    post.featured_image ||
+                    (Array.isArray(post.featured_image) && post.featured_image.length > 0
+                      ? post.featured_image[0]
+                      : post.featured_image) ||
                     "https://images.pexels.com/photos/3483098/pexels-photo-3483098.jpeg?auto=compress&cs=tinysrgb&w=800"
                   }
                   alt={post?.title}

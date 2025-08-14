@@ -1,14 +1,13 @@
 import { useEffect, useState } from "react";
 import { IoMdReturnLeft } from "react-icons/io";
 import { Link } from "react-router-dom";
-import { Footer } from "../../Components";
-import { Header } from "../../Components";
+import { Footer, Header } from "../../Components";
+import ImageCarousel from "../../Components/ImageCarousel/ImageCarousel";
 import { BlogService } from "../../services/blogService.js";
 import { formatDate } from "../../lib/utils";
 import "./blog-detail.css";
 
-export const BlogDetailSection = ({slug}) => {
-
+export const BlogDetailSection = ({ slug }) => {
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -24,12 +23,21 @@ export const BlogDetailSection = ({slug}) => {
       try {
         setLoading(true);
         const blogPost = await BlogService.getPostBySlug(slug);
-
         if (!blogPost) {
           setError("Artículo no encontrado");
-        } else {
-          setPost(blogPost);
         }
+        if (blogPost?.featured_image) {
+          const slices = Object.values(blogPost?.featured_image);
+          const sliceImages = slices.map((slice) => ({
+            src: slice,
+            alt: blogPost.title || "Imagen del artículo",
+          }));
+          if (sliceImages) {
+            blogPost.featured_image = sliceImages;
+          }
+        }
+
+        setPost(blogPost);
       } catch (err) {
         setError("Error al cargar el artículo");
         console.error("Error fetching blog post:", err);
@@ -85,7 +93,6 @@ export const BlogDetailSection = ({slug}) => {
 
   return (
     <div className='blog-detail-section'>
-
       <div className='blog-detail-container'>
         <Link
           to='/cofa-tips'
@@ -107,12 +114,20 @@ export const BlogDetailSection = ({slug}) => {
             </div>
           </div>
 
-          {post.featured_image && (
-            <img
-              src={post.featured_image}
-              alt={post.title}
-              className='blog-detail-featured-image'
-            />
+          {post.featured_image &&
+          Array.isArray(post.featured_image) &&
+          post.featured_image.length > 1 ? (
+            <ImageCarousel images={post.featured_image} showControls={true} />
+          ) : (
+            post.featured_image && (
+              <img
+                src={
+                  Array.isArray(post.featured_image) ? post.featured_image[0] : post.featured_image
+                }
+                alt={post.title}
+                className='blog-detail-featured-image'
+              />
+            )
           )}
 
           <div
