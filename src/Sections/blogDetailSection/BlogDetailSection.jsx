@@ -117,12 +117,17 @@ export const BlogDetailSection = ({ slug }) => {
           {post.featured_image &&
           Array.isArray(post.featured_image) &&
           post.featured_image.length > 1 ? (
-            <ImageCarousel images={post.featured_image} showControls={true} />
+            <ImageCarousel
+              images={post.featured_image}
+              showControls={true}
+            />
           ) : (
             post.featured_image && (
               <img
                 src={
-                  Array.isArray(post.featured_image) ? post.featured_image[0] : post.featured_image
+                  Array.isArray(post.featured_image)
+                    ? post.featured_image[0].src
+                    : post.featured_image.src
                 }
                 alt={post.title}
                 className='blog-detail-featured-image'
