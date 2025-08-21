@@ -24,7 +24,7 @@ const HeroAssist = () => {
                 </div>
             </div>
             <div className='hero-assist-img-container'>
-                <img src='/img/assist-hero-img.png' alt='assist-hero-img' className='stain-hero-assist-svg assist-hero-img'/>
+                <img src='/img/assist-hero-img.webp' alt='assist-hero-img' className='stain-hero-assist-svg assist-hero-img'/>
                 <img src='/img/hero-points.svg' alt='hero-points' className='stain-hero-points-svg'/>
             </div>
             <div className='services-assist-list'>

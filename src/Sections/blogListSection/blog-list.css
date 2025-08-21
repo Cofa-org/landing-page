@@ -14,7 +14,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
   gap: var(--spacing-2xl);
-  margin-bottom: var(--spacing-4xl);
+  margin-bottom: var(--spacing-lg);
 }
 
 .blog-card {
@@ -175,11 +175,6 @@
     font-size: 36px;
   }
 
-  .blog-list-grid {
-    grid-template-columns: 1fr;
-    gap: var(--spacing-xl);
-  }
-
   .blog-card-content {
     padding: var(--spacing-lg);
   }
@@ -211,4 +206,18 @@
   .blog-card-content {
     padding: var(--spacing-md);
   }
+}
+
+.contactInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: 25px;
+  padding: 0px var(--spacing-4xl);
+}
+
+.contactInfo img {
+  width: 200px;
 }

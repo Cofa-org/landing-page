@@ -4,6 +4,7 @@ import { formatDate } from "../../lib/utils.js";
 import { BlogService } from "../../services/blogService.js";
 import { Footer, Header } from "../../Components/index.js";
 import "./blog-list.css";
+import SocialNetworks from "../../Components/SocialNetworks/SocialNetworks.jsx";
 
 export const BlogListSection = () => {
   const [posts, setPosts] = useState([]);
@@ -123,6 +124,13 @@ export const BlogListSection = () => {
           </div>
         )}
       </div>
+      <section className='contactInfo'>
+        <img
+          src='/Logo.svg'
+          alt='logo'
+        />
+        <SocialNetworks />
+      </section>
     </div>
   );
 };

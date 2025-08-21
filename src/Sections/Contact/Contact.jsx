@@ -1,9 +1,17 @@
 import React from "react";
 import "./Contact.css";
 import { AiOutlineClockCircle } from "react-icons/ai";
-import { BsTelephone, BsFacebook, BsInstagram, BsLinkedin, BsWhatsapp } from "react-icons/bs";
+import {
+  BsTelephone,
+  BsFacebook,
+  BsInstagram,
+  BsLinkedin,
+  BsWhatsapp,
+  BsTiktok,
+} from "react-icons/bs";
 import { CiMail, CiLocationOn } from "react-icons/ci";
 import { Link } from "react-router-dom";
+import SocialNetworks from "../../Components/SocialNetworks/SocialNetworks.jsx";
 
 const Contact = () => {
   return (
@@ -43,36 +51,7 @@ const Contact = () => {
             src='/Logo.svg'
             alt='logo'
           />
-          <div className='socialMediaList'>
-            <Link
-              to={"https://www.facebook.com/cofa.ar"}
-              target='_blank'
-              aria-label='Facebook COFA'
-            >
-              <BsFacebook />
-            </Link>
-            <Link
-              to={"https://www.instagram.com/cofa.ar"}
-              target='_blank'
-              aria-label='Instagram COFA'
-            >
-              <BsInstagram />
-            </Link>
-            <Link
-              to={"https://www.linkedin.com/company/cofa-ar/"}
-              target='_blank'
-              aria-label='LinkedIn COFA'
-            >
-              <BsLinkedin />
-            </Link>
-            <Link
-              to={"http://wa.me/5491137570853"}
-              target='_blank'
-              aria-label='WhatsApp COFA'
-            >
-              <BsWhatsapp />
-            </Link>
-          </div>
+          <SocialNetworks />
           <div className='links'>
             <Link
               className='linkRedirect'

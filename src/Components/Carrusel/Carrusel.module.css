@@ -1,12 +1,13 @@
 .carrusel {
   width: 100%;
-  max-height: 600px;
+  max-height: 500px;
   overflow: hidden;
   position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
   border-radius: 3%;
+  aspect-ratio: 9/16;
 }
 
 .slides {

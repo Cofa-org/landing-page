@@ -1,220 +1,197 @@
 @media screen and (min-width: 1400px) {
-    .contact{
-        padding: 100px 15vw !important;
-    }
+  .contact {
+    padding: 100px 15vw !important;
+  }
 }
 
-.contact{
-    padding: 75px 5vw;
-    
+.contact {
+  padding: 75px 5vw;
 }
 
+.contact h2 {
+  font-size: 40px;
+  text-align: center;
+  margin-bottom: 50px;
+}
 
+.contactMediaList {
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+}
 
-.contact h2{
-    font-size: 40px;
+.contactMediaList span {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.contactMediaList span svg {
+  font-size: 24px;
+}
+
+.contactMediaList span span {
+  font-weight: 500;
+}
+
+.cofaContact {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 380px;
+  gap: 25px;
+}
+
+.cofaContact img {
+  width: 200px;
+}
+
+.linkRedirect {
+  color: var(--primary-color);
+}
+
+.contactInfoItem {
+  display: flex;
+  margin: 50px 0;
+  justify-content: space-between;
+  margin-top: 100px;
+}
+.contactInfoItem .cofaContact {
+  display: flex;
+  flex-direction: column;
+}
+.links {
+  display: flex;
+  gap: 20px;
+}
+.contactMap {
+  width: 400px;
+  height: 150px;
+  border-radius: 10px;
+  background-color: gray;
+}
+.contactListLink {
+  display: flex;
+  justify-content: space-between;
+  margin: 40px 0;
+}
+.contactListLink a {
+  color: rgba(64, 64, 64, 1);
+  font-weight: 500;
+}
+.contactListLink a:hover {
+  color: var(--primary-color);
+  font-weight: 500;
+  text-decoration: underline;
+}
+
+.border-footer {
+  border-top: var(--primary-color) 3px solid !important;
+  height: 3px;
+  width: 100%;
+  background-color: var(--primary-color);
+  margin-bottom: 50px;
+  display: block;
+}
+
+.contact-box {
+  border-top: 3px solid var(--primary-color);
+  box-shadow: 3px 3px 5px 0px rgba(23, 148, 79, 0.25);
+  padding: 12px;
+  border-radius: 5px;
+  max-width: 500px;
+}
+.contact-box-special {
+  border-top: 3px solid rgb(250, 116, 116);
+}
+.contact-box p {
+  font-weight: 300;
+  font-size: 14px;
+}
+
+@media screen and (max-width: 950px) {
+  .contact {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .contact .contactMediaList {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .contact .contactInfoItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 50px;
+  }
+}
+
+@media screen and (max-width: 750px) {
+  .contactListLink {
+    flex-direction: row;
+    flex-wrap: wrap;
     text-align: center;
-    margin-bottom: 50px;
-}
-
-.contactMediaList{
-    display: flex;
-    gap: 20px;
-    justify-content: space-between;
-}
-
-.contactMediaList span{
-    display: flex;
+    row-gap: 30px;
+  }
+  .contactListLink .contact-box {
+    flex-basis: 48%;
+  }
+  .contact-box-special {
+    width: 90% !important;
+  }
+  .contact-box a {
+    font-size: 17px !important;
+  }
+  .contactListLink {
     flex-direction: column;
     align-items: center;
-    gap: 5px;
+  }
+  .contact-box-special {
+    margin: auto;
+  }
+  .contact {
+    padding-bottom: 20px;
+  }
 }
 
-.contactMediaList span svg{
-    font-size: 24px;
-}
-
-.contactMediaList span span{
-    font-weight: 500;
-}
-
-
-.cofaContact{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 380px;
-    gap: 25px;
-}
-
-.cofaContact img{
-    width: 200px;
-}
-
-.socialMediaList{
-    display: flex;
-    justify-content: space-around;
-    width: 100%;
-}
-.socialMediaList svg path:hover{
-    color: var(--primary-color);
-}
-
-.linkRedirect{
-    color: var(--primary-color)
-}
-
-.contactInfoItem{
-    display: flex;
-    margin: 50px 0;
-    justify-content: space-between;
-    margin-top: 100px;
-}
-.contactInfoItem .cofaContact{
-    display: flex;
-    flex-direction: column;
-    
-}
-.links{
-    display: flex;
-    
-    gap: 20px
-}
-.contactMap{
-    width: 400px;
-    height: 150px;
-    border-radius: 10px;
-    background-color: gray;
-}
-.contactListLink{
-    display: flex;
-    justify-content: space-between;
-    margin: 40px 0;
-}
-.contactListLink a{
-    color:rgba(64, 64, 64, 1);
-    font-weight: 500;
-}
-.contactListLink a:hover{
-    color:var(--primary-color);
-    font-weight: 500;
-    text-decoration: underline;
-}
-
-
-.border-footer{
-    border-top: var(--primary-color) 3px solid !important;
-    height: 3px;
-    width: 100%;
-    background-color: var(--primary-color);
-    margin-bottom: 50px;
-    display: block;
-}
-
-.contact-box{
-    border-top:3px solid var(--primary-color);
-    box-shadow: 3px 3px 5px 0px rgba(23, 148, 79, 0.25);
-    padding: 12px;
-    border-radius: 5px;
-    max-width: 500px;
-}
-.contact-box-special{
-    border-top:3px solid rgb(250, 116, 116);
-}
-.contact-box p{
-    font-weight: 300;
+@media screen and (max-width: 550px) {
+  .contactListLink a {
     font-size: 14px;
+  }
+}
+@media screen and (max-width: 500px) {
+  .contactListLink {
+    flex-direction: column;
+    align-items: center;
+  }
+  .contact-box-special {
+    margin: auto;
+  }
+  .contactListLink .contact-box {
+    width: 200px;
+  }
 }
 
-
-@media screen and (max-width: 950px){
-    .contact{
-        display: flex;
-        flex-direction: column;
-    }
-
-    .contact .contactMediaList{
-        display: flex;
-        flex-direction: column;
-    }
-
-    .contact .contactInfoItem{
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 50px;
-    }
-    
-}
-
-@media screen and (max-width: 750px){
-    .contactListLink{
-        flex-direction: row;
-        flex-wrap: wrap;
-        text-align: center;
-        row-gap: 30px
-    }
-    .contactListLink .contact-box{
-        flex-basis: 48%;
-        
-
-    }
-    .contact-box-special{
-        width: 90% !important;
-    }
-    .contact-box a{
-        font-size: 17px !important;
-    }
-    .contactListLink{
-        flex-direction: column;
-        align-items: center;
-
-    }
-    .contact-box-special{
-        margin: auto;
-    }
-    .contact{
-        padding-bottom: 20px;
-    }
-}
-
-
-@media screen and (max-width:550px){
-    .contactListLink a{
-        font-size: 14px;
-    }
-}
-@media screen and (max-width:500px){
-    .contactListLink{
-        flex-direction: column;
-        align-items: center;
-
-    }
-    .contact-box-special{
-        margin: auto;
-    }
-    .contactListLink .contact-box{
-        width: 200px;
-    }
-}
-
-@media screen and (max-width:450px){
-    .contact .contactInfoItem .contactMap{
-        width: 100%;
-    }
-    .contactListLink a{
-        font-size: 16px;
-    }
-    .contactListLink{
-        flex-direction: column;
-        align-items: center;
-        gap: 25px
-    }
-    .contact .contactInfoItem .cofaContact{
-        width: 100%;
-    }
-    .contact .contactInfoItem .cofaContact .links{
-        flex-direction: column;
-        align-items: center;
-    }
+@media screen and (max-width: 450px) {
+  .contact .contactInfoItem .contactMap {
+    width: 100%;
+  }
+  .contactListLink a {
+    font-size: 16px;
+  }
+  .contactListLink {
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+  }
+  .contact .contactInfoItem .cofaContact {
+    width: 100%;
+  }
+  .contact .contactInfoItem .cofaContact .links {
+    flex-direction: column;
+    align-items: center;
+  }
 }

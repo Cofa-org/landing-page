@@ -28,7 +28,9 @@ En este caso específico, encontramos varios puntos mejorables que podrían esta
 - **Sugerencia**:
 
 ```html
-<title>Préstamos Online en el Día | COFA Fintech con 17 Años de Trayectoria | Soluciones Financieras Hoy</title>
+<title>
+  Préstamos Online en el Día | COFA Fintech con 17 Años de Trayectoria | Soluciones Financieras Hoy
+</title>
 ```
 
 ---
@@ -39,7 +41,10 @@ En este caso específico, encontramos varios puntos mejorables que podrían esta
 - **Sugerencia**:
 
 ```html
-<meta name="description" content="Préstamos online rápidos con mínimos requisitos. Con COFA accedé a tu dinero en el día, 100% online y con total seguridad. ¡Solicitá hoy tu préstamo!">
+<meta
+  name="description"
+  content="Préstamos online rápidos con mínimos requisitos. Con COFA accedé a tu dinero en el día, 100% online y con total seguridad. ¡Solicitá hoy tu préstamo!"
+/>
 ```
 
 ---
@@ -64,7 +69,10 @@ En este caso específico, encontramos varios puntos mejorables que podrían esta
 - **Sugerencia**:
 
 ```html
-<img src="persona-prestamo.jpg" alt="Persona feliz recibiendo préstamo online" />
+<img
+  src="persona-prestamo.jpg"
+  alt="Persona feliz recibiendo préstamo online"
+/>
 ```
 
 ---
@@ -75,10 +83,22 @@ En este caso específico, encontramos varios puntos mejorables que podrían esta
 - **Sugerencia**:
 
 ```html
-<meta property="og:title" content="Préstamos Personales Online Rápidos con COFA" />
-<meta property="og:description" content="Accedé a préstamos en el día, 100% online. Soluciones financieras hoy." />
-<meta property="og:image" content="https://cofa.com.ar/og-image.jpg" />
-<meta property="og:url" content="https://cofa.com.ar" />
+<meta
+  property="og:title"
+  content="Préstamos Personales Online Rápidos con COFA"
+/>
+<meta
+  property="og:description"
+  content="Accedé a préstamos en el día, 100% online. Soluciones financieras hoy."
+/>
+<meta
+  property="og:image"
+  content="https://cofa.com.ar/og-image.jpg"
+/>
+<meta
+  property="og:url"
+  content="https://cofa.com.ar"
+/>
 ```
 
 ---
@@ -89,7 +109,10 @@ En este caso específico, encontramos varios puntos mejorables que podrían esta
 - **Sugerencia**:
 
 ```html
-<meta name="robots" content="index, follow" />
+<meta
+  name="robots"
+  content="index, follow"
+/>
 ```
 
 ---
@@ -101,13 +124,13 @@ En este caso específico, encontramos varios puntos mejorables que podrían esta
 
 ```html
 <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  "name": "COFA",
-  "url": "https://cofa.com.ar",
-  "logo": "https://cofa.com.ar/logo.png"
-}
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "COFA",
+    "url": "https://cofa.com.ar",
+    "logo": "https://cofa.com.ar/logo.webp"
+  }
 </script>
 ```
 
@@ -143,20 +166,20 @@ En este caso específico, encontramos varios puntos mejorables que podrían esta
 
 ```html
 <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "¿Cuánto dinero puedo solicitar?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Podés solicitar entre $5.000 y $200.000 dependiendo de tu perfil."
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "¿Cuánto dinero puedo solicitar?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Podés solicitar entre $5.000 y $200.000 dependiendo de tu perfil."
+        }
       }
-    }
-  ]
-}
+    ]
+  }
 </script>
 ```
 
