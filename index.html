@@ -18,7 +18,7 @@
 
     <!-- Meta Pixel Code -->
     <script>
-      !(function (f, b, e, v, n, t, s) {
+      (function (f, b, e, v, n, t, s) {
         if (f.fbq) return;
         n = f.fbq = function () {
           n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments);
@@ -31,12 +31,24 @@
         t = b.createElement(e);
         t.async = !0;
         t.src = v;
+
+        // Manejo de error si está bloqueado
+        t.onerror = function () {
+          console.warn("Facebook Pixel bloqueado o no disponible.");
+        };
+
         s = b.getElementsByTagName(e)[0];
         s.parentNode.insertBefore(t, s);
       })(window, document, "script", "https://connect.facebook.net/en_US/fbevents.js");
-      fbq("init", "1085977612494127");
-      fbq("track", "PageView");
+
+      try {
+        fbq("init", "1085977612494127");
+        fbq("track", "PageView");
+      } catch (err) {
+        console.warn("fbq no disponible:", err);
+      }
     </script>
+
     <!-- End Meta Pixel Code -->
 
     <meta

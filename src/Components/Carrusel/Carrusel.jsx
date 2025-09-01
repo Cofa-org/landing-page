@@ -18,7 +18,7 @@ const Carrusel = ({ images }) => {
     if (videoRef.current) {
       videoRef.current.currentTime = 0;
       videoRef.current.play().catch((err) => {
-        console.error("Error playing video:", err);
+        console.warn("Error playing video:", err);
       });
     }
   }, [currentIndex]);
