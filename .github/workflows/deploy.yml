@@ -19,17 +19,18 @@ jobs:
     - name: Build React app
       run: npm run build
 
+    - name: Prepare deploy folder
+      run: |
+        mkdir deploy
+        cp -r dist/* deploy/
+
     - name: Deploy to Hostinger via FTP
       uses: SamKirkland/FTP-Deploy-Action@v4.3.4
       with:
         server: ${{ secrets.FTP_HOST }}
         username: ${{ secrets.FTP_USER }}
         password: ${{ secrets.FTP_PASS }}
-        local-dir: ./dist
+        local-dir: ./deploy/
         server-dir: ./
         exclude: |
-          dist/
           **/.git*
-
-        
-
