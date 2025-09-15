@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Footer, Header } from "../../Components/index.js";
 import { Contact, IaPoliciesHeader, IaPoliciesMain } from "../../Sections/index.js";
 
