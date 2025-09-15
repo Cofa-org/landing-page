@@ -11,10 +11,11 @@ import {
   RegretOrDischargeScreen,
   SuggestionsScreen,
   TermsPointsScreen,
-  TermsScreen
+  TermsScreen,
 } from "./screens";
 import { FormWorkWithUs } from "./Sections";
 import { BlogDetailScreen } from "./screens/blogDetailScreen/BlogDetailScreen.jsx";
+import IaPoliciesScreen from "./screens/IaPoliciesScreen.jsx/IaPoliciesScreen.jsx";
 
 /* import SuggestionsScreen from './screens/SuggestionsScreen/SuggestionsScreen' */
 
@@ -39,6 +40,10 @@ const RouterScreens = () => {
       <Route
         path='/politicas-de-privacidad'
         element={<PrivacyPoliciesScreen />}
+      />
+      <Route
+        path='/politicas-de-uso-ia'
+        element={<IaPoliciesScreen />}
       />
       {/* Politicas de Privacidad */}
       {/* <Route path='/puntos-cofa' element={<PointsScreen/>}/>Puntos COFA */}

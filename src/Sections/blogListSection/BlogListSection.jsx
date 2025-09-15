@@ -74,7 +74,7 @@ export const BlogListSection = () => {
       </div>
     );
   }
-
+  posts[0].featured_image = [];
   return (
     <div className='blog-list-page'>
       <div className='blog-list-container'>
@@ -94,16 +94,25 @@ export const BlogListSection = () => {
                 className='blog-card'
                 onClick={() => handleCardClick(post?.slug)}
               >
-                <img
-                  src={
-                    (Array.isArray(post.featured_image) && post.featured_image.length > 0
-                      ? post.featured_image[0]
-                      : post.featured_image) ||
-                    "https://images.pexels.com/photos/3483098/pexels-photo-3483098.jpeg?auto=compress&cs=tinysrgb&w=800"
-                  }
-                  alt={post?.title}
-                  className='blog-card-image'
-                />
+                {Array.isArray(post.featured_image) && post.featured_image.length > 0 ? (
+                  <img
+                    src={
+                      (Array.isArray(post.featured_image) && post.featured_image.length > 0
+                        ? post.featured_image[0]
+                        : post.featured_image) ||
+                      "https://images.pexels.com/photos/3483098/pexels-photo-3483098.jpeg?auto=compress&cs=tinysrgb&w=800"
+                    }
+                    alt={post?.title}
+                    className='blog-card-image'
+                  />
+                ) : (
+                  <img
+                    style={{ objectFit: "contain" }}
+                    src='../../../img/logo_cofa_tips.svg'
+                    alt={post?.title}
+                    className='blog-card-image'
+                  />
+                )}
 
                 <div className='blog-card-content'>
                   <span className='blog-card-category'>{post?.category}</span>

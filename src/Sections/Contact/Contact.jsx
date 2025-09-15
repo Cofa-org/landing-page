@@ -57,13 +57,19 @@ const Contact = () => {
               className='linkRedirect'
               to={"/politicas-de-privacidad/#top"}
             >
-              Politicas de privacidad
+              Políticas de privacidad
             </Link>
             <Link
               className='linkRedirect'
               to={"/terminos-y-condiciones/#top"}
             >
               Términos y Condiciones
+            </Link>
+            <Link
+              className='linkRedirect'
+              to={"/politicas-de-uso-ia/#top"}
+            >
+              Políticas de uso IA
             </Link>
           </div>
         </div>

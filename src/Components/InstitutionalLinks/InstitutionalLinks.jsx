@@ -15,6 +15,12 @@ function InstitutionalLinks() {
       >
         Términos y Condiciones
       </Link>
+      <Link
+        className='linkRedirect'
+        to={"/politicas-de-uso-ia/#top"}
+      >
+        Políticas de uso de IA
+      </Link>
     </div>
   );
 }

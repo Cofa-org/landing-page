@@ -14,7 +14,7 @@ import QuejasScreen from "./QuejasScreen/QuejasScreen";
 import TermsV2 from "./TermsV2/TermsV2";
 import ErrorScreen from "./ErrorScreen/ErrorScreen";
 import CofaTipsScreen from "./cofaTipsScreen/CofaTipsScreen.jsx";
-
+import IaPoliciesScreen from "./IaPoliciesScreen.jsx/IaPoliciesScreen.jsx";
 export {
   HomeScreen,
   TermsScreen,
@@ -31,5 +31,6 @@ export {
   QuejasScreen,
   TermsV2,
   ErrorScreen,
-  CofaTipsScreen
+  CofaTipsScreen,
+  IaPoliciesScreen,
 };

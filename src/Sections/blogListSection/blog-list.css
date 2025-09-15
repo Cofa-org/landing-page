@@ -35,6 +35,8 @@
 .blog-card-image {
   width: 100%;
   height: 220px;
+  min-height: 220px;
+  max-height: 220px;
   object-fit: cover;
   transition: transform 0.3s ease;
 }
@@ -201,6 +203,8 @@
 
   .blog-card-image {
     height: 180px;
+    min-height: 180px;
+    max-height: 180px;
   }
 
   .blog-card-content {
