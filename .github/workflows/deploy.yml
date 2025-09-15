@@ -8,29 +8,38 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
+    
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-
-    - name: Install dependencies
-      run: npm install
-
-    - name: Build React app
-      run: npm run build
-
-    - name: Prepare deploy folder
-      run: |
-        mkdir deploy
-        cp -r dist/* deploy/
-
-    - name: Deploy to Hostinger via FTP
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
-      with:
-        server: ${{ secrets.FTP_HOST }}
-        username: ${{ secrets.FTP_USER }}
-        password: ${{ secrets.FTP_PASS }}
-        local-dir: ./deploy/
-        server-dir: ./
-        exclude: |
-          **/.git*
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build React app
+        run: npm run build
+        
+      - name: Deploy to Hostinger via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PASS }}
+          local-dir: ./dist/
+          server-dir: /public_html/
+          port: 21
+          protocol: ftp
+          timeout: 600000
+          exclude: |
+            **/.git*
+            **/.gitignore
+            **/node_modules/**
+            **/.env
+            **/README.md
+            **/*.map
