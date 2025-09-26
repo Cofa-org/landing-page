@@ -135,9 +135,12 @@ export const BlogDetailSection = ({ slug }) => {
             )
           )}
 
-          <div
+          <textarea
             className='blog-detail-content'
-            dangerouslySetInnerHTML={{ __html: post.content }}
+            value={post.content}
+            disabled={true}
+            id="blog-detail-content"
+            name="blog-detail-content"
           />
 
           {post.tags && post.tags.length > 0 && (

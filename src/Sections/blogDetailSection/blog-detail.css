@@ -53,7 +53,7 @@
   color: var(--color-text-primary);
   line-height: 1.2;
   margin-bottom: var(--spacing-lg);
-  font-family: 'Roboto', Helvetica;
+  font-family: "Roboto", Helvetica;
 }
 
 .blog-detail-meta {
@@ -87,9 +87,18 @@
 .blog-detail-content {
   font-size: 18px;
   line-height: 1.8;
+  min-height: 100px;
+  height: auto;
+  resize: none;
+  overflow: hidden;
+  field-sizing: content; /* Nueva propiedad CSS, soporte limitado */
   color: var(--color-text-primary);
 }
 
+.blog-detail-content:disabled {
+  border: none;
+  background: var(--color-background);
+}
 .blog-detail-content p {
   margin-bottom: var(--spacing-lg);
 }
@@ -135,7 +144,7 @@
   background-color: #f4f4f4;
   padding: 2px 6px;
   border-radius: 4px;
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
   font-size: 16px;
 }
 
@@ -221,29 +230,29 @@
   .blog-detail-container {
     padding: var(--spacing-xl) var(--spacing-md);
   }
-  
+
   .blog-detail-title {
     font-size: 32px;
   }
-  
+
   .blog-detail-meta {
     flex-direction: column;
     align-items: flex-start;
     gap: var(--spacing-sm);
   }
-  
+
   .blog-detail-featured-image {
     height: 250px;
   }
-  
+
   .blog-detail-content {
     font-size: 16px;
   }
-  
+
   .blog-detail-content h2 {
     font-size: 24px;
   }
-  
+
   .blog-detail-content h3 {
     font-size: 20px;
   }
@@ -253,7 +262,7 @@
   .blog-detail-title {
     font-size: 28px;
   }
-  
+
   .blog-detail-featured-image {
     height: 200px;
   }
