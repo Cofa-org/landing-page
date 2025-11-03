@@ -90,7 +90,7 @@ export const BlogDetailSection = ({ slug }) => {
       </div>
     );
   }
-
+  
   return (
     <div className='blog-detail-section'>
       <div className='blog-detail-container'>
@@ -122,10 +122,11 @@ export const BlogDetailSection = ({ slug }) => {
               showControls={true}
             />
           ) : (
-            post.featured_image && (
+            post.featured_image &&
+            post.featured_image.src && (
               <img
                 src={
-                  Array.isArray(post.featured_image)
+                  Array.isArray(post.featured_image) 
                     ? post.featured_image[0].src
                     : post.featured_image.src
                 }
@@ -139,8 +140,8 @@ export const BlogDetailSection = ({ slug }) => {
             className='blog-detail-content'
             value={post.content}
             disabled={true}
-            id="blog-detail-content"
-            name="blog-detail-content"
+            id='blog-detail-content'
+            name='blog-detail-content'
           />
 
           {post.tags && post.tags.length > 0 && (
