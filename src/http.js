@@ -14,6 +14,7 @@ export async function HttpApi(url, body) {
       headers: {
         "x-api-key": VITE_COFA_AUTH_API_KEY,
         Authorization: `Bearer ${cofaAuthToken}`,
+        "Content-Type": "application/json",
       },
       method: "POST",
       body: body,
