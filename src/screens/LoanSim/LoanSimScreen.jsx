@@ -10,6 +10,7 @@ const LoanSimScreen = () => {
     simulationData,
     loading,
     error,
+    cuit,
     handleAmountChange,
     handleInstallmentChange,
   } = useLoanSimulator();
@@ -28,10 +29,27 @@ const LoanSimScreen = () => {
   const cfto = simulationData?.tasa_operacion || 0;
   const tna = (cfta * 0.79).toFixed(2); // CFTA - 21%
 
+  if (error && !simulationData) {
+    return (
+      <div className={styles.homeCalculator_calculatorBox}>
+        <div className={styles.calculatorContainer}>
+          <h2 className={styles.title}>Simulador de Préstamo</h2>
+          <div className={styles.errorContainer}>
+            <p className={styles.errorMsg}>{error}</p>
+            <p className={styles.errorSubtext}>
+              Por favor, utilizá el enlace que recibiste para acceder al simulador.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.homeCalculator_calculatorBox}>
       <div className={`${styles.calculatorContainer} ${loading ? styles.loadingOverlay : ""}`}>
         <h2 className={styles.title}>Simulá tu préstamo</h2>
+        {cuit && <p className={styles.cuitDisplay}>CUIT: {cuit}</p>}
 
         {/* Amount Slider */}
         <div className={styles.inputGroup}>
@@ -81,17 +99,8 @@ const LoanSimScreen = () => {
               {formatCurrency(simulationData?.cuota)}
             </span>
           </div>
-
-          {/* <div className={styles.resultItem}>
-            <span className={styles.resultLabel}>Capital máximo a ofrecer:</span> */}
-            {/* <span className={styles.resultValue}>
-              {formatCurrency(simulationData?.capital_maximo_a_ofrecer)}
-            </span> */}
-          {/* </div> */}
         </div>
 
-
-        {error && <p className={styles.errorMsg}>{error}</p>}
         {loading && <div className={styles.spinner}>Recalculando...</div>}
 
         <button

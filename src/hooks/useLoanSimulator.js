@@ -1,23 +1,48 @@
 import { useState, useEffect, useCallback } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useDebounce } from "./useDebounce";
 import CalculadoraService from "../services/calculadoraService";
+import { getDecodedToken } from "../lib/token";
 
-export const useLoanSimulator = (initialScoringId = "33655") => {
+export const useLoanSimulator = () => {
+  const [searchParams] = useSearchParams();
   const [amount, setAmount] = useState(0);
   const [installment, setInstallment] = useState(null);
   const [simulationData, setSimulationData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [scoringData, setScoringData] = useState({ scoringId: null, cuit: null });
 
   const debouncedAmount = useDebounce(amount, 500);
 
+  // Initialize scoring data from token
+  useEffect(() => {
+    const token = searchParams.get("token");
+    if (token) {
+      const decoded = getDecodedToken(token);
+
+      if (decoded && decoded.scoringId) {
+        setScoringData({
+          scoringId: String(decoded.scoringId),
+          cuit: decoded.cuit || null,
+        });
+      } else {
+        setError("El enlace de acceso es inválido o ha expirado.");
+      }
+    } else {
+      setError("No se ha proporcionado un token de acceso válido.");
+    }
+  }, [searchParams]);
+
   const fetchSimulation = useCallback(
     async (currentAmount, currentInstallment, isInitial = false) => {
+      if (!scoringData.scoringId) return;
+
       setLoading(true);
       setError(null);
       try {
         const params = {
-          scoringId: initialScoringId,
+          scoringId: scoringData.scoringId,
           plazoSeleccionado: currentInstallment,
         };
 
@@ -46,20 +71,22 @@ export const useLoanSimulator = (initialScoringId = "33655") => {
         setLoading(false);
       }
     },
-    [initialScoringId]
+    [scoringData.scoringId]
   );
 
-  // Initial load
+  // Initial load when scoringId is ready
   useEffect(() => {
-    fetchSimulation(0, null, true);
-  }, [fetchSimulation]);
+    if (scoringData.scoringId) {
+      fetchSimulation(0, null, true);
+    }
+  }, [scoringData.scoringId, fetchSimulation]);
 
   // Update on amount or installment change (debounced for amount)
   useEffect(() => {
-    if (simulationData) {
+    if (simulationData && scoringData.scoringId) {
       fetchSimulation(debouncedAmount, installment);
     }
-  }, [debouncedAmount, installment, fetchSimulation, simulationData ? true : false]);
+  }, [debouncedAmount, installment, fetchSimulation, !!simulationData]);
 
   const handleAmountChange = (newAmount) => {
     setAmount(newAmount);
@@ -75,6 +102,7 @@ export const useLoanSimulator = (initialScoringId = "33655") => {
     simulationData,
     loading,
     error,
+    cuit: scoringData.cuit,
     handleAmountChange,
     handleInstallmentChange,
   };

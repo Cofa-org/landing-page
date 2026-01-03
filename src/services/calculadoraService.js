@@ -6,8 +6,7 @@ export default class CalculadoraService {
     try {
       //   const baseUrl = VITE_COFA_AUTH_URL || VITE_URL_LOCAL;
       //   const url = `${baseUrl}/api/calculadora/calcular`;
-        const scoringId = "34505";
-    
+
       const body = JSON.stringify({
         scoringId,
         plazoSeleccionado,
