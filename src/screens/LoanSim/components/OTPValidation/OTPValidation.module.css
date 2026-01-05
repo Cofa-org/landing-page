@@ -1,0 +1,35 @@
+.otpContainer {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.digitInput {
+  width: 45px;
+  height: 55px;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  border: 2px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  background-color: var(--color-background);
+  color: var(--text-color);
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.digitInput:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 4px var(--primary-color-10);
+  background-color: #fff;
+  transform: translateY(-2px);
+}
+
+.errorText {
+  color: #dc3545;
+  font-size: 0.85rem;
+  text-align: center;
+  margin-top: -8px;
+  margin-bottom: 16px;
+}

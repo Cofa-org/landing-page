@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
-import { useDebounce } from "./useDebounce";
-import CalculadoraService from "../services/calculadoraService";
-import { getDecodedToken } from "../lib/token";
+import { useDebounce } from "../../../hooks/useDebounce";
+import CalculadoraService from "../../../services/calculadoraService";
+import { getDecodedToken } from "../../../lib/token";
 
 export const useLoanSimulator = () => {
   const [searchParams] = useSearchParams();
@@ -10,8 +10,12 @@ export const useLoanSimulator = () => {
   const [installment, setInstallment] = useState(null);
   const [simulationData, setSimulationData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [validating, setValidating] = useState(false);
   const [error, setError] = useState(null);
   const [scoringData, setScoringData] = useState({ scoringId: null, cuit: null });
+  const [step, setStep] = useState("simulacion");
+  const [email, setEmail] = useState("");
+  const [cbu, setCbu] = useState("");
 
   const debouncedAmount = useDebounce(amount, 500);
 
@@ -96,14 +100,84 @@ export const useLoanSimulator = () => {
     setInstallment(newInstallment);
   };
 
+  const handleNextStep = () => {
+    if (step === "simulacion") setStep("email");
+    else if (step === "email") setStep("otp");
+    else if (step === "otp") setStep("cbu");
+    else if (step === "cbu") setStep("success");
+  };
+
+  const solicitarOTP = async (emailValue) => {
+    setValidating(true);
+    setError(null);
+    try {
+      const response = await CalculadoraService.solicitarOTP(emailValue);
+      console.log("response", response);
+      if (response.success || response.data) {
+        setEmail(emailValue);
+        setStep("otp");
+      } else {
+        setError(response.mensaje || "Error al validar el email");
+      }
+    } catch (err) {
+      setError(err.message || "Error de conexión al validar email");
+    } finally {
+      setValidating(false);
+    }
+  };
+
+  const verificarOTP = async (code) => {
+    setValidating(true);
+    setError(null);
+    try {
+      const response = await CalculadoraService.verificarOTP(code, email);
+      if (response.success || response.data) {
+        setStep("cbu");
+      } else {
+        setError(response.mensaje || "Código inválido");
+      }
+    } catch (err) {
+      setError(err.message || "Error al verificar código");
+    } finally {
+      setValidating(false);
+    }
+  };
+
+  const validateCBU = async (cbuValue) => {
+    setValidating(true);
+    setError(null);
+    try {
+      const response = await CalculadoraService.validarCBU(cbuValue, scoringData.cuit);
+      if (response.success || response.data) {
+        setCbu(cbuValue);
+        setStep("success");
+      } else {
+        setError(response.mensaje || "Error al validar el CBU");
+      }
+    } catch (err) {
+      setError(err.message || "Error de conexión al validar CBU");
+    } finally {
+      setValidating(false);
+    }
+  };
+
   return {
     amount,
     installment,
     simulationData,
     loading,
+    validating,
     error,
     cuit: scoringData.cuit,
+    step,
+    email,
+    cbu,
     handleAmountChange,
     handleInstallmentChange,
+    handleNextStep,
+    solicitarOTP,
+    verificarOTP,
+    validateCBU,
+    setStep,
   };
 };

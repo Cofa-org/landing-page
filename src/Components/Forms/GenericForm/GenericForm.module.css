@@ -1,0 +1,33 @@
+.form {
+  width: 100%;
+  max-width: 450px;
+  margin: 0 auto;
+  padding: 24px;
+  background: var(--color-background);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-color);
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.description {
+  font-size: 0.95rem;
+  color: var(--text-color);
+  opacity: 0.8;
+  line-height: 1.5;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.footer {
+  margin-top: 12px;
+}

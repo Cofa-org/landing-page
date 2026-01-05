@@ -35,4 +35,95 @@ export default class CalculadoraService {
       throw error;
     }
   }
+
+  static async solicitarOTP(email) {
+    try {
+      const body = JSON.stringify({
+        email,
+      });
+
+      //   const response = await HttpApi(url, body)
+      const local = "http://localhost:1000/api/calculadora/solicitar-otp";
+      const response = await fetch(local, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": "4b2129b4-c4f6-4551-8d1c-934af49f5309",
+        },
+        body,
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Error al calcular planes");
+      }
+      const jsonResponse = await response.json();
+      console.log("response", jsonResponse);
+      return jsonResponse;
+    } catch (error) {
+      console.error("VALIDAR_EMAIL_ERROR:", error);
+      throw error;
+    }
+  }
+
+  static async validarCBU(cbu, cuit) {
+    cuit = "20284623569";
+    try {
+      const body = JSON.stringify({
+        cbu,
+        cuit,
+      });
+
+      //   const response = await HttpApi(url, body)
+      const local = "http://localhost:1000/api/calculadora/validar-cbu";
+      const response = await fetch(local, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": "4b2129b4-c4f6-4551-8d1c-934af49f5309",
+        },
+        body,
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Error al calcular planes");
+      }
+      const jsonResponse = await response.json();
+      console.log("response", jsonResponse);
+      return jsonResponse;
+    } catch (error) {
+      console.error("VALIDAR_CBU_ERROR:", error);
+      throw error;
+    }
+  }
+
+  static async verificarOTP(code, email) {
+    try {
+      const body = JSON.stringify({
+        code,
+        email,
+      });
+
+      const local = "http://localhost:1000/api/calculadora/verificar-otp";
+      const response = await fetch(local, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": "4b2129b4-c4f6-4551-8d1c-934af49f5309",
+        },
+        body,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Error al verificar código");
+      }
+
+      const jsonResponse = await response.json();
+      console.log("response", jsonResponse);
+      return jsonResponse;
+    } catch (error) {
+      console.error("VERIFICAR_OTP_ERROR:", error);
+      throw error;
+    }
+  }
 }
