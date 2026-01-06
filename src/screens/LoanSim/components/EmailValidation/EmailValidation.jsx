@@ -4,7 +4,7 @@ import GenericForm from "../../../../Components/Forms/GenericForm/GenericForm";
 import GenericInput from "../../../../Components/Forms/GenericInput/GenericInput";
 import GenericButton from "../../../../Components/Forms/GenericButton/GenericButton";
 
-const EmailValidation = ({ onValidate, loading, error }) => {
+const EmailValidation = ({ onValidate, onBack, loading, error }) => {
   const [email, setEmail] = useState("");
 
   const handleSubmit = (e) => {
@@ -19,6 +19,7 @@ const EmailValidation = ({ onValidate, loading, error }) => {
       title='Validá tu Email'
       description='Necesitamos validar tu correo electrónico para continuar con la solicitud.'
       onSubmit={handleSubmit}
+      onBack={onBack}
     >
       <GenericInput
         label='Correo electrónico'
@@ -43,6 +44,7 @@ const EmailValidation = ({ onValidate, loading, error }) => {
 
 EmailValidation.propTypes = {
   onValidate: PropTypes.func.isRequired,
+  onBack: PropTypes.func,
   loading: PropTypes.bool,
   error: PropTypes.string,
 };

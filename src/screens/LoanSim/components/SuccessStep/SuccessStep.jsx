@@ -1,6 +1,7 @@
 import React from "react";
 import styles from "./SuccessStep.module.css";
 import { MdCheckCircleOutline } from "react-icons/md";
+import { UI_CONFIG } from "../../../../constants/loanSim.constants";
 
 const SuccessStep = () => {
   return (
@@ -13,10 +14,10 @@ const SuccessStep = () => {
       </p>
       <button
         className='primary-btn'
-        onClick={() => (window.location.href = "/")}
+        onClick={() => (window.location.href = UI_CONFIG.HOME_URL)}
         style={{ marginTop: "20px" }}
       >
-        Volver al inicio
+        Ir a la página principal
       </button>
     </div>
   );

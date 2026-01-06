@@ -8,6 +8,7 @@ import EmailValidation from "./components/EmailValidation/EmailValidation";
 import CBUValidation from "./components/CBUValidation/CBUValidation";
 import OTPValidation from "./components/OTPValidation/OTPValidation";
 import SuccessStep from "./components/SuccessStep/SuccessStep";
+import { LOAN_SIM_STEPS } from "../../constants/loanSim.constants";
 
 const LoanSimScreen = () => {
   const {
@@ -26,6 +27,7 @@ const LoanSimScreen = () => {
     verificarOTP,
     validateCBU,
     handleNextStep,
+    handlePrevStep,
   } = useLoanSimulator();
 
   const maxOffer = simulationData?.capital_maximo_a_ofrecer
@@ -35,7 +37,7 @@ const LoanSimScreen = () => {
 
   const renderStep = () => {
     switch (step) {
-      case "simulacion":
+      case LOAN_SIM_STEPS.SIMULACION:
         return (
           <SimulationStep
             amount={amount}
@@ -51,26 +53,29 @@ const LoanSimScreen = () => {
           />
         );
 
-      case "email":
+      case LOAN_SIM_STEPS.EMAIL:
         return (
           <EmailValidation
             onValidate={solicitarOTP}
+            onBack={handlePrevStep}
             loading={validating}
             error={error}
           />
         );
 
-      case "otp":
+      case LOAN_SIM_STEPS.OTP:
         return (
           <OTPValidation
             onValidate={verificarOTP}
+            onResend={solicitarOTP}
+            onBack={handlePrevStep}
             loading={validating}
             error={error}
             email={email}
           />
         );
 
-      case "cbu":
+      case LOAN_SIM_STEPS.CBU:
         return (
           <CBUValidation
             onValidate={validateCBU}
@@ -79,7 +84,7 @@ const LoanSimScreen = () => {
           />
         );
 
-      case "success":
+      case LOAN_SIM_STEPS.SUCCESS:
         return <SuccessStep />;
 
       default:
@@ -87,7 +92,7 @@ const LoanSimScreen = () => {
     }
   };
 
-  if (error && !simulationData && step === "simulacion") {
+  if (error && !simulationData && step === LOAN_SIM_STEPS.SIMULACION) {
     return (
       <div className={styles.homeCalculator_calculatorBox}>
         <div className={styles.calculatorContainer}>

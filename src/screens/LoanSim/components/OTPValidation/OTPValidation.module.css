@@ -33,3 +33,42 @@
   margin-top: -8px;
   margin-bottom: 16px;
 }
+
+.resendContainer {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  min-height: 24px;
+}
+
+.resendButton {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  font-weight: 500;
+  font-size: 0.95rem;
+  cursor: pointer;
+  padding: 5px 10px;
+  transition: opacity 0.2s;
+}
+
+.resendButton:hover {
+  text-decoration: underline;
+  opacity: 0.8;
+}
+
+.resendButton:disabled {
+  color: var(--text-color-secondary, #999);
+  cursor: not-allowed;
+  text-decoration: none;
+}
+
+.resendText {
+  color: var(--text-color-secondary, #666);
+  font-size: 0.9rem;
+}
+
+.timer {
+  font-weight: 600;
+  color: var(--text-color);
+}

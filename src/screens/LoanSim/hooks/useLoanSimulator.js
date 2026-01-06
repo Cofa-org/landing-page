@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { useDebounce } from "../../../hooks/useDebounce";
 import CalculadoraService from "../../../services/calculadoraService";
 import { getDecodedToken } from "../../../lib/token";
+import { LOAN_SIM_STEPS } from "../../../constants/loanSim.constants";
 
 export const useLoanSimulator = () => {
   const [searchParams] = useSearchParams();
@@ -13,7 +14,7 @@ export const useLoanSimulator = () => {
   const [validating, setValidating] = useState(false);
   const [error, setError] = useState(null);
   const [scoringData, setScoringData] = useState({ scoringId: null, cuit: null });
-  const [step, setStep] = useState("simulacion");
+  const [step, setStep] = useState(LOAN_SIM_STEPS.SIMULACION);
   const [email, setEmail] = useState("");
   const [cbu, setCbu] = useState("");
 
@@ -58,12 +59,35 @@ export const useLoanSimulator = () => {
         const response = await CalculadoraService.calcularPlanes(params);
 
         if (response.success) {
-          setSimulationData(response.data.data);
+          const newData = response.data.data;
+
+          // Map backend states to frontend steps for persistent navigation
+          const stateToStepMap = {
+            SIMULACION: LOAN_SIM_STEPS.EMAIL, // Plan already saved, move to email entry
+            EMAIL_VALIDATION: LOAN_SIM_STEPS.EMAIL,
+            OTP_VALIDATION: LOAN_SIM_STEPS.OTP,
+            CBU_VALIDATION: LOAN_SIM_STEPS.CBU,
+            COMPLETADO: LOAN_SIM_STEPS.SUCCESS,
+          };
+
+          const existingState = response.data.existingSimulation?.estado;
+          if (existingState && stateToStepMap[existingState]) {
+            setStep(stateToStepMap[existingState]);
+
+            // If already completed or reached a post-validation step, we might want to stop further loading
+            if (existingState === "COMPLETADO") {
+              setLoading(false);
+              return;
+            }
+          }
+
+          setSimulationData(newData);
+          localStorage.setItem("simulation_draft", JSON.stringify(response));
 
           // Set initial values from response if they are not set
           if (isInitial) {
-            setAmount(Number(response.data.data.capital_maximo_a_ofrecer));
-            setInstallment(response.data.data.plazo_utilizado);
+            setAmount(Number(newData.capital_maximo_a_ofrecer));
+            setInstallment(newData.plazo_utilizado);
           }
         } else {
           setError(response.mensaje || "Error en la simulación");
@@ -100,24 +124,55 @@ export const useLoanSimulator = () => {
     setInstallment(newInstallment);
   };
 
-  const handleNextStep = () => {
-    if (step === "simulacion") setStep("email");
-    else if (step === "email") setStep("otp");
-    else if (step === "otp") setStep("cbu");
-    else if (step === "cbu") setStep("success");
+  const handleNextStep = async () => {
+    if (step === LOAN_SIM_STEPS.SIMULACION) {
+      setLoading(true);
+      try {
+        const draftJSON = localStorage.getItem("simulation_draft");
+        const draft = draftJSON ? JSON.parse(draftJSON) : null;
+        const payload = {
+          scoringId: scoringData.scoringId,
+          plazoSeleccionado: installment,
+          capitalSeleccionado: amount,
+          plan: draft,
+        };
+        const response = await CalculadoraService.guardarPlan(payload);
+        if (response.success || response.data) {
+          setStep(LOAN_SIM_STEPS.EMAIL);
+        } else {
+          setError(response.mensaje || "Error al guardar la simulación");
+        }
+      } catch (err) {
+        setError(err.message || "Error al guardar la simulación");
+        console.error("SAVE_PLAN_ERROR:", err);
+      } finally {
+        setLoading(false);
+      }
+    } else if (step === LOAN_SIM_STEPS.EMAIL) setStep(LOAN_SIM_STEPS.OTP);
+    else if (step === LOAN_SIM_STEPS.OTP) setStep(LOAN_SIM_STEPS.CBU);
+    else if (step === LOAN_SIM_STEPS.CBU) setStep(LOAN_SIM_STEPS.SUCCESS);
   };
 
-  const solicitarOTP = async (emailValue) => {
+  const handlePrevStep = () => {
+    if (step === LOAN_SIM_STEPS.EMAIL) setStep(LOAN_SIM_STEPS.SIMULACION);
+    else if (step === LOAN_SIM_STEPS.OTP) setStep(LOAN_SIM_STEPS.EMAIL);
+  };
+
+  const solicitarOTP = async (emailValue, isResend = false) => {
     setValidating(true);
     setError(null);
     try {
-      const response = await CalculadoraService.solicitarOTP(emailValue);
-      console.log("response", response);
+      const params = {
+        scoringId: scoringData.scoringId,
+        email: emailValue,
+        isResend,
+      };
+      const response = await CalculadoraService.solicitarOTP(params);
       if (response.success || response.data) {
         setEmail(emailValue);
-        setStep("otp");
+        setStep(LOAN_SIM_STEPS.OTP);
       } else {
-        setError(response.mensaje || "Error al validar el email");
+        setError(response.message || "Error al validar el email");
       }
     } catch (err) {
       setError(err.message || "Error de conexión al validar email");
@@ -130,9 +185,14 @@ export const useLoanSimulator = () => {
     setValidating(true);
     setError(null);
     try {
-      const response = await CalculadoraService.verificarOTP(code, email);
+      const params = {
+        code,
+        email,
+        scoringId: scoringData.scoringId,
+      };
+      const response = await CalculadoraService.verificarOTP(params);
       if (response.success || response.data) {
-        setStep("cbu");
+        setStep(LOAN_SIM_STEPS.CBU);
       } else {
         setError(response.mensaje || "Código inválido");
       }
@@ -150,7 +210,13 @@ export const useLoanSimulator = () => {
       const response = await CalculadoraService.validarCBU(cbuValue, scoringData.cuit);
       if (response.success || response.data) {
         setCbu(cbuValue);
-        setStep("success");
+        // Generar id preaprobado después de validar CBU
+        await CalculadoraService.obtenerIdPreaprobado({
+          scoringId: scoringData.scoringId,
+          cantidad_cuotas: installment,
+          monto: amount,
+        });
+        setStep(LOAN_SIM_STEPS.SUCCESS);
       } else {
         setError(response.mensaje || "Error al validar el CBU");
       }
@@ -175,6 +241,7 @@ export const useLoanSimulator = () => {
     handleAmountChange,
     handleInstallmentChange,
     handleNextStep,
+    handlePrevStep,
     solicitarOTP,
     verificarOTP,
     validateCBU,
