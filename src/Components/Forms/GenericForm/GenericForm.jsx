@@ -7,7 +7,7 @@ import styles from "./GenericForm.module.css";
  * GenericForm component.
  * Acts as a container for forms, providing consistent layout and styling.
  */
-const GenericForm = ({ title, description, children, onSubmit, onBack, className = "" }) => {
+const GenericForm = ({ title, description, children, onSubmit, onBack, className = "", style = {} }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (onSubmit) onSubmit(e);
@@ -16,6 +16,7 @@ const GenericForm = ({ title, description, children, onSubmit, onBack, className
   return (
     <form
       className={`${styles.form} ${className}`}
+      style={style}
       onSubmit={handleSubmit}
     >
       {onBack && (
@@ -43,6 +44,7 @@ GenericForm.propTypes = {
   onSubmit: PropTypes.func,
   onBack: PropTypes.func,
   className: PropTypes.string,
+  customStyle: PropTypes.object,
 };
 
 export default GenericForm;

@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useDebounce } from "../../../hooks/useDebounce";
-import CalculadoraService from "../../../services/calculadoraService";
-import { getDecodedToken } from "../../../lib/token";
+import SimuladorService from "../../../services/simuladorService";
+import { getDecodedToken, isTokenExpired } from "../../../lib/token";
 import { LOAN_SIM_STEPS } from "../../../constants/loanSim.constants";
 
 export const useLoanSimulator = () => {
@@ -22,21 +22,34 @@ export const useLoanSimulator = () => {
 
   // Initialize scoring data from token
   useEffect(() => {
-    const token = searchParams.get("token");
-    if (token) {
-      const decoded = getDecodedToken(token);
-
-      if (decoded && decoded.scoringId) {
-        setScoringData({
-          scoringId: String(decoded.scoringId),
-          cuit: decoded.cuit || null,
-        });
-      } else {
-        setError("El enlace de acceso es inválido o ha expirado.");
+    const initVerification = async () => {
+      const token = searchParams.get("token");
+      if (!token) {
+        setError("No se ha proporcionado un token de acceso válido.");
+        return;
       }
-    } else {
-      setError("No se ha proporcionado un token de acceso válido.");
-    }
+
+      setLoading(true);
+      try {
+        const response = await SimuladorService.verificarAcceso(token);
+      
+        if (response.success && response.data) {
+          setScoringData({
+            scoringId: String(response.data.scoringId),
+            cuit: response.data.cuit || null,
+          });
+        } else {
+          setError(response.mensaje || "El enlace de acceso es inválido o ha expirado.");
+        }
+      } catch (err) {
+        setError(err.message || "Error al verificar el acceso");
+        console.error("VERIFY_TOKEN_ERROR:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initVerification();
   }, [searchParams]);
 
   const fetchSimulation = useCallback(
@@ -56,7 +69,7 @@ export const useLoanSimulator = () => {
           params.capitalSeleccionado = currentAmount;
         }
 
-        const response = await CalculadoraService.calcularPlanes(params);
+        const response = await SimuladorService.calcularPlanes(params);
 
         if (response.success) {
           const newData = response.data.data;
@@ -136,7 +149,7 @@ export const useLoanSimulator = () => {
           capitalSeleccionado: amount,
           plan: draft,
         };
-        const response = await CalculadoraService.guardarPlan(payload);
+        const response = await SimuladorService.guardarPlan(payload);
         if (response.success || response.data) {
           setStep(LOAN_SIM_STEPS.EMAIL);
         } else {
@@ -167,7 +180,7 @@ export const useLoanSimulator = () => {
         email: emailValue,
         isResend,
       };
-      const response = await CalculadoraService.solicitarOTP(params);
+      const response = await SimuladorService.solicitarOTP(params);
       if (response.success || response.data) {
         setEmail(emailValue);
         setStep(LOAN_SIM_STEPS.OTP);
@@ -190,7 +203,7 @@ export const useLoanSimulator = () => {
         email,
         scoringId: scoringData.scoringId,
       };
-      const response = await CalculadoraService.verificarOTP(params);
+      const response = await SimuladorService.verificarOTP(params);
       if (response.success || response.data) {
         setStep(LOAN_SIM_STEPS.CBU);
       } else {
@@ -207,11 +220,11 @@ export const useLoanSimulator = () => {
     setValidating(true);
     setError(null);
     try {
-      const response = await CalculadoraService.validarCBU(cbuValue, scoringData.cuit);
+      const response = await SimuladorService.validarCBU(cbuValue, scoringData.cuit);
       if (response.success || response.data) {
         setCbu(cbuValue);
         // Generar id preaprobado después de validar CBU
-        await CalculadoraService.obtenerIdPreaprobado({
+        await SimuladorService.obtenerIdPreaprobado({
           scoringId: scoringData.scoringId,
           cantidad_cuotas: installment,
           monto: amount,

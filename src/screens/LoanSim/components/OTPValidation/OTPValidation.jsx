@@ -121,6 +121,13 @@ const OTPValidation = ({ onValidate, onResend, onBack, loading, error, email }) 
       description={`Ingresá el código de ${OTP_CONFIG.OTP_LENGTH} dígitos que enviamos a ${email}`}
       onSubmit={handleSubmit}
       onBack={onBack}
+      style={{
+        width: "100%",
+        height: "100%",
+        gap: "5rem",
+        margin: "0px",
+        maxWidth: "none",
+      }}
     >
       <div className={styles.otpContainer}>
         {otp.map((digit, index) => (

@@ -1,7 +1,6 @@
 import React from "react";
 import { useLoanSimulator } from "./hooks/useLoanSimulator";
 import styles from "./LoanSimScreen.module.css";
-
 // Step Components
 import SimulationStep from "./components/SimulationStep/SimulationStep";
 import EmailValidation from "./components/EmailValidation/EmailValidation";
@@ -9,6 +8,8 @@ import CBUValidation from "./components/CBUValidation/CBUValidation";
 import OTPValidation from "./components/OTPValidation/OTPValidation";
 import SuccessStep from "./components/SuccessStep/SuccessStep";
 import { LOAN_SIM_STEPS } from "../../constants/loanSim.constants";
+import { Header, Footer } from "../../Components/index.js";
+import { HeroElMejorTrato, HeroLoanSim } from "../../Sections/index.js";
 
 const LoanSimScreen = () => {
   const {
@@ -109,11 +110,16 @@ const LoanSimScreen = () => {
   }
 
   return (
-    <div className={styles.homeCalculator_calculatorBox}>
-      <div className={`${styles.calculatorContainer} ${loading ? styles.loadingOverlay : ""}`}>
-        {renderStep()}
+    <>
+      <Header />
+      <HeroLoanSim />
+      <div className={styles.homeCalculator_calculatorBox}>
+        <div className={`${styles.calculatorContainer} ${loading ? styles.loadingOverlay : ""}`}>
+          {renderStep()}
+        </div>
       </div>
-    </div>
+      <Footer />
+    </>
   );
 };
 

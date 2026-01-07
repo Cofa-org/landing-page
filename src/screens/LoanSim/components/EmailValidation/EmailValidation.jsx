@@ -20,6 +20,13 @@ const EmailValidation = ({ onValidate, onBack, loading, error }) => {
       description='Necesitamos validar tu correo electrónico para continuar con la solicitud.'
       onSubmit={handleSubmit}
       onBack={onBack}
+      style={{
+        width: "100%",
+        height: "100%",
+        gap: "5rem",
+        margin: "0px",
+        maxWidth: "none",
+      }}
     >
       <GenericInput
         label='Correo electrónico'

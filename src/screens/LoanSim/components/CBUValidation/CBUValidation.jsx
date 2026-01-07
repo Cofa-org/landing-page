@@ -20,6 +20,13 @@ const CBUValidation = ({ onValidate, loading, error }) => {
       title='Validá tu CBU'
       description={`Ingresá los ${CBU_CONFIG.CBU_LENGTH} dígitos de tu CBU para validar tu cuenta bancaria.`}
       onSubmit={handleSubmit}
+      style={{
+        width: "100%",
+        height: "100%",
+        gap: "5rem",
+        margin: "0px",
+        maxWidth: "none",
+      }}
     >
       <GenericInput
         label='CBU'

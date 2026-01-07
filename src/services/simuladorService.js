@@ -1,7 +1,33 @@
 import { HttpApi } from "../http";
 import { VITE_URL_LOCAL, VITE_COFA_AUTH_URL } from "../config";
 
-export default class CalculadoraService {
+export default class SimuladorService {
+  static async verificarAcceso(token) {
+    try {
+      const local = "http://localhost:1000/api/calculadora/verificar";
+      const response = await fetch(local, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": "4b2129b4-c4f6-4551-8d1c-934af49f5309",
+        },
+        body: JSON.stringify({ token }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Error al verificar acceso");
+      }
+
+      const jsonResponse = await response.json();
+      console.log("verificarAcceso response", jsonResponse);
+      return jsonResponse;
+    } catch (error) {
+      console.error("VERIFICAR_ACCESO_ERROR:", error);
+      throw error;
+    }
+  }
+
   static async calcularPlanes({ scoringId, plazoSeleccionado, capitalSeleccionado }) {
     try {
       //   const baseUrl = VITE_COFA_AUTH_URL || VITE_URL_LOCAL;

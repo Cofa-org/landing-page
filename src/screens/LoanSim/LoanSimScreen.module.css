@@ -1,18 +1,26 @@
 .homeCalculator_calculatorBox {
-  min-height: 90vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  background-color: var(--background-color);
 }
 
 .calculatorContainer {
-  background-color: var(--color-background);
   border-radius: var(--border-radius-lg);
   padding: var(--spacing-xl);
   box-shadow: var(--shadow);
   width: 100%;
-  max-width: 500px;
+  max-width: 700px;
   margin: 0 auto;
+  height: 700px;
+  background-color: var(--background-color);
+}
+
+.calculatorMainBox {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .title {
@@ -35,13 +43,13 @@
 }
 
 .label {
-  font-size: 14px;
+  font-size: 20px;
   font-weight: 500;
   color: var(--text-color);
 }
 
 .amountValue {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 700;
   color: var(--primary-color);
 }
@@ -110,7 +118,7 @@
 }
 
 .resultLabel {
-  font-size: 14px;
+  font-size: 16px;
   color: var(--text-color);
 }
 
@@ -230,4 +238,8 @@
   width: fit-content;
   margin-left: auto;
   margin-right: auto;
+}
+
+.primary-btn {
+  font-size: 24px;
 }
