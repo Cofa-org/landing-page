@@ -69,7 +69,7 @@ const validarToken = async () => {
   } else {
     try {
       const result = await HttpApi(
-        VITE_URL_LOCAL + "/validar-token",
+        VITE_COFA_AUTH_URL || VITE_URL_LOCAL + "/validar-token",
         null,
         "GET",
         VITE_COFA_AUTH_API_KEY,
