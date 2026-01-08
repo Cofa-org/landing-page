@@ -3,8 +3,9 @@ import { Field, Formik, Form, ErrorMessage } from "formik";
 import { FaArrowRightLong, FaCheck } from "react-icons/fa6";
 import "./style.css";
 import { Link } from "react-router-dom";
-import { HttpApi } from "../../http.js";
+import { cofaAuthLogin, HttpApi } from "../../http.js";
 import { VITE_COFA_AUTH_URL } from "../../config.js";
+import { HTTP_METHOD } from "../../constants/HTTP_METHODS.js";
 
 const PersonalLendForm = () => {
   const [isSent, setIsSent] = useState(false);
@@ -33,7 +34,9 @@ const PersonalLendForm = () => {
     }
 
     try {
-      const response = await HttpApi(VITE_COFA_AUTH_URL + "/mail/EL-MEJOR-TRATO", formData);
+      const apiKey = process.env.VITE_COFA_AUTH_API_KEY;
+      const sessionToken = await cofaAuthLogin();
+      const response = await HttpApi(VITE_COFA_AUTH_URL + "/mail/EL-MEJOR-TRATO", formData, HTTP_METHOD.POST, apiKey, sessionToken);
 
       if (response.status === 200) {
         setIsSent(true);

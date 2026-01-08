@@ -15,6 +15,7 @@ import TermsV2 from "./TermsV2/TermsV2";
 import ErrorScreen from "./ErrorScreen/ErrorScreen";
 import CofaTipsScreen from "./cofaTipsScreen/CofaTipsScreen.jsx";
 import IaPoliciesScreen from "./IaPoliciesScreen.jsx/IaPoliciesScreen.jsx";
+import LoanSimScreen from "./LoanSim/LoanSimScreen";
 export {
   HomeScreen,
   TermsScreen,
@@ -33,4 +34,5 @@ export {
   ErrorScreen,
   CofaTipsScreen,
   IaPoliciesScreen,
+  LoanSimScreen,
 };

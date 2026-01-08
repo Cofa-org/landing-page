@@ -24,8 +24,9 @@ import HeroElMejorTrato from "./Hero/HeroElMejorTrato";
 import HeroAssist from "./Hero/HeroAssist";
 import BlogSection from "./BlogSection/BlogSection.jsx";
 import CofaTipsSection from "./CofaTipsSection/CofaTipsSection.jsx";
-import IaPoliciesHeader from "./IaPolicies/IaPoliciesHeader.jsx";
 import IaPoliciesMain from "./IaPolicies/IaPoliciesMain.jsx";
+import HeroLoanSim from "./Hero/HeroLoanSim";
+import IaPoliciesHeader from "./IaPolicies/IaPoliciesHeader.jsx";
 
 export {
   Hero,
@@ -50,8 +51,9 @@ export {
   TermsAndConditionsPoints,
   FormWorkWithUs,
   HeroElMejorTrato,
-  BlogSection,
-  CofaTipsSection,
   IaPoliciesHeader,
   IaPoliciesMain,
+  HeroLoanSim,
+  BlogSection,
+  CofaTipsSection,
 };

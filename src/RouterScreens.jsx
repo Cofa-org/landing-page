@@ -12,6 +12,7 @@ import {
   SuggestionsScreen,
   TermsPointsScreen,
   TermsScreen,
+  LoanSimScreen,
 } from "./screens";
 import { FormWorkWithUs } from "./Sections";
 import { BlogDetailScreen } from "./screens/blogDetailScreen/BlogDetailScreen.jsx";
@@ -30,6 +31,10 @@ const RouterScreens = () => {
       <Route
         path='/prestamos'
         element={<HomeScreen />}
+      />
+      <Route
+        path='/simulador'
+        element={<LoanSimScreen />}
       />
       {/* Prestamos  */}
       <Route
