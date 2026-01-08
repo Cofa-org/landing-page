@@ -1,15 +1,13 @@
-import React from "react";
 import { useLoanSimulator } from "./hooks/useLoanSimulator";
 import styles from "./LoanSimScreen.module.css";
-// Step Components
 import SimulationStep from "./components/SimulationStep/SimulationStep";
 import EmailValidation from "./components/EmailValidation/EmailValidation";
 import CBUValidation from "./components/CBUValidation/CBUValidation";
 import OTPValidation from "./components/OTPValidation/OTPValidation";
 import SuccessStep from "./components/SuccessStep/SuccessStep";
-import { LOAN_SIM_STEPS } from "../../constants/loanSim.constants";
+import { LOAN_SIM_STEPS } from "../../constants/LOAN_SIM.js";
 import { Header, Footer } from "../../Components/index.js";
-import { HeroElMejorTrato, HeroLoanSim } from "../../Sections/index.js";
+import { HeroLoanSim } from "../../Sections/index.js";
 
 const LoanSimScreen = () => {
   const {

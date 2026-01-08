@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import GenericForm from "../../../../Components/Forms/GenericForm/GenericForm";
 import GenericInput from "../../../../Components/Forms/GenericInput/GenericInput";
 import GenericButton from "../../../../Components/Forms/GenericButton/GenericButton";
-import { CBU_CONFIG } from "../../../../constants/loanSim.constants";
+import { CBU_CONFIG } from "../../../../constants/LOAN_SIM.js";
 
 const CBUValidation = ({ onValidate, loading, error }) => {
   const [cbu, setCbu] = useState("");

@@ -2,8 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useDebounce } from "../../../hooks/useDebounce";
 import SimuladorService from "../../../services/simuladorService";
-import { getDecodedToken, isTokenExpired } from "../../../lib/token";
-import { LOAN_SIM_STEPS } from "../../../constants/loanSim.constants";
+import { LOAN_SIM_STEPS } from "../../../constants/LOAN_SIM.js";
 
 export const useLoanSimulator = () => {
   const [searchParams] = useSearchParams();

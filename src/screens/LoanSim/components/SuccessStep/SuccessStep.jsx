@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "./SuccessStep.module.css";
 import { MdCheckCircleOutline } from "react-icons/md";
-import { UI_CONFIG } from "../../../../constants/loanSim.constants";
+import { UI_CONFIG } from "../../../../constants/LOAN_SIM.js";
 
 const SuccessStep = () => {
   return (

@@ -1,27 +1,22 @@
-import { HttpApi } from "../http";
-import { VITE_URL_LOCAL, VITE_COFA_AUTH_URL } from "../config";
+import { cofaAuthLogin, HttpApi } from "../http";
+import { VITE_URL_LOCAL, VITE_COFA_AUTH_URL, VITE_COFA_AUTH_API_KEY } from "../config";
+import { HTTP_METHOD } from "../constants/HTTP_METHODS.js";
 
 export default class SimuladorService {
   static async verificarAcceso(token) {
     try {
-      const local = "http://localhost:1000/api/calculadora/verificar";
-      const response = await fetch(local, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": "4b2129b4-c4f6-4551-8d1c-934af49f5309",
-        },
-        body: JSON.stringify({ token }),
-      });
-
+      const url = `${VITE_COFA_AUTH_URL}/api/calculadora/verificar`;
+      const apiKey = VITE_COFA_AUTH_API_KEY;
+      const body = {
+        token,
+      };
+      const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, null);
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Error al verificar acceso");
       }
 
-      const jsonResponse = await response.json();
-      console.log("verificarAcceso response", jsonResponse);
-      return jsonResponse;
+      return await response.json();
     } catch (error) {
       console.error("VERIFICAR_ACCESO_ERROR:", error);
       throw error;
@@ -30,32 +25,20 @@ export default class SimuladorService {
 
   static async calcularPlanes({ scoringId, plazoSeleccionado, capitalSeleccionado }) {
     try {
-      //   const baseUrl = VITE_COFA_AUTH_URL || VITE_URL_LOCAL;
-      //   const url = `${baseUrl}/api/calculadora/calcular`;
-
-      const body = JSON.stringify({
+      const url = `${VITE_COFA_AUTH_URL}/api/calculadora/calcular`;
+      const apiKey = VITE_COFA_AUTH_API_KEY;
+      const body = {
         scoringId,
         plazoSeleccionado,
         capitalSeleccionado,
-      });
+      };
 
-      //   const response = await HttpApi(url, body)
-      const local = "http://localhost:1000/api/calculadora/calcular";
-      const response = await fetch(local, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": "4b2129b4-c4f6-4551-8d1c-934af49f5309",
-        },
-        body,
-      });
+      const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, null);
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Error al calcular planes");
       }
-      const jsonResponse = await response.json();
-      console.log("response", jsonResponse);
-      return jsonResponse;
+      return await response.json();
     } catch (error) {
       console.error("CALCULADORA_SERVICE_ERROR:", error);
       throw error;
@@ -64,26 +47,17 @@ export default class SimuladorService {
 
   static async guardarPlan(payload) {
     try {
-      const body = JSON.stringify(payload);
-
-      const local = "http://localhost:1000/api/calculadora/guardar";
-      const response = await fetch(local, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": "4b2129b4-c4f6-4551-8d1c-934af49f5309",
-        },
-        body,
-      });
+      const URL = `${VITE_COFA_AUTH_URL}/api/calculadora/guardar`;
+      const apiKey = VITE_COFA_AUTH_API_KEY;
+      const body = payload;
+      const response = await HttpApi(URL, body, HTTP_METHOD.POST, apiKey, null);
 
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Error al guardar plan");
       }
 
-      const jsonResponse = await response.json();
-      console.log("guardarPlan response", jsonResponse);
-      return jsonResponse;
+      return await response.json();
     } catch (error) {
       console.error("GUARDAR_PLAN_ERROR:", error);
       throw error;
@@ -92,28 +66,20 @@ export default class SimuladorService {
 
   static async solicitarOTP({ scoringId, email, isResend }) {
     try {
-      const body = JSON.stringify({
+      const url = `${VITE_COFA_AUTH_URL}/api/calculadora/solicitar-otp`;
+      const apiKey = VITE_COFA_AUTH_API_KEY;
+      const body = {
         scoringId,
         email,
         isResend,
-      });
+      };
 
-      //   const response = await HttpApi(url, body)
-      const local = "http://localhost:1000/api/calculadora/solicitar-otp";
-      const response = await fetch(local, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": "4b2129b4-c4f6-4551-8d1c-934af49f5309",
-        },
-        body,
-      });
+      const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, null);
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Error al calcular planes");
+        throw new Error(errorData.message || "Error al solicitar OTP");
       }
       const jsonResponse = await response.json();
-      console.log("response", jsonResponse);
       return jsonResponse;
     } catch (error) {
       console.error("VALIDAR_EMAIL_ERROR:", error);
@@ -123,30 +89,20 @@ export default class SimuladorService {
 
   static async verificarOTP({ code, email, scoringId }) {
     try {
-      const body = JSON.stringify({
+      const url = `${VITE_COFA_AUTH_URL}/api/calculadora/verificar-otp`;
+      const apiKey = VITE_COFA_AUTH_API_KEY;
+      const body = {
         code,
         email,
         scoringId,
-      });
+      };
 
-      const local = "http://localhost:1000/api/calculadora/verificar-otp";
-      const response = await fetch(local, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": "4b2129b4-c4f6-4551-8d1c-934af49f5309",
-        },
-        body,
-      });
-
+      const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, null);
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Error al verificar código");
+        throw new Error(errorData.message || "Error al verificar OTP");
       }
-
-      const jsonResponse = await response.json();
-      console.log("response", jsonResponse);
-      return jsonResponse;
+      return await response.json();
     } catch (error) {
       console.error("VERIFICAR_OTP_ERROR:", error);
       throw error;
@@ -154,30 +110,20 @@ export default class SimuladorService {
   }
 
   static async validarCBU(cbu, cuit) {
-    cuit = "20284623569";
+
     try {
-      const body = JSON.stringify({
+      const url = `${VITE_COFA_AUTH_URL}/api/calculadora/validar-cbu`;
+      const apiKey = VITE_COFA_AUTH_API_KEY;
+      const body = {
         cbu,
         cuit,
-      });
-
-      //   const response = await HttpApi(url, body)
-      const local = "http://localhost:1000/api/calculadora/validar-cbu";
-      const response = await fetch(local, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": "4b2129b4-c4f6-4551-8d1c-934af49f5309",
-        },
-        body,
-      });
+      };
+      const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, null);
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Error al calcular planes");
+        throw new Error(errorData.message || "Error al validar CBU");
       }
-      const jsonResponse = await response.json();
-      console.log("response", jsonResponse);
-      return jsonResponse;
+      return await response.json();
     } catch (error) {
       console.error("VALIDAR_CBU_ERROR:", error);
       throw error;
@@ -186,30 +132,21 @@ export default class SimuladorService {
 
   static async obtenerIdPreaprobado({ scoringId, cantidad_cuotas, monto }) {
     try {
-      const body = JSON.stringify({
+      const url = `${VITE_COFA_AUTH_URL}/api/calculadora/preaprobado`;
+      const apiKey = VITE_COFA_AUTH_API_KEY;
+      const body = {
         scoringId,
         cantidad_cuotas,
         monto,
-      });
-
-      const local = "http://localhost:1000/api/calculadora/preaprobado";
-      const response = await fetch(local, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": "4b2129b4-c4f6-4551-8d1c-934af49f5309",
-        },
-        body,
-      });
+      };
+      const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, null);
 
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Error al obtener ID preaprobado");
       }
 
-      const jsonResponse = await response.json();
-      console.log("obtenerIdPreaprobado response", jsonResponse);
-      return jsonResponse;
+      return await response.json();
     } catch (error) {
       console.error("OBTENER_ID_PREAPROBADO_ERROR:", error);
       throw error;
