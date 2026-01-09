@@ -5,15 +5,14 @@ import { HTTP_METHOD } from "../constants/HTTP_METHODS.js";
 export default class SimuladorService {
   static async verificarAcceso(token) {
     try {
-      const url = `${VITE_COFA_AUTH_URL}/api/simulador-prestamos/verificar`;
+      const url = `${VITE_COFA_AUTH_URL || VITE_URL_LOCAL}/api/simulador-prestamos/verificar`;
       const apiKey = VITE_COFA_AUTH_API_KEY;
       const body = {
         token,
       };
       const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, null);
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Error al verificar acceso");
+        throw new Error(response.message || "Error al verificar acceso");
       }
 
       return await response.json();
@@ -25,7 +24,7 @@ export default class SimuladorService {
 
   static async calcularPlanes({ scoringId, plazoSeleccionado, capitalSeleccionado }) {
     try {
-      const url = `${VITE_COFA_AUTH_URL}/api/simulador-prestamos/calcular`;
+      const url = `${VITE_COFA_AUTH_URL || VITE_URL_LOCAL}/api/simulador-prestamos/calcular`;
       const apiKey = VITE_COFA_AUTH_API_KEY;
       const body = {
         scoringId,
@@ -47,7 +46,7 @@ export default class SimuladorService {
 
   static async guardarPlan(payload) {
     try {
-      const URL = `${VITE_COFA_AUTH_URL}/api/simulador-prestamos/guardar`;
+      const URL = `${VITE_COFA_AUTH_URL || VITE_URL_LOCAL}/api/simulador-prestamos/guardar`;
       const apiKey = VITE_COFA_AUTH_API_KEY;
       const body = payload;
       const response = await HttpApi(URL, body, HTTP_METHOD.POST, apiKey, null);
@@ -66,7 +65,7 @@ export default class SimuladorService {
 
   static async solicitarOTP({ scoringId, email, isResend }) {
     try {
-      const url = `${VITE_COFA_AUTH_URL}/api/simulador-prestamos/solicitar-otp`;
+      const url = `${VITE_COFA_AUTH_URL || VITE_URL_LOCAL}/api/simulador-prestamos/solicitar-otp`;
       const apiKey = VITE_COFA_AUTH_API_KEY;
       const body = {
         scoringId,
@@ -89,7 +88,7 @@ export default class SimuladorService {
 
   static async verificarOTP({ code, email, scoringId }) {
     try {
-      const url = `${VITE_COFA_AUTH_URL}/api/simulador-prestamos/verificar-otp`;
+      const url = `${VITE_COFA_AUTH_URL || VITE_URL_LOCAL}/api/simulador-prestamos/verificar-otp`;
       const apiKey = VITE_COFA_AUTH_API_KEY;
       const body = {
         code,
@@ -112,7 +111,7 @@ export default class SimuladorService {
   static async validarCBU(cbu, cuit) {
 
     try {
-      const url = `${VITE_COFA_AUTH_URL}/api/simulador-prestamos/validar-cbu`;
+      const url = `${VITE_COFA_AUTH_URL || VITE_URL_LOCAL}/api/simulador-prestamos/validar-cbu`;
       const apiKey = VITE_COFA_AUTH_API_KEY;
       const body = {
         cbu,
@@ -132,7 +131,7 @@ export default class SimuladorService {
 
   static async obtenerIdPreaprobado({ scoringId, cantidad_cuotas, monto }) {
     try {
-      const url = `${VITE_COFA_AUTH_URL}/api/simulador-prestamos/preaprobado`;
+      const url = `${VITE_COFA_AUTH_URL || VITE_URL_LOCAL}/api/simulador-prestamos/preaprobado`;
       const apiKey = VITE_COFA_AUTH_API_KEY;
       const body = {
         scoringId,
