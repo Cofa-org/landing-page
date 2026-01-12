@@ -9,6 +9,7 @@ const SimulationStep = ({
   maxOffer,
   installments,
   simulationData,
+  selectedPlan,
   loading,
   cuit,
   onAmountChange,
@@ -19,7 +20,7 @@ const SimulationStep = ({
     new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS" }).format(value || 0);
 
   const cfta = simulationData?.tasa_nominal || 0;
-  const cfto = simulationData?.tasa_operacion || 0;
+  const cfto = selectedPlan?.tasaOp || 0;
   const tna = (cfta * 0.79).toFixed(2);
 
   return (
@@ -72,7 +73,7 @@ const SimulationStep = ({
         <div className={styles.resultItem}>
           <span className={styles.resultLabel}>Tu cuota mensual:</span>
           <span className={`${styles.resultValue} ${styles.resultValueLarge}`}>
-            {formatCurrency(simulationData?.cuota)}
+            {formatCurrency(selectedPlan?.valorCuota)}
           </span>
         </div>
       </div>
@@ -105,6 +106,7 @@ SimulationStep.propTypes = {
   maxOffer: PropTypes.number.isRequired,
   installments: PropTypes.arrayOf(PropTypes.number).isRequired,
   simulationData: PropTypes.object,
+  selectedPlan: PropTypes.object,
   loading: PropTypes.bool,
   cuit: PropTypes.string,
   onAmountChange: PropTypes.func.isRequired,

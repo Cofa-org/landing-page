@@ -32,7 +32,8 @@ const LoanSimScreen = () => {
   const maxOffer = simulationData?.capital_maximo_a_ofrecer
     ? Number(simulationData.capital_maximo_a_ofrecer)
     : 200000;
-  const installments = simulationData?.plazos_disponibles || [];
+  const installments = simulationData?.planes_disponibles?.map((p) => p.plazo) || [];
+  const selectedPlan = simulationData?.planes_disponibles?.find((p) => p.plazo === installment);
 
   const renderStep = () => {
     switch (step) {
@@ -44,6 +45,7 @@ const LoanSimScreen = () => {
             maxOffer={maxOffer}
             installments={installments}
             simulationData={simulationData}
+            selectedPlan={selectedPlan}
             loading={loading}
             cuit={cuit}
             onAmountChange={handleAmountChange}

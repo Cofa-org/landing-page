@@ -19,7 +19,6 @@ export const useLoanSimulator = () => {
 
   const debouncedAmount = useDebounce(amount, 500);
 
-  // Initialize scoring data from token
   useEffect(() => {
     const initVerification = async () => {
       const token = searchParams.get("token");
@@ -31,7 +30,7 @@ export const useLoanSimulator = () => {
       setLoading(true);
       try {
         const response = await SimuladorService.verificarAcceso(token);
-      
+
         if (response.success && response.data) {
           setScoringData({
             scoringId: String(response.data.scoringId),
@@ -52,7 +51,7 @@ export const useLoanSimulator = () => {
   }, [searchParams]);
 
   const fetchSimulation = useCallback(
-    async (currentAmount, currentInstallment, isInitial = false) => {
+    async (currentAmount, isInitial = false) => {
       if (!scoringData.scoringId) return;
 
       setLoading(true);
@@ -60,10 +59,8 @@ export const useLoanSimulator = () => {
       try {
         const params = {
           scoringId: scoringData.scoringId,
-          plazoSeleccionado: currentInstallment,
         };
 
-        // Only send capitalSeleccionado if it's not the initial call or if amount is specifically set
         if (!isInitial && currentAmount > 0) {
           params.capitalSeleccionado = currentAmount;
         }
@@ -71,34 +68,25 @@ export const useLoanSimulator = () => {
         const response = await SimuladorService.calcularPlanes(params);
 
         if (response.success) {
-          const newData = response.data.data;
-
-          // Map backend states to frontend steps for persistent navigation
+          const newData = response.data;
           const stateToStepMap = {
-            SIMULACION: LOAN_SIM_STEPS.EMAIL, // Plan already saved, move to email entry
+            SIMULACION: LOAN_SIM_STEPS.EMAIL,
             EMAIL_VALIDATION: LOAN_SIM_STEPS.EMAIL,
             OTP_VALIDATION: LOAN_SIM_STEPS.OTP,
             CBU_VALIDATION: LOAN_SIM_STEPS.CBU,
             COMPLETADO: LOAN_SIM_STEPS.SUCCESS,
           };
 
-          const existingState = response.data.existingSimulation?.estado;
-          if (existingState && stateToStepMap[existingState]) {
-            setStep(stateToStepMap[existingState]);
-
-            // If already completed or reached a post-validation step, we might want to stop further loading
-            if (existingState === "COMPLETADO") {
-              setLoading(false);
-              return;
-            }
-          }
+          setSimulationData(newData);
+          localStorage.setItem("simulation_draft", JSON.stringify(response));
 
           setSimulationData(newData);
           localStorage.setItem("simulation_draft", JSON.stringify(response));
 
-          // Set initial values from response if they are not set
           if (isInitial) {
-            setAmount(Number(newData.capital_maximo_a_ofrecer));
+   
+            const capMax = Number(newData.capital_maximo_a_ofrecer);
+            setAmount(capMax);
             setInstallment(newData.plazo_utilizado);
           }
         } else {
@@ -114,19 +102,19 @@ export const useLoanSimulator = () => {
     [scoringData.scoringId]
   );
 
-  // Initial load when scoringId is ready
   useEffect(() => {
     if (scoringData.scoringId) {
-      fetchSimulation(0, null, true);
+      if (scoringData.scoringId) {
+        fetchSimulation(0, true);
+      }
     }
   }, [scoringData.scoringId, fetchSimulation]);
 
-  // Update on amount or installment change (debounced for amount)
   useEffect(() => {
-    if (simulationData && scoringData.scoringId) {
-      fetchSimulation(debouncedAmount, installment);
+    if (debouncedAmount > 0 && scoringData.scoringId) {
+      fetchSimulation(debouncedAmount);
     }
-  }, [debouncedAmount, installment, fetchSimulation, !!simulationData]);
+  }, [debouncedAmount, scoringData.scoringId, fetchSimulation]);
 
   const handleAmountChange = (newAmount) => {
     setAmount(newAmount);
@@ -142,12 +130,24 @@ export const useLoanSimulator = () => {
       try {
         const draftJSON = localStorage.getItem("simulation_draft");
         const draft = draftJSON ? JSON.parse(draftJSON) : null;
+        const selectedPlan = simulationData?.planes_disponibles?.find(
+          (p) => p.plazo === installment
+        );
+
+        const simulationDataWithoutPlans = {
+          ...simulationData,
+          planes_disponibles: undefined,
+        };
         const payload = {
           scoringId: scoringData.scoringId,
-          plazoSeleccionado: installment,
           capitalSeleccionado: amount,
-          plan: draft,
+          plazoSeleccionado: installment,
+          plan: {
+            ...simulationDataWithoutPlans,
+            ...selectedPlan,
+          },
         };
+     
         const response = await SimuladorService.guardarPlan(payload);
         if (response.success || response.data) {
           setStep(LOAN_SIM_STEPS.EMAIL);
@@ -222,7 +222,6 @@ export const useLoanSimulator = () => {
       const response = await SimuladorService.validarCBU(cbuValue, scoringData.cuit);
       if (response.success || response.data) {
         setCbu(cbuValue);
-        // Generar id preaprobado después de validar CBU
         await SimuladorService.obtenerIdPreaprobado({
           scoringId: scoringData.scoringId,
           cantidad_cuotas: installment,
