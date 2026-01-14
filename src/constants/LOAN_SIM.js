@@ -1,9 +1,9 @@
 export const LOAN_SIM_STEPS = {
-  SIMULACION: "simulacion",
-  EMAIL: "email",
-  OTP: "otp",
-  CBU: "cbu",
-  SUCCESS: "success",
+  SIMULACION: "SIMULACION",
+  EMAIL_VALIDATION: "EMAIL_VALIDATION",
+  OTP_VALIDATION: "OTP_VALIDATION",
+  CBU_VALIDATION: "CBU_VALIDATION",
+  COMPLETADO: "COMPLETADO",
 };
 
 export const OTP_CONFIG = {
@@ -17,4 +17,10 @@ export const CBU_CONFIG = {
 
 export const UI_CONFIG = {
   HOME_URL: "https://www.cofa.com.ar/",
+};
+
+export const COOKIE_CONFIG = {
+  NAME: "scoringId",
+  EXPIRY_DAYS: Date.now() + 24 * 60 * 60 * 1000, // 1 day
+
 };

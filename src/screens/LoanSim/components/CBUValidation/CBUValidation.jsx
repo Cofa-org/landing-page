@@ -5,7 +5,7 @@ import GenericInput from "../../../../Components/Forms/GenericInput/GenericInput
 import GenericButton from "../../../../Components/Forms/GenericButton/GenericButton";
 import { CBU_CONFIG } from "../../../../constants/LOAN_SIM.js";
 
-const CBUValidation = ({ onValidate, loading, error }) => {
+const CBUValidation = ({ onValidate, loading, error, onBack }) => {
   const [cbu, setCbu] = useState("");
 
   const handleSubmit = (e) => {
@@ -20,6 +20,7 @@ const CBUValidation = ({ onValidate, loading, error }) => {
       title='Validá tu CBU'
       description={`Ingresá los ${CBU_CONFIG.CBU_LENGTH} dígitos de tu CBU para validar tu cuenta bancaria.`}
       onSubmit={handleSubmit}
+      onBack={onBack}
       style={{
         width: "100%",
         height: "100%",

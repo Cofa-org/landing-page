@@ -1,5 +1,5 @@
 .heroContainer {
-  padding: var(--spacing-4xl) 15vh;
+  padding: var(--spacing-2xl) 15vh;
   display: flex;
   flex-direction: row;
   align-items: center;

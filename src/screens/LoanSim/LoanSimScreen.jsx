@@ -20,13 +20,16 @@ const LoanSimScreen = () => {
     cuit,
     step,
     email,
+    loanInfo,
+    loadingModal,
     handleAmountChange,
     handleInstallmentChange,
     solicitarOTP,
     verificarOTP,
-    validateCBU,
+    validarCBU,
     handleNextStep,
     handlePrevStep,
+    handleInfoPrestamo,
   } = useLoanSimulator();
 
   const maxOffer = simulationData?.capital_maximo_a_ofrecer
@@ -34,7 +37,6 @@ const LoanSimScreen = () => {
     : 200000;
   const installments = simulationData?.planes_disponibles?.map((p) => p.plazo) || [];
   const selectedPlan = simulationData?.planes_disponibles?.find((p) => p.plazo === installment);
-
   const renderStep = () => {
     switch (step) {
       case LOAN_SIM_STEPS.SIMULACION:
@@ -54,7 +56,7 @@ const LoanSimScreen = () => {
           />
         );
 
-      case LOAN_SIM_STEPS.EMAIL:
+      case LOAN_SIM_STEPS.EMAIL_VALIDATION:
         return (
           <EmailValidation
             onValidate={solicitarOTP}
@@ -64,7 +66,7 @@ const LoanSimScreen = () => {
           />
         );
 
-      case LOAN_SIM_STEPS.OTP:
+      case LOAN_SIM_STEPS.OTP_VALIDATION:
         return (
           <OTPValidation
             onValidate={verificarOTP}
@@ -76,17 +78,24 @@ const LoanSimScreen = () => {
           />
         );
 
-      case LOAN_SIM_STEPS.CBU:
+      case LOAN_SIM_STEPS.CBU_VALIDATION:
         return (
           <CBUValidation
-            onValidate={validateCBU}
+            onValidate={validarCBU}
             loading={validating}
             error={error}
+            onBack={handlePrevStep}
           />
         );
 
-      case LOAN_SIM_STEPS.SUCCESS:
-        return <SuccessStep />;
+      case LOAN_SIM_STEPS.COMPLETADO:
+        return (
+          <SuccessStep
+            handleInfoPrestamo={handleInfoPrestamo}
+            loanInfo={loanInfo}
+            loadingModal={loadingModal}
+          />
+        );
 
       default:
         return null;

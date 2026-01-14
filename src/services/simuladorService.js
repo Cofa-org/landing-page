@@ -90,6 +90,7 @@ export default class SimuladorService {
     try {
       const url = `${VITE_COFA_AUTH_URL || VITE_URL_LOCAL}/api/simulador-prestamos/verificar-otp`;
       const apiKey = VITE_COFA_AUTH_API_KEY;
+
       const body = {
         code,
         email,
@@ -97,6 +98,7 @@ export default class SimuladorService {
       };
 
       const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, null);
+      console.log(response);
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Error al verificar OTP");
@@ -109,7 +111,6 @@ export default class SimuladorService {
   }
 
   static async validarCBU(cbu, cuit) {
-
     try {
       const url = `${VITE_COFA_AUTH_URL || VITE_URL_LOCAL}/api/simulador-prestamos/validar-cbu`;
       const apiKey = VITE_COFA_AUTH_API_KEY;
@@ -148,6 +149,26 @@ export default class SimuladorService {
       return await response.json();
     } catch (error) {
       console.error("OBTENER_ID_PREAPROBADO_ERROR:", error);
+      throw error;
+    }
+  }
+
+  static async obtenerInfoPrestamo(scoringId) {
+    try {
+      const url = `${
+        VITE_COFA_AUTH_URL || VITE_URL_LOCAL
+      }/api/simulador-prestamos/info/${scoringId}`;
+      const apiKey = VITE_COFA_AUTH_API_KEY;
+      const response = await HttpApi(url, null, HTTP_METHOD.GET, apiKey, null);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Error al obtener info del préstamo");
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("OBTENER_INFO_PRESTAMO_ERROR:", error);
       throw error;
     }
   }
