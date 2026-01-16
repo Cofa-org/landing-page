@@ -22,7 +22,7 @@ export default class SimuladorService {
       const responseJson = await response.json();
       return responseJson;
     } catch (error) {
-      console.error("CALCULADORA_SERVICE_ERROR:", error);
+      console.error("CALCULAR_PLANES_ERROR:", error);
       throw error;
     }
   }

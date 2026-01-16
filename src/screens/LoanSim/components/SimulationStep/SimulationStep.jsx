@@ -19,8 +19,8 @@ const SimulationStep = ({
   const formatCurrency = (value) =>
     new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS" }).format(value || 0);
 
-  const cfta = simulationData?.tasa_nominal || 0;
-  const cfto = selectedPlan?.tasaOp || 0;
+  const cfta = (simulationData?.tasa_nominal * 100).toFixed(2) || 0;
+  const cfto = (selectedPlan?.tasaOp * 100).toFixed(2) || 0;
   const tna = (cfta * 0.79).toFixed(2);
 
   return (
