@@ -3,24 +3,6 @@ import { VITE_URL_LOCAL, VITE_COFA_AUTH_URL, VITE_COFA_AUTH_API_KEY } from "../c
 import { HTTP_METHOD } from "../constants/HTTP_METHODS.js";
 
 export default class SimuladorService {
-  static async verificarAcceso(token) {
-    try {
-      const url = `${VITE_COFA_AUTH_URL || VITE_URL_LOCAL}/api/simulador-prestamos/verificar`;
-      const apiKey = VITE_COFA_AUTH_API_KEY;
-      const body = {
-        token,
-      };
-      const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, null);
-      if (!response.ok) {
-        throw new Error(response.message || "Error al verificar acceso");
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error("VERIFICAR_ACCESO_ERROR:", error);
-      throw error;
-    }
-  }
 
   static async calcularPlanes({ scoringId, plazoSeleccionado, capitalSeleccionado }) {
     try {
@@ -37,7 +19,8 @@ export default class SimuladorService {
         const errorData = await response.json();
         throw new Error(errorData.message || "Error al calcular planes");
       }
-      return await response.json();
+      const responseJson = await response.json();
+      return responseJson;
     } catch (error) {
       console.error("CALCULADORA_SERVICE_ERROR:", error);
       throw error;

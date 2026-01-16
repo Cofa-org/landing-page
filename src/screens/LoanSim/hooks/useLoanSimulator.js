@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { useDebounce } from "../../../hooks/useDebounce";
 import SimuladorService from "../../../services/simuladorService";
 import { COOKIE_CONFIG, LOAN_SIM_STEPS } from "../../../constants/LOAN_SIM.js";
+import LinkResolutionService from "../../../services/linkResolutionService.js";
 
 export const useLoanSimulator = () => {
   const [searchParams] = useSearchParams();
@@ -20,18 +21,18 @@ export const useLoanSimulator = () => {
   const [existingSimulation, setExistingSimulation] = useState(null);
   const [loanInfo, setLoanInfo] = useState(null);
   const [loadingModal, setLoadingModal] = useState(false);
-
+  const {shortId} = useParams();
+  
   useEffect(() => {
     const initVerification = async () => {
-      const token = searchParams.get("token");
-      if (!token) {
-        setError("No se ha proporcionado un token de acceso válido.");
+      if (!shortId) {
+        setError("No se ha proporcionado un shortId de acceso válido.");
         return;
       }
 
       setLoading(true);
       try {
-        const response = await SimuladorService.verificarAcceso(token);
+        const response = await LinkResolutionService.verificarAcceso(shortId);
 
         if (response.success && response.data) {
           setScoringData({

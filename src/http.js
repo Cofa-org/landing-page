@@ -8,14 +8,16 @@ import {
 
 export async function HttpApi(url, body, method, apiKey, token) {
   try {
+    const isFormData = body instanceof FormData;
     const options = {
       headers: {
         ...(apiKey && { "x-api-key": apiKey }),
         ...(token && { Authorization: `Bearer ${token}` }),
-        "Content-Type": "application/json",
+        ...(!isFormData && { "Content-Type": "application/json" }),
       },
       method: method,
-      ...(body && { body: JSON.stringify(body) }),
+      ...(body && { body: isFormData ? body : JSON.stringify(body) }),
+      credentials: "include",
     };
 
     return await fetch(url, options);

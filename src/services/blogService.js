@@ -1,82 +1,72 @@
-import { supabase } from "../lib/supabase";
+import { HttpApi } from "../http";
+import { VITE_COFA_AUTH_URL, VITE_URL_LOCAL, VITE_COFA_AUTH_API_KEY } from "../config";
+import { HTTP_METHOD } from "../constants/HTTP_METHODS.js";
 
 export class BlogService {
   static async getAllPosts() {
     try {
-      const { data, error } = await supabase
-        .from("landing_blog_posts")
-        .select("*")
-        .eq("published", true)
-        .order("published_date", { ascending: false })
-        .is("deleted_at", null);
+      const url = `${VITE_COFA_AUTH_URL || VITE_URL_LOCAL}/api/blog`;
+      const apiKey = VITE_COFA_AUTH_API_KEY;
 
-
-      if (error) {
-        console.error("Error fetching blog posts:", error);
-        return [];
+      const response = await HttpApi(url, null, HTTP_METHOD.GET, apiKey, null);
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Error al obtener posts");
       }
-
-      return data || [];
+      return await response.json();
     } catch (error) {
-      console.error("Error in getAllPosts:", error);
+      console.error("BLOG_SERVICE_GET_ALL_ERROR:", error);
       return [];
     }
   }
-  
+
   static async getPostBySlug(slug) {
     try {
-      const { data, error } = await supabase
-        .from("landing_blog_posts")
-        .select("*")
-        .eq("slug", slug)
-        .eq("published", true)
-        .single();
+      const url = `${VITE_COFA_AUTH_URL || VITE_URL_LOCAL}/api/blog/${slug}`;
+      const apiKey = VITE_COFA_AUTH_API_KEY;
 
-      if (error) {
-        console.error("Error fetching blog post:", error);
-        return null;
+      const response = await HttpApi(url, null, HTTP_METHOD.GET, apiKey, null);
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Error al obtener post por slug");
       }
-
-      return data;
+      return await response.json();
     } catch (error) {
-      console.error("Error in getPostBySlug:", error);
+      console.error("BLOG_SERVICE_GET_BY_SLUG_ERROR:", error);
       return null;
     }
   }
 
   static async getPostsByCategory(category) {
     try {
-      const { data, error } = await supabase
-        .from("landing_blog_posts")
-        .select("*")
-        .eq("category", category)
-        .eq("published", true)
-        .order("published_date", { ascending: false });
+      const url = `${VITE_COFA_AUTH_URL || VITE_URL_LOCAL}/api/blog/category/${category}`;
+      const apiKey = VITE_COFA_AUTH_API_KEY;
 
-      if (error) {
-        console.error("Error fetching posts by category:", error);
-        return [];
+      const response = await HttpApi(url, null, HTTP_METHOD.GET, apiKey, null);
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Error al obtener posts por categoría");
       }
-
-      return data || [];
+      return await response.json();
     } catch (error) {
-      console.error("Error in getPostsByCategory:", error);
+      console.error("BLOG_SERVICE_GET_BY_CATEGORY_ERROR:", error);
       return [];
     }
   }
 
   static async createPost(post) {
     try {
-      const { data, error } = await supabase.from("landing_blog_posts").insert([post]).select();
+      const url = `${VITE_COFA_AUTH_URL || VITE_URL_LOCAL}/api/blog`;
+      const apiKey = VITE_COFA_AUTH_API_KEY;
 
-      if (error) {
-        console.error("Error creating blog post:", error);
-        return null;
+      const response = await HttpApi(url, post, HTTP_METHOD.POST, apiKey, null);
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Error al crear post");
       }
-
-      return data ? data[0] : null;
+      return await response.json();
     } catch (error) {
-      console.error("Error in createPost:", error);
+      console.error("BLOG_SERVICE_CREATE_ERROR:", error);
       return null;
     }
   }

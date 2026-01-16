@@ -4,6 +4,7 @@ import { useDropzone } from "react-dropzone";
 import { PiCloudArrowUp } from "react-icons/pi";
 import { AiOutlineDelete } from "react-icons/ai";
 import { FaArrowRightLong, FaCheck } from "react-icons/fa6";
+import MailService from "../../services/mailService.js";
 
 import "./style.css";
 
@@ -36,12 +37,12 @@ const MyDropzone = ({ field, form: { setFieldValue } }) => {
   });
 
   return (
-    <div className="dropzone-container">
+    <div className='dropzone-container'>
       {fileNames.length > 0 ? (
-        <div className="dropzone-delete-container">
+        <div className='dropzone-delete-container'>
           <div
             {...getRootProps()}
-            className="dropzone"
+            className='dropzone'
           >
             <PiCloudArrowUp />
             <h3>Archivo cargado</h3>
@@ -57,7 +58,7 @@ const MyDropzone = ({ field, form: { setFieldValue } }) => {
       ) : (
         <div
           {...getRootProps()}
-          className="dropzone"
+          className='dropzone'
         >
           <PiCloudArrowUp />
           <h3>Importá acá tu CV</h3>
@@ -85,21 +86,14 @@ const WorkWithUsForm = () => {
       formData.append("archivoPDF", blob, file.originalname);
     }
 
-    const response = await fetch(
-      `https://backend-landing-cofa-production-81e9.up.railway.app/mail/` + "TRABAJO",
-      {
-        method: "POST",
-        headers: {
-          "x-api-key": "4b2129b4-c4f6-4551-8d1c-934af49f5309",
-        },
-        credentials: "include",
-        body: formData,
-      }
-    ).then((res) => {
-      if (res.status == 200) {
+    try {
+      const response = await MailService.sendMail("TRABAJO", formData);
+      if (response.status === 200) {
         setIsSent(true);
       }
-    });
+    } catch (error) {
+      console.error("Error sending mail:", error);
+    }
   };
 
   const handleSubmit = async (values) => {
@@ -155,7 +149,7 @@ const WorkWithUsForm = () => {
   };
 
   return (
-    <div className="quejas-sugerencias">
+    <div className='quejas-sugerencias'>
       <Formik
         initialValues={{
           name: "",
@@ -168,86 +162,86 @@ const WorkWithUsForm = () => {
         validate={validate}
       >
         {({ isSubmitting, isValid }) => (
-          <Form className="form-container">
-            <div className="input-container">
+          <Form className='form-container'>
+            <div className='input-container'>
               <label>Nombre Completo</label>
               <Field
-                name="name"
-                type="text"
-                placeholder="Nombre(s) y apellido"
+                name='name'
+                type='text'
+                placeholder='Nombre(s) y apellido'
               />
               <ErrorMessage
-                name="name"
-                component="div"
-                className="error-message"
+                name='name'
+                component='div'
+                className='error-message'
               />
             </div>
 
-            <div className="input-container">
+            <div className='input-container'>
               <label>Correo electrónico</label>
               <Field
-                name="email"
-                type="email"
-                placeholder="nombre123@gmail.com"
+                name='email'
+                type='email'
+                placeholder='nombre123@gmail.com'
               />
               <ErrorMessage
-                name="email"
-                component="div"
-                className="error-message"
+                name='email'
+                component='div'
+                className='error-message'
               />
             </div>
 
-            <div className="input-container input-container-100">
-              <label htmlFor="telephone">Celular</label>
+            <div className='input-container input-container-100'>
+              <label htmlFor='telephone'>Celular</label>
               <Field
-                name="telephone"
-                type="text"
-                id="telephone"
-                placeholder="1122223333"
+                name='telephone'
+                type='text'
+                id='telephone'
+                placeholder='1122223333'
               />
               <ErrorMessage
-                name="telephone"
-                component="div"
-                className="error-message"
+                name='telephone'
+                component='div'
+                className='error-message'
               />
             </div>
 
-            <div className="input-container input-container-100">
-              <label htmlFor="message">Mensaje:</label>
+            <div className='input-container input-container-100'>
+              <label htmlFor='message'>Mensaje:</label>
               <Field
-                as="textarea"
-                name="message"
-                id="message"
+                as='textarea'
+                name='message'
+                id='message'
                 placeholder={"Contanos de vos"}
-                className="work-with-us-textarea"
+                className='work-with-us-textarea'
               />
               <ErrorMessage
-                name="message"
-                component="div"
-                className="error-message"
+                name='message'
+                component='div'
+                className='error-message'
               />
             </div>
 
-            <div className="input-container input-container-100">
+            <div className='input-container input-container-100'>
               <Field
-                name="files"
+                name='files'
                 component={MyDropzone}
               />
               <ErrorMessage
-                name="files"
-                component="div"
-                className="error-message"
+                name='files'
+                component='div'
+                className='error-message'
               />
             </div>
 
-            <div className="submit">
+            <div className='submit'>
               {isSent ? (
-                <span className="sent-message">
+                <span className='sent-message'>
                   Enviado <FaCheck />
                 </span>
               ) : (
                 <button
-                  type="submit"
+                  type='submit'
                   className={`primary-btn ${isSubmitting || !isValid ? "disabled-btn" : ""}`}
                   disabled={isSubmitting || !isValid}
                 >

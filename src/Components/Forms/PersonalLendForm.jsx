@@ -3,9 +3,7 @@ import { Field, Formik, Form, ErrorMessage } from "formik";
 import { FaArrowRightLong, FaCheck } from "react-icons/fa6";
 import "./style.css";
 import { Link } from "react-router-dom";
-import { cofaAuthLogin, HttpApi } from "../../http.js";
-import { VITE_COFA_AUTH_URL } from "../../config.js";
-import { HTTP_METHOD } from "../../constants/HTTP_METHODS.js";
+import MailService from "../../services/mailService.js";
 
 const PersonalLendForm = () => {
   const [isSent, setIsSent] = useState(false);
@@ -34,9 +32,7 @@ const PersonalLendForm = () => {
     }
 
     try {
-      const apiKey = process.env.VITE_COFA_AUTH_API_KEY;
-      const sessionToken = await cofaAuthLogin();
-      const response = await HttpApi(VITE_COFA_AUTH_URL + "/mail/EL-MEJOR-TRATO", formData, HTTP_METHOD.POST, apiKey, sessionToken);
+      const response = await MailService.sendMail("EL-MEJOR-TRATO", formData);
 
       if (response.status === 200) {
         setIsSent(true);
@@ -115,7 +111,7 @@ const PersonalLendForm = () => {
   };
 
   return (
-    <div className="form-template">
+    <div className='form-template'>
       <Formik
         initialValues={{
           name: "",
@@ -131,178 +127,178 @@ const PersonalLendForm = () => {
         validate={validate}
       >
         {({ isSubmitting, isValid }) => (
-          <Form className="form-container">
-            <div className="input-container">
+          <Form className='form-container'>
+            <div className='input-container'>
               <label>Nombre Completo</label>
               <Field
-                name="name"
-                type="text"
-                placeholder="Nombre y apellido"
+                name='name'
+                type='text'
+                placeholder='Nombre y apellido'
               />
               <ErrorMessage
-                name="name"
-                component="div"
-                className="error-message"
+                name='name'
+                component='div'
+                className='error-message'
               />
             </div>
 
-            <div className="input-container">
+            <div className='input-container'>
               <label>CUIL | CUIT</label>
               <Field
-                name="cuit"
-                type="number"
-                placeholder="00112223330"
+                name='cuit'
+                type='number'
+                placeholder='00112223330'
               />
               <ErrorMessage
-                name="cuit"
-                component="div"
-                className="error-message"
+                name='cuit'
+                component='div'
+                className='error-message'
               />
             </div>
 
-            <div className="input-container">
+            <div className='input-container'>
               <label>Correo electrónico</label>
               <Field
-                name="email"
-                type="email"
+                name='email'
+                type='email'
                 placeholder={"nombre123@gmail.com"}
               />
               <ErrorMessage
-                name="email"
-                component="div"
-                className="error-message"
+                name='email'
+                component='div'
+                className='error-message'
               />
             </div>
 
-            <div className="input-container">
-              <label htmlFor="telephone">Teléfono</label>
+            <div className='input-container'>
+              <label htmlFor='telephone'>Teléfono</label>
               <Field
-                name="telephone"
-                placeholder="1122334455"
-                id="telephone"
+                name='telephone'
+                placeholder='1122334455'
+                id='telephone'
               />
               <ErrorMessage
-                name="telephone"
-                component="div"
-                className="error-message"
+                name='telephone'
+                component='div'
+                className='error-message'
               />
             </div>
 
-            <div className="input-container input-container-100">
-              <label htmlFor="mySelectField">Situación Laboral:</label>
+            <div className='input-container input-container-100'>
+              <label htmlFor='mySelectField'>Situación Laboral:</label>
               <Field
-                as="select"
-                name="situacion"
-                id="mySelectField"
+                as='select'
+                name='situacion'
+                id='mySelectField'
               >
                 <option
-                  value="no"
-                  label="Elija su situacion laboral"
+                  value='no'
+                  label='Elija su situacion laboral'
                 />
                 <option
-                  value="relacion-dependencia"
-                  label="Relacion de dependencia"
+                  value='relacion-dependencia'
+                  label='Relacion de dependencia'
                 />
                 <option
-                  value="monotributista"
-                  label="Monotribustista/Autónomo"
+                  value='monotributista'
+                  label='Monotribustista/Autónomo'
                 />
                 <option
-                  value="informal"
-                  label="Trabajo informal"
+                  value='informal'
+                  label='Trabajo informal'
                 />
                 <option
-                  value="jubilado-pensionado"
-                  label="Jubilado/Pensionado"
+                  value='jubilado-pensionado'
+                  label='Jubilado/Pensionado'
                 />
                 <option
-                  value="estudiante"
-                  label="Estudiante"
+                  value='estudiante'
+                  label='Estudiante'
                 />
                 <option
-                  value="freelancer"
-                  label="Freelancer"
+                  value='freelancer'
+                  label='Freelancer'
                 />
                 <option
-                  value="desempleado"
-                  label="Desempleado"
+                  value='desempleado'
+                  label='Desempleado'
                 />
                 <option
-                  value="otro"
-                  label="Otro"
+                  value='otro'
+                  label='Otro'
                 />
               </Field>
               <ErrorMessage
-                name="situacion"
-                component="div"
-                className="error-message"
+                name='situacion'
+                component='div'
+                className='error-message'
               />
             </div>
 
-            <div className="input-container input-container-100">
-              <label htmlFor="mySelectField">Ingresos promedio:</label>
+            <div className='input-container input-container-100'>
+              <label htmlFor='mySelectField'>Ingresos promedio:</label>
               <Field
-                as="select"
-                name="ingresos"
-                id="mySelectField"
+                as='select'
+                name='ingresos'
+                id='mySelectField'
               >
                 <option
-                  value="no"
-                  label="Elija su nivel de ingresos"
+                  value='no'
+                  label='Elija su nivel de ingresos'
                 />
                 <option
-                  value="Menos de $300.000"
-                  label="Menos de $300.000"
+                  value='Menos de $300.000'
+                  label='Menos de $300.000'
                 />
                 <option
-                  value="De $300.001 a $600.000"
-                  label="De $300.001 a $600.000"
+                  value='De $300.001 a $600.000'
+                  label='De $300.001 a $600.000'
                 />
                 <option
-                  value="De $600.001 a $1.000.000"
-                  label="De $600.001 a $1.000.000"
+                  value='De $600.001 a $1.000.000'
+                  label='De $600.001 a $1.000.000'
                 />
                 <option
-                  value="Más de $1.000.000"
-                  label="Más de $1.000.000"
+                  value='Más de $1.000.000'
+                  label='Más de $1.000.000'
                 />
               </Field>
               <ErrorMessage
-                name="ingresos"
-                component="div"
-                className="error-message"
+                name='ingresos'
+                component='div'
+                className='error-message'
               />
             </div>
 
-            <div className="input-container input-container-100">
-              <label htmlFor="amount">Importe solicitado:</label>
+            <div className='input-container input-container-100'>
+              <label htmlFor='amount'>Importe solicitado:</label>
               <Field
-                name="amount"
-                id="amount"
-                placeholder="$"
+                name='amount'
+                id='amount'
+                placeholder='$'
               />
               <ErrorMessage
-                name="amount"
-                component="div"
-                className="error-message"
+                name='amount'
+                component='div'
+                className='error-message'
               />
             </div>
-            <div className="input-container-100">
+            <div className='input-container-100'>
               <Field
-                name="terminos_y_condiciones"
-                type="checkbox"
-                id="aceptarTerminos"
-                className="checkbox"
+                name='terminos_y_condiciones'
+                type='checkbox'
+                id='aceptarTerminos'
+                className='checkbox'
               />
               <ErrorMessage
-                name="terminos_y_condiciones"
-                component="div"
-                className="error-message"
+                name='terminos_y_condiciones'
+                component='div'
+                className='error-message'
               />
-              <label htmlFor="aceptarTerminos">
+              <label htmlFor='aceptarTerminos'>
                 Acepto los{" "}
                 <Link
-                  to="/terminos-y-condiciones"
+                  to='/terminos-y-condiciones'
                   style={{ textDecoration: "underline" }}
                 >
                   Términos y Condiciones
@@ -310,14 +306,14 @@ const PersonalLendForm = () => {
               </label>
             </div>
 
-            <div className="submit">
+            <div className='submit'>
               {isSent ? (
-                <span className="sent-message">
+                <span className='sent-message'>
                   Enviado <FaCheck />
                 </span>
               ) : (
                 <button
-                  type="submit"
+                  type='submit'
                   className={`primary-btn ${isSubmitting || !isValid ? "disabled-btn" : ""}`}
                   disabled={isSubmitting || !isValid}
                 >
