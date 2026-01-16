@@ -32,7 +32,7 @@ export const useLoanSimulator = () => {
 
       setLoading(true);
       try {
-        const response = await LinkResolutionService.verificarAcceso(shortId);
+        const response = await LinkResolutionService.consumeLink(shortId);
 
         if (response.success && response.data) {
           setScoringData({
@@ -137,7 +137,7 @@ export const useLoanSimulator = () => {
           capitalSeleccionado: amount,
           plazoSeleccionado: installment,
           plan: {
-            estado: existingSimulation.email_validado
+            estado: existingSimulation?.email_validado
               ? LOAN_SIM_STEPS.CBU_VALIDATION
               : LOAN_SIM_STEPS.EMAIL_VALIDATION,
             ...simulationDataWithoutPlans,

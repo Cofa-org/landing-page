@@ -17,7 +17,6 @@ export async function HttpApi(url, body, method, apiKey, token) {
       },
       method: method,
       ...(body && { body: isFormData ? body : JSON.stringify(body) }),
-      credentials: "include",
     };
 
     return await fetch(url, options);
