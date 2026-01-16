@@ -44,7 +44,7 @@ export const useLoanSimulator = () => {
         }
       } catch (err) {
         setError(err.message || "Error al verificar el acceso");
-        console.error("VERIFY_TOKEN_ERROR:", err);
+        console.error("VERIFY_LINK_ERROR:", err);
       } finally {
         setLoading(false);
       }
