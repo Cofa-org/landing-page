@@ -21,6 +21,6 @@ export const UI_CONFIG = {
 
 export const COOKIE_CONFIG = {
   NAME: "scoringId",
-  EXPIRY_DAYS: Date.now() + 24 * 60 * 60 * 1000, // 1 day
+  EXPIRY_DAYS: Date.now() + 2 * 60 * 60 * 1000, // 2 hours
 
 };

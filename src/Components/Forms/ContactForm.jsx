@@ -9,6 +9,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { AiOutlineDelete } from "react-icons/ai";
 import { FaArrowRightLong, FaCheck } from "react-icons/fa6";
 import MailService from "../../services/mailService.js";
+import Notification from "../Notifications/Notification.jsx";
 
 const MyDropzone = ({ field, form: { setFieldValue } }) => {
   const [fileNames, setFileNames] = useState([]);
@@ -75,6 +76,9 @@ const MyDropzone = ({ field, form: { setFieldValue } }) => {
 const ContactForm = ({ type }) => {
   const [isSent, setIsSent] = useState(false);
   const [isSelectorOpen, setIsSelectorOpen] = useState(false);
+  const [notification, setNotification] = useState({ show: false, message: "", type: "success" });
+  const navigate = useNavigate();
+
   const pathname = useLocation();
   const route = pathname.pathname.substring(1);
   const sendMailRequest = async (values) => {
@@ -98,20 +102,42 @@ const ContactForm = ({ type }) => {
       if (reasonSelected.reason && reasonSelected.value) {
         try {
           const response = await MailService.sendMail(`${type}/`, formData);
-          if (response.status === 200) {
-            setIsSent(true);
-          }
+          setNotification({
+            show: true,
+            message: "¡Mensaje enviado con éxito!",
+            type: "success",
+          });
+          setIsSent(true);
+          setTimeout(() => {
+            navigate("/");
+          }, 3000);
         } catch (error) {
+          setNotification({
+            show: true,
+            message: error.message || "Error al enviar el mensaje",
+            type: "error",
+          });
           console.error("Error sending mail:", error);
         }
       }
     } else {
       try {
         const response = await MailService.sendMail(`${type}/`, formData);
-        if (response.status === 200) {
-          setIsSent(true);
-        }
+        setNotification({
+          show: true,
+          message: "¡Mensaje enviado con éxito!",
+          type: "success",
+        });
+        setIsSent(true);
+        setTimeout(() => {
+          navigate("/");
+        }, 3000);
       } catch (error) {
+        setNotification({
+          show: true,
+          message: error.message || "Error al enviar el mensaje",
+          type: "error",
+        });
         console.error("Error sending mail:", error);
       }
     }
@@ -476,6 +502,13 @@ const ContactForm = ({ type }) => {
           </Form>
         )}
       </Formik>
+      {notification.show && (
+        <Notification
+          message={notification.message}
+          type={notification.type}
+          onClose={() => setNotification({ ...notification, show: false })}
+        />
+      )}
     </div>
   );
 };

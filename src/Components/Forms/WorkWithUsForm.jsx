@@ -5,6 +5,8 @@ import { PiCloudArrowUp } from "react-icons/pi";
 import { AiOutlineDelete } from "react-icons/ai";
 import { FaArrowRightLong, FaCheck } from "react-icons/fa6";
 import MailService from "../../services/mailService.js";
+import { useNavigate } from "react-router-dom";
+import Notification from "../Notifications/Notification.jsx";
 
 import "./style.css";
 
@@ -72,6 +74,8 @@ const MyDropzone = ({ field, form: { setFieldValue } }) => {
 
 const WorkWithUsForm = () => {
   const [isSent, setIsSent] = useState(false);
+  const [notification, setNotification] = useState({ show: false, message: "", type: "success" });
+  const navigate = useNavigate();
 
   const sendMailRequest = async (values) => {
     const formData = new FormData();
@@ -88,10 +92,21 @@ const WorkWithUsForm = () => {
 
     try {
       const response = await MailService.sendMail("TRABAJO", formData);
-      if (response.status === 200) {
-        setIsSent(true);
-      }
+      setNotification({
+        show: true,
+        message: "¡CV enviado con éxito!",
+        type: "success",
+      });
+      setIsSent(true);
+      setTimeout(() => {
+        navigate("/");
+      }, 3000);
     } catch (error) {
+      setNotification({
+        show: true,
+        message: error.message || "Error al enviar el CV",
+        type: "error",
+      });
       console.error("Error sending mail:", error);
     }
   };
@@ -252,6 +267,13 @@ const WorkWithUsForm = () => {
           </Form>
         )}
       </Formik>
+      {notification.show && (
+        <Notification
+          message={notification.message}
+          type={notification.type}
+          onClose={() => setNotification({ ...notification, show: false })}
+        />
+      )}
     </div>
   );
 };

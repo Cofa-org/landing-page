@@ -4,10 +4,14 @@ import { FaArrowRightLong, FaCheck } from "react-icons/fa6";
 import "./style.css";
 import { Link } from "react-router-dom";
 import MailService from "../../services/mailService.js";
+import { useNavigate } from "react-router-dom";
+import Notification from "../Notifications/Notification.jsx";
 
 const PersonalLendForm = () => {
   const [isSent, setIsSent] = useState(false);
   const [aceptoTerminos, setAceptoTerminos] = useState(false);
+  const [notification, setNotification] = useState({ show: false, message: "", type: "success" });
+  const navigate = useNavigate();
 
   const handleAceptoCambio = () => {
     setAceptoTerminos(!aceptoTerminos);
@@ -34,11 +38,22 @@ const PersonalLendForm = () => {
     try {
       const response = await MailService.sendMail("EL-MEJOR-TRATO", formData);
 
-      if (response.status === 200) {
-        setIsSent(true);
-        resetForm();
-      }
+      setNotification({
+        show: true,
+        message: "¡Solicitud enviada con éxito!",
+        type: "success",
+      });
+      setIsSent(true);
+      resetForm();
+      setTimeout(() => {
+        navigate("/");
+      }, 3000);
     } catch (error) {
+      setNotification({
+        show: true,
+        message: error.message || "Error en el envío del formulario",
+        type: "error",
+      });
       console.error("Error en el envío del formulario:", error);
     } finally {
       setSubmitting(false);
@@ -327,6 +342,13 @@ const PersonalLendForm = () => {
           </Form>
         )}
       </Formik>
+      {notification.show && (
+        <Notification
+          message={notification.message}
+          type={notification.type}
+          onClose={() => setNotification({ ...notification, show: false })}
+        />
+      )}
     </div>
   );
 };
