@@ -33,7 +33,7 @@ const RouterScreens = () => {
         element={<HomeScreen />}
       />
       <Route
-        path='/simulador/:shortId'
+        path='/simulador'
         element={<LoanSimScreen />}
       />
       {/* Prestamos  */}

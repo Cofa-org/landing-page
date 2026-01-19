@@ -1,6 +1,6 @@
-import { cofaAuthLogin, HttpApi } from "../http";
 import { VITE_URL_LOCAL, VITE_COFA_AUTH_URL, VITE_COFA_AUTH_API_KEY } from "../config";
 import { HTTP_METHOD } from "../constants/HTTP_METHODS.js";
+import { HttpApi } from "../http.js";
 
 export default class SimuladorService {
 

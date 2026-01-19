@@ -21,15 +21,14 @@ export const useLoanSimulator = () => {
   const [existingSimulation, setExistingSimulation] = useState(null);
   const [loanInfo, setLoanInfo] = useState(null);
   const [loadingModal, setLoadingModal] = useState(false);
-  const {shortId} = useParams();
-  
+  const shortId = searchParams.get("id");
+
   useEffect(() => {
     const initVerification = async () => {
       if (!shortId) {
         setError("No se ha proporcionado un shortId de acceso válido.");
         return;
       }
-
       setLoading(true);
       try {
         const response = await LinkResolutionService.consumeLink(shortId);
@@ -51,7 +50,7 @@ export const useLoanSimulator = () => {
     };
 
     initVerification();
-  }, [searchParams]);
+  }, [shortId]);
 
   const fetchSimulation = useCallback(
     async (currentAmount, isInitial = false) => {
