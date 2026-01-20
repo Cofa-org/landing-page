@@ -5,13 +5,15 @@ import { HttpApi } from "../http.js";
 export default class LinkResolutionService {
   static async consumeLink(shortId) {
     try {
-      const url = `${VITE_COFA_AUTH_URL || VITE_URL_LOCAL}/api/lrs/consume/${shortId}`;
+      const url = `${VITE_COFA_AUTH_URL || VITE_URL_LOCAL}/api/lrs/consume?id=${shortId}`;
       const apiKey = VITE_COFA_AUTH_API_KEY;
       const response = await HttpApi(url, null, HTTP_METHOD.POST, apiKey, null);
       if (!response.ok) {
         throw new Error(response.message || "Error al consumir el link");
       }
-      return await response.json();
+      const data = await response.json();
+
+      return data;
     } catch (error) {
       console.error("CONSUME_LINK_ERROR:", error);
       throw error;

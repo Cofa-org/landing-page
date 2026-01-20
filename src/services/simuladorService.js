@@ -93,13 +93,14 @@ export default class SimuladorService {
     }
   }
 
-  static async validarCBU(cbu, cuit) {
+  static async validarCBU(cbu, cuit, scoringId) {
     try {
       const url = `${VITE_COFA_AUTH_URL || VITE_URL_LOCAL}/api/simulador-prestamos/validar-cbu`;
       const apiKey = VITE_COFA_AUTH_API_KEY;
       const body = {
         cbu,
         cuit,
+        scoringId,
       };
       const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, null);
       if (!response.ok) {

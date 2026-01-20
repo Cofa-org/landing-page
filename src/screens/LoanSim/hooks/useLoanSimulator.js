@@ -226,7 +226,11 @@ export const useLoanSimulator = () => {
     setValidating(true);
     setError(null);
     try {
-      const response = await SimuladorService.validarCBU(cbuValue, scoringData.cuit);
+      const response = await SimuladorService.validarCBU(
+        cbuValue,
+        scoringData.cuit,
+        scoringData.scoringId,
+      );
       if (response.success || response.data) {
         setCbu(cbuValue);
         const response = await SimuladorService.obtenerIdPreaprobado({
@@ -234,6 +238,7 @@ export const useLoanSimulator = () => {
           cantidad_cuotas: installment,
           monto: amount,
         });
+   
         if (response.success) {
           const cookieOptions = {
             name: COOKIE_CONFIG.NAME,
@@ -241,8 +246,15 @@ export const useLoanSimulator = () => {
             expires: COOKIE_CONFIG.EXPIRY_DAYS,
             partitioned: true,
           };
-          await cookieStore.set(cookieOptions);
-        }
+         const res =  await cookieStore.set(cookieOptions);
+;
+        } else {
+          setError(
+            response.mensaje ||
+              "¡Lo sentimos! No pudimos validar tu CBU. Revisa los datos e intenta nuevamente 😕"
+          );
+          return;
+        } 
         setStep(LOAN_SIM_STEPS.COMPLETADO);
       } else {
         setError(
@@ -264,20 +276,20 @@ export const useLoanSimulator = () => {
       const cookie = await cookieStore.get(COOKIE_CONFIG.NAME);
       const scoringId = cookie?.value;
       if (!scoringId) {
-        alert("No se encontró el scoringId. Inténtalo de nuevo.");
+        setError("No se encontró el scoringId. Inténtalo de nuevo.");
         return false;
       }
       const response = await SimuladorService.obtenerInfoPrestamo(scoringId);
       if (response.success) {
         setLoanInfo(response.data);
-        return true; // Indicar que se debe mostrar el modal
+        return true; 
       } else {
-        alert("Error al obtener la información del préstamo.");
+        setError("Error al obtener la información del préstamo.");
         return false;
       }
     } catch (error) {
       console.error("Error obteniendo info del préstamo:", error);
-      alert("Error al obtener la información del préstamo.");
+      setError("Error al obtener la información del préstamo.");
       return false;
     } finally {
       setLoadingModal(false);
