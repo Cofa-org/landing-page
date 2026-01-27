@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import PropTypes from "prop-types";
-import { useComplianceForm, COMPLIANCE_STEPS } from "./hooks/useComplianceForm";
+import { useComplianceForm, COMPLIANCE_STEPS } from "../../hooks/useComplianceForm.js";
 import {
   ComplianceInitial,
   ComplianceTypeSelection,
