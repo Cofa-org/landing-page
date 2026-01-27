@@ -3,7 +3,6 @@ import { HTTP_METHOD } from "../constants/HTTP_METHODS.js";
 import { HttpApi } from "../http.js";
 
 export default class SimuladorService {
-
   static async calcularPlanes({ scoringId, plazoSeleccionado, capitalSeleccionado }) {
     try {
       const url = `${VITE_COFA_AUTH_URL || VITE_URL_LOCAL}/api/simulador-prestamos/calcular`;
@@ -13,7 +12,6 @@ export default class SimuladorService {
         plazoSeleccionado,
         capitalSeleccionado,
       };
-
       const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, null);
       if (!response.ok) {
         const errorData = await response.json();
@@ -153,6 +151,22 @@ export default class SimuladorService {
       return await response.json();
     } catch (error) {
       console.error("OBTENER_INFO_PRESTAMO_ERROR:", error);
+      throw error;
+    }
+  }
+
+  static async guardarCompliance(payload) {
+    try {
+      const url = `${VITE_COFA_AUTH_URL || VITE_URL_LOCAL}/api/simulador-prestamos/compliance`;
+      const apiKey = VITE_COFA_AUTH_API_KEY;
+      const response = await HttpApi(url, payload, HTTP_METHOD.POST, apiKey, null);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Error al guardar información de compliance");
+      }
+      return await response.json();
+    } catch (error) {
+      console.error("GUARDAR_COMPLIANCE_ERROR:", error);
       throw error;
     }
   }

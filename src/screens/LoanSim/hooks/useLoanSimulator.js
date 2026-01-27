@@ -37,6 +37,7 @@ export const useLoanSimulator = () => {
           setScoringData({
             scoringId: String(response.data.scoringId),
             cuit: response.data.cuit || null,
+            nombreCompleto: response.data.nombreCompleto || null,
           });
         } else {
           setError(response.mensaje || "El enlace de acceso es inválido o ha expirado.");
@@ -94,7 +95,7 @@ export const useLoanSimulator = () => {
         setLoading(false);
       }
     },
-    [scoringData.scoringId]
+    [scoringData.scoringId],
   );
 
   useEffect(() => {
@@ -124,7 +125,7 @@ export const useLoanSimulator = () => {
       setLoading(true);
       try {
         const selectedPlan = simulationData?.planes_disponibles?.find(
-          (p) => p.plazo === installment
+          (p) => p.plazo === installment,
         );
 
         const simulationDataWithoutPlans = {
@@ -137,7 +138,7 @@ export const useLoanSimulator = () => {
           plazoSeleccionado: installment,
           plan: {
             estado: existingSimulation?.email_validado
-              ? LOAN_SIM_STEPS.CBU_VALIDATION
+              ? LOAN_SIM_STEPS.COMPLIANCE // PEP/SO before CBU
               : LOAN_SIM_STEPS.EMAIL_VALIDATION,
             ...simulationDataWithoutPlans,
             ...selectedPlan,
@@ -151,7 +152,7 @@ export const useLoanSimulator = () => {
           (response.data && !existingSimulation?.email_validado)
         ) {
           setStep(LOAN_SIM_STEPS.EMAIL_VALIDATION);
-        } else if (response.success || response.data) setStep(LOAN_SIM_STEPS.CBU_VALIDATION);
+        } else if (response.success || response.data) setStep(LOAN_SIM_STEPS.COMPLIANCE);
         else {
           setError(response.mensaje || "¡Ups! Ha ocurrido un error al guardar la simulación");
         }
@@ -162,14 +163,16 @@ export const useLoanSimulator = () => {
         setLoading(false);
       }
     } else if (step === LOAN_SIM_STEPS.EMAIL_VALIDATION) setStep(LOAN_SIM_STEPS.OTP_VALIDATION);
-    else if (step === LOAN_SIM_STEPS.OTP_VALIDATION) setStep(LOAN_SIM_STEPS.CBU_VALIDATION);
+    else if (step === LOAN_SIM_STEPS.OTP_VALIDATION) setStep(LOAN_SIM_STEPS.COMPLIANCE);
+    else if (step === LOAN_SIM_STEPS.COMPLIANCE) setStep(LOAN_SIM_STEPS.CBU_VALIDATION);
     else if (step === LOAN_SIM_STEPS.CBU_VALIDATION) setStep(LOAN_SIM_STEPS.COMPLETADO);
   };
 
   const handlePrevStep = () => {
     if (step === LOAN_SIM_STEPS.EMAIL_VALIDATION) setStep(LOAN_SIM_STEPS.SIMULACION);
     else if (step === LOAN_SIM_STEPS.OTP_VALIDATION) setStep(LOAN_SIM_STEPS.EMAIL_VALIDATION);
-    else if (step === LOAN_SIM_STEPS.CBU_VALIDATION) setStep(LOAN_SIM_STEPS.SIMULACION);
+    else if (step === LOAN_SIM_STEPS.COMPLIANCE) setStep(LOAN_SIM_STEPS.OTP_VALIDATION);
+    else if (step === LOAN_SIM_STEPS.CBU_VALIDATION) setStep(LOAN_SIM_STEPS.COMPLIANCE);
   };
 
   const solicitarOTP = async (emailValue, isResend = false) => {
@@ -206,17 +209,38 @@ export const useLoanSimulator = () => {
       };
       const response = await SimuladorService.verificarOTP(params);
       if (response.success || response.data) {
-        setStep(LOAN_SIM_STEPS.CBU_VALIDATION);
+        setStep(LOAN_SIM_STEPS.COMPLIANCE);
       } else {
         setError(
-          response.mensaje || "¡Ups! El código que ingresaste no es correcto. Inténtalo de nuevo 😊"
+          response.mensaje ||
+            "¡Ups! El código que ingresaste no es correcto. Inténtalo de nuevo 😊",
         );
       }
     } catch (err) {
       setError(
         err.message ||
-          "¡Oh no! Hubo un problema al verificar tu código. Por favor, inténtalo otra vez 🤔"
+          "¡Oh no! Hubo un problema al verificar tu código. Por favor, inténtalo otra vez 🤔",
       );
+    } finally {
+      setValidating(false);
+    }
+  };
+
+  const guardarCompliance = async (payload) => {
+    setValidating(true);
+    setError(null);
+    try {
+      const response = await SimuladorService.guardarCompliance({
+        scoringId: scoringData.scoringId,
+        ...payload,
+      });
+      if (response.success || response.data) {
+        setStep(LOAN_SIM_STEPS.CBU_VALIDATION);
+      } else {
+        setError(response.message || "Error al guardar información de compliance");
+      }
+    } catch (err) {
+      setError(err.message || "Error de conexión al guardar compliance");
     } finally {
       setValidating(false);
     }
@@ -238,7 +262,7 @@ export const useLoanSimulator = () => {
           cantidad_cuotas: installment,
           monto: amount,
         });
-   
+
         if (response.success) {
           const cookieOptions = {
             name: COOKIE_CONFIG.NAME,
@@ -246,20 +270,19 @@ export const useLoanSimulator = () => {
             expires: COOKIE_CONFIG.EXPIRY_DAYS,
             partitioned: true,
           };
-         const res =  await cookieStore.set(cookieOptions);
-;
+          const res = await cookieStore.set(cookieOptions);
         } else {
           setError(
             response.mensaje ||
-              "¡Lo sentimos! No pudimos validar tu CBU. Revisa los datos e intenta nuevamente 😕"
+              "¡Lo sentimos! No pudimos validar tu CBU. Revisa los datos e intenta nuevamente 😕",
           );
           return;
-        } 
+        }
         setStep(LOAN_SIM_STEPS.COMPLETADO);
       } else {
         setError(
           response.mensaje ||
-            "¡Lo sentimos! No pudimos validar tu CBU. Revisa los datos e intenta nuevamente 😕"
+            "¡Lo sentimos! No pudimos validar tu CBU. Revisa los datos e intenta nuevamente 😕",
         );
       }
     } catch (err) {
@@ -272,7 +295,6 @@ export const useLoanSimulator = () => {
   const handleInfoPrestamo = async () => {
     setLoadingModal(true);
     try {
-
       const cookie = await cookieStore.get(COOKIE_CONFIG.NAME);
       const scoringId = cookie?.value;
       if (!scoringId) {
@@ -282,7 +304,7 @@ export const useLoanSimulator = () => {
       const response = await SimuladorService.obtenerInfoPrestamo(scoringId);
       if (response.success) {
         setLoanInfo(response.data);
-        return true; 
+        return true;
       } else {
         setError("Error al obtener la información del préstamo.");
         return false;
@@ -303,7 +325,7 @@ export const useLoanSimulator = () => {
     loading,
     validating,
     error,
-    cuit: scoringData.cuit,
+    nombreCompleto: scoringData.nombreCompleto,
     step,
     email,
     cbu,
@@ -315,6 +337,7 @@ export const useLoanSimulator = () => {
     handlePrevStep,
     solicitarOTP,
     verificarOTP,
+    guardarCompliance,
     validarCBU,
     handleInfoPrestamo,
     setStep,

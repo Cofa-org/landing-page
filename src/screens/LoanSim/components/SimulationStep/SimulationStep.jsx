@@ -11,7 +11,7 @@ const SimulationStep = ({
   simulationData,
   selectedPlan,
   loading,
-  cuit,
+  nombreCompleto,
   onAmountChange,
   onInstallmentChange,
   onNextStep,
@@ -26,7 +26,7 @@ const SimulationStep = ({
   return (
     <div className={styles.calculatorMainBox}>
       <h2 className={styles.title}>Simulá tu préstamo</h2>
-      {cuit && <p className={styles.cuitDisplay}>CUIT: {cuit}</p>}
+      {nombreCompleto && <p className={styles.cuitDisplay}>{nombreCompleto}</p>}
 
       {/* Amount Slider */}
       <div className={styles.inputGroup}>

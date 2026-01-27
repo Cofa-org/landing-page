@@ -4,6 +4,7 @@ import SimulationStep from "./components/SimulationStep/SimulationStep";
 import EmailValidation from "./components/EmailValidation/EmailValidation";
 import CBUValidation from "./components/CBUValidation/CBUValidation";
 import OTPValidation from "./components/OTPValidation/OTPValidation";
+import ComplianceStep from "./components/ComplianceStep/ComplianceStep";
 import SuccessStep from "./components/SuccessStep/SuccessStep";
 import { LOAN_SIM_STEPS } from "../../constants/LOAN_SIM.js";
 import { Header, Footer } from "../../Components/index.js";
@@ -17,7 +18,7 @@ const LoanSimScreen = () => {
     loading,
     validating,
     error,
-    cuit,
+    nombreCompleto,
     step,
     email,
     loanInfo,
@@ -30,6 +31,7 @@ const LoanSimScreen = () => {
     handleNextStep,
     handlePrevStep,
     handleInfoPrestamo,
+    guardarCompliance,
   } = useLoanSimulator();
 
   const maxOffer = simulationData?.capital_maximo_a_ofrecer
@@ -49,7 +51,7 @@ const LoanSimScreen = () => {
             simulationData={simulationData}
             selectedPlan={selectedPlan}
             loading={loading}
-            cuit={cuit}
+            nombreCompleto={nombreCompleto}
             onAmountChange={handleAmountChange}
             onInstallmentChange={handleInstallmentChange}
             onNextStep={handleNextStep}
@@ -75,6 +77,16 @@ const LoanSimScreen = () => {
             loading={validating}
             error={error}
             email={email}
+          />
+        );
+
+      case LOAN_SIM_STEPS.COMPLIANCE:
+        return (
+          <ComplianceStep
+            onValidate={guardarCompliance}
+            onBack={handlePrevStep}
+            loading={validating}
+            error={error}
           />
         );
 

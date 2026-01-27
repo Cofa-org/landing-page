@@ -26,6 +26,8 @@ const EmailValidation = ({ onValidate, onBack, loading, error }) => {
         gap: "5rem",
         margin: "0px",
         maxWidth: "none",
+        minHeight: "760px",
+        justifyContent: "center",
       }}
     >
       <GenericInput

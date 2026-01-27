@@ -127,6 +127,8 @@ const OTPValidation = ({ onValidate, onResend, onBack, loading, error, email }) 
         gap: "5rem",
         margin: "0px",
         maxWidth: "none",
+        minHeight: "760px",
+        justifyContent: "center",
       }}
     >
       <div className={styles.otpContainer}>
