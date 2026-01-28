@@ -1,9 +1,13 @@
 import React from "react";
 import PropTypes from "prop-types";
 import styles from "../ComplianceStep.module.css";
-import GenericButton from "../../../../../Components/Forms/GenericButton/GenericButton";
+import GenericButton from "../../../../../Components/buttons/GenericButton/GenericButton";
 import GenericForm from "../../../../../Components/Forms/GenericForm/GenericForm";
 import GenericInput from "../../../../../Components/Forms/GenericInput/GenericInput";
+import BackButton from "../../../../../Components/buttons/backbutton/Backbutton.jsx";
+import Modal from "../../../../../Components/Modal/Modal";
+import Notification from "../../../../../Components/Notifications/Notification";
+import SimuladorService from "../../../../../services/simuladorService";
 
 export const ComplianceInitial = ({ onNext, onNone }) => (
   <div className={styles.selectionContainer}>
@@ -24,16 +28,12 @@ export const ComplianceInitial = ({ onNext, onNone }) => (
 
 export const ComplianceTypeSelection = ({ onSelectPEP, onSelectSO, onBack }) => (
   <div className={styles.selectionContainer}>
+    <BackButton onClick={onBack} />
     <h3 className={styles.question}>Seleccione su condición:</h3>
     <div className={styles.buttonGroup}>
       <GenericButton onClick={onSelectPEP}>Soy PEP</GenericButton>
       <GenericButton onClick={onSelectSO}>Soy Sujeto Obligado</GenericButton>
-      <GenericButton
-        variant='outline'
-        onClick={onBack}
-      >
-        Volver
-      </GenericButton>
+    </div>
     <p className={styles.legalNote}>
       “La siguiente información se solicita a través de una declaración jurada, lo que implica que
       los datos que usted consigne son verdaderos, completos y exactos. En particular, se le pide
@@ -41,35 +41,63 @@ export const ComplianceTypeSelection = ({ onSelectPEP, onSelectSO, onBack }) => 
       (PEP). Esta manifestación se realiza bajo su exclusiva responsabilidad y puede ser verificada
       conforme a la normativa vigente en materia de prevención de lavado de activos.”
     </p>
-    </div>
   </div>
 );
 
 export const CompliancePEPSelection = ({ onSelectDirect, onSelectIndirect, onBack }) => (
-  <div className={styles.selectionContainer}>
-    <h3 className={styles.question}>¿Qué tipo de PEP es usted?</h3>
-    <p className={styles.legalNote}>
-      “La siguiente información se solicita a través de una declaración jurada, lo que implica que
-      los datos que usted consigne son verdaderos, completos y exactos. En particular, se le pide
-      que indique si reviste o no la condición de Sujeto Obligado o Persona Expuesta Políticamente
-      (PEP). Esta manifestación se realiza bajo su exclusiva responsabilidad y puede ser verificada
-      conforme a la normativa vigente en materia de prevención de lavado de activos.”
+  <div
+    className={styles.selectionContainer}
+    style={{ gap: "1rem" }}
+  >
+    <BackButton onClick={onBack} />
+    <h3 className={styles.soTitle}>
+      Solicitud de Documentación e Información para Personas Expuestas Políticamente
+    </h3>
+    <p className={styles.soLaw}>(Ley 25.246 / Resolución UIF 200/2024)</p>
+
+    <p style={{ textAlign: "left" }}>
+      <strong>Estimado/a cliente:</strong>
     </p>
+    <p style={{ textAlign: "left" }}>
+      Para avanzar, es necesario identificar qué tipo de Persona Expuesta Políticamente (PEP) es
+      usted:
+    </p>
+    <div
+      className={styles.infoBox}
+      style={{ margin: "1rem 0", padding: "1rem" }}
+    >
+      <p style={{ marginBottom: "0.5rem" }}>
+        <strong>• PEP Directo:</strong> Persona que desempeña o ha desempeñado funciones públicas
+        destacadas (funcionarios gubernamentales, judiciales, militares de alto rango o directivos
+        de empresas estatales).
+      </p>
+      <p>
+        <strong>• PEP Indirecto:</strong> Familiares directos (cónyuges, padres, hijos, hermanos) o
+        allegados cercanos con vínculos comerciales o afectivos estrechos con un PEP Directo.
+      </p>
+    </div>
+    <h3 className={styles.question}>¿Qué tipo de PEP es usted?</h3>
     <div className={styles.buttonGroup}>
       <GenericButton onClick={onSelectDirect}>PEP Directo</GenericButton>
       <GenericButton onClick={onSelectIndirect}>PEP Indirecto</GenericButton>
-      <GenericButton
-        variant='outline'
-        onClick={onBack}
-      >
-        Volver
-      </GenericButton>
     </div>
   </div>
 );
 
-export const ComplianceSOInfo = ({ onConfirm, onBack, loading }) => {
+export const ComplianceSOInfo = ({
+  scoringId,
+  formData,
+  onInputChange,
+  onConfirm,
+  onBack,
+  loading,
+}) => {
   const [page, setPage] = React.useState(1);
+  const [showModal, setShowModal] = React.useState(false);
+  const [isNoteConfirmed, setIsNoteConfirmed] = React.useState(false);
+  const [isDownloaded, setIsDownloaded] = React.useState(false);
+  const [showNotification, setShowNotification] = React.useState(false);
+  const [savingNote, setSavingNote] = React.useState(false);
 
   const handleNextPage = () => setPage((prev) => prev + 1);
   const handlePrevPage = () => setPage((prev) => Math.max(1, prev - 1));
@@ -82,27 +110,50 @@ export const ComplianceSOInfo = ({ onConfirm, onBack, loading }) => {
     }
   };
 
+  const handleOpenModal = (e) => {
+    if (e) e.preventDefault();
+    // Validate fields before opening modal
+    if (!formData.so_nombre || !formData.so_cuit || !formData.so_inciso || !formData.so_actividad) {
+      alert("Por favor complete todos los campos de la declaración.");
+      return;
+    }
+    setShowModal(true);
+  };
+
+  const handleConfirmModal = async () => {
+    setSavingNote(true);
+    try {
+      await SimuladorService.guardarCompliance({
+        scoringId,
+        es_pep: false,
+        es_so: true,
+        so_detalle: {
+          so_nombre: formData.so_nombre,
+          so_cuit: formData.so_cuit,
+          so_inciso: formData.so_inciso,
+          so_actividad: formData.so_actividad,
+        },
+      });
+      setIsNoteConfirmed(true);
+      setShowModal(false);
+    } catch (error) {
+      console.error("Error saving SO note:", error);
+      alert("Error al guardar la declaración. Por favor intente nuevamente.");
+    } finally {
+      setSavingNote(false);
+    }
+  };
+
+  const handleDownload = () => {
+    window.open("/Solicitud_Documentacion_Sujeto_Obligado.pdf", "_blank");
+    setIsDownloaded(true);
+    setShowNotification(true);
+  };
+
   return (
     <div className={styles.soContainer}>
-      <button
-        type='button'
-        className={styles.backButton}
-        onClick={handleBack}
-      >
-        <svg
-          stroke='currentColor'
-          fill='currentColor'
-          strokeWidth='0'
-          viewBox='0 0 24 24'
-          height='1em'
-          width='1em'
-          xmlns='http://www.w3.org/2000/svg'
-        >
-          <path d='M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z'></path>
-        </svg>
-        <span>Volver</span>
-      </button>
       <div className={styles.soContent}>
+        <BackButton onClick={handleBack} />
         <h3 className={styles.soTitle}>
           Solicitud de Documentación e Información para Sujetos Obligados
         </h3>
@@ -117,81 +168,87 @@ export const ComplianceSOInfo = ({ onConfirm, onBack, loading }) => {
               <p>
                 Usted ha informado ser Sujeto Obligado conforme al artículo 20 de la Ley 25.246. A
                 fin de cumplir con la normativa vigente en materia de Prevención de Lavado de
-                Activos y Financiamiento del Terrorismo (Resolución UIF 200/2024), le solicitamos
-                completar y remitir la siguiente información y documentación al correo electrónico{" "}
+                Activos y Financiamiento del Terrorismo, le solicitamos completar y remitir la
+                siguiente información y documentación al correo electrónico{" "}
                 <strong>compliance@cofa.com.ar</strong>.
               </p>
-              <div className={styles.soRequirements}>
-                <div className={styles.recItem}>
-                  <h4># Acreditación de la condición de Sujeto Obligado</h4>
-                  <p>
-                    Nota firmada indicando el inciso del art. 20 de la Ley 25.246 bajo el cual se
-                    encuentra alcanzado.
-                    <p className={styles.draftHeader}>Declaración a completar por el cliente</p>
-                    <p>
-                      Yo,
-                      ..............................................................................................................................
-                      , CUIT Nº ................................................... , declaro bajo
-                      juramento que me encuentro alcanzado/a como Sujeto Obligado en virtud del
-                      inciso Nº ............. del artículo 20 de la Ley 25.246, desempeñando la
-                      actividad de ........................................
-                    </p>
-                  </p>
-                </div>
-              </div>
             </div>
           )}
-
           {page === 2 && (
-            <div className={styles.fadeSlide}>
-              <div className={styles.soRequirements}>
-                <div className={styles.recItem}>
-                  <h4># Constancia de inscripción ante organismo de control</h4>
-                  <p>
-                    Ejemplo: matrícula profesional, inscripción CNV, SSN, INAES, BCRA, UIF, IGJ,
-                    etc.
-                  </p>
+            <div className={styles.soRequirements}>
+              <div className={styles.recItem}>
+                <h4># Acreditación de la condición de Sujeto Obligado</h4>
+                <p>
+                  Nota indicando el inciso del art. 20 de la Ley 25.246 bajo el cual se encuentra
+                  alcanzado.
+                </p>
+                <p className={styles.draftHeader}>Declaración a completar por el cliente</p>
+                <div className={styles.soDeclarationDraft}>
+                  Yo,{" "}
+                  <input
+                    className={styles.inlineInput}
+                    name='so_nombre'
+                    placeholder='Nombre y Apellido'
+                    value={formData.so_nombre || ""}
+                    onChange={onInputChange}
+                    required
+                  />
+                  , CUIT Nº{" "}
+                  <input
+                    className={styles.inlineInput}
+                    name='so_cuit'
+                    placeholder='CUIT'
+                    value={formData.so_cuit || ""}
+                    onChange={onInputChange}
+                    required
+                  />{" "}
+                  , declaro bajo juramento que me encuentro alcanzado/a como Sujeto Obligado en
+                  virtud del inciso Nº{" "}
+                  <input
+                    className={styles.inlineInput}
+                    style={{ width: "60px" }}
+                    name='so_inciso'
+                    placeholder='Inciso'
+                    value={formData.so_inciso || ""}
+                    onChange={onInputChange}
+                    required
+                  />{" "}
+                  del artículo 20 de la Ley 25.246, desempeñando la actividad de{" "}
+                  <input
+                    className={styles.inlineInput}
+                    name='so_actividad'
+                    placeholder='Actividad'
+                    value={formData.so_actividad || ""}
+                    onChange={onInputChange}
+                    required
+                  />
                 </div>
-                <div className={styles.recItem}>
-                  <h4># Política o Manual PLAFT propio</h4>
-                  <p>
-                    Declaración o resumen ejecutivo que acredite la existencia de un sistema interno
-                    de PLAFT.
-                  </p>
-                </div>
-                <div className={styles.recItem}>
-                  <h4># Identificación del Oficial de Cumplimiento</h4>
-                  <p>
-                    Nombre completo, cargo, datos de contacto y número o fecha de designación (si
-                    aplica).
-                  </p>
+                <div style={{ marginTop: "1.5rem", textAlign: "right" }}>
+                  <GenericButton
+                    variant={isNoteConfirmed ? "outline" : "solid"}
+                    onClick={handleOpenModal}
+                    disabled={isNoteConfirmed || savingNote}
+                  >
+                    {isNoteConfirmed ? "Declaración Confirmada ✓" : "Confirmar Declaración"}
+                  </GenericButton>
                 </div>
               </div>
             </div>
           )}
-
           {page === 3 && (
             <div className={styles.fadeSlide}>
-              <div className={styles.soRequirements}>
-                <div className={styles.recItem}>
-                  <h4># Declaración sobre propósito de la relación comercial</h4>
-                  <p>
-                    Descripción del tipo de operaciones que realizará con COFA (créditos,
-                    inversiones, intermediación, etc.).
-                  </p>
-                </div>
-                <div className={styles.recItem}>
-                  <h4># Documentación general de identificación y domicilio</h4>
-                  <p>
-                    DNI / CUIT / estatuto / actas / poderes vigentes, según corresponda (persona
-                    humana o jurídica).
-                  </p>
-                </div>
+              <div className={styles.soFooterContainer}>
+                <p className={styles.soFooter}>
+                  La información requerida es de carácter obligatorio y será tratada conforme a la
+                  Ley 25.326 de Protección de Datos Personales.
+                </p>
+                <GenericButton
+                  variant='outline'
+                  onClick={handleDownload}
+                >
+                  Descargar Solicitud de Documentación (PDF)
+                </GenericButton>
               </div>
-              <p className={styles.soFooter}>
-                La información requerida es de carácter obligatorio y será tratada conforme a la Ley
-                25.326 de Protección de Datos Personales.
-              </p>
             </div>
           )}
         </div>
@@ -200,16 +257,55 @@ export const ComplianceSOInfo = ({ onConfirm, onBack, loading }) => {
       <div className={styles.paginationFooter}>
         <p className={styles.pageIndicator}>Paso {page} de 3</p>
         {page < 3 ? (
-          <GenericButton onClick={handleNextPage}>Siguiente</GenericButton>
+          <GenericButton
+            onClick={handleNextPage}
+            disabled={page === 2 && !isNoteConfirmed}
+          >
+            Siguiente Paso
+          </GenericButton>
         ) : (
           <GenericButton
             onClick={onConfirm}
             loading={loading}
+            disabled={!isDownloaded}
           >
-            Entendido, Continuar
+            Siguiente paso
           </GenericButton>
         )}
       </div>
+
+      {showModal && (
+        <Modal
+          closeModal={() => setShowModal(false)}
+          title='Confirmar Declaración Jurada'
+          description='¿Está seguro que desea dar por confirmada la declaración jurada con los datos ingresados?'
+        >
+          <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
+            <GenericButton
+              variant='outline'
+              onClick={() => setShowModal(false)}
+              disabled={savingNote}
+            >
+              Cancelar
+            </GenericButton>
+            <GenericButton
+              onClick={handleConfirmModal}
+              loading={savingNote}
+            >
+              Confirmar
+            </GenericButton>
+          </div>
+        </Modal>
+      )}
+
+      {showNotification && (
+        <Notification
+          message='La descarga se ha realizado con éxito. Un asesor se pondrá en contacto en cuanto recibamos el mail con la documentación.'
+          type='success'
+          onClose={() => setShowNotification(false)}
+          duration={8000}
+        />
+      )}
     </div>
   );
 };
@@ -227,6 +323,14 @@ export const CompliancePEPForm = ({ type, formData, onInputChange, onSubmit, onB
       }
       onSubmit={onSubmit}
       onBack={onBack}
+      style={{
+        width: "100%",
+        height: "100%",
+        margin: "0px",
+        maxWidth: "none",
+        minHeight: "760px",
+        justifyContent: "center",
+      }}
     >
       <div className={styles.scrollableForm}>
         {isDirect ? (
@@ -266,6 +370,13 @@ export const CompliancePEPForm = ({ type, formData, onInputChange, onSubmit, onB
               required
             />
             <GenericInput
+              label='¿Ya es cliente de COFA o es la primera vez que opera con nosotros?'
+              name='cliente_cofa'
+              value={formData.cliente_cofa || ""}
+              onChange={onInputChange}
+              required
+            />
+            <GenericInput
               label='Ingreso declarado'
               name='ingreso_declarado'
               type='number'
@@ -299,7 +410,7 @@ export const CompliancePEPForm = ({ type, formData, onInputChange, onSubmit, onB
               onChange={onInputChange}
             />
             <GenericInput
-              label='¿Cuentas o estructuras en el exterior?'
+              label='¿Cuentas o estructuras societarias en el exterior?'
               name='cuentas_exterior'
               value={formData.cuentas_exterior || ""}
               onChange={onInputChange}

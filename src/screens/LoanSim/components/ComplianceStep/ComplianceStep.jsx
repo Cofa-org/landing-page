@@ -15,7 +15,7 @@ import styles from "./ComplianceStep.module.css";
  * Manages the multi-step flow for PEP and SO declarations.
  * Refactored following /react-ui-designer workflow.
  */
-const ComplianceStep = ({ onValidate, onBack, loading, error }) => {
+const ComplianceStep = ({ scoringId, onValidate, onBack, loading, error }) => {
   const { currentStep, formData, handleInputChange, goToStep, resetAndProceed, handleSubmit } =
     useComplianceForm(onValidate);
 
@@ -50,6 +50,9 @@ const ComplianceStep = ({ onValidate, onBack, loading, error }) => {
       case COMPLIANCE_STEPS.FORM_SO:
         return (
           <ComplianceSOInfo
+            scoringId={scoringId}
+            formData={formData}
+            onInputChange={handleInputChange}
             onConfirm={handleSubmit}
             onBack={() => goToStep(COMPLIANCE_STEPS.TYPE_SELECTION)}
             loading={loading}

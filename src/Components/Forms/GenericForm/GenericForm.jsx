@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { MdArrowBack } from "react-icons/md";
 import styles from "./GenericForm.module.css";
+import BackButton from "../../buttons/backbutton/Backbutton.jsx";
 
 /**
  * GenericForm component.
@@ -20,15 +20,7 @@ const GenericForm = ({ title, description, children, onSubmit, onBack, className
       onSubmit={handleSubmit}
     >
       {onBack && (
-        <button
-          type='button'
-          className={styles.backButton}
-          onClick={onBack}
-          aria-label='Volver'
-        >
-          <MdArrowBack className={styles.backIcon} />
-          <span>Volver</span>
-        </button>
+        <BackButton onClick={onBack} />
       )}
       {title && <h3 className={styles.title}>{title}</h3>}
       {description && <p className={styles.description}>{description}</p>}

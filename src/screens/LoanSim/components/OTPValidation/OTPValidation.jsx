@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import PropTypes from "prop-types";
 import GenericForm from "../../../../Components/Forms/GenericForm/GenericForm.jsx";
-import GenericButton from "../../../../Components/Forms/GenericButton/GenericButton.jsx";
+import GenericButton from "../../../../Components/buttons/GenericButton/GenericButton.jsx";
 import styles from "./OTPValidation.module.css";
 import { OTP_CONFIG } from "../../../../constants/LOAN_SIM.js";
 

@@ -19,6 +19,7 @@ const LoanSimScreen = () => {
     validating,
     error,
     nombreCompleto,
+    scoringId,
     step,
     email,
     loanInfo,
@@ -83,6 +84,7 @@ const LoanSimScreen = () => {
       case LOAN_SIM_STEPS.COMPLIANCE:
         return (
           <ComplianceStep
+            scoringId={scoringId}
             onValidate={guardarCompliance}
             onBack={handlePrevStep}
             loading={validating}

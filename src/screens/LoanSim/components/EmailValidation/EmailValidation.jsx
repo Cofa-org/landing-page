@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import GenericForm from "../../../../Components/Forms/GenericForm/GenericForm";
 import GenericInput from "../../../../Components/Forms/GenericInput/GenericInput";
-import GenericButton from "../../../../Components/Forms/GenericButton/GenericButton";
+import GenericButton from "../../../../Components/buttons/GenericButton/GenericButton.jsx";
 
 const EmailValidation = ({ onValidate, onBack, loading, error }) => {
   const [email, setEmail] = useState("");

@@ -13,14 +13,21 @@
   text-align: center;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-evenly;
   gap: 5rem;
   padding: 2rem;
   background: var(--color-background);
   border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow);
   animation: slideIn 0.3s ease-out;
-  min-height: 760px;
+  min-height: 675px;
+  width: 100%;
+}
+
+.soFooterContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .question {
@@ -65,12 +72,14 @@
   box-shadow: var(--shadow);
   max-width: 850px;
   margin: 0 auto;
+  min-height: 675px;
 }
 
 .soTitle {
   font-size: 1.8rem;
   color: var(--primary-color);
   margin-bottom: 0.5rem;
+  margin-top: 0.5rem;
   text-align: center;
   font-weight: 800;
 }
@@ -109,6 +118,31 @@
   letter-spacing: 0.5px;
 }
 
+.inlineInput {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid var(--primary-color-20);
+  font-family: inherit;
+  font-size: 1rem;
+  color: var(--primary-color);
+  font-weight: 700;
+  text-align: center;
+  padding: 0 5px;
+  transition: border-bottom 0.2s;
+  min-width: 120px;
+}
+
+.inlineInput:focus {
+  outline: none;
+  border-bottom: 2px solid var(--primary-color);
+}
+
+.inlineInput::placeholder {
+  color: #ccc;
+  font-weight: 400;
+  font-style: normal;
+}
+
 .soRequirements {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -122,6 +156,10 @@
   padding: 1.2rem;
   border-radius: var(--border-radius-sm);
   transition: all 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  justify-content: center;
 }
 
 .recItem:hover {
@@ -168,6 +206,9 @@
 
 .fadeSlide {
   animation: fadeSlideIn 0.4s ease-out;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
 }
 
 @keyframes fadeSlideIn {

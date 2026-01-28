@@ -326,6 +326,7 @@ export const useLoanSimulator = () => {
     validating,
     error,
     nombreCompleto: scoringData.nombreCompleto,
+    scoringId: scoringData.scoringId,
     step,
     email,
     cbu,

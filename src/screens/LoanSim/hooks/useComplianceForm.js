@@ -50,6 +50,7 @@ export const useComplianceForm = (onValidate) => {
 
       if (currentStep === COMPLIANCE_STEPS.FORM_SO) {
         payload.es_so = true;
+        payload.so_detalle = { ...formData };
       } else if (currentStep === COMPLIANCE_STEPS.FORM_PEP_DIRECT) {
         payload.es_pep = true;
         payload.pep_tipo = "DIRECTO";
