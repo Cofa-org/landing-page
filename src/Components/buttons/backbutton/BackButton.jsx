@@ -2,13 +2,14 @@ import PropTypes from "prop-types";
 import styles from "./BackButton.module.css";
 import { MdArrowBack } from "react-icons/md";
 
-const BackButton = ({ onClick, disabled, loading }) => {
+const BackButton = ({ onClick, disabled, loading, style }) => {
   return (
     <button
       type='button'
       className={styles.backButton}
       onClick={onClick}
       disabled={disabled || loading}
+      style={style}
     >
       <MdArrowBack className={styles.backIcon} />
       <span>Volver</span>

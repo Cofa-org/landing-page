@@ -7,7 +7,7 @@ import BackButton from "../../buttons/backbutton/Backbutton.jsx";
  * GenericForm component.
  * Acts as a container for forms, providing consistent layout and styling.
  */
-const GenericForm = ({ title, description, children, onSubmit, onBack, className = "", style = {} }) => {
+const GenericForm = ({ title, description, children, onSubmit, className = "", style = {} }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (onSubmit) onSubmit(e);
@@ -19,9 +19,7 @@ const GenericForm = ({ title, description, children, onSubmit, onBack, className
       style={style}
       onSubmit={handleSubmit}
     >
-      {onBack && (
-        <BackButton onClick={onBack} />
-      )}
+
       {title && <h3 className={styles.title}>{title}</h3>}
       {description && <p className={styles.description}>{description}</p>}
       <div className={styles.content}>{children}</div>

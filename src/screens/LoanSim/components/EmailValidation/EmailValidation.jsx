@@ -19,7 +19,6 @@ const EmailValidation = ({ onValidate, onBack, loading, error }) => {
       title='Validá tu Email'
       description='Necesitamos validar tu correo electrónico para continuar con la solicitud.'
       onSubmit={handleSubmit}
-      onBack={onBack}
       style={{
         width: "100%",
         height: "100%",

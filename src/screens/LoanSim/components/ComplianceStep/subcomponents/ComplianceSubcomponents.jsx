@@ -28,7 +28,7 @@ export const ComplianceInitial = ({ onNext, onNone }) => (
 
 export const ComplianceTypeSelection = ({ onSelectPEP, onSelectSO, onBack }) => (
   <div className={styles.selectionContainer}>
-    <BackButton onClick={onBack} />
+    <BackButton onClick={onBack} style={{position: "relative", top: "-35px", left: "-30px"}} />
     <h3 className={styles.question}>Seleccione su condición:</h3>
     <div className={styles.buttonGroup}>
       <GenericButton onClick={onSelectPEP}>Soy PEP</GenericButton>
@@ -238,9 +238,10 @@ export const ComplianceSOInfo = ({
           {page === 3 && (
             <div className={styles.fadeSlide}>
               <div className={styles.soFooterContainer}>
-                <p className={styles.soFooter}>
-                  La información requerida es de carácter obligatorio y será tratada conforme a la
-                  Ley 25.326 de Protección de Datos Personales.
+                <p style={{ margin: "1rem 0", color: "#666", fontSize: "0.95rem" }}>
+                  Para completar su trámite, por favor descargue el documento de solicitud de
+                  documentación. Una vez realizada la descarga, se habilitará el botón para
+                  finalizar el proceso.
                 </p>
                 <GenericButton
                   variant='outline'
@@ -248,6 +249,10 @@ export const ComplianceSOInfo = ({
                 >
                   Descargar Solicitud de Documentación (PDF)
                 </GenericButton>
+                <p className={styles.soFooter}>
+                  La información requerida es de carácter obligatorio y será tratada conforme a la
+                  Ley 25.326 de Protección de Datos Personales.
+                </p>
               </div>
             </div>
           )}
@@ -385,7 +390,7 @@ export const CompliancePEPForm = ({ type, formData, onInputChange, onSubmit, onB
               required
             />
             <GenericInput
-              label='Actividad económica que genera los fondos'
+              label='Actividad económica que genera los ingresos'
               name='actividad_generadora'
               value={formData.actividad_generadora || ""}
               onChange={onInputChange}
@@ -435,14 +440,14 @@ export const CompliancePEPForm = ({ type, formData, onInputChange, onSubmit, onB
               required
             />
             <GenericInput
-              label='Propósito de la relación comercial'
+              label='Propósito de la relación comercial. Destino del capital solicitado.'
               name='proposito'
               value={formData.proposito || ""}
               onChange={onInputChange}
               required
             />
             <GenericInput
-              label='Origen de los fondos'
+              label='Origen de los ingresos'
               name='origen_fondos'
               placeholder='¿Su actividad, la del PEP u otro?'
               value={formData.origen_fondos || ""}
@@ -473,10 +478,10 @@ export const CompliancePEPForm = ({ type, formData, onInputChange, onSubmit, onB
           {isDirect ? (
             <>
               <li>Declaraciones juradas de bienes y/o ingresos.</li>
-              <li>Contratos que respalden el origen de fondos.</li>
+              <li>Contratos que respalden el origen de ingresos.</li>
             </>
           ) : (
-            <li>Documentación que respalde el origen de los fondos declarados.</li>
+            <li>Documentación que respalde el origen de los ingresos declarados.</li>
           )}
         </ul>
       </div>

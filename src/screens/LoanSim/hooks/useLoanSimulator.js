@@ -255,6 +255,7 @@ export const useLoanSimulator = () => {
         scoringData.cuit,
         scoringData.scoringId,
       );
+
       if (response.success || response.data) {
         setCbu(cbuValue);
         const response = await SimuladorService.obtenerIdPreaprobado({
@@ -262,7 +263,7 @@ export const useLoanSimulator = () => {
           cantidad_cuotas: installment,
           monto: amount,
         });
-
+console.log(response)
         if (response.success) {
           const cookieOptions = {
             name: COOKIE_CONFIG.NAME,

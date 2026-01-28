@@ -93,7 +93,7 @@ export default class SimuladorService {
 
   static async validarCBU(cbu, cuit, scoringId) {
     try {
-      const url = `${VITE_COFA_AUTH_URL || VITE_URL_LOCAL}/api/simulador-prestamos/validar-cbu`;
+      const url = `http://localhost:7005/api/simulador-prestamos/validar-cbu`;
       const apiKey = VITE_COFA_AUTH_API_KEY;
       const body = {
         cbu,
@@ -114,7 +114,7 @@ export default class SimuladorService {
 
   static async obtenerIdPreaprobado({ scoringId, cantidad_cuotas, monto }) {
     try {
-      const url = `${VITE_COFA_AUTH_URL || VITE_URL_LOCAL}/api/simulador-prestamos/preaprobado`;
+      const url = `http://localhost:7005/api/simulador-prestamos/preaprobado`;
       const apiKey = VITE_COFA_AUTH_API_KEY;
       const body = {
         scoringId,

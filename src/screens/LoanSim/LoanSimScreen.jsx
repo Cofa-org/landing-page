@@ -9,6 +9,9 @@ import SuccessStep from "./components/SuccessStep/SuccessStep";
 import { LOAN_SIM_STEPS } from "../../constants/LOAN_SIM.js";
 import { Header, Footer } from "../../Components/index.js";
 import { HeroLoanSim } from "../../Sections/index.js";
+import BackButton from "../../Components/buttons/backbutton/Backbutton.jsx";
+import { useState } from "react";
+import { COMPLIANCE_STEPS } from "./hooks/useComplianceForm.js";
 
 const LoanSimScreen = () => {
   const {
@@ -35,11 +38,16 @@ const LoanSimScreen = () => {
     guardarCompliance,
   } = useLoanSimulator();
 
+  const [currentStepCompliance, setCurrentStepCompliance] = useState(null);
+
   const maxOffer = simulationData?.capital_maximo_a_ofrecer
     ? Number(simulationData.capital_maximo_a_ofrecer)
     : 200000;
   const installments = simulationData?.planes_disponibles?.map((p) => p.plazo) || [];
   const selectedPlan = simulationData?.planes_disponibles?.find((p) => p.plazo === installment);
+  // const getComplianceStep = (step) => {
+  //   setCurrentStepCompliance(step);
+  // };
   const renderStep = () => {
     switch (step) {
       case LOAN_SIM_STEPS.SIMULACION:
@@ -88,6 +96,7 @@ const LoanSimScreen = () => {
             onValidate={guardarCompliance}
             onBack={handlePrevStep}
             loading={validating}
+            // getComplianceStep={getComplianceStep}
             error={error}
           />
         );
@@ -132,12 +141,22 @@ const LoanSimScreen = () => {
     );
   }
 
+ 
+  // console.log(currentStepCompliance);
   return (
     <>
       <Header />
       <HeroLoanSim />
       <div className={styles.homeCalculator_calculatorBox}>
         <div className={`${styles.calculatorContainer} ${loading ? styles.loadingOverlay : ""}`}>
+          {(step === LOAN_SIM_STEPS.COMPLIANCE &&
+            currentStepCompliance === COMPLIANCE_STEPS.INITIAL) ||
+            (step !== LOAN_SIM_STEPS.COMPLIANCE && (
+              <BackButton
+                onClick={handlePrevStep}
+                style={{ position: "relative", top: "30px" }}
+              />
+            ))}
           {renderStep()}
         </div>
       </div>

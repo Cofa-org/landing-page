@@ -12,7 +12,6 @@ export default class LinkResolutionService {
         throw new Error(response.message || "Error al consumir el link");
       }
       const data = await response.json();
-
       return data;
     } catch (error) {
       console.error("CONSUME_LINK_ERROR:", error);
