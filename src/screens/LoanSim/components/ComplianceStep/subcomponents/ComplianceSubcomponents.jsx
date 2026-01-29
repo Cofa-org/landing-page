@@ -1,13 +1,44 @@
-import React from "react";
 import PropTypes from "prop-types";
-import styles from "../ComplianceStep.module.css";
+import React from "react";
 import GenericButton from "../../../../../Components/buttons/GenericButton/GenericButton";
 import GenericForm from "../../../../../Components/Forms/GenericForm/GenericForm";
 import GenericInput from "../../../../../Components/Forms/GenericInput/GenericInput";
-import BackButton from "../../../../../Components/buttons/backbutton/Backbutton.jsx";
 import Modal from "../../../../../Components/Modal/Modal";
 import Notification from "../../../../../Components/Notifications/Notification";
-import SimuladorService from "../../../../../services/simuladorService";
+import { PEP_TIPO } from "../../../../../constants/LOAN_SIM.js";
+import styles from "../ComplianceStep.module.css";
+
+export const ComplianceStatusCheck = ({ onStatusChanged, onStatusUnchanged }) => (
+  <div className={styles.selectionContainer}>
+    <h3 className={styles.question}>
+      ¿Han cambiado sus condiciones como Sujeto Obligado o Persona Expuesta Políticamente?
+    </h3>
+    <p style={{ textAlign: "center", marginBottom: "1.5rem", color: "#666" }}>
+      Usted ya ha completado el proceso de compliance anteriormente.
+    </p>
+    <p className={styles.legalNote}>
+      “La siguiente información se solicita a través de una declaración jurada, lo que implica que
+      los datos que usted consigne son verdaderos, completos y exactos. En particular, se le pide
+      que indique si reviste o no la condición de Sujeto Obligado o Persona Expuesta Políticamente
+      (PEP). Esta manifestación se realiza bajo su exclusiva responsabilidad y puede ser verificada
+      conforme a la normativa vigente en materia de prevención de lavado de activos.”
+    </p>
+    <div className={styles.buttonGroup}>
+      <GenericButton onClick={onStatusChanged}>Sí, han cambiado</GenericButton>
+      <GenericButton
+        variant='outline'
+        onClick={onStatusUnchanged}
+      >
+        No, siguen igual
+      </GenericButton>
+    </div>
+  </div>
+);
+
+ComplianceStatusCheck.propTypes = {
+  onStatusChanged: PropTypes.func.isRequired,
+  onStatusUnchanged: PropTypes.func.isRequired,
+};
 
 export const ComplianceInitial = ({ onNext, onNone }) => (
   <div className={styles.selectionContainer}>
@@ -26,9 +57,8 @@ export const ComplianceInitial = ({ onNext, onNone }) => (
   </div>
 );
 
-export const ComplianceTypeSelection = ({ onSelectPEP, onSelectSO, onBack }) => (
+export const ComplianceTypeSelection = ({ onSelectPEP, onSelectSO }) => (
   <div className={styles.selectionContainer}>
-    <BackButton onClick={onBack} style={{position: "relative", top: "-35px", left: "-30px"}} />
     <h3 className={styles.question}>Seleccione su condición:</h3>
     <div className={styles.buttonGroup}>
       <GenericButton onClick={onSelectPEP}>Soy PEP</GenericButton>
@@ -44,12 +74,11 @@ export const ComplianceTypeSelection = ({ onSelectPEP, onSelectSO, onBack }) => 
   </div>
 );
 
-export const CompliancePEPSelection = ({ onSelectDirect, onSelectIndirect, onBack }) => (
+export const CompliancePEPSelection = ({ onSelectDirect, onSelectIndirect }) => (
   <div
     className={styles.selectionContainer}
     style={{ gap: "1rem" }}
   >
-    <BackButton onClick={onBack} />
     <h3 className={styles.soTitle}>
       Solicitud de Documentación e Información para Personas Expuestas Políticamente
     </h3>
@@ -85,63 +114,33 @@ export const CompliancePEPSelection = ({ onSelectDirect, onSelectIndirect, onBac
 );
 
 export const ComplianceSOInfo = ({
-  scoringId,
   formData,
   onInputChange,
   onConfirm,
-  onBack,
   loading,
+  isNoteConfirmed,
+  handleConfirmModal,
+  savingNote,
+  scoringId,
+  showModal,
+  setShowModal,
 }) => {
   const [page, setPage] = React.useState(1);
-  const [showModal, setShowModal] = React.useState(false);
-  const [isNoteConfirmed, setIsNoteConfirmed] = React.useState(false);
   const [isDownloaded, setIsDownloaded] = React.useState(false);
   const [showNotification, setShowNotification] = React.useState(false);
-  const [savingNote, setSavingNote] = React.useState(false);
+  const [showErrorNotification, setShowErrorNotification] = React.useState(false);
 
   const handleNextPage = () => setPage((prev) => prev + 1);
   const handlePrevPage = () => setPage((prev) => Math.max(1, prev - 1));
-
-  const handleBack = () => {
-    if (page > 1) {
-      handlePrevPage();
-    } else {
-      onBack();
-    }
-  };
 
   const handleOpenModal = (e) => {
     if (e) e.preventDefault();
     // Validate fields before opening modal
     if (!formData.so_nombre || !formData.so_cuit || !formData.so_inciso || !formData.so_actividad) {
-      alert("Por favor complete todos los campos de la declaración.");
+      setShowErrorNotification(true);
       return;
     }
     setShowModal(true);
-  };
-
-  const handleConfirmModal = async () => {
-    setSavingNote(true);
-    try {
-      await SimuladorService.guardarCompliance({
-        scoringId,
-        es_pep: false,
-        es_so: true,
-        so_detalle: {
-          so_nombre: formData.so_nombre,
-          so_cuit: formData.so_cuit,
-          so_inciso: formData.so_inciso,
-          so_actividad: formData.so_actividad,
-        },
-      });
-      setIsNoteConfirmed(true);
-      setShowModal(false);
-    } catch (error) {
-      console.error("Error saving SO note:", error);
-      alert("Error al guardar la declaración. Por favor intente nuevamente.");
-    } finally {
-      setSavingNote(false);
-    }
   };
 
   const handleDownload = () => {
@@ -153,7 +152,6 @@ export const ComplianceSOInfo = ({
   return (
     <div className={styles.soContainer}>
       <div className={styles.soContent}>
-        <BackButton onClick={handleBack} />
         <h3 className={styles.soTitle}>
           Solicitud de Documentación e Información para Sujetos Obligados
         </h3>
@@ -192,6 +190,7 @@ export const ComplianceSOInfo = ({
                     value={formData.so_nombre || ""}
                     onChange={onInputChange}
                     required
+                    disabled={isNoteConfirmed}
                   />
                   , CUIT Nº{" "}
                   <input
@@ -201,6 +200,7 @@ export const ComplianceSOInfo = ({
                     value={formData.so_cuit || ""}
                     onChange={onInputChange}
                     required
+                    disabled={isNoteConfirmed}
                   />{" "}
                   , declaro bajo juramento que me encuentro alcanzado/a como Sujeto Obligado en
                   virtud del inciso Nº{" "}
@@ -212,6 +212,7 @@ export const ComplianceSOInfo = ({
                     value={formData.so_inciso || ""}
                     onChange={onInputChange}
                     required
+                    disabled={isNoteConfirmed}
                   />{" "}
                   del artículo 20 de la Ley 25.246, desempeñando la actividad de{" "}
                   <input
@@ -221,11 +222,12 @@ export const ComplianceSOInfo = ({
                     value={formData.so_actividad || ""}
                     onChange={onInputChange}
                     required
+                    disabled={isNoteConfirmed}
                   />
                 </div>
                 <div style={{ marginTop: "1.5rem", textAlign: "right" }}>
                   <GenericButton
-                    variant={isNoteConfirmed ? "outline" : "solid"}
+                    variant={isNoteConfirmed ? "outline" : "primary"}
                     onClick={handleOpenModal}
                     disabled={isNoteConfirmed || savingNote}
                   >
@@ -294,7 +296,7 @@ export const ComplianceSOInfo = ({
               Cancelar
             </GenericButton>
             <GenericButton
-              onClick={handleConfirmModal}
+              onClick={() => handleConfirmModal(scoringId)}
               loading={savingNote}
             >
               Confirmar
@@ -311,186 +313,231 @@ export const ComplianceSOInfo = ({
           duration={8000}
         />
       )}
+
+      {showErrorNotification && (
+        <Notification
+          message='Por favor complete todos los campos de la declaración.'
+          type='error'
+          onClose={() => setShowErrorNotification(false)}
+        />
+      )}
     </div>
   );
 };
 
 export const CompliancePEPForm = ({ type, formData, onInputChange, onSubmit, onBack, loading }) => {
-  const isDirect = type === "DIRECTO";
+  const isDirect = type === PEP_TIPO.DIRECTO;
+  const [showModal, setShowModal] = React.useState(false);
+
+  const handlePreSubmit = (e) => {
+    if (e) e.preventDefault();
+    setShowModal(true);
+  };
+
+  const handleConfirm = () => {
+    onSubmit({ preventDefault: () => {} });
+    setShowModal(false);
+  };
 
   return (
-    <GenericForm
-      title={isDirect ? "Declaración PEP Directo" : "KYC PEP Indirecto"}
-      description={
-        isDirect
-          ? "Cuestionario detallado. Envíe documentación a compliance@cofa.com.ar"
-          : "Familiares y allegados a PEP. Envíe documentación a compliance@cofa.com.ar"
-      }
-      onSubmit={onSubmit}
-      onBack={onBack}
-      style={{
-        width: "100%",
-        height: "100%",
-        margin: "0px",
-        maxWidth: "none",
-        minHeight: "760px",
-        justifyContent: "center",
-      }}
-    >
-      <div className={styles.scrollableForm}>
-        {isDirect ? (
-          <>
-            <GenericInput
-              label='Nombre completo del PEP'
-              name='nombre_completo_pep'
-              value={formData.nombre_completo_pep || ""}
-              onChange={onInputChange}
-              required
-            />
-            <GenericInput
-              label='Cargo actual y Organismo'
-              name='cargo_organismo'
-              value={formData.cargo_organismo || ""}
-              onChange={onInputChange}
-              required
-            />
-            <GenericInput
-              label='Fecha de asunción y duración prevista'
-              name='fecha_asuncion_duracion'
-              value={formData.fecha_asuncion_duracion || ""}
-              onChange={onInputChange}
-              required
-            />
-            <GenericInput
-              label='Historial de cargos públicos previos'
-              name='historial_cargos'
-              value={formData.historial_cargos || ""}
-              onChange={onInputChange}
-            />
-            <GenericInput
-              label='Razón de la solicitud del préstamo'
-              name='razon_prestamo'
-              value={formData.razon_prestamo || ""}
-              onChange={onInputChange}
-              required
-            />
-            <GenericInput
-              label='¿Ya es cliente de COFA o es la primera vez que opera con nosotros?'
-              name='cliente_cofa'
-              value={formData.cliente_cofa || ""}
-              onChange={onInputChange}
-              required
-            />
-            <GenericInput
-              label='Ingreso declarado'
-              name='ingreso_declarado'
-              type='number'
-              value={formData.ingreso_declarado || ""}
-              onChange={onInputChange}
-              required
-            />
-            <GenericInput
-              label='Actividad económica que genera los ingresos'
-              name='actividad_generadora'
-              value={formData.actividad_generadora || ""}
-              onChange={onInputChange}
-              required
-            />
-            <GenericInput
-              label='¿Fondos de otras fuentes? Detalle'
-              name='otras_fuentes'
-              value={formData.otras_fuentes || ""}
-              onChange={onInputChange}
-            />
-            <GenericInput
-              label='Empresas en las que participa'
-              name='empresas_participa'
-              value={formData.empresas_participa || ""}
-              onChange={onInputChange}
-            />
-            <GenericInput
-              label='Personas relacionadas con acceso a fondos'
-              name='personas_relacionadas'
-              value={formData.personas_relacionadas || ""}
-              onChange={onInputChange}
-            />
-            <GenericInput
-              label='¿Cuentas o estructuras societarias en el exterior?'
-              name='cuentas_exterior'
-              value={formData.cuentas_exterior || ""}
-              onChange={onInputChange}
-            />
-          </>
-        ) : (
-          <>
-            <GenericInput
-              label='Relación con el PEP'
-              name='relacion'
-              placeholder='Ej: Cónyuge, hijo, etc.'
-              value={formData.relacion || ""}
-              onChange={onInputChange}
-              required
-            />
-            <GenericInput
-              label='Organismo y Cargo del PEP'
-              name='pep_cargo'
-              placeholder='Donde se desempeña el PEP'
-              value={formData.pep_cargo || ""}
-              onChange={onInputChange}
-              required
-            />
-            <GenericInput
-              label='Propósito de la relación comercial. Destino del capital solicitado.'
-              name='proposito'
-              value={formData.proposito || ""}
-              onChange={onInputChange}
-              required
-            />
-            <GenericInput
-              label='Origen de los ingresos'
-              name='origen_fondos'
-              placeholder='¿Su actividad, la del PEP u otro?'
-              value={formData.origen_fondos || ""}
-              onChange={onInputChange}
-              required
-            />
-            <GenericInput
-              label='¿Cuánto estima que va a operar?'
-              name='volumen_estimado'
-              type='number'
-              value={formData.volumen_estimado || ""}
-              onChange={onInputChange}
-              required
-            />
-            <GenericInput
-              label='¿Cómo llegó a COFA?'
-              name='canal_llegada'
-              value={formData.canal_llegada || ""}
-              onChange={onInputChange}
-              required
-            />
-          </>
-        )}
-      </div>
-      <div className={styles.infoBox}>
-        <p>Deberá adjuntar por mail:</p>
-        <ul>
+    <>
+      <GenericForm
+        title={isDirect ? "Declaración PEP Directo" : "KYC PEP Indirecto"}
+        description={
+          isDirect
+            ? "Cuestionario detallado. Envíe documentación a compliance@cofa.com.ar"
+            : "Familiares y allegados a PEP. Envíe documentación a compliance@cofa.com.ar"
+        }
+        onSubmit={handlePreSubmit}
+        onBack={onBack}
+        style={{
+          width: "100%",
+          height: "100%",
+          margin: "0px",
+          maxWidth: "none",
+          minHeight: "760px",
+          justifyContent: "center",
+        }}
+      >
+        <div className={styles.scrollableForm}>
           {isDirect ? (
             <>
-              <li>Declaraciones juradas de bienes y/o ingresos.</li>
-              <li>Contratos que respalden el origen de ingresos.</li>
+              <GenericInput
+                label='Nombre completo del PEP'
+                name='nombre_completo_pep'
+                value={formData.nombre_completo_pep || ""}
+                onChange={onInputChange}
+                required
+              />
+              <GenericInput
+                label='Cargo actual y Organismo'
+                name='cargo_organismo'
+                value={formData.cargo_organismo || ""}
+                onChange={onInputChange}
+                required
+              />
+              <GenericInput
+                label='Fecha de asunción y duración prevista'
+                name='fecha_asuncion_duracion'
+                value={formData.fecha_asuncion_duracion || ""}
+                onChange={onInputChange}
+                required
+              />
+              <GenericInput
+                label='Historial de cargos públicos previos'
+                name='historial_cargos'
+                value={formData.historial_cargos || ""}
+                onChange={onInputChange}
+              />
+              <GenericInput
+                label='Razón de la solicitud del préstamo'
+                name='razon_prestamo'
+                value={formData.razon_prestamo || ""}
+                onChange={onInputChange}
+                required
+              />
+              <GenericInput
+                label='¿Ya es cliente de COFA o es la primera vez que opera con nosotros?'
+                name='cliente_cofa'
+                value={formData.cliente_cofa || ""}
+                onChange={onInputChange}
+                required
+              />
+              <GenericInput
+                label='Ingreso declarado'
+                name='ingreso_declarado'
+                type='number'
+                value={formData.ingreso_declarado || ""}
+                onChange={onInputChange}
+                required
+              />
+              <GenericInput
+                label='Actividad económica que genera los ingresos'
+                name='actividad_generadora'
+                value={formData.actividad_generadora || ""}
+                onChange={onInputChange}
+                required
+              />
+              <GenericInput
+                label='¿Fondos de otras fuentes? Detalle'
+                name='otras_fuentes'
+                value={formData.otras_fuentes || ""}
+                onChange={onInputChange}
+              />
+              <GenericInput
+                label='Empresas en las que participa'
+                name='empresas_participa'
+                value={formData.empresas_participa || ""}
+                onChange={onInputChange}
+              />
+              <GenericInput
+                label='Personas relacionadas con acceso a fondos'
+                name='personas_relacionadas'
+                value={formData.personas_relacionadas || ""}
+                onChange={onInputChange}
+              />
+              <GenericInput
+                label='¿Cuentas o estructuras societarias en el exterior?'
+                name='cuentas_exterior'
+                value={formData.cuentas_exterior || ""}
+                onChange={onInputChange}
+              />
             </>
           ) : (
-            <li>Documentación que respalde el origen de los ingresos declarados.</li>
+            <>
+              <GenericInput
+                label='Relación con el PEP'
+                name='relacion'
+                placeholder='Ej: Cónyuge, hijo, etc.'
+                value={formData.relacion || ""}
+                onChange={onInputChange}
+                required
+              />
+              <GenericInput
+                label='Organismo y Cargo del PEP'
+                name='pep_cargo'
+                placeholder='Donde se desempeña el PEP'
+                value={formData.pep_cargo || ""}
+                onChange={onInputChange}
+                required
+              />
+              <GenericInput
+                label='Propósito de la relación comercial. Destino del capital solicitado.'
+                name='proposito'
+                value={formData.proposito || ""}
+                onChange={onInputChange}
+                required
+              />
+              <GenericInput
+                label='Origen de los ingresos'
+                name='origen_fondos'
+                placeholder='¿Su actividad, la del PEP u otro?'
+                value={formData.origen_fondos || ""}
+                onChange={onInputChange}
+                required
+              />
+              <GenericInput
+                label='¿Cuánto estima que va a operar?'
+                name='volumen_estimado'
+                type='number'
+                value={formData.volumen_estimado || ""}
+                onChange={onInputChange}
+                required
+              />
+              <GenericInput
+                label='¿Cómo llegó a COFA?'
+                name='canal_llegada'
+                value={formData.canal_llegada || ""}
+                onChange={onInputChange}
+                required
+              />
+            </>
           )}
-        </ul>
-      </div>
-      <GenericButton
-        type='submit'
-        loading={loading}
-      >
-        Finalizar Declaración
-      </GenericButton>
-    </GenericForm>
+        </div>
+        <div className={styles.infoBox}>
+          <p>Deberá adjuntar por mail:</p>
+          <ul>
+            {isDirect ? (
+              <>
+                <li>Declaraciones juradas de bienes y/o ingresos.</li>
+                <li>Contratos que respalden el origen de ingresos.</li>
+              </>
+            ) : (
+              <li>Documentación que respalde el origen de los ingresos declarados.</li>
+            )}
+          </ul>
+        </div>
+        <GenericButton
+          type='submit'
+          loading={loading}
+        >
+          Finalizar Declaración
+        </GenericButton>
+      </GenericForm>
+
+      {showModal && (
+        <Modal
+          closeModal={() => setShowModal(false)}
+          title='Confirmar Declaración Jurada'
+          description='¿Está seguro que desea dar por confirmada la declaración jurada con los datos ingresados?'
+        >
+          <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
+            <GenericButton
+              variant='outline'
+              onClick={() => setShowModal(false)}
+              disabled={loading}
+            >
+              Cancelar
+            </GenericButton>
+            <GenericButton
+              onClick={handleConfirm}
+              loading={loading}
+            >
+              Confirmar
+            </GenericButton>
+          </div>
+        </Modal>
+      )}
+    </>
   );
 };

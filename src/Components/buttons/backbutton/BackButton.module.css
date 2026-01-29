@@ -27,3 +27,9 @@
 .backIcon {
   font-size: 1.1rem;
 }
+
+.backButton:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: none;
+}

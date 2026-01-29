@@ -79,7 +79,7 @@ export default class SimuladorService {
       };
 
       const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, null);
-      console.log(response);
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Error al verificar OTP");
@@ -93,7 +93,7 @@ export default class SimuladorService {
 
   static async validarCBU(cbu, cuit, scoringId) {
     try {
-      const url = `http://localhost:7005/api/simulador-prestamos/validar-cbu`;
+      const url = `${VITE_COFA_AUTH_URL || VITE_URL_LOCAL}/api/simulador-prestamos/validar-cbu`;
       const apiKey = VITE_COFA_AUTH_API_KEY;
       const body = {
         cbu,
@@ -114,7 +114,7 @@ export default class SimuladorService {
 
   static async obtenerIdPreaprobado({ scoringId, cantidad_cuotas, monto }) {
     try {
-      const url = `http://localhost:7005/api/simulador-prestamos/preaprobado`;
+      const url = `${VITE_COFA_AUTH_URL || VITE_URL_LOCAL}/api/simulador-prestamos/preaprobado`;
       const apiKey = VITE_COFA_AUTH_API_KEY;
       const body = {
         scoringId,
@@ -167,6 +167,22 @@ export default class SimuladorService {
       return await response.json();
     } catch (error) {
       console.error("GUARDAR_COMPLIANCE_ERROR:", error);
+      throw error;
+    }
+  }
+
+  static async verificarComplianceExistente(cuit) {
+    try {
+      const url = `${VITE_COFA_AUTH_URL || VITE_URL_LOCAL}/api/simulador-prestamos/compliance/verificar?cuit=${encodeURIComponent(cuit)}`;
+      const apiKey = VITE_COFA_AUTH_API_KEY;
+      const response = await HttpApi(url, null, HTTP_METHOD.GET, apiKey, null);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Error al verificar compliance existente");
+      }
+      return await response.json();
+    } catch (error) {
+      console.error("VERIFICAR_COMPLIANCE_ERROR:", error);
       throw error;
     }
   }

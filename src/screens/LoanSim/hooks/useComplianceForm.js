@@ -1,21 +1,26 @@
-import { useState, useCallback } from "react";
-
-export const COMPLIANCE_STEPS = {
-  INITIAL: "INITIAL",
-  TYPE_SELECTION: "TYPE_SELECTION",
-  PEP_TYPE_SELECTION: "PEP_TYPE_SELECTION",
-  FORM_SO: "FORM_SO",
-  FORM_PEP_DIRECT: "FORM_PEP_DIRECT",
-  FORM_PEP_INDIRECT: "FORM_PEP_INDIRECT",
-};
+import { useState, useCallback, useEffect } from "react";
+import SimuladorService from "../../../services/simuladorService.js";
+import { COMPLIANCE_STEPS, PEP_TIPO } from "../../../constants/LOAN_SIM.js";
 
 /**
  * Hook to manage compliance form logic.
  * Follows /react-ui-designer workflow.
+ * @param {Function} onValidate - Callback when validation is needed
+ * @param {string} initialStep - Optional initial step (defaults to INITIAL)
  */
-export const useComplianceForm = (onValidate) => {
-  const [currentStep, setCurrentStep] = useState(COMPLIANCE_STEPS.INITIAL);
+export const useComplianceForm = (onValidate, initialStep, existingCompliance) => {
+  const [currentStep, setCurrentStep] = useState(initialStep || COMPLIANCE_STEPS.INITIAL);
   const [formData, setFormData] = useState({});
+  const [isNoteConfirmed, setIsNoteConfirmed] = useState(false);
+  const [savingNote, setSavingNote] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+
+  // Update step when initialStep changes (e.g., after async compliance check)
+  useEffect(() => {
+    if (initialStep && initialStep !== currentStep) {
+      setCurrentStep(initialStep);
+    }
+  }, [initialStep]);
 
   const handleInputChange = useCallback((e) => {
     const { name, value } = e.target;
@@ -36,6 +41,21 @@ export const useComplianceForm = (onValidate) => {
     });
   }, [onValidate]);
 
+  const handleStatusUnchanged = useCallback(() => {
+    if (existingCompliance) {
+      const payload = {
+        es_pep: existingCompliance.es_pep,
+        es_so: existingCompliance.es_so,
+        pep_tipo: existingCompliance.pep_tipo,
+        pep_detalle: existingCompliance.pep_detalle,
+        so_detalle: existingCompliance.so_detalle,
+      };
+      onValidate(payload);
+    } else {
+      resetAndProceed();
+    }
+  }, [existingCompliance, onValidate, resetAndProceed]);
+
   const handleSubmit = useCallback(
     (e) => {
       if (e?.preventDefault) e.preventDefault();
@@ -53,11 +73,11 @@ export const useComplianceForm = (onValidate) => {
         payload.so_detalle = { ...formData };
       } else if (currentStep === COMPLIANCE_STEPS.FORM_PEP_DIRECT) {
         payload.es_pep = true;
-        payload.pep_tipo = "DIRECTO";
+        payload.pep_tipo = PEP_TIPO.DIRECTO;
         payload.pep_detalle = { ...formData };
       } else if (currentStep === COMPLIANCE_STEPS.FORM_PEP_INDIRECT) {
         payload.es_pep = true;
-        payload.pep_tipo = "INDIRECTO";
+        payload.pep_tipo = PEP_TIPO.INDIRECTO;
         payload.pep_detalle = { ...formData };
       }
 
@@ -66,12 +86,43 @@ export const useComplianceForm = (onValidate) => {
     [currentStep, formData, onValidate],
   );
 
+  const handleConfirmModal = async (scoringId) => {
+    setSavingNote(true);
+    try {
+      await SimuladorService.guardarCompliance({
+        scoringId,
+        es_pep: false,
+        es_so: true,
+        so_detalle: {
+          so_nombre: formData.so_nombre,
+          so_cuit: formData.so_cuit,
+          so_inciso: formData.so_inciso,
+          so_actividad: formData.so_actividad,
+        },
+      });
+      setIsNoteConfirmed(true);
+      setShowModal(false);
+    } catch (error) {
+      console.error("Error saving SO note:", error);
+      alert("Error al guardar la declaración. Por favor intente nuevamente.");
+    } finally {
+      setSavingNote(false);
+    }
+  };
+
   return {
     currentStep,
     formData,
     handleInputChange,
     goToStep,
+    goToStep,
     resetAndProceed,
+    handleStatusUnchanged,
     handleSubmit,
+    isNoteConfirmed,
+    handleConfirmModal,
+    savingNote,
+    showModal,
+    setShowModal,
   };
 };

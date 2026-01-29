@@ -6,12 +6,12 @@ import CBUValidation from "./components/CBUValidation/CBUValidation";
 import OTPValidation from "./components/OTPValidation/OTPValidation";
 import ComplianceStep from "./components/ComplianceStep/ComplianceStep";
 import SuccessStep from "./components/SuccessStep/SuccessStep";
-import { LOAN_SIM_STEPS } from "../../constants/LOAN_SIM.js";
+import { COMPLIANCE_STEPS, LOAN_SIM_STEPS } from "../../constants/LOAN_SIM.js";
 import { Header, Footer } from "../../Components/index.js";
 import { HeroLoanSim } from "../../Sections/index.js";
 import BackButton from "../../Components/buttons/backbutton/Backbutton.jsx";
-import { useState } from "react";
-import { COMPLIANCE_STEPS } from "./hooks/useComplianceForm.js";
+import { useState, useEffect } from "react";
+import { useComplianceForm } from "./hooks/useComplianceForm.js";
 
 const LoanSimScreen = () => {
   const {
@@ -36,18 +36,50 @@ const LoanSimScreen = () => {
     handlePrevStep,
     handleInfoPrestamo,
     guardarCompliance,
+    existingCompliance,
+    verificarComplianceExistente,
+    setStep,
   } = useLoanSimulator();
 
   const [currentStepCompliance, setCurrentStepCompliance] = useState(null);
+
+  useEffect(() => {
+    if (step === LOAN_SIM_STEPS.COMPLIANCE) {
+      verificarComplianceExistente();
+    }
+  }, [step]);
+
+
+  useEffect(() => {
+    if (step === LOAN_SIM_STEPS.COMPLIANCE && existingCompliance) {
+      const createdDate = new Date(existingCompliance.created_at);
+      const now = new Date();
+      const diffInMs = now - createdDate;
+      const diffInHours = diffInMs / (1000 * 60 * 60);
+      if (diffInHours < 24) { 
+        setStep(LOAN_SIM_STEPS.CBU_VALIDATION);
+      }
+    }
+  }, [step, existingCompliance, setStep]);
+
+
+  const initialComplianceStep =
+    existingCompliance?.es_so || existingCompliance?.es_pep
+      ? COMPLIANCE_STEPS.STATUS_CHECK
+      : COMPLIANCE_STEPS.INITIAL;
+
+  const complianceForm = useComplianceForm(
+    guardarCompliance,
+    initialComplianceStep,
+    existingCompliance,
+  );
 
   const maxOffer = simulationData?.capital_maximo_a_ofrecer
     ? Number(simulationData.capital_maximo_a_ofrecer)
     : 200000;
   const installments = simulationData?.planes_disponibles?.map((p) => p.plazo) || [];
   const selectedPlan = simulationData?.planes_disponibles?.find((p) => p.plazo === installment);
-  // const getComplianceStep = (step) => {
-  //   setCurrentStepCompliance(step);
-  // };
+
   const renderStep = () => {
     switch (step) {
       case LOAN_SIM_STEPS.SIMULACION:
@@ -96,7 +128,7 @@ const LoanSimScreen = () => {
             onValidate={guardarCompliance}
             onBack={handlePrevStep}
             loading={validating}
-            // getComplianceStep={getComplianceStep}
+            complianceForm={complianceForm}
             error={error}
           />
         );
@@ -125,6 +157,14 @@ const LoanSimScreen = () => {
     }
   };
 
+  const renderBackButton = () => {
+    if (step === LOAN_SIM_STEPS.COMPLIANCE && currentStepCompliance === COMPLIANCE_STEPS.INITIAL)
+      return <BackButton onClick={handlePrevStep} />;
+    if (step !== LOAN_SIM_STEPS.COMPLIANCE && step !== LOAN_SIM_STEPS.SIMULACION)
+      return <BackButton onClick={handlePrevStep} />;
+    return null;
+  };
+
   if (error && !simulationData && step === LOAN_SIM_STEPS.SIMULACION) {
     return (
       <div className={styles.homeCalculator_calculatorBox}>
@@ -141,22 +181,13 @@ const LoanSimScreen = () => {
     );
   }
 
- 
-  // console.log(currentStepCompliance);
   return (
     <>
       <Header />
       <HeroLoanSim />
       <div className={styles.homeCalculator_calculatorBox}>
         <div className={`${styles.calculatorContainer} ${loading ? styles.loadingOverlay : ""}`}>
-          {(step === LOAN_SIM_STEPS.COMPLIANCE &&
-            currentStepCompliance === COMPLIANCE_STEPS.INITIAL) ||
-            (step !== LOAN_SIM_STEPS.COMPLIANCE && (
-              <BackButton
-                onClick={handlePrevStep}
-                style={{ position: "relative", top: "30px" }}
-              />
-            ))}
+          {renderBackButton()}
           {renderStep()}
         </div>
       </div>

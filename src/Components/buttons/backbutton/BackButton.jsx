@@ -6,7 +6,7 @@ const BackButton = ({ onClick, disabled, loading, style }) => {
   return (
     <button
       type='button'
-      className={styles.backButton}
+      className={`${styles.backButton} ${disabled || loading ? styles.disabled : ''}`}
       onClick={onClick}
       disabled={disabled || loading}
       style={style}

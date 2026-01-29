@@ -41,7 +41,9 @@
 
 .infoList {
   list-style: none;
-  padding: 0;
+  padding: 2rem;
+  text-align: left;
+  line-height: 2rem;
 }
 
 .infoItem {
@@ -58,7 +60,9 @@
   font-size: 16px;
   font-weight: bold;
   margin-top: 20px;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  transition:
+    background-color 0.3s ease,
+    transform 0.2s ease;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 

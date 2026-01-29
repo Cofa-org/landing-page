@@ -7,7 +7,7 @@ import { use } from "react";
 
 const SuccessStep = ({ handleInfoPrestamo, loanInfo, loadingModal }) => {
   const [showInfoModal, setShowInfoModal] = useState(false);
-  const [dayDurationCookie, setDayDurationCookie] = useState(null);
+  const [twoHourDurationCookie, setTwoHourDurationCookie] = useState(null);
   const onInfoPrestamo = async () => {
     const success = await handleInfoPrestamo();
     if (success) {
@@ -18,7 +18,7 @@ const SuccessStep = ({ handleInfoPrestamo, loanInfo, loadingModal }) => {
   useEffect(() => {
     const getCookie = async () => {
       const cookie = await cookieStore.get(COOKIE_CONFIG.NAME);
-      setDayDurationCookie(cookie);
+      setTwoHourDurationCookie(cookie);
     };
     getCookie();
   }, []);
@@ -33,9 +33,9 @@ const SuccessStep = ({ handleInfoPrestamo, loanInfo, loadingModal }) => {
       </p>
       <div className={styles.buttonContainer}>
         <button
-          className={`primary-btn ${loadingModal || !dayDurationCookie ? styles.disabled : ""}`}
+          className={`primary-btn ${loadingModal || !twoHourDurationCookie ? styles.disabled : ""}`}
           onClick={onInfoPrestamo}
-          disabled={loadingModal || !dayDurationCookie}
+          disabled={loadingModal || !twoHourDurationCookie}
           style={{ flex: 1 }}
           aria-label='Info prestamo'
         >

@@ -21,6 +21,7 @@ export const useLoanSimulator = () => {
   const [existingSimulation, setExistingSimulation] = useState(null);
   const [loanInfo, setLoanInfo] = useState(null);
   const [loadingModal, setLoadingModal] = useState(false);
+  const [existingCompliance, setExistingCompliance] = useState(null);
   const shortId = searchParams.get("id");
 
   useEffect(() => {
@@ -146,14 +147,14 @@ export const useLoanSimulator = () => {
         };
 
         const response = await SimuladorService.guardarPlan(payload);
-
         if (
           (response.success && !existingSimulation?.email_validado) ||
           (response.data && !existingSimulation?.email_validado)
         ) {
           setStep(LOAN_SIM_STEPS.EMAIL_VALIDATION);
-        } else if (response.success || response.data) setStep(LOAN_SIM_STEPS.COMPLIANCE);
-        else {
+        } else if (response.success && existingSimulation?.email_validado) {
+          setStep(LOAN_SIM_STEPS.COMPLIANCE);
+        } else {
           setError(response.mensaje || "¡Ups! Ha ocurrido un error al guardar la simulación");
         }
       } catch (err) {
@@ -171,8 +172,8 @@ export const useLoanSimulator = () => {
   const handlePrevStep = () => {
     if (step === LOAN_SIM_STEPS.EMAIL_VALIDATION) setStep(LOAN_SIM_STEPS.SIMULACION);
     else if (step === LOAN_SIM_STEPS.OTP_VALIDATION) setStep(LOAN_SIM_STEPS.EMAIL_VALIDATION);
-    else if (step === LOAN_SIM_STEPS.COMPLIANCE) setStep(LOAN_SIM_STEPS.OTP_VALIDATION);
-    else if (step === LOAN_SIM_STEPS.CBU_VALIDATION) setStep(LOAN_SIM_STEPS.COMPLIANCE);
+    else if (step === LOAN_SIM_STEPS.COMPLIANCE) setStep(LOAN_SIM_STEPS.SIMULACION);
+    else if (step === LOAN_SIM_STEPS.CBU_VALIDATION) setStep(LOAN_SIM_STEPS.SIMULACION);
   };
 
   const solicitarOTP = async (emailValue, isResend = false) => {
@@ -232,6 +233,7 @@ export const useLoanSimulator = () => {
     try {
       const response = await SimuladorService.guardarCompliance({
         scoringId: scoringData.scoringId,
+        cuit: scoringData.cuit,
         ...payload,
       });
       if (response.success || response.data) {
@@ -263,7 +265,7 @@ export const useLoanSimulator = () => {
           cantidad_cuotas: installment,
           monto: amount,
         });
-console.log(response)
+   
         if (response.success) {
           const cookieOptions = {
             name: COOKIE_CONFIG.NAME,
@@ -319,6 +321,26 @@ console.log(response)
     }
   };
 
+  const verificarComplianceExistente = async () => {
+    if (!scoringData.cuit) {
+      return;
+    }
+    setValidating(true);
+    try {
+      const response = await SimuladorService.verificarComplianceExistente(scoringData.cuit);
+      if (response.success && response.exists) {
+        setExistingCompliance(response.data);
+      } else {
+        setExistingCompliance(null);
+      }
+    } catch (err) {
+      console.error("Error verificando compliance:", err);
+      setExistingCompliance(null);
+    } finally {
+      setValidating(false);
+    }
+  };
+
   return {
     amount,
     installment,
@@ -343,5 +365,7 @@ console.log(response)
     validarCBU,
     handleInfoPrestamo,
     setStep,
+    existingCompliance,
+    verificarComplianceExistente,
   };
 };

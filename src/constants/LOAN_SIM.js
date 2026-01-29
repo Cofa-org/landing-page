@@ -24,3 +24,18 @@ export const COOKIE_CONFIG = {
   NAME: "scoringId",
   EXPIRY_DAYS: Date.now() + 2 * 60 * 60 * 1000, // 2 hours
 };
+
+export const COMPLIANCE_STEPS = Object.freeze({
+  STATUS_CHECK: "STATUS_CHECK",
+  INITIAL: "INITIAL",
+  TYPE_SELECTION: "TYPE_SELECTION",
+  PEP_TYPE_SELECTION: "PEP_TYPE_SELECTION",
+  FORM_SO: "FORM_SO",
+  FORM_PEP_DIRECT: "FORM_PEP_DIRECT",
+  FORM_PEP_INDIRECT: "FORM_PEP_INDIRECT",
+});
+
+export const PEP_TIPO = Object.freeze({
+  DIRECTO: "DIRECTO",
+  INDIRECTO: "INDIRECTO",
+});

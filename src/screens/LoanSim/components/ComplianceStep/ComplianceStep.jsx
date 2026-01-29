@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import PropTypes from "prop-types";
-import { useComplianceForm, COMPLIANCE_STEPS } from "../../hooks/useComplianceForm.js";
 import {
+  ComplianceStatusCheck,
   ComplianceInitial,
   ComplianceTypeSelection,
   CompliancePEPSelection,
@@ -9,18 +9,65 @@ import {
   CompliancePEPForm,
 } from "./subcomponents/ComplianceSubcomponents";
 import styles from "./ComplianceStep.module.css";
+import BackButton from "../../../../Components/buttons/backbutton/Backbutton.jsx";
+import { COMPLIANCE_STEPS } from "../../../../constants/LOAN_SIM.js";
 
 /**
  * ComplianceStep component.
  * Manages the multi-step flow for PEP and SO declarations.
  * Refactored following /react-ui-designer workflow.
  */
-const ComplianceStep = ({ scoringId, onValidate, onBack, loading, error, getComplianceStep }) => {
-  const { currentStep, formData, handleInputChange, goToStep, resetAndProceed, handleSubmit } =
-    useComplianceForm(onValidate);
-  // getComplianceStep(currentStep);
+const ComplianceStep = ({ scoringId, onBack, loading, error, complianceForm }) => {
+  const {
+    currentStep,
+    formData,
+    handleInputChange,
+    goToStep,
+    resetAndProceed,
+    handleSubmit,
+    isNoteConfirmed,
+    handleConfirmModal,
+    savingNote,
+    showModal,
+    setShowModal,
+    handleStatusUnchanged,
+  } = complianceForm;
+
+  // Centralized back button handler based on current step
+  const handleBackClick = () => {
+    switch (currentStep) {
+      case COMPLIANCE_STEPS.STATUS_CHECK:
+      case COMPLIANCE_STEPS.INITIAL:
+        onBack(); // Go back to previous main step
+        break;
+      case COMPLIANCE_STEPS.TYPE_SELECTION:
+        goToStep(COMPLIANCE_STEPS.INITIAL);
+        break;
+      case COMPLIANCE_STEPS.PEP_TYPE_SELECTION:
+        goToStep(COMPLIANCE_STEPS.TYPE_SELECTION);
+        break;
+      case COMPLIANCE_STEPS.FORM_SO:
+        goToStep(COMPLIANCE_STEPS.TYPE_SELECTION);
+        break;
+      case COMPLIANCE_STEPS.FORM_PEP_DIRECT:
+      case COMPLIANCE_STEPS.FORM_PEP_INDIRECT:
+        goToStep(COMPLIANCE_STEPS.PEP_TYPE_SELECTION);
+        break;
+      default:
+        onBack();
+    }
+  };
+
   const renderedContent = useMemo(() => {
     switch (currentStep) {
+      case COMPLIANCE_STEPS.STATUS_CHECK:
+        return (
+          <ComplianceStatusCheck
+            onStatusChanged={() => goToStep(COMPLIANCE_STEPS.INITIAL)}
+            onStatusUnchanged={handleStatusUnchanged}
+          />
+        );
+
       case COMPLIANCE_STEPS.INITIAL:
         return (
           <ComplianceInitial
@@ -50,12 +97,16 @@ const ComplianceStep = ({ scoringId, onValidate, onBack, loading, error, getComp
       case COMPLIANCE_STEPS.FORM_SO:
         return (
           <ComplianceSOInfo
-            scoringId={scoringId}
             formData={formData}
             onInputChange={handleInputChange}
             onConfirm={handleSubmit}
-            onBack={() => goToStep(COMPLIANCE_STEPS.TYPE_SELECTION)}
+            isNoteConfirmed={isNoteConfirmed}
+            handleConfirmModal={handleConfirmModal}
+            savingNote={savingNote}
             loading={loading}
+            scoringId={scoringId}
+            showModal={showModal}
+            setShowModal={setShowModal}
           />
         );
 
@@ -80,6 +131,11 @@ const ComplianceStep = ({ scoringId, onValidate, onBack, loading, error, getComp
 
   return (
     <div className={styles.container}>
+      <BackButton
+        onClick={handleBackClick}
+        disabled={currentStep === "FORM_SO" && isNoteConfirmed}
+        style={{ width: "100%", marginBottom: "1rem" }}
+      />
       {error && <p className={styles.error}>{error}</p>}
       {renderedContent}
     </div>
