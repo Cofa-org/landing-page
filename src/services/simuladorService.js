@@ -5,7 +5,7 @@ import { HttpApi } from "../http.js";
 export default class SimuladorService {
   static async calcularPlanes({ scoringId, plazoSeleccionado, capitalSeleccionado }) {
     try {
-      const url = `${VITE_COFA_AUTH_URL || VITE_URL_LOCAL}/api/simulador-prestamos/calcular`;
+      const url = `https://cofa-auth-dev-development.up.railway.app/api/simulador-prestamos/calcular`;
       const apiKey = VITE_COFA_AUTH_API_KEY;
       const body = {
         scoringId,
@@ -17,6 +17,7 @@ export default class SimuladorService {
         const errorData = await response.json();
         throw new Error(errorData.message || "Error al calcular planes");
       }
+      console.log("RESPONSE:", response);
       const responseJson = await response.json();
       return responseJson;
     } catch (error) {
@@ -27,7 +28,7 @@ export default class SimuladorService {
 
   static async guardarPlan(payload) {
     try {
-      const URL = `${VITE_COFA_AUTH_URL || VITE_URL_LOCAL}/api/simulador-prestamos/guardar`;
+      const URL = `https://cofa-auth-dev-development.up.railway.app/api/simulador-prestamos/guardar`;
       const apiKey = VITE_COFA_AUTH_API_KEY;
       const body = payload;
       const response = await HttpApi(URL, body, HTTP_METHOD.POST, apiKey, null);
@@ -46,7 +47,7 @@ export default class SimuladorService {
 
   static async solicitarOTP({ scoringId, email, isResend }) {
     try {
-      const url = `${VITE_COFA_AUTH_URL || VITE_URL_LOCAL}/api/simulador-prestamos/solicitar-otp`;
+      const url = `https://cofa-auth-dev-development.up.railway.app/api/simulador-prestamos/solicitar-otp`;
       const apiKey = VITE_COFA_AUTH_API_KEY;
       const body = {
         scoringId,
@@ -69,7 +70,7 @@ export default class SimuladorService {
 
   static async verificarOTP({ code, email, scoringId }) {
     try {
-      const url = `${VITE_COFA_AUTH_URL || VITE_URL_LOCAL}/api/simulador-prestamos/verificar-otp`;
+      const url = `https://cofa-auth-dev-development.up.railway.app/api/simulador-prestamos/verificar-otp`;
       const apiKey = VITE_COFA_AUTH_API_KEY;
 
       const body = {
@@ -93,7 +94,7 @@ export default class SimuladorService {
 
   static async validarCBU(cbu, cuit, scoringId) {
     try {
-      const url = `${VITE_COFA_AUTH_URL || VITE_URL_LOCAL}/api/simulador-prestamos/validar-cbu`;
+      const url = `https://cofa-auth-dev-development.up.railway.app/api/simulador-prestamos/validar-cbu`;
       const apiKey = VITE_COFA_AUTH_API_KEY;
       const body = {
         cbu,
@@ -114,7 +115,7 @@ export default class SimuladorService {
 
   static async obtenerIdPreaprobado({ scoringId, cantidad_cuotas, monto }) {
     try {
-      const url = `${VITE_COFA_AUTH_URL || VITE_URL_LOCAL}/api/simulador-prestamos/preaprobado`;
+      const url = `https://cofa-auth-dev-development.up.railway.app/api/simulador-prestamos/preaprobado`;
       const apiKey = VITE_COFA_AUTH_API_KEY;
       const body = {
         scoringId,
@@ -137,9 +138,7 @@ export default class SimuladorService {
 
   static async obtenerInfoPrestamo(scoringId) {
     try {
-      const url = `${
-        VITE_COFA_AUTH_URL || VITE_URL_LOCAL
-      }/api/simulador-prestamos/info/${scoringId}`;
+      const url = `https://cofa-auth-dev-development.up.railway.app/api/simulador-prestamos/info/${scoringId}`;
       const apiKey = VITE_COFA_AUTH_API_KEY;
       const response = await HttpApi(url, null, HTTP_METHOD.GET, apiKey, null);
 
@@ -157,7 +156,7 @@ export default class SimuladorService {
 
   static async guardarCompliance(payload) {
     try {
-      const url = `${VITE_COFA_AUTH_URL || VITE_URL_LOCAL}/api/simulador-prestamos/compliance`;
+      const url = `https://cofa-auth-dev-development.up.railway.app/api/simulador-prestamos/compliance`;
       const apiKey = VITE_COFA_AUTH_API_KEY;
       const response = await HttpApi(url, payload, HTTP_METHOD.POST, apiKey, null);
       if (!response.ok) {
@@ -173,7 +172,7 @@ export default class SimuladorService {
 
   static async verificarComplianceExistente(cuit) {
     try {
-      const url = `${VITE_COFA_AUTH_URL || VITE_URL_LOCAL}/api/simulador-prestamos/compliance/verificar?cuit=${encodeURIComponent(cuit)}`;
+      const url = `https://cofa-auth-dev-development.up.railway.app/api/simulador-prestamos/compliance/verificar?cuit=${encodeURIComponent(cuit)}`;
       const apiKey = VITE_COFA_AUTH_API_KEY;
       const response = await HttpApi(url, null, HTTP_METHOD.GET, apiKey, null);
       if (!response.ok) {

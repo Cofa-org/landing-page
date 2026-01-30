@@ -14,13 +14,13 @@ export const useComplianceForm = (onValidate, initialStep, existingCompliance) =
   const [isNoteConfirmed, setIsNoteConfirmed] = useState(false);
   const [savingNote, setSavingNote] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [prevInitialStep, setPrevInitialStep] = useState(initialStep);
 
-  // Update step when initialStep changes (e.g., after async compliance check)
-  useEffect(() => {
-    if (initialStep && initialStep !== currentStep) {
-      setCurrentStep(initialStep);
-    }
-  }, [initialStep]);
+  // Synchronous state adjustment when initialStep changes from parent
+  if (initialStep && initialStep !== prevInitialStep) {
+    setPrevInitialStep(initialStep);
+    setCurrentStep(initialStep);
+  }
 
   const handleInputChange = useCallback((e) => {
     const { name, value } = e.target;
@@ -38,6 +38,7 @@ export const useComplianceForm = (onValidate, initialStep, existingCompliance) =
       pep_tipo: null,
       pep_detalle: null,
       so_detalle: null,
+      cuit: null,
     });
   }, [onValidate]);
 
@@ -114,7 +115,6 @@ export const useComplianceForm = (onValidate, initialStep, existingCompliance) =
     currentStep,
     formData,
     handleInputChange,
-    goToStep,
     goToStep,
     resetAndProceed,
     handleStatusUnchanged,

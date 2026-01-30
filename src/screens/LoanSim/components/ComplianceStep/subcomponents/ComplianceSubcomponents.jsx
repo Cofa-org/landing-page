@@ -307,7 +307,7 @@ export const ComplianceSOInfo = ({
 
       {showNotification && (
         <Notification
-          message='La descarga se ha realizado con éxito. Un asesor se pondrá en contacto en cuanto recibamos el mail con la documentación.'
+          message='Un asesor se pondrá en contacto en cuanto recibamos el mail con la documentación.'
           type='success'
           onClose={() => setShowNotification(false)}
           duration={8000}

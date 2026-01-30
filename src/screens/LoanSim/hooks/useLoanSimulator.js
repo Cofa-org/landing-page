@@ -21,7 +21,7 @@ export const useLoanSimulator = () => {
   const [existingSimulation, setExistingSimulation] = useState(null);
   const [loanInfo, setLoanInfo] = useState(null);
   const [loadingModal, setLoadingModal] = useState(false);
-  const [existingCompliance, setExistingCompliance] = useState(null);
+  const [existingCompliance, setExistingCompliance] = useState(undefined);
   const shortId = searchParams.get("id");
 
   useEffect(() => {
@@ -76,7 +76,7 @@ export const useLoanSimulator = () => {
 
           setSimulationData(newData);
           const existingState = newData?.existingSimulation?.estado || null;
-
+          console.log("existingState", existingState);
           if (existingState) {
             setExistingSimulation(newData?.existingSimulation);
             setStep(LOAN_SIM_STEPS[existingState]);
@@ -265,7 +265,7 @@ export const useLoanSimulator = () => {
           cantidad_cuotas: installment,
           monto: amount,
         });
-   
+
         if (response.success) {
           const cookieOptions = {
             name: COOKIE_CONFIG.NAME,
@@ -322,6 +322,7 @@ export const useLoanSimulator = () => {
   };
 
   const verificarComplianceExistente = async () => {
+    console.log(scoringData.cuit);
     if (!scoringData.cuit) {
       return;
     }

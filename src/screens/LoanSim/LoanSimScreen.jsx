@@ -1,17 +1,18 @@
+import { useEffect } from "react";
+import BackButton from "../../Components/buttons/backbutton/Backbutton.jsx";
+import { Footer, Header } from "../../Components/index.js";
+import Loader from "../../Components/Loader/Loader.jsx";
+import { COMPLIANCE_STEPS, LOAN_SIM_STEPS } from "../../constants/LOAN_SIM.js";
+import { HeroLoanSim } from "../../Sections/index.js";
+import CBUValidation from "./components/CBUValidation/CBUValidation";
+import ComplianceStep from "./components/ComplianceStep/ComplianceStep";
+import EmailValidation from "./components/EmailValidation/EmailValidation";
+import OTPValidation from "./components/OTPValidation/OTPValidation";
+import SimulationStep from "./components/SimulationStep/SimulationStep";
+import SuccessStep from "./components/SuccessStep/SuccessStep";
+import { useComplianceForm } from "./hooks/useComplianceForm.js";
 import { useLoanSimulator } from "./hooks/useLoanSimulator";
 import styles from "./LoanSimScreen.module.css";
-import SimulationStep from "./components/SimulationStep/SimulationStep";
-import EmailValidation from "./components/EmailValidation/EmailValidation";
-import CBUValidation from "./components/CBUValidation/CBUValidation";
-import OTPValidation from "./components/OTPValidation/OTPValidation";
-import ComplianceStep from "./components/ComplianceStep/ComplianceStep";
-import SuccessStep from "./components/SuccessStep/SuccessStep";
-import { COMPLIANCE_STEPS, LOAN_SIM_STEPS } from "../../constants/LOAN_SIM.js";
-import { Header, Footer } from "../../Components/index.js";
-import { HeroLoanSim } from "../../Sections/index.js";
-import BackButton from "../../Components/buttons/backbutton/Backbutton.jsx";
-import { useState, useEffect } from "react";
-import { useComplianceForm } from "./hooks/useComplianceForm.js";
 
 const LoanSimScreen = () => {
   const {
@@ -41,14 +42,11 @@ const LoanSimScreen = () => {
     setStep,
   } = useLoanSimulator();
 
-  const [currentStepCompliance, setCurrentStepCompliance] = useState(null);
-
   useEffect(() => {
     if (step === LOAN_SIM_STEPS.COMPLIANCE) {
       verificarComplianceExistente();
     }
   }, [step]);
-
 
   useEffect(() => {
     if (step === LOAN_SIM_STEPS.COMPLIANCE && existingCompliance) {
@@ -56,17 +54,18 @@ const LoanSimScreen = () => {
       const now = new Date();
       const diffInMs = now - createdDate;
       const diffInHours = diffInMs / (1000 * 60 * 60);
-      if (diffInHours < 24) { 
+      if (diffInHours < 24) {
         setStep(LOAN_SIM_STEPS.CBU_VALIDATION);
       }
     }
   }, [step, existingCompliance, setStep]);
 
-
   const initialComplianceStep =
-    existingCompliance?.es_so || existingCompliance?.es_pep
-      ? COMPLIANCE_STEPS.STATUS_CHECK
-      : COMPLIANCE_STEPS.INITIAL;
+    existingCompliance !== undefined
+      ? existingCompliance?.es_so || existingCompliance?.es_pep
+        ? COMPLIANCE_STEPS.STATUS_CHECK
+        : COMPLIANCE_STEPS.INITIAL
+      : null;
 
   const complianceForm = useComplianceForm(
     guardarCompliance,
@@ -122,6 +121,15 @@ const LoanSimScreen = () => {
         );
 
       case LOAN_SIM_STEPS.COMPLIANCE:
+        if (initialComplianceStep === null) {
+          return (
+            <div className={styles.calculatorContainer}>
+              <div className={styles.loaderContainer}>
+                <Loader />
+              </div>
+            </div>
+          );
+        }
         return (
           <ComplianceStep
             scoringId={scoringId}
@@ -158,9 +166,16 @@ const LoanSimScreen = () => {
   };
 
   const renderBackButton = () => {
-    if (step === LOAN_SIM_STEPS.COMPLIANCE && currentStepCompliance === COMPLIANCE_STEPS.INITIAL)
+    if (
+      step === LOAN_SIM_STEPS.COMPLIANCE &&
+      complianceForm.currentStep === COMPLIANCE_STEPS.INITIAL 
+    )
       return <BackButton onClick={handlePrevStep} />;
-    if (step !== LOAN_SIM_STEPS.COMPLIANCE && step !== LOAN_SIM_STEPS.SIMULACION)
+    if (
+      step !== LOAN_SIM_STEPS.COMPLIANCE &&
+      step !== LOAN_SIM_STEPS.SIMULACION &&
+      step !== LOAN_SIM_STEPS.COMPLETADO
+    )
       return <BackButton onClick={handlePrevStep} />;
     return null;
   };
@@ -186,7 +201,9 @@ const LoanSimScreen = () => {
       <Header />
       <HeroLoanSim />
       <div className={styles.homeCalculator_calculatorBox}>
-        <div className={`${styles.calculatorContainer} ${loading ? styles.loadingOverlay : ""}`}>
+        <div
+          className={`${styles.calculatorContainer} ${loading || validating ? styles.loadingOverlay : ""}`}
+        >
           {renderBackButton()}
           {renderStep()}
         </div>
