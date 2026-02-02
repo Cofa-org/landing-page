@@ -167,11 +167,6 @@ const LoanSimScreen = () => {
 
   const renderBackButton = () => {
     if (
-      step === LOAN_SIM_STEPS.COMPLIANCE &&
-      complianceForm.currentStep === COMPLIANCE_STEPS.INITIAL 
-    )
-      return <BackButton onClick={handlePrevStep} />;
-    if (
       step !== LOAN_SIM_STEPS.COMPLIANCE &&
       step !== LOAN_SIM_STEPS.SIMULACION &&
       step !== LOAN_SIM_STEPS.COMPLETADO

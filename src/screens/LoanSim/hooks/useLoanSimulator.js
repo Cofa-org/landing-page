@@ -76,7 +76,7 @@ export const useLoanSimulator = () => {
 
           setSimulationData(newData);
           const existingState = newData?.existingSimulation?.estado || null;
-          console.log("existingState", existingState);
+         
           if (existingState) {
             setExistingSimulation(newData?.existingSimulation);
             setStep(LOAN_SIM_STEPS[existingState]);
