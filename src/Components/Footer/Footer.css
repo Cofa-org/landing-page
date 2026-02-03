@@ -239,7 +239,7 @@ footer .registeredBrand {
 @media screen and (max-width: 450px) {
   .wsp-contact {
     bottom: 12px;
-    right: 12px;
+    right: 50px;
   }
 }
 

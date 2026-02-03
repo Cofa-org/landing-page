@@ -57,22 +57,61 @@ export const ComplianceInitial = ({ onNext, onNone }) => (
   </div>
 );
 
-export const ComplianceTypeSelection = ({ onSelectPEP, onSelectSO }) => (
-  <div className={styles.selectionContainer}>
-    <h3 className={styles.question}>Seleccione su condición:</h3>
-    <div className={styles.buttonGroup}>
-      <GenericButton onClick={onSelectPEP}>Soy PEP</GenericButton>
-      <GenericButton onClick={onSelectSO}>Soy Sujeto Obligado</GenericButton>
+export const ComplianceTypeSelection = ({ onSelectPEP, onSelectSO }) => {
+  const [showModal, setShowModal] = React.useState(false);
+  const [pendingSelection, setPendingSelection] = React.useState(null);
+
+  const handleSelect = (type) => {
+    setPendingSelection(type);
+    setShowModal(true);
+  };
+
+  const handleConfirm = () => {
+    if (pendingSelection === "PEP") onSelectPEP();
+    else if (pendingSelection === "SO") onSelectSO();
+    setShowModal(false);
+    setPendingSelection(null);
+  };
+
+  return (
+    <div className={styles.selectionContainer}>
+      <h3 className={styles.question}>Seleccione su condición:</h3>
+      <div className={styles.buttonGroup}>
+        <GenericButton onClick={() => handleSelect("PEP")}>Soy PEP</GenericButton>
+        <GenericButton onClick={() => handleSelect("SO")}>Soy Sujeto Obligado</GenericButton>
+      </div>
+      <p className={styles.legalNote}>
+        “La siguiente información se solicita a través de una declaración jurada, lo que implica que
+        los datos que usted consigne son verdaderos, completos y exactos. En particular, se le pide
+        que indique si reviste o no la condición de Sujeto Obligado o Persona Expuesta Políticamente
+        (PEP). Esta manifestación se realiza bajo su exclusiva responsabilidad y puede ser
+        verificada conforme a la normativa vigente en materia de prevención de lavado de activos.”
+      </p>
+
+      {showModal && (
+        <Modal
+          closeModal={() => setShowModal(false)}
+          title='Confirmar Condición'
+          description={`¿Está seguro que desea declarar que es ${
+            pendingSelection === "PEP"
+              ? "Persona Expuesta Políticamente (PEP)"
+              : "Sujeto Obligado (SO)"
+          }?`}
+        >
+          <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
+            <GenericButton
+              variant='outline'
+              onClick={() => setShowModal(false)}
+            >
+              Cancelar
+            </GenericButton>
+            <GenericButton onClick={handleConfirm}>Confirmar</GenericButton>
+          </div>
+        </Modal>
+      )}
     </div>
-    <p className={styles.legalNote}>
-      “La siguiente información se solicita a través de una declaración jurada, lo que implica que
-      los datos que usted consigne son verdaderos, completos y exactos. En particular, se le pide
-      que indique si reviste o no la condición de Sujeto Obligado o Persona Expuesta Políticamente
-      (PEP). Esta manifestación se realiza bajo su exclusiva responsabilidad y puede ser verificada
-      conforme a la normativa vigente en materia de prevención de lavado de activos.”
-    </p>
-  </div>
-);
+  );
+};
 
 export const CompliancePEPSelection = ({ onSelectDirect, onSelectIndirect }) => (
   <div

@@ -26,6 +26,7 @@ const LoanSimScreen = () => {
     scoringId,
     step,
     email,
+    cuit,
     loanInfo,
     loadingModal,
     handleAmountChange,
@@ -71,6 +72,7 @@ const LoanSimScreen = () => {
     guardarCompliance,
     initialComplianceStep,
     existingCompliance,
+    cuit,
   );
 
   const maxOffer = simulationData?.capital_maximo_a_ofrecer

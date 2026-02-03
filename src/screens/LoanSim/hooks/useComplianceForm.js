@@ -8,7 +8,7 @@ import { COMPLIANCE_STEPS, PEP_TIPO } from "../../../constants/LOAN_SIM.js";
  * @param {Function} onValidate - Callback when validation is needed
  * @param {string} initialStep - Optional initial step (defaults to INITIAL)
  */
-export const useComplianceForm = (onValidate, initialStep, existingCompliance) => {
+export const useComplianceForm = (onValidate, initialStep, existingCompliance, cuit) => {
   const [currentStep, setCurrentStep] = useState(initialStep || COMPLIANCE_STEPS.INITIAL);
   const [formData, setFormData] = useState({});
   const [isNoteConfirmed, setIsNoteConfirmed] = useState(false);
@@ -38,7 +38,7 @@ export const useComplianceForm = (onValidate, initialStep, existingCompliance) =
       pep_tipo: null,
       pep_detalle: null,
       so_detalle: null,
-      cuit: null,
+      cuit: cuit,
     });
   }, [onValidate]);
 
@@ -60,6 +60,11 @@ export const useComplianceForm = (onValidate, initialStep, existingCompliance) =
   const handleSubmit = useCallback(
     (e) => {
       if (e?.preventDefault) e.preventDefault();
+
+      if (currentStep === COMPLIANCE_STEPS.FORM_SO && isNoteConfirmed) {
+        onValidate({ proceedOnly: true });
+        return;
+      }
 
       let payload = {
         es_pep: false,
@@ -84,7 +89,7 @@ export const useComplianceForm = (onValidate, initialStep, existingCompliance) =
 
       onValidate(payload);
     },
-    [currentStep, formData, onValidate],
+    [currentStep, formData, isNoteConfirmed, onValidate],
   );
 
   const handleConfirmModal = async (scoringId) => {

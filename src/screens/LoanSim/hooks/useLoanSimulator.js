@@ -76,7 +76,7 @@ export const useLoanSimulator = () => {
 
           setSimulationData(newData);
           const existingState = newData?.existingSimulation?.estado || null;
-         
+
           if (existingState) {
             setExistingSimulation(newData?.existingSimulation);
             setStep(LOAN_SIM_STEPS[existingState]);
@@ -169,11 +169,26 @@ export const useLoanSimulator = () => {
     else if (step === LOAN_SIM_STEPS.CBU_VALIDATION) setStep(LOAN_SIM_STEPS.COMPLETADO);
   };
 
-  const handlePrevStep = () => {
-    if (step === LOAN_SIM_STEPS.EMAIL_VALIDATION) setStep(LOAN_SIM_STEPS.SIMULACION);
-    else if (step === LOAN_SIM_STEPS.OTP_VALIDATION) setStep(LOAN_SIM_STEPS.EMAIL_VALIDATION);
-    else if (step === LOAN_SIM_STEPS.COMPLIANCE) setStep(LOAN_SIM_STEPS.SIMULACION);
-    else if (step === LOAN_SIM_STEPS.CBU_VALIDATION) setStep(LOAN_SIM_STEPS.SIMULACION);
+  const handlePrevStep = async () => {
+    let nextStep = null;
+    if (step === LOAN_SIM_STEPS.EMAIL_VALIDATION) nextStep = LOAN_SIM_STEPS.SIMULACION;
+    else if (step === LOAN_SIM_STEPS.OTP_VALIDATION) nextStep = LOAN_SIM_STEPS.EMAIL_VALIDATION;
+    else if (step === LOAN_SIM_STEPS.COMPLIANCE) nextStep = LOAN_SIM_STEPS.SIMULACION;
+    else if (step === LOAN_SIM_STEPS.CBU_VALIDATION) nextStep = LOAN_SIM_STEPS.SIMULACION;
+
+    if (nextStep) {
+      try {
+        await SimuladorService.actualizarEstado({
+          scoringId: scoringData.scoringId,
+          estado: nextStep,
+        });
+        setStep(nextStep);
+      } catch (err) {
+        console.error("Error al sincronizar estado tras retroceder:", err);
+        // Even if the backend fails, we allow local navigation to not block the user
+        setStep(nextStep);
+      }
+    }
   };
 
   const solicitarOTP = async (emailValue, isResend = false) => {
@@ -228,6 +243,10 @@ export const useLoanSimulator = () => {
   };
 
   const guardarCompliance = async (payload) => {
+    if (payload?.proceedOnly) {
+      setStep(LOAN_SIM_STEPS.CBU_VALIDATION);
+      return;
+    }
     setValidating(true);
     setError(null);
     try {
@@ -236,6 +255,7 @@ export const useLoanSimulator = () => {
         cuit: scoringData.cuit,
         ...payload,
       });
+
       if (response.success || response.data) {
         setStep(LOAN_SIM_STEPS.CBU_VALIDATION);
       } else {
@@ -322,7 +342,6 @@ export const useLoanSimulator = () => {
   };
 
   const verificarComplianceExistente = async () => {
-    console.log(scoringData.cuit);
     if (!scoringData.cuit) {
       return;
     }
@@ -353,6 +372,7 @@ export const useLoanSimulator = () => {
     scoringId: scoringData.scoringId,
     step,
     email,
+    cuit: scoringData.cuit,
     cbu,
     loanInfo,
     loadingModal,
