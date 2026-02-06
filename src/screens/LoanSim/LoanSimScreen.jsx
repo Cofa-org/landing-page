@@ -150,6 +150,8 @@ const LoanSimScreen = () => {
             loading={validating}
             error={error}
             onBack={handlePrevStep}
+            isClient={!!simulationData?.existingSimulation?.id_cliente}
+            existingCbu={simulationData?.existingSimulation?.cbu}
           />
         );
 

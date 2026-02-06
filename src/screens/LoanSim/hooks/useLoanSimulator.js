@@ -135,6 +135,7 @@ export const useLoanSimulator = () => {
         };
         const payload = {
           scoringId: scoringData.scoringId,
+          cuit: scoringData.cuit,
           capitalSeleccionado: amount,
           plazoSeleccionado: installment,
           plan: {
