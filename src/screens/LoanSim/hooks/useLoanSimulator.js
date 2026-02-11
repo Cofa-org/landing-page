@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { useDebounce } from "../../../hooks/useDebounce";
 import SimuladorService from "../../../services/simuladorService";
 import { COOKIE_CONFIG, LOAN_SIM_STEPS } from "../../../constants/LOAN_SIM.js";
@@ -81,6 +81,7 @@ export const useLoanSimulator = () => {
             setExistingSimulation(newData?.existingSimulation);
             setStep(LOAN_SIM_STEPS[existingState]);
           }
+        
           if (isInitial) {
             const capMax = Number(newData.capital_maximo_a_ofrecer);
             setAmount(capMax);
@@ -101,9 +102,7 @@ export const useLoanSimulator = () => {
 
   useEffect(() => {
     if (scoringData.scoringId) {
-      if (scoringData.scoringId) {
-        fetchSimulation(0, true);
-      }
+      fetchSimulation(0, true);
     }
   }, [scoringData.scoringId, fetchSimulation]);
 
@@ -135,6 +134,7 @@ export const useLoanSimulator = () => {
         };
         const payload = {
           scoringId: scoringData.scoringId,
+          cuit: scoringData.cuit,
           capitalSeleccionado: amount,
           plazoSeleccionado: installment,
           plan: {

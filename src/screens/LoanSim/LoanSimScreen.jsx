@@ -77,7 +77,7 @@ const LoanSimScreen = () => {
 
   const maxOffer = simulationData?.capital_maximo_a_ofrecer
     ? Number(simulationData.capital_maximo_a_ofrecer)
-    : 200000;
+    : 0;
   const installments = simulationData?.planes_disponibles?.map((p) => p.plazo) || [];
   const selectedPlan = simulationData?.planes_disponibles?.find((p) => p.plazo === installment);
 
@@ -150,6 +150,8 @@ const LoanSimScreen = () => {
             loading={validating}
             error={error}
             onBack={handlePrevStep}
+            isClient={!!simulationData?.existingSimulation?.id_cliente}
+            existingCbu={simulationData?.existingSimulation?.cbu}
           />
         );
 
