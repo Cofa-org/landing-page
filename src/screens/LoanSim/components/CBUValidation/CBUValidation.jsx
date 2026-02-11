@@ -5,6 +5,8 @@ import GenericInput from "../../../../Components/Forms/GenericInput/GenericInput
 import GenericButton from "../../../../Components/buttons/GenericButton/GenericButton.jsx";
 import { CBU_CONFIG } from "../../../../constants/LOAN_SIM.js";
 
+import styles from "./CBUValidation.module.css";
+
 const CBUValidation = ({ onValidate, loading, error, onBack, isClient, existingCbu }) => {
   const [cbu, setCbu] = useState("");
   const [isUpdating, setIsUpdating] = useState(!isClient);
@@ -33,48 +35,17 @@ const CBUValidation = ({ onValidate, loading, error, onBack, isClient, existingC
       }
       onSubmit={handleSubmit}
       onBack={onBack}
-      style={{
-        width: "100%",
-        height: "100%",
-        gap: "4rem",
-        margin: "0px",
-        maxWidth: "none",
-        minHeight: "760px",
-        justifyContent: "center",
-      }}
+      className={styles.formOverride}
     >
       {isClient && !isUpdating ? (
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "2rem",
-            width: "100%",
-            textAlign: "center",
-          }}
-        >
-          <div
-            style={{
-              padding: "2rem",
-              background: "rgba(255, 255, 255, 0.05)",
-              borderRadius: "12px",
-              border: "1px solid rgba(255, 255, 255, 0.1)",
-              fontSize: "1.5rem",
-              letterSpacing: "0.2rem",
-              fontWeight: "bold",
-              color: "#fff",
-            }}
-          >
-            {existingCbu}
-          </div>
-          <p style={{ color: "rgba(255, 255, 255, 0.7)", fontSize: "1rem" }}>
-            ¿Es este tu CBU correcto?
-          </p>
-          <div style={{ display: "flex", gap: "1rem" }}>
+        <div className={styles.clientContainer}>
+          <div className={styles.cbuBox}>{existingCbu}</div>
+          <p className={styles.helperText}>¿Es este tu CBU correcto?</p>
+          <div className={styles.buttonGroup}>
             <GenericButton
               type='submit'
               loading={loading}
-              style={{ flex: 1 }}
+              className={styles.flexButton}
             >
               Sí, es correcto
             </GenericButton>
@@ -82,7 +53,7 @@ const CBUValidation = ({ onValidate, loading, error, onBack, isClient, existingC
               type='button'
               variant='outline'
               onClick={handleToggleUpdate}
-              style={{ flex: 1 }}
+              className={styles.flexButton}
             >
               No, ingresar otro
             </GenericButton>
