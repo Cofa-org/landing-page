@@ -29,11 +29,15 @@ const LoanSimScreen = () => {
     cuit,
     loanInfo,
     loadingModal,
+    bancoEncontrado,
+    codigoBancoError,
+    validandoBanco,
     handleAmountChange,
     handleInstallmentChange,
     solicitarOTP,
     verificarOTP,
     validarCBU,
+    validarCodigoBancoHandler,
     handleNextStep,
     handlePrevStep,
     handleInfoPrestamo,
@@ -152,6 +156,10 @@ const LoanSimScreen = () => {
             onBack={handlePrevStep}
             isClient={!!simulationData?.existingSimulation?.id_cliente}
             existingCbu={simulationData?.existingSimulation?.cbu}
+            bancoEncontrado={bancoEncontrado}
+            codigoBancoError={codigoBancoError}
+            validandoBanco={validandoBanco}
+            validarCodigoBanco={validarCodigoBancoHandler}
           />
         );
 

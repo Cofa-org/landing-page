@@ -22,6 +22,9 @@ export const useLoanSimulator = () => {
   const [loanInfo, setLoanInfo] = useState(null);
   const [loadingModal, setLoadingModal] = useState(false);
   const [existingCompliance, setExistingCompliance] = useState(undefined);
+  const [bancoEncontrado, setBancoEncontrado] = useState(null);
+  const [codigoBancoError, setCodigoBancoError] = useState(null);
+  const [validandoBanco, setValidandoBanco] = useState(false);
   const shortId = searchParams.get("id");
 
   useEffect(() => {
@@ -362,6 +365,28 @@ export const useLoanSimulator = () => {
     }
   };
 
+  const validarCodigoBancoHandler = useCallback(async (codigoValue) => {
+    if (codigoValue && codigoValue.length === 3) {
+      setValidandoBanco(true);
+      try {
+        const response = await SimuladorService.validarCodigoBanco(codigoValue);
+        if (response.success && response.exists) {
+          setBancoEncontrado(response.data);
+          setCodigoBancoError(null);
+        } else {
+          setBancoEncontrado(null);
+          setCodigoBancoError("Alguno de los dígitos ingresados no es correcto");
+        }
+      } catch (err) {
+        console.error("Error validando código bancario:", err);
+        setBancoEncontrado(null);
+        setCodigoBancoError("Error al validar el código bancario");
+      } finally {
+        setValidandoBanco(false);
+      }
+    }
+  }, []);
+
   return {
     amount,
     installment,
@@ -377,6 +402,9 @@ export const useLoanSimulator = () => {
     cbu,
     loanInfo,
     loadingModal,
+    bancoEncontrado,
+    codigoBancoError,
+    validandoBanco,
     handleAmountChange,
     handleInstallmentChange,
     handleNextStep,
@@ -385,6 +413,7 @@ export const useLoanSimulator = () => {
     verificarOTP,
     guardarCompliance,
     validarCBU,
+    validarCodigoBancoHandler,
     handleInfoPrestamo,
     setStep,
     existingCompliance,

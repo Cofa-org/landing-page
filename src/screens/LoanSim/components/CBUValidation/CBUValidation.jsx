@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import GenericForm from "../../../../Components/Forms/GenericForm/GenericForm";
 import GenericInput from "../../../../Components/Forms/GenericInput/GenericInput";
@@ -7,10 +7,34 @@ import { CBU_CONFIG } from "../../../../constants/LOAN_SIM.js";
 
 import styles from "./CBUValidation.module.css";
 
-const CBUValidation = ({ onValidate, loading, error, onBack, isClient, existingCbu }) => {
+const CBUValidation = ({
+  onValidate,
+  loading,
+  error,
+  onBack,
+  isClient,
+  existingCbu,
+  bancoEncontrado,
+  codigoBancoError,
+  validandoBanco,
+  validarCodigoBanco,
+}) => {
+
   const [cbu, setCbu] = useState("");
   const [isUpdating, setIsUpdating] = useState(!isClient);
   const [accountType, setAccountType] = useState("cbu");
+
+  // Validar código bancario cuando se ingresa
+  useEffect(() => {
+    if (!isClient || isUpdating && accountType === "cbu") {
+      if (cbu.length >= 3) {
+        const codigo = cbu.slice(0, 3);
+        validarCodigoBanco(codigo);
+      } else if (cbu.length === 0) {
+        validarCodigoBanco("");
+      }
+    }
+  }, [cbu, isClient, isUpdating, validarCodigoBanco]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -93,24 +117,36 @@ const CBUValidation = ({ onValidate, loading, error, onBack, isClient, existingC
               </label>
             </div>
           )}
-          <GenericInput
-            label={accountType.toUpperCase()}
-            name={accountType}
-            type='text'
-            value={cbu}
-            onChange={(e) => {
-              const val = e.target.value.replace(/\D/g, "").slice(0, CBU_CONFIG.CBU_LENGTH);
-              setCbu(val);
-            }}
-            placeholder='0000000000000000000000'
-            required
-            error={error}
-            maxLength={CBU_CONFIG.CBU_LENGTH}
-          />
+          <div>
+            <div
+              className={styles.bancoContainer}
+            >
+              <label className={styles.bancoLabel}>{accountType.toUpperCase()}</label>
+              {bancoEncontrado && (
+                <span className={styles.bancoName}>
+                  ✓ {bancoEncontrado.descripcion}
+                </span>
+              )}
+            </div>
+            <GenericInput
+              label=''
+              name={accountType}
+              type='text'
+              value={cbu}
+              onChange={(e) => {
+                const val = e.target.value.replace(/\D/g, "").slice(0, CBU_CONFIG.CBU_LENGTH);
+                setCbu(val);
+              }}
+              placeholder='0000000000000000000000'
+              required
+              error={error || codigoBancoError}
+              maxLength={CBU_CONFIG.CBU_LENGTH}
+            />
+          </div>
           <GenericButton
             type='submit'
             loading={loading}
-            disabled={cbu.length !== CBU_CONFIG.CBU_LENGTH}
+            disabled={cbu.length !== CBU_CONFIG.CBU_LENGTH || validandoBanco || loading || codigoBancoError}
           >
             Validar {accountType.toUpperCase()}
           </GenericButton>
@@ -126,6 +162,10 @@ CBUValidation.propTypes = {
   error: PropTypes.string,
   isClient: PropTypes.bool,
   existingCbu: PropTypes.string,
+  bancoEncontrado: PropTypes.object,
+  codigoBancoError: PropTypes.string,
+  validandoBanco: PropTypes.bool,
+  validarCodigoBanco: PropTypes.func.isRequired,
 };
 
 export default CBUValidation;

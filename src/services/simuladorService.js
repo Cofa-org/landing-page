@@ -188,6 +188,26 @@ export default class SimuladorService {
     }
   }
 
+  static async validarCodigoBanco(codigo) {
+    try {
+      const url = `${VITE_COFA_AUTH_URL}/api/simulador-prestamos/validar-codigo-banco`;
+      const apiKey = VITE_COFA_AUTH_API_KEY;
+      const body = { codigo };
+
+      const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, null);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Error al validar código de banco");
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("VALIDAR_CODIGO_BANCO_ERROR:", error);
+      throw error;
+    }
+  }
+
   static async actualizarEstado({ scoringId, estado }) {
     try {
       const url = `${VITE_COFA_AUTH_URL}/api/simulador-prestamos/estado`;
