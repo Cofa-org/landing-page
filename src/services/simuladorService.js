@@ -13,12 +13,12 @@ export default class SimuladorService {
         capitalSeleccionado,
       };
       const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, null);
-     
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Error al calcular planes");
       }
-  
+
       const responseJson = await response.json();
       return responseJson;
     } catch (error) {
@@ -93,7 +93,7 @@ export default class SimuladorService {
     }
   }
 
-  static async validarCBU(cbu, cuit, scoringId) {
+  static async validarCBU(cbu, cuit, scoringId, accountType = "cbu") {
     try {
       const url = `${VITE_COFA_AUTH_URL}/api/simulador-prestamos/validar-cbu`;
       const apiKey = VITE_COFA_AUTH_API_KEY;
@@ -101,6 +101,7 @@ export default class SimuladorService {
         cbu,
         cuit,
         scoringId,
+        accountType,
       };
       const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, null);
       if (!response.ok) {
@@ -193,7 +194,7 @@ export default class SimuladorService {
       const apiKey = VITE_COFA_AUTH_API_KEY;
       const body = { scoringId, estado };
       const response = await HttpApi(url, body, HTTP_METHOD.PUT, apiKey, null);
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Error al actualizar el estado de la simulación");

@@ -10,19 +10,21 @@ import styles from "./CBUValidation.module.css";
 const CBUValidation = ({ onValidate, loading, error, onBack, isClient, existingCbu }) => {
   const [cbu, setCbu] = useState("");
   const [isUpdating, setIsUpdating] = useState(!isClient);
+  const [accountType, setAccountType] = useState("cbu");
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (isClient && !isUpdating) {
-      onValidate(existingCbu);
+      onValidate(existingCbu, "cbu");
     } else if (cbu) {
-      onValidate(cbu);
+      onValidate(cbu, accountType);
     }
   };
 
   const handleToggleUpdate = () => {
     setIsUpdating(true);
     setCbu("");
+    setAccountType("cbu");
   };
 
   return (
@@ -31,7 +33,7 @@ const CBUValidation = ({ onValidate, loading, error, onBack, isClient, existingC
       description={
         isClient && !isUpdating
           ? "Verificá que tu CBU sea el correcto para recibir el préstamo."
-          : `Ingresá los ${CBU_CONFIG.CBU_LENGTH} dígitos de tu CBU para validar tu cuenta bancaria.`
+          : `Ingresá los ${CBU_CONFIG.CBU_LENGTH} dígitos de tu ${accountType.toUpperCase()} para validar tu cuenta bancaria.`
       }
       onSubmit={handleSubmit}
       onBack={onBack}
@@ -61,9 +63,39 @@ const CBUValidation = ({ onValidate, loading, error, onBack, isClient, existingC
         </div>
       ) : (
         <>
+          {isClient && isUpdating && (
+            <div className={styles.radioGroup}>
+              <label className={styles.radioLabel}>
+                <input
+                  type='radio'
+                  name='accountType'
+                  value='cbu'
+                  checked={accountType === "cbu"}
+                  onChange={(e) => {
+                    setAccountType(e.target.value);
+                    setCbu("");
+                  }}
+                />
+                <span>CBU</span>
+              </label>
+              <label className={styles.radioLabel}>
+                <input
+                  type='radio'
+                  name='accountType'
+                  value='cvu'
+                  checked={accountType === "cvu"}
+                  onChange={(e) => {
+                    setAccountType(e.target.value);
+                    setCbu("");
+                  }}
+                />
+                <span>CVU</span>
+              </label>
+            </div>
+          )}
           <GenericInput
-            label='CBU'
-            name='cbu'
+            label={accountType.toUpperCase()}
+            name={accountType}
             type='text'
             value={cbu}
             onChange={(e) => {
@@ -80,7 +112,7 @@ const CBUValidation = ({ onValidate, loading, error, onBack, isClient, existingC
             loading={loading}
             disabled={cbu.length !== CBU_CONFIG.CBU_LENGTH}
           >
-            Validar CBU
+            Validar {accountType.toUpperCase()}
           </GenericButton>
         </>
       )}

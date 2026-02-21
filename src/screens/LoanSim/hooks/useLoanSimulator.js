@@ -81,7 +81,7 @@ export const useLoanSimulator = () => {
             setExistingSimulation(newData?.existingSimulation);
             setStep(LOAN_SIM_STEPS[existingState]);
           }
-        
+
           if (isInitial) {
             const capMax = Number(newData.capital_maximo_a_ofrecer);
             setAmount(capMax);
@@ -268,7 +268,7 @@ export const useLoanSimulator = () => {
     }
   };
 
-  const validarCBU = async (cbuValue) => {
+  const validarCBU = async (cbuValue, accountType = "cbu") => {
     setValidating(true);
     setError(null);
     try {
@@ -276,6 +276,7 @@ export const useLoanSimulator = () => {
         cbuValue,
         scoringData.cuit,
         scoringData.scoringId,
+        accountType,
       );
 
       if (response.success || response.data) {
