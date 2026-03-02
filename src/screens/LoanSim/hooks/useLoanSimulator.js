@@ -83,6 +83,10 @@ export const useLoanSimulator = () => {
           if (existingState) {
             setExistingSimulation(newData?.existingSimulation);
             setStep(LOAN_SIM_STEPS[existingState]);
+
+            if (newData?.existingSimulation?.email) {
+              setEmail(newData.existingSimulation.email);
+            }
           }
 
           if (isInitial) {
