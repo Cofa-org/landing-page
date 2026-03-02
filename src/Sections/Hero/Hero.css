@@ -3,14 +3,17 @@
     padding: 50px 15vw 100px 15vw !important;
   }
 }
+
 .hero-container {
   background-color: var(--background-color);
   padding: 100px 5vw;
 }
+
 .btn-loan-main {
   font-size: 18px;
   letter-spacing: 3px;
 }
+
 .hero {
   display: flex;
   justify-content: space-between;
@@ -46,12 +49,14 @@
 .hero .hero-info h1 strong {
   color: var(--primary-color);
 }
+
 .info-container {
   position: relative;
   display: flex;
   flex-direction: column;
   margin-top: 8%;
 }
+
 .info-container h2 {
   margin-top: 30px;
   margin-bottom: 30px;
@@ -100,15 +105,17 @@
 }
 
 .cursor::after {
-  content: "|"; /* El carácter que simula la barra de escritura */
+  content: "|";
+  /* El carácter que simula la barra de escritura */
   display: inline-block;
-  width: 0; /* Inicialmente no se muestra */
-  animation: blink-caret 0.75s step-end infinite; /* Animación de parpadeo */
+  width: 0;
+  /* Inicialmente no se muestra */
+  animation: blink-caret 0.75s step-end infinite;
+  /* Animación de parpadeo */
 }
 
 @keyframes blink-caret {
-  50% {
-  }
+  50% {}
 }
 
 @media screen and (max-width: 1300px) {
@@ -116,65 +123,80 @@
     position: relative !important;
     margin: auto;
   }
+
   .hero-assist-img-container {
     display: none;
     justify-content: center;
   }
 }
+
 @media screen and (max-width: 1200px) {
   .contact-secondary-button {
     background-color: var(--primary-color) !important;
     width: 80%;
     margin: auto;
   }
+
   .hero-content-left {
     padding-left: 0vw;
     margin-top: 5%;
   }
 }
+
 @media screen and (max-width: 900px) {
   .hero-container .hero {
     display: flex;
     flex-direction: column-reverse;
     gap: 1rem;
   }
+
   .hero .hero-img {
     order: 1;
   }
+
   .hero .hero-info {
     width: 100%;
     order: 2;
   }
+
   .hero .hero-info h1 br {
     display: none;
   }
+
   .hero .hero-info h1 {
     font-size: 40px;
     text-align: center;
   }
+
   .hero-container {
     padding-top: 50px;
   }
+
   .hero .hero-info h1 .mq-title-wrap {
     display: block;
   }
+
   .info-list {
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
   }
+
   .info-list .info-card {
     flex-basis: 50%;
     margin-bottom: 10px;
   }
+
   .hero-img {
     width: 100%;
     display: flex;
     justify-content: center;
   }
+
   .hero-img img {
     width: 45%;
   }
+
   .backgroundDecorationInfo {
     display: none;
   }
@@ -184,9 +206,11 @@
   .hero-img img {
     width: 65%;
   }
+
   .hero-container {
     padding-bottom: 50px;
   }
+
   .hero-container .services-assist-list {
     margin-top: 40px;
   }
@@ -196,23 +220,29 @@
   .hero-img img {
     width: 85%;
   }
+
   .hero .hero-info h1 {
     font-size: 30px;
   }
+
   .hero-container .info-container .info-list {
     flex-direction: column;
     gap: 20px;
   }
+
   .hero-container .info-container .info-list .info-card {
     flex-basis: 100%;
     width: 100%;
   }
+
   .hero-container .info-container .info-list .info-card .info-icon {
     margin: auto;
   }
+
   .hero-container .info-container .info-list .info-card {
     text-align: center;
   }
+
   .info-card .info-icon {
     font-size: 40px;
   }
@@ -228,6 +258,7 @@
 .btn-consult {
   font-size: 18px;
 }
+
 /* .info-icon{
     width: 24px;
     height: 24px;
@@ -241,15 +272,18 @@
   justify-content: flex-end;
   align-items: center;
 }
+
 .background-icon svg path,
 rect,
 circle {
   color: var(--primary-color);
 }
+
 .card-points {
   width: 270px;
   padding: 24px;
 }
+
 .stain-hero-points-svg {
   position: absolute;
   top: 0;
@@ -309,10 +343,11 @@ circle {
   gap: 10px;
 }
 
-.btn-score-points > svg > path {
+.btn-score-points>svg>path {
   color: var(--primary-color);
 }
-.btn-score-points > svg {
+
+.btn-score-points>svg {
   font-size: 24px;
 }
 
@@ -351,6 +386,7 @@ circle {
   flex-wrap: wrap;
   flex-direction: column;
 }
+
 .background-icon {
   width: 46px;
   height: 46px;
@@ -361,15 +397,19 @@ circle {
   justify-content: center;
   margin-bottom: 5%;
 }
+
 .background-icon:hover {
   background: rgb(36, 149, 87, 0.4);
 }
+
 .text-add {
   width: 80%;
 }
+
 #btn-points-assist {
   width: 200px;
 }
+
 #btn-lend {
   width: 200px;
   border: 1px solid white;
@@ -380,10 +420,12 @@ circle {
     flex-direction: column;
     align-items: flex-start;
   }
+
   .how-do-add-points .info-cards-points {
     justify-content: space-between;
     margin-top: 50px;
   }
+
   .how-do-add-points .info-cards-points .card-points {
     padding: 0;
     flex-basis: 40%;
@@ -398,6 +440,7 @@ circle {
   .stain-hero-points-svg {
     display: none;
   }
+
   .hero-overlay .hero-img-points {
     position: static;
     width: 100%;
@@ -414,6 +457,7 @@ circle {
   .hero-buttons {
     flex-direction: column;
   }
+
   .btn-score-points {
     width: 100%;
   }
@@ -423,15 +467,19 @@ circle {
   #btn-points-assist {
     display: none;
   }
+
   .hero-container {
     margin-top: 13%;
   }
+
   .line-background-points {
     display: none;
   }
+
   .stain-hero-points-svg {
     display: none;
   }
+
   .hero-img-points {
     background: cover fixed no-repeat;
     color: var(--primary-color);
@@ -439,42 +487,52 @@ circle {
     z-index: -1;
     top: 70px;
   }
+
   .hero-points {
     width: 100%;
   }
+
   .text-info {
     z-index: 1;
     margin-top: 2%;
   }
+
   .hero-points h1 {
     font-size: 45px;
   }
+
   .hero-buttons {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
   }
+
   .how-do-add-points {
     flex-direction: row;
     flex-wrap: wrap;
     width: 100%;
   }
+
   .text-add {
     width: 100%;
   }
+
   .text-add h1 {
     font-size: 40px;
   }
+
   .info-cards-points {
     flex-direction: column;
     margin-top: 10%;
     justify-content: flex-start;
     width: 100%;
   }
+
   .card-points {
     width: 100%;
     padding: 10px;
   }
+
   .btn {
     width: 100%;
   }
@@ -624,6 +682,7 @@ circle {
   .hero-container-type-2 {
     flex-direction: column-reverse;
   }
+
   .hero-container-type-2 .hero-content-left,
   .hero-container-type-2 .hero-content-rigth {
     width: 100%;
@@ -635,16 +694,19 @@ circle {
     padding: 40px 0;
     background-color: rgba(36, 149, 87, 0.2);
   }
+
   .hero-container-type-2 .hero-content-rigth h1 {
     font-size: 34px;
     text-align: center;
     color: var(--text-color);
   }
+
   .hero-container-type-2 .hero-content-rigth p {
     font-size: 18px;
     color: var(--text-color);
     text-align: center;
   }
+
   .hero-container-type-2 .hero-content-rigth button {
     margin: auto;
     background-color: var(--primary-color);
@@ -653,7 +715,8 @@ circle {
   }
 }
 
-/* EL MEJOR TRATO */ /* Suggestions Hero */
+/* EL MEJOR TRATO */
+/* Suggestions Hero */
 .container-el-mejor-trato {
   padding: 100px 15vh;
   display: flex;
@@ -724,6 +787,7 @@ circle {
   gap: 10px;
   align-items: center;
 }
+
 .social-media-list-title .rect {
   width: 25px;
   background-color: var(--text-color);
@@ -734,10 +798,12 @@ circle {
   font-size: 12px;
   font-weight: 500;
 }
+
 .social-media-list .social-media-container {
   display: flex;
   gap: 12px;
 }
+
 .social-media-list .social-media-container a {
   width: 32px;
   height: 32px;
@@ -758,10 +824,12 @@ circle {
   flex-direction: column;
   align-items: center;
 }
+
 .services-el-mejor-trato h1 {
   font-size: 50px;
   font-weight: 500;
 }
+
 .cards-el-mejor-trato {
   display: flex;
   flex-direction: row;
@@ -771,6 +839,7 @@ circle {
   width: 100%;
   margin-top: 3%;
 }
+
 .card-el-mejor-trato h2 {
   color: var(--primary-color);
   text-align: center;
@@ -785,6 +854,7 @@ circle {
   height: 24px;
   margin-right: 10px;
 }
+
 .card-el-mejor-trato svg path {
   color: var(--primary-color);
 }
@@ -795,20 +865,25 @@ circle {
     flex-wrap: wrap;
     justify-content: flex-start;
   }
+
   .container-form-elmejortrato {
     margin-top: 10%;
   }
+
   .services-el-mejor-trato {
     padding: 80px 5vh;
     align-items: flex-start;
     width: 100%;
   }
+
   .cards-el-mejor-trato {
     flex-wrap: wrap;
   }
+
   .card-el-mejor-trato {
     margin-bottom: 3%;
   }
+
   .card-el-mejor-trato h2 {
     text-align: center;
   }
@@ -820,14 +895,17 @@ circle {
     flex-wrap: wrap;
     justify-content: flex-start;
   }
+
   .container-form-elmejortrato {
     margin-top: 10%;
   }
+
   .services-el-mejor-trato {
     padding: 80px 5vh;
     align-items: flex-start;
     width: 100%;
   }
+
   .cards-el-mejor-trato {
     flex-direction: row;
     flex-wrap: wrap;
@@ -835,9 +913,11 @@ circle {
     justify-content: center;
     align-items: center;
   }
+
   .card-el-mejor-trato {
     margin-bottom: 3%;
   }
+
   .card-el-mejor-trato h2 {
     text-align: center;
   }
@@ -848,13 +928,16 @@ circle {
     padding: 50px 15vh;
     flex-direction: column;
   }
+
   .services-el-mejor-trato {
     padding: 80px 5vh;
     width: 100%;
   }
+
   .container-form-elmejortrato {
     margin-top: 10%;
   }
+
   .cards-el-mejor-trato {
     gap: 20px;
   }
@@ -878,12 +961,15 @@ circle {
     padding: 80px 5vh;
     width: 100%;
   }
+
   .container-form-elmejortrato {
     margin-top: 10%;
   }
+
   .cards-el-mejor-trato {
     gap: 20px;
   }
+
   .hero-content-left {
     padding-left: 0vw;
     margin-top: 5%;

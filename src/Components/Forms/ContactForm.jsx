@@ -203,6 +203,14 @@ const ContactForm = ({ type }) => {
       errors.message = "";
     }
 
+    if (type === "BAJA" || type === "ARREPENTIMIENTO") {
+      if (!values.files || (Array.isArray(values.files) && values.files.length === 0) || !values.files.buffer) {
+        errors.files = "Debe adjuntar un archivo.";
+      } else {
+        errors.files = "";
+      }
+    }
+
     // Verificar si todos los campos están completos
     const isFormValid = Object.values(errors).every((error) => error === "");
 
@@ -460,6 +468,12 @@ const ContactForm = ({ type }) => {
                 <span className='circle-item'></span>
                 {EXPLICACION_MENSAJE[type]}
               </span>
+              {type === "ARREPENTIMIENTO" && (
+                <span className="message-item">
+                  <span className="circle-item"></span>
+                  Debe adjuntar los comprobantes de movimiento bancario de la misma cuenta a la cual se transfirió el dinero desde el día del desembolso, hasta el día de la intención de arrepentimiento.
+                </span>
+              )}
               <Field
                 as='textarea'
                 name='message'
@@ -479,8 +493,9 @@ const ContactForm = ({ type }) => {
                 component={MyDropzone}
               />
               <ErrorMessage
-                name='files'
-                component='div'
+                name="files"
+                component="div"
+                className="error-message"
               />
             </div>
 

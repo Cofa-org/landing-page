@@ -45,16 +45,14 @@ const HomeScreen = () => {
 
   return (
     <>
-        <StructuredData faqData={faqData} breadcrumbData={breadcrumbData} />
-        <Header/>
-        <Hero />
-        <AboutUs/>
-        {/* <OurServices/> */}
-        <ClientReview/>
-        <FrecuentQuestion/>
-        <WorkWithUs/>
-        <Contact/>
-        <Footer/>
+      <Header />
+      <Hero />
+      <AboutUs />
+      {/* <OurServices/> */}
+      <FrecuentQuestion />
+      <WorkWithUs />
+      <Contact />
+      <Footer />
     </>
   )
 }

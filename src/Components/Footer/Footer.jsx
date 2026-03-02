@@ -20,7 +20,7 @@ const Footer = () => {
         </Link>
         <div className='footer-contracts'>
           <div>
-            <h3>CONTRATOS DE ADHESIÓN LEY 24240 DE DEFENSA AL CONSUMIDOR</h3>
+            <h3>CONTRATOS DE ADHESIÓN</h3>
             <a
               href='/mod-contrato-electronica.pdf'
               target='_blank'
@@ -41,7 +41,7 @@ const Footer = () => {
             </a>
           </div>
           <div>
-            <h3>DEFENSA AL CONSUMIDOR</h3>
+            <h3>DEFENSA AL CONSUMIDOR <br /> LEY 24240</h3>
             <a
               href='https://www.argentina.gob.ar/economia/comercio/defensadelconsumidor'
               target='_blank'
@@ -112,10 +112,6 @@ const Footer = () => {
             href='https://www.argentina.gob.ar/aaip/datospersonales/reclama/33711334799--RL-2019-106873898-APN-DNPDP#AAIP'
             target='_blank'
           >
-            <img
-              src='/img/footer-pdp.webp'
-              alt='registro nacional de bases de datos, PDP'
-            />
           </a>
         </div>
         <div className='ssn-container'>

@@ -36,7 +36,7 @@ const Hero = () => {
         <Carrusel images={arrImages}></Carrusel>
       </div>
       <div className='info-container'>
-        <h2>Te prestamos hasta $500.000</h2>
+        <h2>Te prestamos hasta $800.000</h2>
         <div className='info-list'>
           {infoList.map((info) => (
             <div
