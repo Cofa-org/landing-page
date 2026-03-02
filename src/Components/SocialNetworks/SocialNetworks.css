@@ -1,0 +1,10 @@
+.socialMediaList {
+  display: flex;
+  width: 100%;
+  gap: 4rem;
+  justify-content: center;
+}
+.socialMediaList svg path:hover {
+  color: var(--primary-color);
+}
+

@@ -1,0 +1,136 @@
+/* Estilos para la sección COFA Tips */
+.cofa-tips-section {
+  width: 100%;
+  background-color: var(--color-background);
+  position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-md) var(--spacing-lg);
+}
+
+.cofa-tips-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3rem;
+  position: relative;
+  border-radius: var(--border-radius-sm);
+}
+
+.cofa-tips-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--spacing-md) var(--spacing-lg);
+}
+
+.cofa-tips-logo {
+  position: relative;
+  width: 252px;
+  height: 243px;
+  overflow: hidden;
+}
+
+.cofa-tips-logo-container {
+  position: absolute;
+  width: 252px;
+  height: 243px;
+  top: 0;
+  left: 0;
+}
+
+.cofa-tips-logo-bg {
+  position: relative;
+  height: 243px;
+}
+
+.cofa-tips-logo-vector1 {
+  position: absolute;
+  width: 243px;
+  height: 234px;
+  top: 4px;
+  left: 4px;
+}
+
+.cofa-tips-featured-card {
+  max-width: 592px;
+  max-height: 361px;
+  border-radius: var(--border-radius-sm);
+  border: none;
+}
+.card-image {
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  border-radius: var(--border-radius-sm);
+  object-fit: cover;
+}
+
+/* Estilos del Blog List Header movidos aquí */
+.cofa-tips-header {
+  text-align: center;
+  width: 100%;
+  padding: 0px var(--spacing-lg);
+}
+
+.cofa-tips-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  font-family: "Roboto", Helvetica;
+  padding: 0px var(--spacing-lg);
+}
+
+.cofa-tips-subtitle {
+  font-size: 18px;
+  color: var(--color-text-secondary);
+  font-weight: 400;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.cofa-tips-banner {
+  width: 100%;
+  max-width: 1200px;
+  padding: 0px var(--spacing-lg);
+}
+
+.cofa-tips-banner img {
+  width: 100%;
+  border-radius: var(--border-radius-sm);
+}
+
+/* Responsive */
+@media (max-width: 980px) {
+  .cofa-tips-top {
+    flex-direction: column;
+    gap: var(--spacing-xl);
+  }
+}
+@media (max-width: 768px) {
+  .cofa-tips-section {
+    padding: var(--spacing-2xl) 0;
+  }
+
+  .cofa-tips-featured-card {
+    width: 100%;
+    max-width: 592px;
+  }
+
+  .blog-list-title {
+    font-size: 36px;
+  }
+}
+
+@media (max-width: 480px) {
+  .blog-list-title {
+    font-size: 28px;
+  }
+
+  .blog-list-subtitle {
+    font-size: 16px;
+  }
+}

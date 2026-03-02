@@ -3,12 +3,13 @@ import { Formik, Field, Form, ErrorMessage } from "formik";
 import { useDropzone } from "react-dropzone";
 import { PiCloudArrowUp } from "react-icons/pi";
 import { FaChevronRight, FaChevronLeft, FaChevronDown, FaChevronUp } from "react-icons/fa";
-/* import dotenv from 'dotenv';
-dotenv.config(); */
+
 import "./style.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AiOutlineDelete } from "react-icons/ai";
 import { FaArrowRightLong, FaCheck } from "react-icons/fa6";
+import MailService from "../../services/mailService.js";
+import Notification from "../Notifications/Notification.jsx";
 
 const MyDropzone = ({ field, form: { setFieldValue } }) => {
   const [fileNames, setFileNames] = useState([]);
@@ -41,10 +42,10 @@ const MyDropzone = ({ field, form: { setFieldValue } }) => {
   return (
     <div>
       {fileNames.length > 0 ? (
-        <div className="dropzone-delete-container">
+        <div className='dropzone-delete-container'>
           <div
             {...getRootProps()}
-            className="dropzone"
+            className='dropzone'
           >
             <PiCloudArrowUp />
             <h3>Archivo seleccionado</h3>
@@ -60,7 +61,7 @@ const MyDropzone = ({ field, form: { setFieldValue } }) => {
       ) : (
         <div
           {...getRootProps()}
-          className="dropzone"
+          className='dropzone'
         >
           <PiCloudArrowUp />
           <h3>Importá acá tu archivo</h3>
@@ -75,6 +76,9 @@ const MyDropzone = ({ field, form: { setFieldValue } }) => {
 const ContactForm = ({ type }) => {
   const [isSent, setIsSent] = useState(false);
   const [isSelectorOpen, setIsSelectorOpen] = useState(false);
+  const [notification, setNotification] = useState({ show: false, message: "", type: "success" });
+  const navigate = useNavigate();
+
   const pathname = useLocation();
   const route = pathname.pathname.substring(1);
   const sendMailRequest = async (values) => {
@@ -96,38 +100,46 @@ const ContactForm = ({ type }) => {
 
     if (type === "RECLAMO") {
       if (reasonSelected.reason && reasonSelected.value) {
-        const response = await fetch(
-          `https://backend-landing-cofa-production-81e9.up.railway.app/mail/${type}/`,
-          {
-            method: "POST",
-            headers: {
-              "x-api-key": "4b2129b4-c4f6-4551-8d1c-934af49f5309",
-            },
-            credentials: "include",
-            body: formData,
-          }
-        ).then((res) => {
-          if (res.status == 200) {
-            setIsSent(true);
-          }
-        });
+        try {
+          const response = await MailService.sendMail(`${type}/`, formData);
+          setNotification({
+            show: true,
+            message: "¡Mensaje enviado con éxito!",
+            type: "success",
+          });
+          setIsSent(true);
+          setTimeout(() => {
+            navigate("/");
+          }, 3000);
+        } catch (error) {
+          setNotification({
+            show: true,
+            message: error.message || "Error al enviar el mensaje",
+            type: "error",
+          });
+          console.error("Error sending mail:", error);
+        }
       }
     } else {
-      const response = await fetch(
-        `https://backend-landing-cofa-production-81e9.up.railway.app/mail/${type}/`,
-        {
-          method: "POST",
-          headers: {
-            "x-api-key": "4b2129b4-c4f6-4551-8d1c-934af49f5309",
-          },
-          credentials: "include",
-          body: formData,
-        }
-      ).then((res) => {
-        if (res.status == 200) {
-          setIsSent(true);
-        }
-      });
+      try {
+        const response = await MailService.sendMail(`${type}/`, formData);
+        setNotification({
+          show: true,
+          message: "¡Mensaje enviado con éxito!",
+          type: "success",
+        });
+        setIsSent(true);
+        setTimeout(() => {
+          navigate("/");
+        }, 3000);
+      } catch (error) {
+        setNotification({
+          show: true,
+          message: error.message || "Error al enviar el mensaje",
+          type: "error",
+        });
+        console.error("Error sending mail:", error);
+      }
     }
   };
 
@@ -300,7 +312,7 @@ const ContactForm = ({ type }) => {
     setOpenSelector(false);
   }, [reasonSelected.value]);
   return (
-    <div className="quejas-sugerencias">
+    <div className='quejas-sugerencias'>
       <Formik
         initialValues={{
           name: "",
@@ -315,70 +327,70 @@ const ContactForm = ({ type }) => {
         validate={validate}
       >
         {({ isSubmitting, isValid }) => (
-          <Form className="form-container">
-            <div className="input-container">
+          <Form className='form-container'>
+            <div className='input-container'>
               <label>Nombre Completo</label>
               <Field
-                name="name"
-                type="text"
-                placeholder="Nombre y apellido"
+                name='name'
+                type='text'
+                placeholder='Nombre y apellido'
               />
               <ErrorMessage
-                name="name"
-                component="div"
-                className="error-message"
+                name='name'
+                component='div'
+                className='error-message'
               />
             </div>
 
-            <div className="input-container">
+            <div className='input-container'>
               <label>D.N.I</label>
               <Field
-                name="dni"
-                type="number"
-                placeholder="11222333"
+                name='dni'
+                type='number'
+                placeholder='11222333'
               />
               <ErrorMessage
-                name="dni"
-                component="div"
-                className="error-message"
+                name='dni'
+                component='div'
+                className='error-message'
               />
             </div>
 
-            <div className="input-container">
+            <div className='input-container'>
               <label>Correo electrónico</label>
               <Field
-                name="email"
-                type="email"
-                placeholder="nombre123@gmail.com"
+                name='email'
+                type='email'
+                placeholder='nombre123@gmail.com'
               />
               <ErrorMessage
-                name="email"
-                component="div"
-                className="error-message"
+                name='email'
+                component='div'
+                className='error-message'
               />
             </div>
 
-            <div className="input-container">
-              <label htmlFor="telephone">Celular</label>
+            <div className='input-container'>
+              <label htmlFor='telephone'>Celular</label>
               <Field
-                name="telephone"
-                type="text"
-                id="telephone"
-                placeholder="1122223333"
+                name='telephone'
+                type='text'
+                id='telephone'
+                placeholder='1122223333'
               />
               <ErrorMessage
-                name="telephone"
-                component="div"
-                className="error-message"
+                name='telephone'
+                component='div'
+                className='error-message'
               />
             </div>
 
             {type === "RECLAMO" && (
-              <div className="input-container input-container-100">
-                <label htmlFor="reason">Motivo:</label>
-                <div className="selector-input-container">
+              <div className='input-container input-container-100'>
+                <label htmlFor='reason'>Motivo:</label>
+                <div className='selector-input-container'>
                   <span
-                    className="selector-input"
+                    className='selector-input'
                     onClick={() => setOpenSelector(!openSelector)}
                   >
                     {reasonSelected.reason ? (
@@ -400,10 +412,10 @@ const ContactForm = ({ type }) => {
                     }
                   >
                     {reasonSelected.reason && reasonSelected.value !== "rollback" ? (
-                      <div className="reason-list-values">
+                      <div className='reason-list-values'>
                         {getReason()?.values.map((value) => (
                           <div
-                            className="option-item"
+                            className='option-item'
                             onClick={() => handleSelectOptionValue(value)}
                           >
                             {value}
@@ -429,57 +441,57 @@ const ContactForm = ({ type }) => {
                   </div>
                   <FaChevronDown
                     onClick={() => setOpenSelector(!openSelector)}
-                    className="flecha-abajo-input"
+                    className='flecha-abajo-input'
                   />
                 </div>
 
                 {isSelectorOpen &&
                   !openSelector &&
                   (!reasonSelected.reason || !reasonSelected.value) && (
-                    <div className="error-message">Debes seleccionar una razón.</div>
+                    <div className='error-message'>Debes seleccionar una razón.</div>
                   )}
               </div>
             )}
 
-            <div className="input-container input-container-100">
-              <label htmlFor="message">Mensaje:</label>
+            <div className='input-container input-container-100'>
+              <label htmlFor='message'>Mensaje:</label>
 
-              <span className="message-item">
-                <span className="circle-item"></span>
+              <span className='message-item'>
+                <span className='circle-item'></span>
                 {EXPLICACION_MENSAJE[type]}
               </span>
               <Field
-                as="textarea"
-                name="message"
-                id="message"
+                as='textarea'
+                name='message'
+                id='message'
                 placeholder={MESSAGES[type]} /* maxLength={255} */
               />
               <ErrorMessage
-                name="message"
-                component="div"
-                className="error-message"
+                name='message'
+                component='div'
+                className='error-message'
               />
             </div>
 
-            <div className="input-container input-container-100">
+            <div className='input-container input-container-100'>
               <Field
-                name="files"
+                name='files'
                 component={MyDropzone}
               />
               <ErrorMessage
-                name="files"
-                component="div"
+                name='files'
+                component='div'
               />
             </div>
 
-            <div className="submit">
+            <div className='submit'>
               {isSent ? (
-                <span className="sent-message">
+                <span className='sent-message'>
                   Enviado <FaCheck />
                 </span>
               ) : (
                 <button
-                  type="submit"
+                  type='submit'
                   className={`primary-btn ${isSubmitting || !isValid ? "disabled-btn" : ""}`}
                   disabled={isSubmitting || !isValid}
                 >
@@ -490,6 +502,13 @@ const ContactForm = ({ type }) => {
           </Form>
         )}
       </Formik>
+      {notification.show && (
+        <Notification
+          message={notification.message}
+          type={notification.type}
+          onClose={() => setNotification({ ...notification, show: false })}
+        />
+      )}
     </div>
   );
 };

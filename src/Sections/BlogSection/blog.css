@@ -1,0 +1,123 @@
+/* Estilos para la sección del blog */
+.blog-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.blog-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xl);
+  padding: 75px var(--spacing-4xl);
+  width: 100%;
+  background-color: var(--color-background-light);
+}
+
+.blog-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xl);
+  width: 100%;
+}
+
+.blog-title {
+  font-weight: 700;
+  font-size: 40px;
+  color: var(--color-text-primary);
+  font-family: 'Roboto', Helvetica;
+  margin-top: -1px;
+}
+
+.blog-main {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2xl);
+  width: 100%;
+}
+
+.blog-article {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 23px;
+  flex: 1;
+  width: 100%;
+}
+
+.blog-card {
+  width: 100%;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  border-radius: var(--border-radius-md);
+  background-color: var(--primary-color);
+}
+
+.blog-card-content {
+  padding: var(--spacing-lg) var(--spacing-xl);
+}
+
+.blog-card-title {
+  font-family: 'Roboto', Helvetica;
+  font-weight: 600;
+  font-size: 28px;
+  color: var(--color-text-light);
+  line-height: 28px;
+  margin-top: -1px;
+}
+
+.blog-text {
+  font-family: 'Roboto', Helvetica;
+  font-weight: 500;
+  font-size: 18px;
+  color: var(--text-color);
+  line-height: 26px;
+}
+
+.blog-pagination {
+  display: flex;
+  width: 94px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.blog-dot {
+  background-color: var(--primary-color);
+}
+
+.blog-dot-1 {
+  width: 20.71px;
+  height: 20.71px;
+  border-radius: 10.36px;
+}
+
+.blog-dot-2,
+.blog-dot-3 {
+  width: 12.75px;
+  height: 12.75px;
+  border-radius: 6.37px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .blog-container {
+    padding: var(--spacing-2xl) var(--spacing-lg);
+  }
+  
+  .blog-title {
+    font-size: 32px;
+  }
+  
+  .blog-card-title {
+    font-size: 24px;
+  }
+  
+  .blog-text {
+    font-size: 16px;
+    line-height: 24px;
+  }
+}

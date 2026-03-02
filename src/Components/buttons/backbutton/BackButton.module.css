@@ -1,0 +1,35 @@
+.backButton {
+  /* position: absolute;
+  top: 16px;
+  left: 16px; */
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  color: var(--text-color);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  padding: 4px 8px;
+  border-radius: 4px;
+  z-index: 10;
+}
+
+.backButton:hover {
+  opacity: 1;
+  background: rgba(var(--color-primary-rgb), 0.05);
+  transform: translateX(-2px);
+}
+
+.backIcon {
+  font-size: 1.1rem;
+}
+
+.backButton:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: none;
+}

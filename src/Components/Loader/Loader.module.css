@@ -1,0 +1,66 @@
+.loader-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  height: 100%;
+  width: 100%;
+}
+
+.loader {
+  width: 80% !important;
+  height: 80% !important;
+}
+
+.loader path {
+  fill: transparent;
+  stroke: #28a460;
+  stroke-width: 1;
+  stroke-dasharray: 800;
+  stroke-dashoffset: 800;
+  animation: draw 1.5s ease-in-out infinite alternate, fill 1.5s ease-in-out 0s infinite alternate;
+}
+
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes fill {
+  0%,
+  100% {
+    fill-opacity: 0;
+  }
+
+  50% {
+    fill-opacity: 1;
+  }
+}
+
+@keyframes reverseDraw {
+  from {
+    stroke-dashoffset: 0;
+  }
+
+  to {
+    stroke-dashoffset: 800;
+  }
+}
+
+@keyframes reverseFill {
+  0%,
+  100% {
+    fill-opacity: 1;
+  }
+
+  50% {
+    fill-opacity: 0;
+  }
+}
+
+.loader path:after {
+  content: "";
+  animation: reverseDraw 1s ease-in-out infinite alternate,
+    reverseFill 1s ease-in-out 0s infinite alternate;
+}

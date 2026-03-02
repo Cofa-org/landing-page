@@ -1,287 +1,284 @@
-header{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 100px;
-    padding: 0vh 5vw;
-    position: sticky;
-    top: 0;
-    background-color: var(--background-color);
-    z-index: 100;
-
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100px;
+  padding: 0vh 5vw;
+  position: sticky;
+  top: 0;
+  background-color: var(--background-color);
+  z-index: 100;
 }
-.solid{
-    background-color: var(--background-color);
-    border-bottom: 1px solid #d6d6d6;
+.solid {
+  background-color: var(--background-color);
+  border-bottom: 1px solid #d6d6d6;
 }
-header nav{
-    display: flex;
-    gap: 32px;
-}
-
-header nav a{
-    font-weight: 600;
+header nav {
+  display: flex;
+  gap: 32px;
 }
 
-.link-selected{
-    color: var(--primary-color);
-    display: flex;
-    flex-flow: column;
-    align-items: center;
-    row-gap: 1px;
+header nav a {
+  font-weight: 600;
 }
 
-.link-selected::after{
-    content: "";
-    padding: 3px;
-    border-radius: 50%;
-    background-color: var(--primary-color);
+.link-selected {
+  color: var(--primary-color);
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  row-gap: 1px;
 }
 
-.btn-show-links{
-    display: none;
+.link-selected::after {
+  content: "";
+  padding: 3px;
+  border-radius: 50%;
+  background-color: var(--primary-color);
 }
-.mobible-navbar{
-    display: none;
-    right: -250px;
-    transition: right 0.4s ease;
+
+.link-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
-.mobible-navbar-points{
-    display: none;
-    right: -250px;
-    transition: right 0.4s ease;
+
+.btn-show-links {
+  display: none;
 }
-.buttons-container{
-    display: flex;
-    align-items: center;
-    gap: 32px;
+.mobible-navbar {
+  display: none;
+  right: -250px;
+  transition: right 0.4s ease;
 }
-#btn-points-assist{
-    width: 100%;
-    font-weight: 500;
+.mobible-navbar-points {
+  display: none;
+  right: -250px;
+  transition: right 0.4s ease;
 }
-#btn-loan-points{
-    border: 1px solid;
+.buttons-container {
+  display: flex;
+  align-items: center;
+  gap: 32px;
 }
-.header-primary-btn{
-    color: #FFF;
-    font-size: 16px;
-    font-weight: 600;
-    letter-spacing: 0.8px;
+#btn-points-assist {
+  width: 100%;
+  font-weight: 500;
+}
+#btn-loan-points {
+  border: 1px solid;
+}
+.header-primary-btn {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
 }
 
 @keyframes to-right {
-    0% {
-        right: -250px;
-    }
-    100% {
-        right: 0;
-    }
+  0% {
+    right: -250px;
+  }
+  100% {
+    right: 0;
+  }
 }
-
 
 @media screen and (max-width: 1500px) {
-    header>.nav-points{
-        display: none;
-    }   
-    .btn-show-links-points{
-        display: flex;
-        background-color: transparent;
-        border: none;
+  header > .nav-points {
+    display: none;
+  }
+  .btn-show-links-points {
+    display: flex;
+    background-color: transparent;
+    border: none;
+  }
+  .btn-show-links svg {
+    font-size: 40px;
+    color: var(--primary-color);
+  }
 
-    }
-    .btn-show-links svg{
-        font-size: 40px;
-        color: var(--primary-color);
-    }
-
-    .btn-show-links svg line{
-        color: var(--text-color);
-    }
-    .buttons-container-points{
-        display: flex;
-        align-items: center;
-        gap: 32px;
-    }
-    .open-points {
-        display: flex;
-        flex-direction: column;
-        transition: right 400ms ease; 
-        position: fixed;
-        top: 0;
-        width: 250px;
-        right: 0;
-        animation-name: to-right;
-        animation-duration: 400ms;
-        height: 100vh !important;
-        background-color: white;
-        z-index: 3;
-        padding: 10px;
-        gap: 20px;
-    }
-    .not-first-points{
-        display: flex;
-        flex-direction: column;
-        position: fixed;
-        right: -350px;
-        transition: 500ms;
-        height: 100vh;
-        top: 0;
-        background-color: white;
-        z-index: 3;
-        padding: 10px;
-        justify-content: space-between;
-        width: 250px;
-    }
-    .mobible-links-points{
-        display: flex;
-        flex-direction: column;
-    }
-    .btn-back-points{
-        background-color: transparent;
-        border: none;
-        font-size: 32px;
-        display: flex;
-        justify-content: end;
-    }
-    .background-layer-points{
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background-color: rgba(0, 0, 0, 0.158);
-        z-index: 1;
-    }
-    .mobible-navbar-points{
-        display: flex;
-
-    }
+  .btn-show-links svg line {
+    color: var(--text-color);
+  }
+  .buttons-container-points {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+  }
+  .open-points {
+    display: flex;
+    flex-direction: column;
+    transition: right 400ms ease;
+    position: fixed;
+    top: 0;
+    width: 250px;
+    right: 0;
+    animation-name: to-right;
+    animation-duration: 400ms;
+    height: 100vh !important;
+    background-color: white;
+    z-index: 3;
+    padding: 10px;
+    gap: 20px;
+  }
+  .not-first-points {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    right: -350px;
+    transition: 500ms;
+    height: 100vh;
+    top: 0;
+    background-color: white;
+    z-index: 3;
+    padding: 10px;
+    justify-content: space-between;
+    width: 250px;
+  }
+  .mobible-links-points {
+    display: flex;
+    flex-direction: column;
+  }
+  .btn-back-points {
+    background-color: transparent;
+    border: none;
+    font-size: 32px;
+    display: flex;
+    justify-content: end;
+  }
+  .background-layer-points {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.158);
+    z-index: 1;
+  }
+  .mobible-navbar-points {
+    display: flex;
+  }
 }
 
-@media screen and (max-width: 1500px){
-    header>nav{
-        display: none;
-    }   
-    .btn-show-links{
-        display: flex;
-        background-color: transparent;
-        border: none;
+@media screen and (max-width: 1500px) {
+  header > nav {
+    display: none;
+  }
+  .btn-show-links {
+    display: flex;
+    background-color: transparent;
+    border: none;
+  }
+  .btn-show-links svg {
+    font-size: 40px;
+    color: var(--primary-color);
+  }
 
-    }
-    .btn-show-links svg{
-        font-size: 40px;
-        color: var(--primary-color);
-    }
-
-    .btn-show-links svg line{
-        color: var(--text-color);
-    }
-    .buttons-container{
-        display: flex;
-        align-items: center;
-        gap: 32px;
-    }
-    .buttons-container .btn-show-links{
-        display: flex;
-    }
-    .open {
-        display: flex;
-        flex-direction: column;
-        transition: right 400ms ease; 
-        position: fixed;
-        top: 0;
-        width: 250px;
-        right: 0;
-        animation-name: to-right;
-        animation-duration: 400ms;
-        height: 100vh !important;
-        background-color: white;
-        z-index: 3;
-        padding: 10px;
-        gap: 20px;
-    }
-    .not-first{
-        display: flex;
-        flex-direction: column;
-        position: fixed;
-        right: -350px;
-        transition: 500ms;
-        height: 100vh;
-        top: 0;
-        background-color: white;
-        z-index: 3;
-        padding: 10px;
-        justify-content: space-between;
-        width: 250px;
-    }
-    .mobible-links{
-        display: flex;
-        flex-direction: column;
-    }
-    .btn-back{
-        background-color: transparent;
-        border: none;
-        font-size: 32px;
-        display: flex;
-        justify-content: end;
-    }
-    .background-layer{
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background-color: rgba(0, 0, 0, 0.158);
-        z-index: 1;
-    }
-/*     .mobible-nav-secondary-btn{
+  .btn-show-links svg line {
+    color: var(--text-color);
+  }
+  .buttons-container {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+  }
+  .buttons-container .btn-show-links {
+    display: flex;
+  }
+  .open {
+    display: flex;
+    flex-direction: column;
+    transition: right 400ms ease;
+    position: fixed;
+    top: 0;
+    width: 250px;
+    right: 0;
+    animation-name: to-right;
+    animation-duration: 400ms;
+    height: 100vh !important;
+    background-color: white;
+    z-index: 3;
+    padding: 10px;
+    gap: 20px;
+  }
+  .not-first {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    right: -350px;
+    transition: 500ms;
+    height: 100vh;
+    top: 0;
+    background-color: white;
+    z-index: 3;
+    padding: 10px;
+    justify-content: space-between;
+    width: 250px;
+  }
+  .mobible-links {
+    display: flex;
+    flex-direction: column;
+  }
+  .btn-back {
+    background-color: transparent;
+    border: none;
+    font-size: 32px;
+    display: flex;
+    justify-content: end;
+  }
+  .background-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.158);
+    z-index: 1;
+  }
+  /*     .mobible-nav-secondary-btn{
         position: absolute;
         bottom: 10px;
     } */
-    .mobible-nav-secondary-btn{
-        text-align: center;
-    }
+  .mobible-nav-secondary-btn {
+    text-align: center;
+  }
 }
 
-@media screen and (max-width: 800px){
-    .buttons-container #btn-points-assist{
-        display: none;
-    }
-    .buttons-container #btn-loan-points{
-        display: none;
-    }
-    .header-primary-btn{
-        display: none;
-    }
+@media screen and (max-width: 800px) {
+  .buttons-container #btn-points-assist {
+    display: none;
+  }
+  .buttons-container #btn-loan-points {
+    display: none;
+  }
+  .header-primary-btn {
+    display: none;
+  }
 }
 
-
-
-@media screen and (max-width: 700px){
-    header{
-        height: 70px;
-    }
-    header img{
-        width: 150px;
-    }
-    
+@media screen and (max-width: 700px) {
+  header {
+    height: 70px;
+  }
+  header img {
+    width: 150px;
+  }
 }
 
-@media screen and (max-width: 500px){
-    .buttons-container>.primary-btn{
-        display: none;
-    }
-    .buttons-container>.secondary-btn{
-        display: none;
-    }
-    .header-primary-btn{
-        display: none;
-    }
+@media screen and (max-width: 500px) {
+  .buttons-container > .primary-btn {
+    display: none;
+  }
+  .buttons-container > .secondary-btn {
+    display: none;
+  }
+  .header-primary-btn {
+    display: none;
+  }
 }
 
 @media screen and (max-width: 450px) {
-    .buttons-container .header-primary-btn {
-        display: none;
-    }
+  .buttons-container .header-primary-btn {
+    display: none;
+  }
 }

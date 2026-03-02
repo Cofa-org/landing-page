@@ -1,0 +1,78 @@
+.modalContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(36, 149, 87, 0.7);
+  z-index: 10;
+}
+
+.modal {
+  background-color: #fff;
+  width: 650px;
+  height: auto;
+  padding: 48px;
+  border-radius: 16.867px;
+  position: relative;
+}
+
+.closeBtnContainer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 24px;
+}
+
+.title {
+  font-size: 30px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.infoList {
+  list-style: none;
+  padding: 2rem;
+  text-align: left;
+  line-height: 2rem;
+}
+
+.infoItem {
+  margin-bottom: 10px;
+}
+
+.downloadBtn {
+  background-color: #249557;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  margin-top: 20px;
+  transition:
+    background-color 0.3s ease,
+    transform 0.2s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.downloadBtn:hover {
+  background-color: #1e7a46;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.downloadBtn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}

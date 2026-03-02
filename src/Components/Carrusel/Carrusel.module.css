@@ -1,28 +1,49 @@
 .carrusel {
-    width: 100%;
-    height: 600px;
-    overflow: hidden;
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
+  width: 100%;
+  max-height: 500px;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 3%;
+  aspect-ratio: 9/16;
 }
 
 .slides {
-    display: flex;
-    /* La transición solo se aplica cuando está habilitada */
-    transition: transform 0.5s ease-in-out;
-    will-change: transform;
+  display: flex;
+  /* La transición solo se aplica cuando está habilitada */
+  transition: transform 0.5s ease-in-out;
+  will-change: transform;
+  border-radius: 3%;
 }
 
 .slides.transition {
-    transition: transform 1s ease-in-out;
+  transition: transform 1s ease-in-out;
 }
 
 .image {
-    width: 100%;
-    flex-shrink: 0;
-    object-fit: scale-down;
-    border-radius: 15px;
+  width: 100%;
+  flex-shrink: 0;
+  object-fit: scale-down;
+  border-radius: 3%;
+}
+
+.fadeIn {
+  animation: fadeIn 1s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0.5;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media screen and (max-width: 900px) {
+  .carrusel {
+    max-height: 400px;
+  }
 }

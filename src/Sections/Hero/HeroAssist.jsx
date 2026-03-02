@@ -7,7 +7,7 @@ import { MdMailOutline } from "react-icons/md";
 const HeroAssist = () => {
   return (
     <>
-        <img src="/img/line-background-points.svg" className='line-background-points'/>
+        <img src="/img/line-background-points.svg" className='line-background-points' alt='background line points'/>
         <section className='hero-container' id='prestamos'>
             <div className='hero-points'>
                 <div className='hero-info'>
@@ -24,8 +24,8 @@ const HeroAssist = () => {
                 </div>
             </div>
             <div className='hero-assist-img-container'>
-                <img src='/img/assist-hero-img.png' className='stain-hero-assist-svg assist-hero-img'/>
-                <img src='/img/hero-points.svg' className='stain-hero-points-svg'/>
+                <img src='/img/assist-hero-img.webp' alt='assist-hero-img' className='stain-hero-assist-svg assist-hero-img'/>
+                <img src='/img/hero-points.svg' alt='hero-points' className='stain-hero-points-svg'/>
             </div>
             <div className='services-assist-list'>
                 <div className='email-info' style={{marginTop: '0%'}}>

@@ -6,7 +6,7 @@ import { PiWarningOctagon } from "react-icons/pi";
 const RedeemPoints = () => {
   return (
     <>
-        <img src="/img/shape-redeem-points.svg" className='shape' />
+        <img src="/img/shape-redeem-points.svg" alt='shape-redeem-points' className='shape' />
         <section className='redeem-container' id='restricciones'>
             <div className='exchange'>
                 <h1>

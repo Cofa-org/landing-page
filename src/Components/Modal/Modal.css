@@ -10,7 +10,7 @@
     width: 100%;
     height: 100%;
     background-color: rgba(36, 149, 87, 0.70);
-    
+    z-index: 10;
 }
 
 .modal {

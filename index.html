@@ -1,47 +1,204 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
   <head>
+    <!-- testing deployment 1-->
+    <meta charset="UTF-8" />
     <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-NKTF7GZQ');</script>
+    <script>
+      (function (w, d, s, l, i) {
+        w[l] = w[l] || [];
+        w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
+        var f = d.getElementsByTagName(s)[0],
+          j = d.createElement(s),
+          dl = l != "dataLayer" ? "&l=" + l : "";
+        j.async = true;
+        j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
+        f.parentNode.insertBefore(j, f);
+      })(window, document, "script", "dataLayer", "GTM-NKTF7GZQ");
+    </script>
     <!-- End Google Tag Manager -->
 
     <!-- Meta Pixel Code -->
     <script>
-    !function(f,b,e,v,n,t,s)
-    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-    n.queue=[];t=b.createElement(e);t.async=!0;
-    t.src=v;s=b.getElementsByTagName(e)[0];
-    s.parentNode.insertBefore(t,s)}(window, document,'script',
-    'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', '1085977612494127');
-    fbq('track', 'PageView');
+      (function (f, b, e, v, n, t, s) {
+        if (f.fbq) return;
+        n = f.fbq = function () {
+          n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments);
+        };
+        if (!f._fbq) f._fbq = n;
+        n.push = n;
+        n.loaded = !0;
+        n.version = "2.0";
+        n.queue = [];
+        t = b.createElement(e);
+        t.async = !0;
+        t.src = v;
+
+        // Manejo de error si está bloqueado
+        t.onerror = function () {
+          console.warn("Facebook Pixel bloqueado o no disponible.");
+        };
+
+        s = b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t, s);
+      })(window, document, "script", "https://connect.facebook.net/en_US/fbevents.js");
+
+      try {
+        fbq("init", "1085977612494127");
+        fbq("track", "PageView");
+      } catch (err) {
+        console.warn("fbq no disponible:", err);
+      }
     </script>
+
     <!-- End Meta Pixel Code -->
 
-    <meta property="og:image" content="https://cofa.com.ar/favicon.png" />
     <meta charset="UTF-8" />
-    <meta name="description" content="Saca tu préstamo con mínimos requisitos, en el día y 100% online. Somos una empresa fintech con más de 17 años de trayectoria en el mercado. Estamos para ayudarte y acompañarte en tus proyectos, por eso te brindamos préstamos que simplifican tu vida.">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon"  href="/fav.png" />
-    <title>COFA</title>
+    <meta
+      property="og:type"
+      content="website"
+    />
+    <meta
+      property="og:title"
+      content="Préstamos en el día en Argentina | COFA"
+    />
+    <meta
+      property="og:description"
+      content="Solicitá tu préstamo 100% online con mínimos requisitos."
+    />
+    <meta
+      property="og:url"
+      content="https://cofa.com.ar/"
+    />
+    <meta
+      property="og:image"
+      content="https://cofa.com.ar/og-image.jpg"
+    />
+    <meta
+      name="twitter:card"
+      content="summary_large_image"
+    />
+    <link
+      rel="preload"
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <noscript
+      ><link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+    /></noscript>
+    <link
+      rel="preconnect"
+      href="https://fonts.googleapis.com"
+    />
+    <link
+      rel="dns-prefetch"
+      href="https://fonts.googleapis.com"
+    />
+    <meta
+      name="description"
+      content="Préstamos online rápidos con mínimos requisitos. Con COFA accedé a tu dinero en el día, 100% online y con total seguridad. ¡Solicitá hoy tu préstamo!"
+    />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <meta
+      name="robots"
+      content="index, follow"
+    />
+    <link
+      rel="alternate"
+      href="https://cofa.com.ar/"
+      hreflang="es-AR"
+    />
+    <link
+      rel="alternate"
+      href="https://cofa.com.ar/"
+      hreflang="x-default"
+    />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "COFA",
+        "url": "https://cofa.com.ar",
+        "logo": "https://cofa.com.ar/logo.webp",
+        "foundingDate": "2008",
+        "foundingLocation": "Argentina",
+        "sameAs": ["https://www.facebook.com/cofa.ar/"],
+        "contactPoint": [
+          {
+            "@type": "ContactPoint",
+            "contactType": "customer service",
+            "areaServed": "AR",
+            "availableLanguage": ["es-AR"]
+          }
+        ]
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "url": "https://cofa.com.ar",
+        "name": "COFA | Préstamos en el día",
+        "inLanguage": "es-AR"
+      }
+    </script>
+    <link
+      rel="preload"
+      href="/img/cofa-2-dinero_contando.mp4"
+      as="video"
+      type="video/mp4"
+    />
+    <link
+      rel="preload"
+      href="/img/cofa-3-dinero_contando.mp4"
+      as="video"
+      type="video/mp4"
+    />
+    <link
+      rel="preload"
+      href="/img/cofa-4-dinero_contando.mp4"
+      as="video"
+      type="video/mp4"
+    />
+    <link
+      rel="icon"
+      href="/favicon.png"
+    />
+    <title>
+      Préstamos Online en el Día | COFA Fintech con 17 Años de Trayectoria | Soluciones Financieras
+      Hoy
+    </title>
   </head>
   <body>
     <!-- Google Tag Manager (noscript) -->
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NKTF7GZQ"
-    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <noscript
+      ><iframe
+        src="https://www.googletagmanager.com/ns.html?id=GTM-NKTF7GZQ"
+        height="0"
+        width="0"
+        style="display: none; visibility: hidden"
+      ></iframe
+    ></noscript>
     <!-- End Google Tag Manager (noscript) -->
 
-    <noscript><img height="1" width="1" style="display:none"
-      src="https://www.facebook.com/tr?id=1085977612494127&ev=PageView&noscript=1"
+    <noscript
+      ><img
+        height="1"
+        width="1"
+        style="display: none"
+        src="https://www.facebook.com/tr?id=1085977612494127&ev=PageView&noscript=1"
     /></noscript>
 
     <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+    <script
+      type="module"
+      src="/src/main.jsx"
+    ></script>
   </body>
 </html>

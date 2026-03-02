@@ -1,0 +1,133 @@
+.heroContainer {
+  padding: var(--spacing-2xl) 15vh;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--background-color);
+  min-height: 50vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.heroContent {
+  flex: 1.5;
+  max-width: 700px;
+  z-index: 2;
+}
+
+.heroContent h1 {
+  font-size: 64px;
+  font-weight: 700;
+  line-height: 1.1;
+  margin-bottom: var(--spacing-lg);
+  color: var(--text-color);
+}
+
+.primaryText {
+  color: var(--primary-color);
+}
+
+.heroContent p {
+  font-size: 20px;
+  line-height: 1.6;
+  margin-bottom: var(--spacing-xl);
+  color: var(--text-color);
+  border-left: 4px solid var(--primary-color);
+  padding-left: var(--spacing-md);
+}
+
+.trustElements {
+  display: flex;
+  gap: var(--spacing-lg);
+  flex-wrap: wrap;
+  margin-top: var(--spacing-xl);
+}
+
+.trustItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-weight: 500;
+  font-size: 16px;
+  color: var(--primary-color);
+}
+
+.trustIcon {
+  font-size: 20px;
+}
+
+.heroImageContainer {
+  flex: 0.5;
+  display: flex;
+  justify-content: flex-end;
+  position: relative;
+  z-index: 1;
+}
+
+.heroImage {
+  width: 90%;
+  height: auto;
+  object-fit: contain;
+}
+
+.stainBackground {
+  position: absolute;
+  top: -10%;
+  right: -5%;
+  z-index: 0;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Responsive */
+@media screen and (max-width: 1200px) {
+  .heroContainer {
+    padding: var(--spacing-3xl) 5vh;
+  }
+
+  .heroContent h1 {
+    font-size: 52px;
+  }
+}
+
+@media screen and (max-width: 992px) {
+  .heroContainer {
+    flex-direction: column;
+    text-align: center;
+    padding: var(--spacing-2xl) 5vh;
+  }
+
+  .heroContent {
+    margin-bottom: var(--spacing-2xl);
+    max-width: 100%;
+  }
+
+  .heroContent p {
+    border-left: none;
+    padding-left: 0;
+  }
+
+  .trustElements {
+    justify-content: center;
+  }
+
+  .heroImageContainer {
+    justify-content: center;
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 576px) {
+  .heroContent h1 {
+    font-size: 36px;
+  }
+
+  .heroContent p {
+    font-size: 18px;
+  }
+
+  .trustItem {
+    font-size: 14px;
+  }
+}

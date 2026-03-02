@@ -1,22 +1,15 @@
-import {
-  VITE_COFA_AUTH_API_KEY,
-  VITE_COFA_AUTH_EMAIL,
-  VITE_COFA_AUTH_PASS,
-  VITE_COFA_AUTH_URL,
-  VITE_URL_LOCAL,
-} from "./config.js";
 
-export async function HttpApi(url, body) {
+export async function HttpApi(url, body, method, apiKey, token) {
   try {
-    const cofaAuthToken = await cofaAuthLogin();
-
+    const isFormData = body instanceof FormData;
     const options = {
       headers: {
-        "x-api-key": VITE_COFA_AUTH_API_KEY,
-        Authorization: `Bearer ${cofaAuthToken}`,
+        ...(apiKey && { "x-api-key": apiKey }),
+        ...(token && { Authorization: `Bearer ${token}` }),
+        ...(!isFormData && { "Content-Type": "application/json" }),
       },
-      method: "POST",
-      body: body,
+      method: method,
+      ...(body && { body: isFormData ? body : JSON.stringify(body) }),
     };
 
     return await fetch(url, options);
@@ -26,27 +19,3 @@ export async function HttpApi(url, body) {
   }
 }
 
-export const cofaAuthLogin = async () => {
-  const url = `${VITE_COFA_AUTH_URL || VITE_URL_LOCAL}/auth/get-token`;
-
-  const credentials = {
-    email: VITE_COFA_AUTH_EMAIL,
-    password: VITE_COFA_AUTH_PASS,
-  };
-
-  const options = {
-    method: "POST",
-    body: JSON.stringify(credentials),
-    headers: {
-      "x-api-key": VITE_COFA_AUTH_API_KEY,
-      "Content-Type": "application/json",
-    },
-    cache: "no-store",
-  };
-
-  const response = await fetch(url, options);
-
-  const { token } = await response.json();
-
-  return token;
-};
