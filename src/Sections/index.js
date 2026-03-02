@@ -31,7 +31,7 @@ export {
   Hero,
   AboutUs,
   OurServices,
-  ClientReview,
+
   FrecuentQuestion,
   Contact,
   TermsHeader,
