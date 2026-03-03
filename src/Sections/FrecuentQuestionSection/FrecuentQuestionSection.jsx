@@ -9,11 +9,12 @@ const FrecuentQuestionSection = () => {
             <div className='container-fq-section'>
                 <div className='info-fq-section'>
                     <h1>Preguntas Frecuentes</h1>
-                    <p>Encontrá respuestas rápidas a tus consultas sobre nuestros servicios, requisitos y operatoria de préstamos. ¡Estamos para ayudarte!</p>
+                    <p>Encontrá respuestas rápidas a tus consultas sobre nuestros servicios, requisitos y operatoria de préstamos. <br /> ¡Estamos para ayudarte!</p>
                     <Link to={'/preguntas-frecuentes'}>
                         <button className='primary-btn btn-fq-section'>Ir a Preguntas Frecuentes <GoArrowRight /></button>
                     </Link>
                 </div>
+                <img src="img/cvs.svg" alt="work-with-us" />
             </div>
         </>
     )

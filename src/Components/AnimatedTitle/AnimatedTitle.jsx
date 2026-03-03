@@ -1,22 +1,22 @@
 import React, { useState, useEffect } from 'react';
 
 function AnimatedTitle() {
-  const options = ['rápidos', 'sencillos' , '100% online'];
+  const options = ['rápidos', 'sencillos', '100% digital'];
   const [currentOptionIndex, setCurrentOptionIndex] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentOptionIndex((prevIndex) => (prevIndex + 1) % options.length);
-    }, 3000); 
+    }, 3000);
 
     return () => clearInterval(interval);
   }, []);
 
   return (
-      <h1 className='animated-title typewriter'>
-        <TypeWriterText text={options[currentOptionIndex]} />
-        <span className="cursor" />
-      </h1>
+    <h1 className='animated-title typewriter'>
+      <TypeWriterText text={options[currentOptionIndex]} />
+      <span className="cursor" />
+    </h1>
   );
 }
 
