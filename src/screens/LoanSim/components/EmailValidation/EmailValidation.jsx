@@ -1,15 +1,16 @@
-import React, { useState } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 import GenericForm from "../../../../Components/Forms/GenericForm/GenericForm";
 import GenericInput from "../../../../Components/Forms/GenericInput/GenericInput";
 import GenericButton from "../../../../Components/buttons/GenericButton/GenericButton.jsx";
+import { useEmailValidation } from "../../hooks/useEmailValidation";
 
 const EmailValidation = ({ onValidate, onBack, loading, error }) => {
-  const [email, setEmail] = useState("");
+  const { email, setEmail, errorMessage, isValid } = useEmailValidation();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (email) {
+    if (isValid) {
       onValidate(email);
     }
   };
@@ -37,12 +38,12 @@ const EmailValidation = ({ onValidate, onBack, loading, error }) => {
         onChange={(e) => setEmail(e.target.value)}
         placeholder='ejemplo@correo.com'
         required
-        error={error}
+        error={errorMessage || error}
       />
       <GenericButton
         type='submit'
         loading={loading}
-        disabled={!email}
+        disabled={!isValid}
       >
         Validar Email
       </GenericButton>

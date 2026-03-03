@@ -73,7 +73,7 @@ export const useLoanSimulator = () => {
         }
 
         const response = await SimuladorService.calcularPlanes(params);
-
+  
         if (response.success) {
           const newData = response.data;
 
@@ -95,7 +95,7 @@ export const useLoanSimulator = () => {
             setInstallment(newData.plazo_utilizado);
           }
         } else {
-          setError(response.mensaje || "¡Ups! Ha ocurrido un error en la simulación");
+          setError(response.message || "¡Ups! Ha ocurrido un error en la simulación");
         }
       } catch (err) {
         setError(err.message || "Error al conectar con el servidor");
