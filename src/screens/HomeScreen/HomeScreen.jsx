@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { Footer, Header } from '../../Components'
 import StructuredData from '../../Components/Seo/StructuredData';
-import { AboutUs, Contact, FrecuentQuestionSection, Hero, OurServices } from '../../Sections'
+import { AboutUs, Contact, FrecuentQuestionSection, Hero, OurServices, CofaTipsSection } from '../../Sections'
 import WorkWithUs from '../../Sections/WorkWithUs/WorkWithUs'
 
 const HomeScreen = () => {
@@ -50,6 +50,7 @@ const HomeScreen = () => {
       <AboutUs />
       {/* <OurServices/> */}
       <FrecuentQuestionSection />
+      <CofaTipsSection />
       <WorkWithUs />
       <Contact />
       <Footer />

@@ -1,26 +1,26 @@
-.container-fq-section {
+.container-cofa-tips {
     padding: 40px 10vw;
     display: flex;
-    flex-direction: row;
-    background-color: #EAFAF1;
+    flex-direction: row-reverse;
+    background-color: #FFFFFF;
 }
 
-.info-fq-section {
+.info-cofa-tips {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: flex-start;
-    text-align: left;
+    align-items: flex-end;
+    text-align: right;
     width: 80%;
-    margin-right: 10%;
+    margin-left: 10%;
 }
 
-.info-fq-section p {
+.info-cofa-tips p {
     margin-top: 3%;
     margin-bottom: 3%;
 }
 
-.btn-fq-section {
+.btn-cofa-tips {
     border: none;
     width: 320px;
     font-size: 20px;
@@ -28,33 +28,33 @@
 }
 
 @media screen and (max-width:900px) {
-    .container-fq-section {
+    .container-cofa-tips {
         flex-direction: row;
         flex-wrap: wrap;
         justify-content: center;
         width: 100%;
     }
 
-    .container-fq-section img {
+    .container-cofa-tips img {
         margin-top: 10%;
     }
 
-    .info-fq-section {
+    .info-cofa-tips {
         width: 100%;
-        margin-right: 0;
+        margin-left: 0;
         align-items: center;
         text-align: center;
     }
 }
 
 @media screen and (max-width:350px) {
-    .info-fq-section {
-        margin-right: 0%;
+    .info-cofa-tips {
+        margin-left: 0%;
         align-items: center;
         text-align: center;
     }
 
-    .container-fq-section img {
+    .container-cofa-tips img {
         width: 80%;
     }
 }
