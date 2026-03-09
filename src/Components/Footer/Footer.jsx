@@ -22,7 +22,7 @@ const Footer = () => {
           <div>
             <h3>CONTRATOS DE ADHESIÓN</h3>
             <a
-              href='/mod-contrato-electronica.pdf'
+              href='/mod-contrato-electronica-03-2026.pdf'
               target='_blank'
             >
               <p>Modelo contrato con suscripción electrónica</p>
@@ -34,7 +34,7 @@ const Footer = () => {
               <p>Modelo contrato con suscripción presencial</p>
             </a>
             <a
-              href='/mod-contrato-refinanciacion-digital.pdf'
+              href='/mod-contrato-refinanciacion-digital-03-2026.pdf'
               target='_blank'
             >
               <p>Modelo contrato de refinanciación digital</p>
