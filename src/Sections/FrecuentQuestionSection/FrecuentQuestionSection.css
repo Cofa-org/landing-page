@@ -27,6 +27,13 @@
     cursor: pointer;
 }
 
+.container-fq-section>img {
+    max-width: 250px;
+    width: 100%;
+    height: auto;
+    transform: scale(1.2);
+}
+
 @media screen and (max-width:900px) {
     .container-fq-section {
         flex-direction: row;

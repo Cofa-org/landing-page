@@ -14,7 +14,7 @@ const FrecuentQuestionSection = () => {
                         <button className='primary-btn btn-fq-section'>Ir a Preguntas Frecuentes <GoArrowRight /></button>
                     </Link>
                 </div>
-                <img src="/img/faq-illustration.png" alt="preguntas-frecuentes" />
+                <img src="/img/faq.svg" alt="preguntas-frecuentes" />
             </div>
         </>
     )
