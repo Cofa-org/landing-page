@@ -1,4 +1,4 @@
-import { VITE_URL_LOCAL, VITE_COFA_AUTH_URL, VITE_COFA_AUTH_API_KEY } from "../config";
+import { VITE_COFA_AUTH_URL, VITE_COFA_AUTH_API_KEY } from "../config";
 import { HTTP_METHOD } from "../constants/HTTP_METHODS.js";
 import { HttpApi } from "../http.js";
 
@@ -125,12 +125,10 @@ export default class SimuladorService {
         monto,
       };
       const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, null);
-
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Error al obtener ID preaprobado");
       }
-
       return await response.json();
     } catch (error) {
       console.error("OBTENER_ID_PREAPROBADO_ERROR:", error);
