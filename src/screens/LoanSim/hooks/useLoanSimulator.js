@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useDebounce } from "../../../hooks/useDebounce";
 import SimuladorService from "../../../services/simuladorService";
@@ -25,6 +25,9 @@ export const useLoanSimulator = () => {
   const [bancoEncontrado, setBancoEncontrado] = useState(null);
   const [codigoBancoError, setCodigoBancoError] = useState(null);
   const [validandoBanco, setValidandoBanco] = useState(false);
+  // Ref to the AbortController for the current calcularPlanes request.
+  // Allows cancelling in-flight fetches when the user changes the capital rapidly.
+  const fetchAbortControllerRef = useRef(null);
   const shortId = searchParams.get("id");
 
   useEffect(() => {
@@ -61,6 +64,15 @@ export const useLoanSimulator = () => {
     async (currentAmount, isInitial = false) => {
       if (!scoringData.scoringId) return;
 
+      // Cancel any in-flight request before starting a new one.
+      // This prevents stale responses from overwriting newer simulation data
+      // when the user moves the capital slider rapidly (race condition fix).
+      if (fetchAbortControllerRef.current) {
+        fetchAbortControllerRef.current.abort();
+      }
+      const controller = new AbortController();
+      fetchAbortControllerRef.current = controller;
+
       setLoading(true);
       setError(null);
       try {
@@ -72,8 +84,11 @@ export const useLoanSimulator = () => {
           params.capitalSeleccionado = currentAmount;
         }
 
-        const response = await SimuladorService.calcularPlanes(params);
-  
+        const response = await SimuladorService.calcularPlanes(params, controller.signal);
+
+        // Discard response if this request was superseded by a newer one.
+        if (controller.signal.aborted) return;
+
         if (response.success) {
           const newData = response.data;
 
@@ -93,15 +108,27 @@ export const useLoanSimulator = () => {
             const capMax = Number(newData.capital_maximo_a_ofrecer);
             setAmount(capMax);
             setInstallment(newData.plazo_utilizado);
+          } else {
+            // Keep the selected installment if still valid for the new capital;
+            // otherwise fall back to the first available plan to avoid a stale value.
+            const plazosDisponibles = newData.planes_disponibles?.map((p) => p.plazo) || [];
+            setInstallment((prev) =>
+              plazosDisponibles.includes(prev) ? prev : (plazosDisponibles[0] ?? null),
+            );
           }
         } else {
           setError(response.message || "¡Ups! Ha ocurrido un error en la simulación");
         }
       } catch (err) {
+        // Ignore errors from cancelled (aborted) requests — they are expected.
+        if (err.name === "AbortError") return;
         setError(err.message || "Error al conectar con el servidor");
         console.error("SIMULATION_HOOK_ERROR:", err);
       } finally {
-        setLoading(false);
+        // Only clear the loading state if this request is still the active one.
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
       }
     },
     [scoringData.scoringId],
@@ -135,6 +162,21 @@ export const useLoanSimulator = () => {
           (p) => p.plazo === installment,
         );
 
+        // Local coherence guard: if the total of installments is less than the
+        // selected capital, the simulation data is stale (race condition residue).
+        // Stay on SIMULACION and let the user wait for the current fetch to settle.
+        if (selectedPlan && installment && amount) {
+          const totalCuotas = Number(selectedPlan.valorCuota) * Number(installment);
+          if (totalCuotas < Number(amount)) {
+            setError(
+              "Los datos de la simulación no son consistentes con el capital seleccionado. " +
+                "Por favor, esperá un momento y volvé a intentarlo.",
+            );
+            setLoading(false);
+            return;
+          }
+        }
+
         const simulationDataWithoutPlans = {
           ...simulationData,
           planes_disponibles: undefined,
@@ -154,6 +196,7 @@ export const useLoanSimulator = () => {
         };
 
         const response = await SimuladorService.guardarPlan(payload);
+        console.log("response", response);
         if (
           (response.success && !existingSimulation?.email_validado) ||
           (response.data && !existingSimulation?.email_validado)
@@ -162,7 +205,8 @@ export const useLoanSimulator = () => {
         } else if (response.success && existingSimulation?.email_validado) {
           setStep(LOAN_SIM_STEPS.COMPLIANCE);
         } else {
-          setError(response.mensaje || "¡Ups! Ha ocurrido un error al guardar la simulación");
+          setError(response.message || "¡Ups! Ha ocurrido un error al guardar la simulación");
+          return;
         }
       } catch (err) {
         setError(err.message || "Error al guardar la simulación");
@@ -279,52 +323,66 @@ export const useLoanSimulator = () => {
     setValidating(true);
     setError(null);
     try {
-      const response = await SimuladorService.validarCBU(
+      const cbuResponse = await SimuladorService.validarCBU(
         cbuValue,
         scoringData.cuit,
         scoringData.scoringId,
         accountType,
       );
 
-      if(!response.success) {
-         setError(
-           response.mensaje ||
-             "¡Lo sentimos! No pudimos validar tu CBU. Revisa los datos e intenta nuevamente 😕",
-         );
-         return;
+      if (!cbuResponse.success) {
+        setError(
+          cbuResponse.mensaje ||
+            "¡Lo sentimos! No pudimos validar tu CBU. Revisá los datos e intentá nuevamente 😕",
+        );
+        return;
       }
 
-      if (response.success || response.data) {
-        setCbu(cbuValue);
-        const response = await SimuladorService.obtenerIdPreaprobado({
-          scoringId: scoringData.scoringId,
-          cantidad_cuotas: installment,
-          monto: amount,
-        });
-        if (response.success) {
-          const cookieOptions = {
-            name: COOKIE_CONFIG.NAME,
-            value: response.data.scoringId,
-            expires: COOKIE_CONFIG.EXPIRY_DAYS,
-            partitioned: true,
-          };
-          const res = await cookieStore.set(cookieOptions);
+      setCbu(cbuValue);
+
+      // Obtain the pre-approved ID. Handle financial coherence errors separately:
+      // the backend resets the state to SIMULACION when they occur, so we redirect
+      // the user to redo the simulation instead of showing a generic error.
+      const preaprobadoResponse = await SimuladorService.obtenerIdPreaprobado({
+        scoringId: scoringData.scoringId,
+        cantidad_cuotas: installment,
+        monto: amount,
+      });
+
+      if (preaprobadoResponse.success) {
+        const cookieOptions = {
+          name: COOKIE_CONFIG.NAME,
+          value: preaprobadoResponse.data.scoringId,
+          expires: COOKIE_CONFIG.EXPIRY_DAYS,
+          partitioned: true,
+        };
+        await cookieStore.set(cookieOptions);
+        setStep(LOAN_SIM_STEPS.COMPLETADO);
+      } else {
+        const esErrorCoherencia =
+          preaprobadoResponse.message?.includes("Inconsistencia financiera") ||
+          preaprobadoResponse.message?.includes("COHERENCIA_FINANCIERA_ERROR");
+
+        if (esErrorCoherencia) {
+          setError(
+            "Los datos de tu simulación han expirado o son inconsistentes. " +
+              "Espera unos segundos y podrás realizar una nueva simulación.",
+          );
+          setTimeout(() => {
+            setError(null);
+            setStep(LOAN_SIM_STEPS.SIMULACION);
+          }, 3000);
+          return;
         } else {
           setError(
-            response.mensaje ||
-              "¡Lo sentimos! No pudimos completar la operación ponte en contacto con un operador 😕",
+            preaprobadoErr.message ||
+              "¡Lo sentimos! No pudimos completar la operación, ponete en contacto con un operador 😕",
           );
           return;
         }
-        setStep(LOAN_SIM_STEPS.COMPLETADO);
-      } else {
-        setError(
-          response.mensaje ||
-            "¡Lo sentimos! No pudimos validar tu CBU. Revisa los datos e intenta nuevamente 😕",
-        );
       }
     } catch (err) {
-      setError(err.message || "¡Ups! Hubo un Problema vuelve a intentarlo 🔄");
+      setError(err.message || "¡Ups! Hubo un problema, volvé a intentarlo 🔄");
     } finally {
       setValidating(false);
     }

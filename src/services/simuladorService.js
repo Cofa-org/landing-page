@@ -3,7 +3,7 @@ import { HTTP_METHOD } from "../constants/HTTP_METHODS.js";
 import { HttpApi } from "../http.js";
 
 export default class SimuladorService {
-  static async calcularPlanes({ scoringId, plazoSeleccionado, capitalSeleccionado }) {
+  static async calcularPlanes({ scoringId, plazoSeleccionado, capitalSeleccionado }, signal = null) {
     try {
       const url = `${VITE_COFA_AUTH_URL}/api/simulador-prestamos/calcular`;
       const apiKey = VITE_COFA_AUTH_API_KEY;
@@ -12,7 +12,7 @@ export default class SimuladorService {
         plazoSeleccionado,
         capitalSeleccionado,
       };
-      const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, null);
+      const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, null, signal);
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -33,12 +33,10 @@ export default class SimuladorService {
       const apiKey = VITE_COFA_AUTH_API_KEY;
       const body = payload;
       const response = await HttpApi(URL, body, HTTP_METHOD.POST, apiKey, null);
-
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Error al guardar plan");
       }
-
       return await response.json();
     } catch (error) {
       console.error("GUARDAR_PLAN_ERROR:", error);

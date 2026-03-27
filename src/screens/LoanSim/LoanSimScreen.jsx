@@ -101,6 +101,7 @@ const LoanSimScreen = () => {
             onAmountChange={handleAmountChange}
             onInstallmentChange={handleInstallmentChange}
             onNextStep={handleNextStep}
+            error={error}
           />
         );
 

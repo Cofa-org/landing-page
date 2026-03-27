@@ -85,15 +85,18 @@ const CBUValidation = ({
               No, ingresar otro
             </GenericButton>
           </div>
-          <span>{error}</span>
-          <button
-            className='primary-btn'
-            onClick={() => (window.location.href = "http://wa.me/5491137570853")}
-            style={{ flex: 1 }}
-          >
-            Comunicarse con asesor
-          </button>
-         
+          {error && (
+            <>
+              <span className={styles.errorText}>{error}</span>
+              <button
+                className='primary-btn'
+                onClick={() => (window.location.href = "http://wa.me/5491137570853")}
+                style={{ flex: 1 }}
+              >
+                Comunicarse con un asesor
+              </button>
+            </>
+          )}
         </div>
       ) : (
         <>
