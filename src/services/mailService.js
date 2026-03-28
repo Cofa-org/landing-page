@@ -7,9 +7,6 @@ export default class MailService {
     try {
       const url = `${LANDING_BACKEND_URL}/api/mail/${type}`;
       const apiKey = LANDING_BACKEND_API_KEY;
-      console.log("url", url);
-      console.log("formData", formData);
-      console.log("apiKey", apiKey);
       const response = await HttpApi(url, formData, HTTP_METHOD.POST, apiKey, null);
 
       let responseData;
