@@ -1,9 +1,6 @@
-const VITE_COFA_AUTH_URL =
-  import.meta.env.VITE_COFA_AUTH_URL
+const LANDING_BACKEND_URL = import.meta.env.VITE_LANDING_BACKEND_URL;
+const LANDING_BACKEND_API_KEY = import.meta.env.VITE_LANDING_BACKEND_API_KEY;
+const LRS_URL = import.meta.env.VITE_LRS_URL;
+const LRS_API_KEY = import.meta.env.VITE_LRS_API_KEY;
 
-const VITE_COFA_AUTH_API_KEY =
-  import.meta.env.VITE_COFA_AUTH_API_KEY
-
-const VITE_URL_LOCAL = import.meta.env.VITE_URL_LOCAL;
-
-export { VITE_COFA_AUTH_URL, VITE_COFA_AUTH_API_KEY, VITE_URL_LOCAL };
+export { LANDING_BACKEND_URL, LANDING_BACKEND_API_KEY, LRS_URL, LRS_API_KEY };

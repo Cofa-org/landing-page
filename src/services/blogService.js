@@ -1,12 +1,12 @@
 import { HttpApi } from "../http";
-import { VITE_COFA_AUTH_URL, VITE_URL_LOCAL, VITE_COFA_AUTH_API_KEY } from "../config";
+import { LANDING_BACKEND_URL, LANDING_BACKEND_API_KEY } from "../config";
 import { HTTP_METHOD } from "../constants/HTTP_METHODS.js";
 
 export class BlogService {
   static async getAllPosts() {
     try {
-      const url = `${VITE_COFA_AUTH_URL || VITE_URL_LOCAL}/api/blog`;
-      const apiKey = VITE_COFA_AUTH_API_KEY;
+      const url = `${LANDING_BACKEND_URL}/api/blog`;
+      const apiKey = LANDING_BACKEND_API_KEY;
 
       const response = await HttpApi(url, null, HTTP_METHOD.GET, apiKey, null);
       if (!response.ok) {
@@ -22,8 +22,8 @@ export class BlogService {
 
   static async getPostBySlug(slug) {
     try {
-      const url = `${VITE_COFA_AUTH_URL || VITE_URL_LOCAL}/api/blog/${slug}`;
-      const apiKey = VITE_COFA_AUTH_API_KEY;
+      const url = `${LANDING_BACKEND_URL}/api/blog/${slug}`;
+      const apiKey = LANDING_BACKEND_API_KEY;
 
       const response = await HttpApi(url, null, HTTP_METHOD.GET, apiKey, null);
       if (!response.ok) {
@@ -39,8 +39,8 @@ export class BlogService {
 
   static async getPostsByCategory(category) {
     try {
-      const url = `${VITE_COFA_AUTH_URL || VITE_URL_LOCAL}/api/blog/category/${category}`;
-      const apiKey = VITE_COFA_AUTH_API_KEY;
+      const url = `${LANDING_BACKEND_URL}/api/blog/category/${category}`;
+      const apiKey = LANDING_BACKEND_API_KEY;
 
       const response = await HttpApi(url, null, HTTP_METHOD.GET, apiKey, null);
       if (!response.ok) {
@@ -56,8 +56,8 @@ export class BlogService {
 
   static async createPost(post) {
     try {
-      const url = `${VITE_COFA_AUTH_URL || VITE_URL_LOCAL}/api/blog`;
-      const apiKey = VITE_COFA_AUTH_API_KEY;
+      const url = `${LANDING_BACKEND_URL}/api/blog`;
+      const apiKey = LANDING_BACKEND_API_KEY;
 
       const response = await HttpApi(url, post, HTTP_METHOD.POST, apiKey, null);
       if (!response.ok) {
