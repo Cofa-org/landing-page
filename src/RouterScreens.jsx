@@ -13,6 +13,7 @@ import {
   TermsPointsScreen,
   TermsScreen,
   LoanSimScreen,
+  FrecuentQuestionScreen,
 } from "./screens";
 import { FormWorkWithUs } from "./Sections";
 import { BlogDetailScreen } from "./screens/blogDetailScreen/BlogDetailScreen.jsx";
@@ -35,6 +36,11 @@ const RouterScreens = () => {
       <Route
         path='/simulador'
         element={<LoanSimScreen />}
+      />
+      {/* Preguntas Frecuentes */}
+      <Route
+        path='/preguntas-frecuentes'
+        element={<FrecuentQuestionScreen />}
       />
       {/* Prestamos  */}
       <Route

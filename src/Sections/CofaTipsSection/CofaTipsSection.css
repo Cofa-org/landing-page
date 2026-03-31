@@ -1,0 +1,58 @@
+.container-cofa-tips {
+    padding: 40px 10vw;
+    display: flex;
+    flex-direction: row-reverse;
+    background-color: #FFFFFF;
+}
+
+.info-cofa-tips {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+    text-align: right;
+    width: 80%;
+    margin-left: 10%;
+}
+
+.info-cofa-tips p {
+    margin-top: 3%;
+    margin-bottom: 3%;
+}
+
+.btn-cofa-tips {
+    border: none;
+    width: 320px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+@media screen and (max-width:900px) {
+    .container-cofa-tips {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        width: 100%;
+    }
+
+    .container-cofa-tips img {
+        margin-top: 10%;
+    }
+
+    .info-cofa-tips {
+        width: 100%;
+        margin-left: 0;
+    }
+}
+
+@media screen and (max-width:350px) {
+    .info-cofa-tips {
+        margin-left: 0%;
+        align-items: center;
+        text-align: center;
+    }
+
+    .container-cofa-tips img {
+        width: 80%;
+    }
+}

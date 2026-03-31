@@ -35,7 +35,7 @@ export const infoList = [
 export const reasonsToChose = [
   {
     id: 1,
-    content: "Más de 140.000 clientes satisfechos.",
+    content: "Más de 250.000 clientes satisfechos.",
   },
   {
     id: 2,
@@ -77,35 +77,41 @@ export const ourServices = [
 
 export const frecuentQuestions = [
   {
-    name: "¿Quién puede obtener un préstamo en COFA?",
-    content: "Brindamos préstamos online al instante a cualquier persona mayor de 18 años.",
+    name: "¿Qué tipo de préstamos ofrecen?",
+    content: "Ofrecemos préstamos personales 100 % digitales, simples y accesibles. El proceso es totalmente online y pensado para personas con distintos niveles de experiencia digital. Podés solicitar un monto adaptado a tus necesidades y devolverlo en cuotas fijas.",
     id: 1,
   },
   {
-    name: "¿Cuáles son los requisitos para obtener mi préstamo?",
-    content: "Todo lo que necesitás es hacer click en Quiero mi préstamo.",
+    name: "¿Cuales son los requisitos para solicitar un préstamo?",
+    content: "Ser mayor de 18 años, residir en Argentina, tener DNI vigente, contar con una cuenta a la vista o de pago (CBU o CVU) a tu nombre y acreditar un ingreso. El proceso incluye verificación de identidad digital.",
     id: 2,
   },
   {
-    name: "¿Qué analizan para darme el préstamo?",
-    content:
-      "El análisis crediticio que realizamos está basado en tu historial financiero.\nUsamos un sistema de decisión, creado por COFA, que analiza decenas de variables, por lo que no importa si tenés antecedentes negativos en las agencias de información crediticia. Con COFA tenés más posibilidades. Cuanto mejor es tu cumplimiento, accedés a mejores condiciones en el préstamo.",
     id: 3,
+    name: "¿Cómo solicito un préstamo?",
+    content: [
+      "1. Ingresá a la web de COFA.",
+      "2. Solicitá tu préstamo.",
+      "3. Completás tus datos y acompañás la documentación.",
+      "4. Elegís monto y cuotas.",
+      "5. Validás tu identidad (DNI + selfie + biometría).",
+      "6. Analizás y, si estás de acuerdo, aceptás términos, firmás el contrato en forma digital y se acredita el dinero en una cuenta de tu titularidad.",
+    ]
   },
   {
-    name: "¿Cómo cobro mi préstamo?",
-    content: "A través de una transferencia al CBU/CVU informado.",
+    name: "¿Cuales son los montos y cuotas disponibles?",
+    content: "El monto máximo depende de tu perfil crediticio. La cantidad y monto de las cuotas disponibles se muestra al momento de la solicitud, junto con las tasas y el Costo Financiero Total (CFT).",
     id: 4,
   },
   {
-    name: "¿Cómo pago la cuota de mi préstamo?",
+    name: "¿Cuándo se acredita el préstamo?",
     content:
-      "Las cuotas del préstamo podrán ser abonadas mediante transferencia o depósito bancario, débito intrabancario o en tarjeta de débito y/o a través de los botones de pago habilitados.",
+      "Una vez aprobada la solicitud, el dinero se acredita en tu cuenta el mismo día hábil o siguiente, según horario y validaciones.",
     id: 5,
   },
   {
-    name: "¿Y si ya tuve o tengo un préstamo con COFA?",
-    content: "Mejor! Ya te conocemos y obtener un nuevo préstamo es más fácil.",
+    name: "¿Cómo pago las cuotas?",
+    content: "Las cuotas del préstamo podrán ser abonadas mediante transferencia o depósito bancario, débito intrabancario o en tarjeta de débito y/o a través de los botones de pago habilitados.",
     id: 6,
   },
 
@@ -116,11 +122,61 @@ export const frecuentQuestions = [
     id: 7,
   },
   {
-    name: "¿Tenés otras preguntas?",
+    name: "¿Cómo funcionan los contracargos y reapertura de deuda?",
     content:
-      "Si tenés otras preguntas, escribinos a consultas@cofa.com.ar y responderemos tus dudas a la brevedad.",
+      "Si generás un contracargo o reversión de alguna cuota ya pagada, se desimpactará el pago y la deuda se reabrirá. Esto puede generar intereses punitorios, coexistencia de deudas si tenés otro préstamo activo, bloqueo de renovaciones, pérdida de libre deuda, inicio de cobranza judicial y reporte a la Central de Deudores del BCRA si supera los 30 días.",
     id: 8,
   },
+  {
+    name: "¿Qué pasas si me atraso?",
+    content: "Se generan intereses punitorios desde el día siguiente al vencimiento. Un atraso prolongado puede afectar tu acceso a nuevos créditos tanto en COFA como en otras entidades.",
+    id: 9,
+  },
+  {
+    name: "Cancelación anticipada y derecho de arrepentimiento",
+    content: "Podés cancelar el préstamo antes del plazo. También contás con derecho de arrepentimiento dentro de los plazos legales a través de este link https://cofa.com.ar/arrepentimiento. Los detalles tambien figuran en tu contrato o en los modelos que también se encuentran en esta web.",
+    id: 10,
+  },
+  {
+    name: "¿Puedo renovar mi préstamo?",
+    content: "Si tu comportamiento de pago es bueno, podrás acceder a renovaciones o montos mayores, con mejores condiciones y tasas más bajas. Esto depende de tu puntuación en el sistema de evaluación crediticia propio de COFA.",
+    id: 11,
+  },
+  {
+    name: "¿Cómo funciona la evaluación de riesgo?",
+    content: "Nuestro sistema analiza ingresos, comportamiento de pago, historial crediticio, verificación de identidad y otros factores para determinar tu línea de crédito.",
+    id: 12,
+  },
+  {
+    name: "Seguridad y protección de datos",
+    content: "Usamos protocolos de cifrado y verificación robustos. Cumplimos con normativa de protección de datos, UIF y BCRA. Tus datos no se comparten ni se guardan sin tu autorización.",
+    id: 13,
+  },
+  {
+    name: "Fraude y uso indebido de datos",
+    content: "Si notás un movimiento extraño, contactanos de inmediato. Podemos bloquear o revisar la operación y ayudarte con el reclamo.",
+    id: 14,
+  },
+  {
+    name: "¿Qué pasa si tengo trabajo informal?",
+    content: "Nuestra plataforma contempla diferentes tipos de ingreso y contextos con barreras de acceso. Podés solicitar si cumplís requisitos mínimos y tu perfil es aprobado.",
+    id: 15,
+  },
+  {
+    name: "Acceso a comprobantes y cronogramas",
+    content: "Desde los canales oficiales (11-3757-0853 // consultas@cofa.com.ar) podés descargar tu contrato, libre deuda, cronograma de pagos y comprobantes.",
+    id: 16,
+  },
+  {
+    name: "Canales de atención",
+    content: "WhatsApp, mail, chat web y teléfono que figuran en esta web. Respondemos bajo los estándares de Protección de Usuarios de Servicios Financieros del BCRA.",
+    id: 17,
+  },
+  {
+    name: "¿Tenés otras preguntas?",
+    content: "Si tenés otras preguntas, escribinos a consultas@cofa.com.ar y responderemos tus dudas a la brevedad.",
+    id: 18,
+  }
 ];
 
 export const termsAndConditions = [
@@ -727,24 +783,3 @@ export const termsAndConditionsPoints = [
   },
 ];
 
-export const clientReview = [
-  {
-    content:
-      "Muy claros a la hora de atenderme. Siempre están bien predispuestos a explicar cuando uno tiene alguna pregunta.",
-    author: "Pablo",
-  },
-  {
-    content: "La atención es muy buena; conozco el servicio y nunca tuve ningún problema.",
-    author: "Laura",
-  },
-  {
-    content:
-      "Muy buena atención y excelente predisposición. Cumplieron con el préstamo y me depositaron en el día lo que necesitaba.",
-    author: "Ricardo",
-  },
-  {
-    content:
-      "Todo el proceso para que me otorguen el préstamo fue muy fácil, rápido y lo hice desde mi celular. Había sacado préstamos en otras empresas, pero me quedo con COFA.",
-    author: "Brenda",
-  },
-];

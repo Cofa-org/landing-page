@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
-import { Footer, HeaderElMejorTrato,   } from '../../Components'
-import { AboutUs, Contact, FrecuentQuestion, HeroElMejorTrato } from '../../Sections'
+import { Footer, HeaderElMejorTrato, FrecuentQuestion } from '../../Components'
+import { AboutUs, Contact, HeroElMejorTrato } from '../../Sections'
 
 
 const ElMejorTratoScreen = () => {
@@ -9,12 +9,12 @@ const ElMejorTratoScreen = () => {
   }, []);
   return (
     <section>
-        <HeaderElMejorTrato/>
-        <HeroElMejorTrato />
-        <AboutUs/>
-        <FrecuentQuestion/>
-        <Contact/>
-        <Footer/>
+      <HeaderElMejorTrato />
+      <HeroElMejorTrato />
+      <AboutUs />
+      <FrecuentQuestion />
+      <Contact />
+      <Footer />
     </section>
   )
 }

@@ -5,10 +5,10 @@ import { Contact, HeroSuggestions } from '../../Sections';
 const RegretScreen = () => {
   return (
     <div>
-        <HeaderType2/>
-        <HeroSuggestions Title={()=><h1>Arrepentimiento </h1>} paragraph={'Se considerará una solicitud de arrepentimiento si contrataste un producto por primera vez con COFA y decidís revocar su aceptación dentro de los 10 días corridos contados desde la fecha de recibido el contrato o de la disponibilidad efectiva del producto.'} type={'ARREPENTIMIENTO'}/>
-        <Contact/>
-        <Footer/>
+      <HeaderType2 />
+      <HeroSuggestions Title={() => <h1>Arrepentimiento </h1>} paragraph={'Se considerará una solicitud de arrepentimiento si contrataste un producto con COFA sin haber hecho uso del dinero y decidís revocar su aceptación dentro de los 10 días corridos contados desde la fecha de recibido el contrato o de la disponibilidad efectiva del producto.'} type={'ARREPENTIMIENTO'} />
+      <Contact />
+      <Footer />
     </div>
   )
 }

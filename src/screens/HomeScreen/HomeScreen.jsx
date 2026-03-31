@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { Footer, Header } from '../../Components'
 import StructuredData from '../../Components/Seo/StructuredData';
-import { AboutUs, ClientReview, Contact, FrecuentQuestion, Hero, OurServices } from '../../Sections'
+import { AboutUs, Contact, FrecuentQuestionSection, Hero, OurServices, CofaTipsSection } from '../../Sections'
 import WorkWithUs from '../../Sections/WorkWithUs/WorkWithUs'
 
 const HomeScreen = () => {
@@ -45,16 +45,15 @@ const HomeScreen = () => {
 
   return (
     <>
-        <StructuredData faqData={faqData} breadcrumbData={breadcrumbData} />
-        <Header/>
-        <Hero />
-        <AboutUs/>
-        {/* <OurServices/> */}
-        <ClientReview/>
-        <FrecuentQuestion/>
-        <WorkWithUs/>
-        <Contact/>
-        <Footer/>
+      <Header />
+      <Hero />
+      <AboutUs />
+      {/* <OurServices/> */}
+      <FrecuentQuestionSection />
+      <CofaTipsSection />
+      <WorkWithUs />
+      <Contact />
+      <Footer />
     </>
   )
 }

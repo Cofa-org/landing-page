@@ -1,35 +1,83 @@
-.policies-list-container{
+.policies-list-container {
     padding: 75px 5vw;
     text-align: justify;
 }
-.policies-header{
+
+.policies-header {
     padding: 75px 5vw;
 }
-.policies-header p{
+
+.policies-header p {
     line-height: 32px;
 }
 
-.policies-title{
+.policies-title {
     color: var(--text-color);
     font-size: 40px;
     text-align: center;
     margin-bottom: 48px;
 }
 
-.policies-list{
+.policies-list {
     padding: 20px 20px;
     display: flex;
     flex-direction: column;
     gap: 30px;
-    list-style-type:upper-alpha;
+    list-style-type: upper-alpha;
 }
 
-.p-after-title{
+.p-after-title {
     text-align: justify;
 }
 
-@media screen and (max-width:400px){
-    .policies-list h2{
+.ia-bullet-list {
+    list-style-type: disc !important;
+    padding-left: 40px;
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ia-bullet-list li {
+    list-style-type: inherit !important;
+}
+
+.ia-paragraph {
+    margin-top: 15px;
+    line-height: inherit;
+}
+
+.terms-list {
+    counter-reset: policy-section;
+}
+
+.term-item {
+    counter-increment: policy-section;
+}
+
+.ia-sub-list {
+    list-style-type: none !important;
+    counter-reset: policy-sub;
+    padding-left: 20px;
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.ia-sub-item {
+    list-style-type: none !important;
+    counter-increment: policy-sub;
+}
+
+.ia-sub-item-title::before {
+    content: counter(policy-section) "." counter(policy-sub) " ";
+    color: var(--primary-color) !important;
+}
+
+@media screen and (max-width:400px) {
+    .policies-list h2 {
         font-size: 20px;
         text-align: start;
     }

@@ -5,39 +5,42 @@ import { FaCircleChevronUp } from "react-icons/fa6";
 import { BsChevronDown } from "react-icons/bs";
 
 const FrecuentQuestion = () => {
-  const [currentQuestionSelected, setCurrentQuestionSelected] = useState(1);
+  const [currentQuestionSelected, setCurrentQuestionSelected] = useState(1)
   const handleSelectQuestion = (id) => {
     if (id == currentQuestionSelected) {
-      setCurrentQuestionSelected(null);
-    } else {
-      setCurrentQuestionSelected(id);
+      setCurrentQuestionSelected(null)
     }
-  };
+    else {
+      setCurrentQuestionSelected(id)
+    }
+
+  }
   return (
-    <section
-      className='frecuentQuestions'
-      id='preguntas-frecuentes'
-    >
+    <section className='frecuentQuestions' id='preguntas-frecuentes'>
       <h2>Preguntas frecuentes</h2>
       <div className='frecuentQuestionsList'>
         {frecuentQuestions.map((question) => (
-          <div key={question.id}>
-            {currentQuestionSelected == question.id ? (
-              <div
+          <>
+            {currentQuestionSelected == question.id
+              ? <div
                 key={question.id}
                 onClick={() => handleSelectQuestion(question.id)}
                 className='questionSelected'
               >
                 <div>
                   <h3>{question.name}</h3>
-                  <p>{question.content}</p>
+                  {Array.isArray(question.content)
+                    ? question.content.map((line, i) => <p key={i}>{line}</p>)
+                    : <p>{question.content}</p>
+                  }
                 </div>
                 <div>
                   <FaCircleChevronUp />
                 </div>
+
+
               </div>
-            ) : (
-              <div
+              : <div
                 key={question.id}
                 onClick={() => handleSelectQuestion(question.id)}
                 className='question'
@@ -47,12 +50,12 @@ const FrecuentQuestion = () => {
                   <BsChevronDown />
                 </div>
               </div>
-            )}
-          </div>
+            }
+          </>
         ))}
       </div>
     </section>
-  );
-};
+  )
+}
 
 export default FrecuentQuestion;

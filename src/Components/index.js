@@ -11,20 +11,22 @@ import HeaderAssist from "./Header/HeaderAssist";
 import AssistSlider from "./AssistSlider/AssistSlider";
 import { WorkWithUsForm } from "./Forms/WorkWithUsForm";
 import Carrusel from "./Carrusel/Carrusel";
+import FrecuentQuestion from "./FrecuentQuestion/FrecuentQuestion";
 
 export {
-    Header, 
-    HeaderPoints, 
-    Footer, 
-    AnimatedTitle, 
-    ContactForm, 
-    OurServicesList, 
+    Header,
+    HeaderPoints,
+    Footer,
+    AnimatedTitle,
+    ContactForm,
+    OurServicesList,
     PersonalLendForm,
     HeaderType2,
     HeaderElMejorTrato,
     HeaderAssist,
     AssistSlider,
     WorkWithUsForm,
-    Carrusel
+    Carrusel,
+    FrecuentQuestion
 }
 export { default as ImageCarousel } from "./ImageCarousel/ImageCarousel";
