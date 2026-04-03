@@ -38,6 +38,12 @@
   width: 100%;
 }
 
+@media (max-width: 768px) {
+  .buttonContainer {
+    flex-direction: column;
+  }
+}
+
 .disabled {
   pointer-events: none;
   opacity: 0.5;
