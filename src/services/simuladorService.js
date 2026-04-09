@@ -3,7 +3,7 @@ import { HTTP_METHOD } from "../constants/HTTP_METHODS.js";
 import { HttpApi } from "../http.js";
 
 export default class SimuladorService {
-  static async calcularPlanes({ scoringId, plazoSeleccionado, capitalSeleccionado }, signal = null) {
+  static async calcularPlanes({ scoringId, plazoSeleccionado, capitalSeleccionado, capitalMaximoOperador }, signal = null) {
     try {
       const url = `${LANDING_BACKEND_URL}/api/simulador-prestamos/calcular`;
       const apiKey = LANDING_BACKEND_API_KEY;
@@ -11,6 +11,7 @@ export default class SimuladorService {
         scoringId,
         plazoSeleccionado,
         capitalSeleccionado,
+        capitalMaximoOperador,
       };
       const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, null, signal);
 
