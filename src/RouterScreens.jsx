@@ -14,6 +14,7 @@ import {
   TermsScreen,
   LoanSimScreen,
   FrecuentQuestionScreen,
+  SacarPrestamoScreen,
 } from "./screens";
 import { FormWorkWithUs } from "./Sections";
 import { BlogDetailScreen } from "./screens/blogDetailScreen/BlogDetailScreen.jsx";
@@ -98,6 +99,11 @@ const RouterScreens = () => {
         element={<ElMejorTratoScreen />}
       />{" "}
       {/* El Mejor Trato */}
+      <Route
+        path='/sacar-prestamo'
+        element={<SacarPrestamoScreen />}
+      />{" "}
+      {/* Sacar Prestamo */}
       <Route
         path='/cofa-tips'
         element={<CofaTipsScreen />}

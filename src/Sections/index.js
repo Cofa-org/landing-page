@@ -20,6 +20,7 @@ import TermsPoints from "./TermsHeader/TermsPoints";
 import TermsAndConditionsPoints from "./TermsAndConditions/TermsAndConditionsPoints";
 import FormWorkWithUs from "./WorkWithUs/FormWorkWithUs";
 import HeroElMejorTrato from "./Hero/HeroElMejorTrato";
+import HeroSacarPrestamo from "./Hero/HeroSacarPrestamo";
 import HeroAssist from "./Hero/HeroAssist";
 import BlogSection from "./BlogSection/BlogSection.jsx";
 import CofaTipsSection from "./CofaTipsSection/CofaTipsSection.jsx";
@@ -50,6 +51,7 @@ export {
   TermsAndConditionsPoints,
   FormWorkWithUs,
   HeroElMejorTrato,
+  HeroSacarPrestamo,
   IaPoliciesHeader,
   IaPoliciesMain,
   HeroLoanSim,

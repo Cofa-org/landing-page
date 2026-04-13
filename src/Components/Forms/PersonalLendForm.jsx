@@ -4,14 +4,15 @@ import { FaArrowRightLong, FaCheck } from "react-icons/fa6";
 import "./style.css";
 import { Link } from "react-router-dom";
 import MailService from "../../services/mailService.js";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import Notification from "../Notifications/Notification.jsx";
 
-const PersonalLendForm = () => {
+const PersonalLendForm = ({ type = "EL-MEJOR-TRATO" }) => {
   const [isSent, setIsSent] = useState(false);
   const [aceptoTerminos, setAceptoTerminos] = useState(false);
   const [notification, setNotification] = useState({ show: false, message: "", type: "success" });
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const handleAceptoCambio = () => {
     setAceptoTerminos(!aceptoTerminos);
@@ -35,8 +36,12 @@ const PersonalLendForm = () => {
       formData.append("archivoPDF", blob, file.originalname);
     }
 
+    searchParams.forEach((value, key) => {
+      formData.append(key, value);
+    });
+
     try {
-      const response = await MailService.sendMail("EL-MEJOR-TRATO", formData);
+      const response = await MailService.sendMail(type, formData);
 
       setNotification({
         show: true,
