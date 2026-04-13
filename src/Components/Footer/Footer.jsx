@@ -20,9 +20,9 @@ const Footer = () => {
         </Link>
         <div className='footer-contracts'>
           <div>
-            <h3>CONTRATOS DE ADHESIÓN LEY 24240 DE DEFENSA AL CONSUMIDOR</h3>
+            <h3>CONTRATOS DE ADHESIÓN</h3>
             <a
-              href='/mod-contrato-electronica.pdf'
+              href='/mod-contrato-electronica-03-2026.pdf'
               target='_blank'
             >
               <p>Modelo contrato con suscripción electrónica</p>
@@ -34,14 +34,14 @@ const Footer = () => {
               <p>Modelo contrato con suscripción presencial</p>
             </a>
             <a
-              href='/mod-contrato-refinanciacion-digital.pdf'
+              href='/mod-contrato-refinanciacion-digital-03-2026.pdf'
               target='_blank'
             >
               <p>Modelo contrato de refinanciación digital</p>
             </a>
           </div>
           <div>
-            <h3>DEFENSA AL CONSUMIDOR</h3>
+            <h3>DEFENSA AL CONSUMIDOR <br /> LEY 24240</h3>
             <a
               href='https://www.argentina.gob.ar/economia/comercio/defensadelconsumidor'
               target='_blank'
@@ -112,10 +112,6 @@ const Footer = () => {
             href='https://www.argentina.gob.ar/aaip/datospersonales/reclama/33711334799--RL-2019-106873898-APN-DNPDP#AAIP'
             target='_blank'
           >
-            <img
-              src='/img/footer-pdp.webp'
-              alt='registro nacional de bases de datos, PDP'
-            />
           </a>
         </div>
         <div className='ssn-container'>
@@ -130,19 +126,32 @@ const Footer = () => {
       <div className='footer-box-right'>
         <div>
           <p>
-            La Tasa Nominal Anual (TNA), la Tasa Efectiva Anual (TEA), el Costo Financiero Total
-            Anual (CFTA) y el Costo Financiero Total de la operación (CFTO) varían según el perfil
-            crediticio del solicitante del préstamo, el plazo de financiación elegido y la situación
-            del mercado. En todos los casos, la TNA, TEA, el CFTA y el CFTO aplicables serán
-            informados al momento de ingresar la solicitud del préstamo y antes de su otorgamiento.
-            Tasa Nominal Anual (TNA): Mínima: 110% - Máxima 402,20% | Costo Financiero Total Anual
-            (CFTA) con IVA: Mínimo: 160% - Máximo 425% Ejemplo de préstamo (*): Monto solicitado de
-            $100.000 a 3 meses | TNA (sin IVA): 190,08% - TEA (sin IVA): 483,87% - CFTA (con IVA):
-            230% - CFTO (con IVA): 57,50% | Cuota: $52.500 | Total a pagar: $157.500. Las cuotas del
-            préstamo son mensuales, iguales, fijas y consecutivas, y podrán ser abonadas mediante
-            transferencia o depósito bancario, débito intrabancario o en tarjeta de débito y/o a
-            través de los botones de pago habilitados. Período para devolver el préstamo; mínimo 2
-            meses - máximo 18 meses.
+            La{" "}
+            <span style={{ fontSize: "1.5em" }}>
+              Tasa Nominal Anual (TNA), la Tasa Efectiva Anual (TEA), el Costo
+              Financiero Total Anual (CFTA) y el Costo Financiero Total de la
+              operación (CFTO)
+            </span>{" "}
+            varían según el perfil crediticio del solicitante del préstamo, el plazo de
+            financiación elegido y la situación del mercado. En todos los casos, la{" "}
+            <span style={{ fontSize: "1.5em" }}>TNA, TEA, el CFTA y el CFTO</span>{" "} aplicables serán informados al
+            momento de ingresar la solicitud del préstamo y antes de su
+            otorgamiento. Tasa Nominal Anual (TNA): Mínima: 110% - Máxima
+            402,20% |{" "}
+            <span style={{ fontSize: "1.5em" }}>
+              Costo Financiero Total Anual (CFTA) con IVA: Mínimo: 160% -
+              Máximo 425%
+            </span>{" "}
+            Ejemplo de préstamo (*): Monto solicitado de $100.000 a 3 meses |{" "}
+            <span style={{ fontSize: "1.5em" }}>
+              TNA (sin IVA): 190,08% - TEA (sin IVA): 483,87% - CFTA (con IVA):
+              230% - CFTO (con IVA): 57,50%
+            </span>{" "}
+            | Cuota: $52.500 | Total a pagar: $157.500. Las cuotas del préstamo son mensuales, iguales, fijas
+            y consecutivas, y podrán ser abonadas mediante transferencia o
+            depósito bancario, débito intrabancario o en tarjeta de débito y/o a
+            través de los botones de pago habilitados. Período para devolver el
+            préstamo; mínimo 2 meses - máximo 18 meses.
           </p>
           <p>Sistema de amortización directo.</p>
           <p>El otorgamiento del préstamo está sujeto a evaluación crediticia.</p>

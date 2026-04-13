@@ -43,7 +43,7 @@ const SuccessStep = ({ handleInfoPrestamo, loanInfo, loadingModal }) => {
         </button>
         <button
           className='primary-btn'
-          onClick={() => (window.location.href = "/contacto")}
+          onClick={() => (window.location.href = "http://wa.me/5491137570853")}
           style={{ flex: 1 }}
         >
           Comunicarse con asesor

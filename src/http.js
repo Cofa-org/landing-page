@@ -1,5 +1,5 @@
 
-export async function HttpApi(url, body, method, apiKey, token) {
+export async function HttpApi(url, body, method, apiKey, token, signal = null) {
   try {
     const isFormData = body instanceof FormData;
     const options = {
@@ -10,6 +10,7 @@ export async function HttpApi(url, body, method, apiKey, token) {
       },
       method: method,
       ...(body && { body: isFormData ? body : JSON.stringify(body) }),
+      ...(signal && { signal }),
     };
 
     return await fetch(url, options);

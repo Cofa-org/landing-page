@@ -15,6 +15,7 @@ const SimulationStep = ({
   onAmountChange,
   onInstallmentChange,
   onNextStep,
+  error,
 }) => {
   const formatCurrency = (value) =>
     new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS" }).format(value || 0);
@@ -96,6 +97,7 @@ const SimulationStep = ({
           </div>
         </div>
       </div>
+      {error && <p className={styles.error}>{`🫣 ${error}`}</p>}
     </div>
   );
 };

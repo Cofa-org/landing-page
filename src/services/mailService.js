@@ -1,13 +1,12 @@
 import { HttpApi } from "../http";
-import { VITE_COFA_AUTH_URL, VITE_URL_LOCAL, VITE_COFA_AUTH_API_KEY } from "../config";
 import { HTTP_METHOD } from "../constants/HTTP_METHODS.js";
+import { LANDING_BACKEND_URL, LANDING_BACKEND_API_KEY } from "../config.js";
 
 export default class MailService {
   static async sendMail(type, formData) {
     try {
-      const url = `${VITE_COFA_AUTH_URL || VITE_URL_LOCAL}/api/mail/${type}`;
-      const apiKey = VITE_COFA_AUTH_API_KEY;
-
+      const url = `${LANDING_BACKEND_URL}/api/mail/${type}`;
+      const apiKey = LANDING_BACKEND_API_KEY;
       const response = await HttpApi(url, formData, HTTP_METHOD.POST, apiKey, null);
 
       let responseData;

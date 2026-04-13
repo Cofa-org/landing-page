@@ -101,6 +101,7 @@ const LoanSimScreen = () => {
             onAmountChange={handleAmountChange}
             onInstallmentChange={handleInstallmentChange}
             onNextStep={handleNextStep}
+            error={error}
           />
         );
 
@@ -195,7 +196,7 @@ const LoanSimScreen = () => {
           <div className={styles.errorContainer}>
             <p className={styles.errorMsg}>{error}</p>
             <p className={styles.errorSubtext}>
-              Por favor, utilizá el enlace que recibiste para acceder al simulador.
+              Por favor, ponte en contacto con un operador.
             </p>
           </div>
         </div>

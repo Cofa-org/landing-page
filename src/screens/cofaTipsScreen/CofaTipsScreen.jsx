@@ -1,5 +1,5 @@
 import { Footer, Header } from "../../Components/index.js";
-import { CofaTipsSection } from "../../Sections/index.js";
+import CofaTipsMain from "./CofaTipsMain/CofaTipsMain.jsx";
 import { BlogListSection } from "../../Sections/blogListSection/BlogListSection.jsx";
 import { useEffect } from "react";
 
@@ -15,7 +15,7 @@ function CofaTipsScreen() {
   return (
     <div style={{ minHeight: "100vh" }}>
       <Header />
-      <CofaTipsSection />
+      <CofaTipsMain />
       <BlogListSection />
       <Footer />
     </div>

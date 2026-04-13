@@ -19,14 +19,13 @@ const CBUValidation = ({
   validandoBanco,
   validarCodigoBanco,
 }) => {
-
   const [cbu, setCbu] = useState("");
   const [isUpdating, setIsUpdating] = useState(!isClient);
   const [accountType, setAccountType] = useState("cbu");
 
   // Validar código bancario cuando se ingresa
   useEffect(() => {
-    if (!isClient || isUpdating && accountType === "cbu") {
+    if (!isClient || (isUpdating && accountType === "cbu")) {
       if (cbu.length >= 3) {
         const codigo = cbu.slice(0, 3);
         validarCodigoBanco(codigo);
@@ -72,6 +71,7 @@ const CBUValidation = ({
               type='submit'
               loading={loading}
               className={styles.flexButton}
+              disabled={loading || validandoBanco || codigoBancoError || error}
             >
               Sí, es correcto
             </GenericButton>
@@ -80,10 +80,23 @@ const CBUValidation = ({
               variant='outline'
               onClick={handleToggleUpdate}
               className={styles.flexButton}
+              disabled={loading || validandoBanco || codigoBancoError || error}
             >
               No, ingresar otro
             </GenericButton>
           </div>
+          {error && (
+            <>
+              <span className={styles.errorText}>{error}</span>
+              <button
+                className='primary-btn'
+                onClick={() => (window.location.href = "http://wa.me/5491137570853")}
+                style={{ flex: 1 }}
+              >
+                Comunicarse con un asesor
+              </button>
+            </>
+          )}
         </div>
       ) : (
         <>
@@ -118,14 +131,10 @@ const CBUValidation = ({
             </div>
           )}
           <div>
-            <div
-              className={styles.bancoContainer}
-            >
+            <div className={styles.bancoContainer}>
               <label className={styles.bancoLabel}>{accountType.toUpperCase()}</label>
               {bancoEncontrado && (
-                <span className={styles.bancoName}>
-                  ✓ {bancoEncontrado.descripcion}
-                </span>
+                <span className={styles.bancoName}>✓ {bancoEncontrado.descripcion}</span>
               )}
             </div>
             <GenericInput
@@ -146,7 +155,9 @@ const CBUValidation = ({
           <GenericButton
             type='submit'
             loading={loading}
-            disabled={cbu.length !== CBU_CONFIG.CBU_LENGTH || validandoBanco || loading || codigoBancoError}
+            disabled={
+              cbu.length !== CBU_CONFIG.CBU_LENGTH || validandoBanco || loading || codigoBancoError
+            }
           >
             Validar {accountType.toUpperCase()}
           </GenericButton>

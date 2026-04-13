@@ -19,9 +19,9 @@ const AboutUs = () => {
         </div>
         <div className='info-about-us'>
           <p>
-            Somos una empresa fintech con más de 17 años de trayectoria. Estamos para ayudarte y
-            acompañarte en tus proyectos. Brindamos préstamos que simplifican tu vida. Mínimos
-            requisitos, en el día, 100% online.
+            Evolucionamos el crédito para hacerlo más simple, rápido y seguro.<br />
+            Hace más de 18 años trabajamos para que acceder a un préstamo sea una experiencia clara y sin fricciones: pocos requisitos y proceso 100% digital.<br />
+            Tecnología y experiencia al servicio de tus proyectos.
           </p>
           <div className='reasons-to-chose'>
             <h3>¿Por qué elegirnos?</h3>

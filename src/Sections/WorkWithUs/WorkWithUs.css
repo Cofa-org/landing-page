@@ -1,9 +1,10 @@
-.container-work{
+.container-work {
     padding: 40px 10vw;
     display: flex;
     background-color: #EAFAF1;
 }
-.info-work{
+
+.info-work {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -11,85 +12,99 @@
     width: 80%;
     margin-right: 10%;
 }
-.info-work p{
+
+.info-work p {
     margin-top: 3%;
     margin-bottom: 3%;
 }
-.btn-work{
+
+.btn-work {
     border: none;
     width: 261px;
     font-size: 20px;
     cursor: pointer;
 }
 
-.container-form-work{
+.container-form-work {
     padding: 40px 15vw;
 }
-.bg-form-work{
+
+.bg-form-work {
     position: absolute;
     z-index: -1;
     top: 0;
     left: 0;
     width: 100vw;
 }
-.info-work-form{
+
+.info-work-form {
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
 }
-.info-work-form h1, .info-work-form p{
+
+.info-work-form h1,
+.info-work-form p {
     color: white;
     width: 80%;
     margin-bottom: 2%;
 }
-.info-work-form h1{
+
+.info-work-form h1 {
     font-size: 60px;
     font-weight: 500;
 }
-.info-work-form p{
+
+.info-work-form p {
     font-weight: 500;
 }
 
-@media screen and (max-width:900px){
-    .container-work{
+@media screen and (max-width:900px) {
+    .container-work {
         flex-direction: row;
         flex-wrap: wrap;
         justify-content: center;
         width: 100%;
     }
-    .container-work img{
+
+    .container-work img {
         margin-top: 10%;
     }
-    .info-work{
+
+    .info-work {
         width: 100%;
     }
-    .bg-form-work{
+
+    .bg-form-work {
 
         width: 200vw;
     }
 }
 
 
-@media screen and (max-width:550px){
-    .quejas-sugerencias{
+@media screen and (max-width:550px) {
+    .quejas-sugerencias {
         padding: 20px;
     }
-    .bg-form-work{
+
+    .bg-form-work {
 
         width: 300vw;
     }
 }
 
 
-@media screen and (max-width:350px){
-    .bg-form-work{
+@media screen and (max-width:350px) {
+    .bg-form-work {
         width: 400vw;
     }
-    .info-work{
+
+    .info-work {
         margin-right: 0%;
         align-items: center;
     }
+
     .container-work img {
         width: 80%;
     }

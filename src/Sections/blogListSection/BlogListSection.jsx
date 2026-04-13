@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { formatDate } from "../../lib/utils.js";
 import { BlogService } from "../../services/blogService.js";
-import { Footer, Header } from "../../Components/index.js";
+
 import "./blog-list.css";
 import SocialNetworks from "../../Components/SocialNetworks/SocialNetworks.jsx";
 
@@ -50,27 +50,19 @@ export const BlogListSection = () => {
 
   if (loading) {
     return (
-      <div className='blog-list-page'>
-        <Header />
-        <div className='blog-list-loading'>
-          <div className='blog-list-spinner'></div>
-        </div>
-        <Footer />
+      <div className='blog-list-loading'>
+        <div className='blog-list-spinner'></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className='blog-list-page'>
-        <Header />
-        <div className='blog-list-container'>
-          <div className='blog-list-error'>
-            <h2 className='blog-list-error-title'>Error</h2>
-            <p className='blog-list-error-text'>{error}</p>
-          </div>
+      <div className='blog-list-container'>
+        <div className='blog-list-error'>
+          <h2 className='blog-list-error-title'>Error</h2>
+          <p className='blog-list-error-text'>{error}</p>
         </div>
-        <Footer />
       </div>
     );
   }
@@ -108,7 +100,7 @@ export const BlogListSection = () => {
                 ) : (
                   <img
                     style={{ objectFit: "contain" }}
-                    src='../../../img/logo_cofa_tips.svg'
+                    src='/img/logo_cofa_tips.svg'
                     alt={post?.title}
                     className='blog-card-image'
                   />
