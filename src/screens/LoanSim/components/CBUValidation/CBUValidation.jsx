@@ -23,17 +23,16 @@ const CBUValidation = ({
   const [isUpdating, setIsUpdating] = useState(!isClient);
   const [accountType, setAccountType] = useState("cbu");
 
+  const prefix = cbu.length >= 3 ? cbu.slice(0, 3) : cbu.length === 0 ? "" : null;
+
   // Validar código bancario cuando se ingresa
   useEffect(() => {
     if (!isClient || (isUpdating && accountType === "cbu")) {
-      if (cbu.length >= 3) {
-        const codigo = cbu.slice(0, 3);
-        validarCodigoBanco(codigo);
-      } else if (cbu.length === 0) {
-        validarCodigoBanco("");
+      if (prefix !== null) {
+        validarCodigoBanco(prefix);
       }
     }
-  }, [cbu, isClient, isUpdating, validarCodigoBanco]);
+  }, [prefix, isClient, isUpdating, accountType, validarCodigoBanco]);
 
   const handleSubmit = (e) => {
     e.preventDefault();

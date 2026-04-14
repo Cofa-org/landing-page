@@ -357,7 +357,7 @@ export const useLoanSimulator = () => {
       if (preaprobadoResponse.success) {
         const cookieOptions = {
           name: COOKIE_CONFIG.NAME,
-          value: preaprobadoResponse.data.scoringId,
+          value: scoringData.scoringId,
           expires: COOKIE_CONFIG.EXPIRY_DAYS,
           partitioned: true,
         };
@@ -380,7 +380,7 @@ export const useLoanSimulator = () => {
           return;
         } else {
           setError(
-            preaprobadoErr.message ||
+            preaprobadoResponse.message ||
               "¡Lo sentimos! No pudimos completar la operación, ponete en contacto con un operador 😕",
           );
           return;
