@@ -37,7 +37,9 @@ const PersonalLendForm = ({ type = "EL-MEJOR-TRATO" }) => {
     }
 
     searchParams.forEach((value, key) => {
-      formData.append(key, value);
+      if (!formData.has(key)) {
+        formData.append(key, value);
+      }
     });
 
     try {
@@ -133,14 +135,15 @@ const PersonalLendForm = ({ type = "EL-MEJOR-TRATO" }) => {
   return (
     <div className='form-template'>
       <Formik
+        enableReinitialize={true}
         initialValues={{
-          name: "",
-          cuit: "",
-          email: "",
-          telephone: "",
-          situacion: "",
-          ingresos: "",
-          amount: "",
+          name: searchParams.get("name") || searchParams.get("nombre") || "",
+          cuit: searchParams.get("cuit") || searchParams.get("cuil") || "",
+          email: searchParams.get("email") || searchParams.get("correo") || "",
+          telephone: searchParams.get("telephone") || searchParams.get("telefono") || "",
+          situacion: searchParams.get("situacion") || searchParams.get("sit_laboral") || "",
+          ingresos: searchParams.get("ingresos") || "",
+          amount: searchParams.get("amount") || searchParams.get("monto") || "",
           terminos_y_condiciones: false,
         }}
         onSubmit={handleSubmit}
