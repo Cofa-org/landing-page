@@ -9,6 +9,7 @@ import RegretOrDischargeScreen from "./RegretOrDischargeScreen/RegretOrDischarge
 import SuggestionsScreen from "./SuggestionsScreen/SuggestionsScreen";
 import TermsPointsScreen from "./TermsScreen/TermsPointsScreen";
 import ElMejorTratoScreen from "./ElMejorTratoScreen/ElMejorTratoScreen";
+import SacarPrestamoScreen from "./SacarPrestamoScreen/SacarPrestamoScreen";
 import DischargeScreen from "./DischargeScreen/DischargeScreen";
 import QuejasScreen from "./QuejasScreen/QuejasScreen";
 import TermsV2 from "./TermsV2/TermsV2";
@@ -30,6 +31,7 @@ export {
   TermsPointsScreen,
   DischargeScreen,
   ElMejorTratoScreen,
+  SacarPrestamoScreen,
   AssistenceScreen,
   QuejasScreen,
   TermsV2,
