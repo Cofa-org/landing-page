@@ -7,6 +7,33 @@ import MailService from "../../services/mailService.js";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Notification from "../Notifications/Notification.jsx";
 
+const mapSituacionLaboral = (value) => {
+  if (!value) return null;
+  const lowerValue = value.toLowerCase();
+  if (lowerValue.includes("dependencia") || lowerValue.includes("empleado")) return "relacion-dependencia";
+  if (lowerValue.includes("monotributista") || lowerValue.includes("autónomo") || lowerValue.includes("autonomo")) return "monotributista";
+  if (lowerValue.includes("informal") || lowerValue.includes("negro")) return "informal";
+  if (lowerValue.includes("jubilado") || lowerValue.includes("pensionado")) return "jubilado-pensionado";
+  if (lowerValue.includes("estudiante")) return "estudiante";
+  if (lowerValue.includes("freelance") || lowerValue.includes("independiente")) return "freelancer";
+  if (lowerValue.includes("desempleado") || lowerValue.includes("parado") || lowerValue.includes("sin empleo")) return "desempleado";
+  return "otro";
+};
+
+const mapIngresos = (value) => {
+  if (!value) return null;
+  // Excluimos puntos y comas por si viene "850.000"
+  const cleanValue = value.replace(/[,.]/g, ''); 
+  const numValue = Number(cleanValue);
+  
+  if (isNaN(numValue)) return null;
+  
+  if (numValue <= 300000) return "Menos de $300.000";
+  if (numValue <= 600000) return "De $300.001 a $600.000";
+  if (numValue <= 1000000) return "De $600.001 a $1.000.000";
+  return "Más de $1.000.000";
+};
+
 const PersonalLendForm = ({ type = "EL-MEJOR-TRATO" }) => {
   const [isSent, setIsSent] = useState(false);
   const [aceptoTerminos, setAceptoTerminos] = useState(false);
@@ -77,9 +104,9 @@ const PersonalLendForm = ({ type = "EL-MEJOR-TRATO" }) => {
     }
 
     if (!values.cuit) {
-      errors.cuit = "El CUIL|CUIT no puede estar vacío";
-    } else if (String(values.cuit).length !== 11) {
-      errors.cuit = "El CUIL|CUIT debe tener 11 dígitos numéricos";
+      errors.cuit = "El DNI/CUIT no puede estar vacío";
+    } else if (![7, 8, 11].includes(String(values.cuit).length)) {
+      errors.cuit = "El documento debe tener 7, 8 u 11 dígitos numéricos";
     } else {
       errors.cuit = "";
     }
@@ -137,13 +164,13 @@ const PersonalLendForm = ({ type = "EL-MEJOR-TRATO" }) => {
       <Formik
         enableReinitialize={true}
         initialValues={{
-          name: searchParams.get("name") || searchParams.get("nombre") || "",
-          cuit: searchParams.get("cuit") || searchParams.get("cuil") || "",
+          name: searchParams.get("nombre_completo") || searchParams.get("name") || searchParams.get("nombre") || "",
+          cuit: searchParams.get("dni_cuit") || searchParams.get("cuit") || searchParams.get("cuil") || "",
           email: searchParams.get("email") || searchParams.get("correo") || "",
           telephone: searchParams.get("telephone") || searchParams.get("telefono") || "",
-          situacion: searchParams.get("situacion") || searchParams.get("sit_laboral") || "",
-          ingresos: searchParams.get("ingresos") || "",
-          amount: searchParams.get("amount") || searchParams.get("monto") || "",
+          situacion: mapSituacionLaboral(searchParams.get("situacion_laboral")) || searchParams.get("situacion") || searchParams.get("sit_laboral") || "",
+          ingresos: mapIngresos(searchParams.get("ingresos_promedio")) || searchParams.get("ingresos") || "",
+          amount: searchParams.get("importe_solicitado") || searchParams.get("amount") || searchParams.get("monto") || "",
           terminos_y_condiciones: false,
         }}
         onSubmit={handleSubmit}
@@ -166,11 +193,11 @@ const PersonalLendForm = ({ type = "EL-MEJOR-TRATO" }) => {
             </div>
 
             <div className='input-container'>
-              <label>CUIL | CUIT</label>
+              <label>DNI | CUIL | CUIT</label>
               <Field
                 name='cuit'
                 type='number'
-                placeholder='00112223330'
+                placeholder='Ej: 11222333 o 20112223330'
               />
               <ErrorMessage
                 name='cuit'
