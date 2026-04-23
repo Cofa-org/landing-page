@@ -10,7 +10,7 @@ import Notification from "../Notifications/Notification.jsx";
 const mapSituacionLaboral = (value) => {
   if (!value) return null;
   const lowerValue = value.toLowerCase();
-  if (lowerValue.includes("dependencia") || lowerValue.includes("empleado")) return "relacion-dependencia";
+  if (lowerValue.includes("dependencia") || /\bempleado\b/.test(lowerValue)) return "relacion-dependencia";
   if (lowerValue.includes("monotributista") || lowerValue.includes("autónomo") || lowerValue.includes("autonomo")) return "monotributista";
   if (lowerValue.includes("informal") || lowerValue.includes("negro")) return "informal";
   if (lowerValue.includes("jubilado") || lowerValue.includes("pensionado")) return "jubilado-pensionado";
