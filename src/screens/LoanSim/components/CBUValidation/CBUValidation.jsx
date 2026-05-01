@@ -60,7 +60,7 @@ const CBUValidation = ({
         <span>
           Acepto los{" "}
           <a
-            href="https://cofa.com.ar/terminos-y-condiciones/#top"
+            href="https://cofa.com.ar/terminos-y-condiciones"
             target="_blank"
             rel="noopener noreferrer"
             className={styles.termsLink}
