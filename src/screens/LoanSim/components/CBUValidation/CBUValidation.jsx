@@ -4,7 +4,6 @@ import GenericForm from "../../../../Components/Forms/GenericForm/GenericForm";
 import GenericInput from "../../../../Components/Forms/GenericInput/GenericInput";
 import GenericButton from "../../../../Components/buttons/GenericButton/GenericButton.jsx";
 import { CBU_CONFIG } from "../../../../constants/LOAN_SIM.js";
-
 import styles from "./CBUValidation.module.css";
 
 const CBUValidation = ({
@@ -22,10 +21,10 @@ const CBUValidation = ({
   const [cbu, setCbu] = useState("");
   const [isUpdating, setIsUpdating] = useState(!isClient);
   const [accountType, setAccountType] = useState("cbu");
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   const prefix = cbu.length >= 3 ? cbu.slice(0, 3) : cbu.length === 0 ? "" : null;
 
-  // Validar código bancario cuando se ingresa
   useEffect(() => {
     if (!isClient || (isUpdating && accountType === "cbu")) {
       if (prefix !== null) {
@@ -49,6 +48,30 @@ const CBUValidation = ({
     setAccountType("cbu");
   };
 
+  const termsCheckbox = (
+    <div className={styles.termsContainer}>
+      <label className={styles.termsLabel}>
+        <input
+          type="checkbox"
+          checked={termsAccepted}
+          onChange={(e) => setTermsAccepted(e.target.checked)}
+          className={styles.termsCheckbox}
+        />
+        <span>
+          Acepto los{" "}
+          <a
+            href="https://cofa.com.ar/terminos-y-condiciones/#top"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.termsLink}
+          >
+            términos y condiciones
+          </a>
+        </span>
+      </label>
+    </div>
+  );
+
   return (
     <GenericForm
       title='Validá tu CBU'
@@ -65,12 +88,13 @@ const CBUValidation = ({
         <div className={styles.clientContainer}>
           <div className={styles.cbuBox}>{existingCbu}</div>
           <p className={styles.helperText}>¿Es este tu CBU correcto?</p>
+          {termsCheckbox}
           <div className={styles.buttonGroup}>
             <GenericButton
               type='submit'
               loading={loading}
               className={styles.flexButton}
-              disabled={loading || validandoBanco || codigoBancoError || error}
+              disabled={loading || validandoBanco || codigoBancoError || error || !termsAccepted}
             >
               Sí, es correcto
             </GenericButton>
@@ -79,7 +103,7 @@ const CBUValidation = ({
               variant='outline'
               onClick={handleToggleUpdate}
               className={styles.flexButton}
-              disabled={loading || validandoBanco || codigoBancoError || error}
+              disabled={loading || validandoBanco || codigoBancoError || error || !termsAccepted}
             >
               No, ingresar otro
             </GenericButton>
@@ -99,6 +123,7 @@ const CBUValidation = ({
         </div>
       ) : (
         <>
+          {termsCheckbox}
           {isClient && isUpdating && (
             <div className={styles.radioGroup}>
               <label className={styles.radioLabel}>
@@ -155,7 +180,11 @@ const CBUValidation = ({
             type='submit'
             loading={loading}
             disabled={
-              cbu.length !== CBU_CONFIG.CBU_LENGTH || validandoBanco || loading || codigoBancoError
+              cbu.length !== CBU_CONFIG.CBU_LENGTH ||
+              validandoBanco ||
+              loading ||
+              codigoBancoError ||
+              !termsAccepted
             }
           >
             Validar {accountType.toUpperCase()}
@@ -176,6 +205,7 @@ CBUValidation.propTypes = {
   codigoBancoError: PropTypes.string,
   validandoBanco: PropTypes.bool,
   validarCodigoBanco: PropTypes.func.isRequired,
+  scoringId: PropTypes.string,
 };
 
 export default CBUValidation;
