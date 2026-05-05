@@ -1,6 +1,12 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { MdInfoOutline } from "react-icons/md";
+import {
+  MdInfoOutline,
+  MdAttachMoney,
+  MdCalendarToday,
+  MdOutlinePayments,
+  MdArrowForward,
+} from "react-icons/md";
 import styles from "../../LoanSimScreen.module.css";
 
 const SimulationStep = ({
@@ -24,9 +30,18 @@ const SimulationStep = ({
   const cfto = (selectedPlan?.tasaOp * 100).toFixed(2) || 0;
   const tna = (cfta * 0.79).toFixed(2);
 
+  // Installment nudge logic
+  const sortedInstallments = [...installments].sort((a, b) => a - b);
+  const maxPlazo = Math.max(...installments);
+  const secondMaxPlazo =
+    sortedInstallments.length > 1 ? sortedInstallments[sortedInstallments.length - 2] : maxPlazo;
+
   return (
     <div className={styles.calculatorMainBox}>
-      <h2 className={styles.title}>¡Simulá tu préstamo! 💰</h2>
+      <h2 className={styles.title}>
+        <MdAttachMoney className={styles.headerIcon} />
+        Simulá tu préstamo
+      </h2>
       {nombreCompleto && <p className={styles.cuitDisplay}>{nombreCompleto}</p>}
 
       {/* Amount Slider */}
@@ -52,17 +67,19 @@ const SimulationStep = ({
 
       {/* Installments Selector */}
       <div className={styles.inputGroup}>
-        <label className={styles.label}>¿En cuántas cuotas? 📅</label>
+        <label className={styles.label}>
+          <MdCalendarToday className={styles.headerIcon} />
+          Elegí tu plan de cuotas
+        </label>
         <div className={styles.installmentGrid}>
-          {[...installments].sort((a, b) => a - b).map((plazo) => {
-            const max = Math.max(...installments);
-            const secondMax = installments.filter((p) => p !== max).length > 0
-              ? Math.max(...installments.filter((p) => p !== max))
-              : max;
-            const thirdMax = installments.filter((p) => p !== max && p !== secondMax).length > 0
-              ? Math.max(...installments.filter((p) => p !== max && p !== secondMax))
-              : secondMax;
-            const emoji = plazo === max ? "💰💰" : plazo === secondMax || plazo === thirdMax ? "💰" : "";
+          {sortedInstallments.map((plazo) => {
+            // const isRecommended = plazo === maxPlazo;
+            // const isPopular = plazo === secondMaxPlazo && sortedInstallments.length > 2;
+
+            let badgeText = "";
+            // if (isRecommended) badgeText = "CUOTA MÍNIMA";
+            // else if (isPopular) badgeText = "RECOMENDADO";
+
             return (
               <button
                 key={plazo}
@@ -72,7 +89,14 @@ const SimulationStep = ({
                 }`}
                 onClick={() => onInstallmentChange(plazo)}
               >
-                {plazo} cuotas {emoji}
+                {badgeText && (
+                  <span
+                    className={`${styles.installmentBadge} ${!isRecommended ? styles.installmentBadgeSecondary : ""}`}
+                  >
+                    {badgeText}
+                  </span>
+                )}
+                {plazo === 1 ? `${plazo} cuota` : `${plazo} cuotas`}
               </button>
             );
           })}
@@ -82,7 +106,10 @@ const SimulationStep = ({
       {/* Results Section */}
       <div className={styles.resultsBox}>
         <div className={styles.resultItem}>
-          <span className={styles.resultLabel}>Tu cuota mensual 💳</span>
+          <span className={styles.resultLabel}>
+            <MdOutlinePayments style={{ marginRight: "8px", verticalAlign: "middle" }} />
+            Tu cuota mensual
+          </span>
           <span className={`${styles.resultValue} ${styles.resultValueLarge}`}>
             {formatCurrency(selectedPlan?.valorCuota)}
           </span>
@@ -90,11 +117,14 @@ const SimulationStep = ({
       </div>
 
       <button
-        className='primary-btn'
-        style={{ marginTop: "24px" }}
+        className={styles["primary-btn"]}
+        style={{ marginTop: "48px" }}
         onClick={onNextStep}
       >
-        ¡Pedilo ahora! 🚀
+        ¡Pedilo ahora!
+        <MdArrowForward
+          color='#fff'
+        />
       </button>
 
       <div className={styles.footerRow}>
@@ -107,7 +137,7 @@ const SimulationStep = ({
           </div>
         </div>
       </div>
-      {error && <p className={styles.error}>{`🫣 ${error}`}</p>}
+      {error && <p className={styles.error}>{`⚠️ ${error}`}</p>}
     </div>
   );
 };

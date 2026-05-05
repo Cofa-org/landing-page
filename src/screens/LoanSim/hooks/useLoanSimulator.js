@@ -82,7 +82,7 @@ export const useLoanSimulator = () => {
         const params = {
           scoringId: scoringData.scoringId,
         };
-       
+      
         if(scoringData.tasaOperador && scoringData.plazoMaximoOperador) {
           params.tasaOperador = scoringData.tasaOperador;
           params.plazoMaximoOperador = scoringData.plazoMaximoOperador;
@@ -95,7 +95,7 @@ export const useLoanSimulator = () => {
         if (!isInitial && currentAmount > 0) {
           params.capitalSeleccionado = currentAmount;
         }
-
+        
         const response = await SimuladorService.calcularPlanes(params, controller.signal);
 
         // Discard response if this request was superseded by a newer one.
@@ -199,6 +199,7 @@ export const useLoanSimulator = () => {
           ...simulationData,
           planes_disponibles: undefined,
         };
+
         const payload = {
           scoringId: scoringData.scoringId,
           cuit: scoringData.cuit,
