@@ -14,6 +14,7 @@ export const OTP_CONFIG = {
 
 export const CBU_CONFIG = {
   CBU_LENGTH: 22,
+  CVU_LENGTH: 24,
 };
 
 export const UI_CONFIG = {

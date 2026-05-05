@@ -189,11 +189,11 @@ export default class SimuladorService {
     }
   }
 
-  static async validarCodigoBanco(codigo) {
+  static async validarCodigoBanco(codigo, accountType = 'cbu') {
     try {
       const url = `${LANDING_BACKEND_URL}/api/simulador-prestamos/validar-codigo-banco`;
       const apiKey = LANDING_BACKEND_API_KEY;
-      const body = { codigo };
+      const body = { codigo, accountType };
 
       const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, null);
 

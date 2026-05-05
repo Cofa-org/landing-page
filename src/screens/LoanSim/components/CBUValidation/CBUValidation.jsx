@@ -14,7 +14,9 @@ const CBUValidation = ({
   isClient,
   existingCbu,
   bancoEncontrado,
+  setBancoEncontrado,
   codigoBancoError,
+  setCodigoBancoError,
   validandoBanco,
   validarCodigoBanco,
 }) => {
@@ -22,16 +24,35 @@ const CBUValidation = ({
   const [isUpdating, setIsUpdating] = useState(!isClient);
   const [accountType, setAccountType] = useState("cbu");
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [lengthError, setLengthError] = useState(null);
 
-  const prefix = cbu.length >= 3 ? cbu.slice(0, 3) : cbu.length === 0 ? "" : null;
+  const CBU_LENGTH = accountType === 'cvu'
+    ? CBU_CONFIG.CVU_LENGTH
+    : CBU_CONFIG.CBU_LENGTH;
+
+  const PREFIX_LENGTH = accountType === 'cvu' ? 6 : 3;
+  const prefix = cbu.length >= PREFIX_LENGTH
+    ? cbu.slice(0, PREFIX_LENGTH)
+    : cbu.length === 0
+      ? ""
+      : null;
 
   useEffect(() => {
-    if (!isClient || (isUpdating && accountType === "cbu")) {
-      if (prefix !== null) {
-        validarCodigoBanco(prefix);
-      }
+    const shouldValidate = !isClient || (isClient && isUpdating);
+
+    if (prefix !== null && prefix.length === PREFIX_LENGTH && shouldValidate && cbu.length === CBU_LENGTH) {
+      validarCodigoBanco(prefix, accountType);
     }
-  }, [prefix, isClient, isUpdating, accountType, validarCodigoBanco]);
+  }, [prefix, isClient, isUpdating, accountType, validarCodigoBanco, cbu.length, CBU_LENGTH]);
+
+  useEffect(() => {
+    setLengthError(null);
+  }, [accountType]);
+
+  useEffect(() => {
+    setBancoEncontrado(null);
+    setCodigoBancoError(null);
+  }, [accountType]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -78,7 +99,7 @@ const CBUValidation = ({
       description={
         isClient && !isUpdating
           ? "Verificá que tu CBU sea el correcto para recibir el préstamo."
-          : `Ingresá los ${CBU_CONFIG.CBU_LENGTH} dígitos de tu ${accountType.toUpperCase()} para validar tu cuenta bancaria.`
+          : `Ingresá los ${CBU_LENGTH} dígitos de tu ${accountType.toUpperCase()} para validar tu cuenta bancaria.`
       }
       onSubmit={handleSubmit}
       onBack={onBack}
@@ -123,7 +144,6 @@ const CBUValidation = ({
         </div>
       ) : (
         <>
-          {termsCheckbox}
           {isClient && isUpdating && (
             <div className={styles.radioGroup}>
               <label className={styles.radioLabel}>
@@ -167,20 +187,27 @@ const CBUValidation = ({
               type='text'
               value={cbu}
               onChange={(e) => {
-                const val = e.target.value.replace(/\D/g, "").slice(0, CBU_CONFIG.CBU_LENGTH);
-                setCbu(val);
+                const rawValue = e.target.value;
+                const digitsOnly = rawValue.replace(/\D/g, "");
+                const hasExcessDigits = rawValue.replace(/\D/g, "").length > CBU_LENGTH;
+                if (hasExcessDigits) {
+                  setLengthError(`El ${accountType.toUpperCase()} debe tener ${CBU_LENGTH} dígitos`);
+                  return;
+                }
+                setLengthError(null);
+                setCbu(digitsOnly);
               }}
               placeholder='0000000000000000000000'
               required
-              error={error || codigoBancoError}
-              maxLength={CBU_CONFIG.CBU_LENGTH}
+              error={error || codigoBancoError || lengthError}
             />
           </div>
+          {termsCheckbox}
           <GenericButton
             type='submit'
             loading={loading}
             disabled={
-              cbu.length !== CBU_CONFIG.CBU_LENGTH ||
+              cbu.length !== CBU_LENGTH ||
               validandoBanco ||
               loading ||
               codigoBancoError ||

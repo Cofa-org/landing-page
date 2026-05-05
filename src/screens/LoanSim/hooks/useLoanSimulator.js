@@ -453,17 +453,22 @@ export const useLoanSimulator = () => {
     }
   };
 
-  const validarCodigoBancoHandler = useCallback(async (codigoValue) => {
-    if (codigoValue && codigoValue.length === 3) {
+  const validarCodigoBancoHandler = useCallback(async (codigoValue, accountType = 'cbu') => {
+    // codigoValue ya es el prefijo (3 o 6 dígitos), no el CBU/CVU completo
+    const longitudMinima = accountType === 'cvu' ? 6 : 3;
+
+    if (codigoValue && codigoValue.length === longitudMinima) {
       setValidandoBanco(true);
       try {
-        const response = await SimuladorService.validarCodigoBanco(codigoValue);
+        const response = await SimuladorService.validarCodigoBanco(codigoValue, accountType);
         if (response.success && response.exists) {
           setBancoEncontrado(response.data);
           setCodigoBancoError(null);
         } else {
           setBancoEncontrado(null);
-          setCodigoBancoError("Alguno de los dígitos ingresados no es correcto");
+          setCodigoBancoError(
+            response.message || "Alguno de los dígitos ingresados no es correcto"
+          );
         }
       } catch (err) {
         console.error("Error validando código bancario:", err);
@@ -490,8 +495,10 @@ export const useLoanSimulator = () => {
     cbu,
     loanInfo,
     loadingModal,
+    setBancoEncontrado,
     bancoEncontrado,
     codigoBancoError,
+    setCodigoBancoError,
     validandoBanco,
     handleAmountChange,
     handleInstallmentChange,
