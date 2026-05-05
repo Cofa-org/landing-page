@@ -43,6 +43,8 @@
 
 .inputGroup {
   margin-bottom: var(--spacing-xl);
+  display: flex;
+  flex-direction: column;
 }
 
 .labelWrapper {
@@ -53,9 +55,11 @@
 }
 
 .label {
-  font-size: 20px;
+  font-size: clamp(1rem, 2vw, 1.5rem);
   font-weight: 500;
   color: var(--text-color);
+  margin-bottom: var(--spacing-sm);
+
 }
 
 .amountValue {
@@ -73,6 +77,7 @@
   -webkit-appearance: none;
   appearance: none;
   cursor: pointer;
+  margin-bottom: var(--spacing-sm);
 }
 
 .slider::-webkit-slider-thumb {
@@ -89,7 +94,7 @@
 
 .installmentGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
   gap: var(--spacing-sm);
 }
 
@@ -103,6 +108,7 @@
   cursor: pointer;
   transition: all 0.2s ease;
   color: var(--text-color);
+  /* width: 100%; */
 }
 
 .installmentBtnActive {

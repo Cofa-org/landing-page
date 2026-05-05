@@ -46,6 +46,8 @@ export const useLoanSimulator = () => {
             cuit: response.data.cuit || null,
             nombreCompleto: response.data.nombreCompleto || null,
             capitalMaximoOperador: response.data.capitalMaximoOperador || null,
+            tasaOperador: response.data.tasaOperador || null,
+            plazoMaximoOperador: response.data.plazoMaximoOperador || null,
           });
         } else {
           setError(response.mensaje || "El enlace de acceso es inválido o ha expirado.");
@@ -80,6 +82,11 @@ export const useLoanSimulator = () => {
         const params = {
           scoringId: scoringData.scoringId,
         };
+       
+        if(scoringData.tasaOperador && scoringData.plazoMaximoOperador) {
+          params.tasaOperador = scoringData.tasaOperador;
+          params.plazoMaximoOperador = scoringData.plazoMaximoOperador;
+        }
 
         if (scoringData.capitalMaximoOperador) {
           params.capitalMaximoOperador = scoringData.capitalMaximoOperador;
@@ -112,13 +119,19 @@ export const useLoanSimulator = () => {
           if (isInitial) {
             const capMax = Number(newData.capital_maximo_a_ofrecer);
             setAmount(capMax);
-            setInstallment(newData.plazo_utilizado);
+            // Set default to maximum available plan to encourage higher cuota selection.
+            const plazosDisponibles = newData.planes_disponibles?.map((p) => p.plazo) || [];
+            setInstallment(
+              plazosDisponibles.length > 0
+                ? Math.max(...plazosDisponibles)
+                : (newData.plazo_utilizado ?? null),
+            );
           } else {
             // Keep the selected installment if still valid for the new capital;
-            // otherwise fall back to the first available plan to avoid a stale value.
+            // otherwise fall back to the maximum available plan to encourage higher cuota selection.
             const plazosDisponibles = newData.planes_disponibles?.map((p) => p.plazo) || [];
             setInstallment((prev) =>
-              plazosDisponibles.includes(prev) ? prev : (plazosDisponibles[0] ?? null),
+              plazosDisponibles.includes(prev) ? prev : (Math.max(...plazosDisponibles) ?? null),
             );
           }
         } else {

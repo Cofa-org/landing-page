@@ -26,13 +26,13 @@ const SimulationStep = ({
 
   return (
     <div className={styles.calculatorMainBox}>
-      <h2 className={styles.title}>Simulá tu préstamo</h2>
+      <h2 className={styles.title}>¡Simulá tu préstamo! 💰</h2>
       {nombreCompleto && <p className={styles.cuitDisplay}>{nombreCompleto}</p>}
 
       {/* Amount Slider */}
       <div className={styles.inputGroup}>
         <div className={styles.labelWrapper}>
-          <label className={styles.label}>Importe a solicitar</label>
+          <label className={styles.label}>¿Cuánto necesitás?</label>
           <span className={styles.amountValue}>{formatCurrency(amount)}</span>
         </div>
         <input
@@ -52,27 +52,37 @@ const SimulationStep = ({
 
       {/* Installments Selector */}
       <div className={styles.inputGroup}>
-        <label className={styles.label}>Cantidad de cuotas</label>
+        <label className={styles.label}>¿En cuántas cuotas? 📅</label>
         <div className={styles.installmentGrid}>
-          {installments.map((plazo) => (
-            <button
-              key={plazo}
-              type='button'
-              className={`${styles.installmentBtn} ${
-                installment === plazo ? styles.installmentBtnActive : ""
-              }`}
-              onClick={() => onInstallmentChange(plazo)}
-            >
-              {plazo} cuotas
-            </button>
-          ))}
+          {[...installments].sort((a, b) => a - b).map((plazo) => {
+            const max = Math.max(...installments);
+            const secondMax = installments.filter((p) => p !== max).length > 0
+              ? Math.max(...installments.filter((p) => p !== max))
+              : max;
+            const thirdMax = installments.filter((p) => p !== max && p !== secondMax).length > 0
+              ? Math.max(...installments.filter((p) => p !== max && p !== secondMax))
+              : secondMax;
+            const emoji = plazo === max ? "💰💰" : plazo === secondMax || plazo === thirdMax ? "💰" : "";
+            return (
+              <button
+                key={plazo}
+                type='button'
+                className={`${styles.installmentBtn} ${
+                  installment === plazo ? styles.installmentBtnActive : ""
+                }`}
+                onClick={() => onInstallmentChange(plazo)}
+              >
+                {plazo} cuotas {emoji}
+              </button>
+            );
+          })}
         </div>
       </div>
 
       {/* Results Section */}
       <div className={styles.resultsBox}>
         <div className={styles.resultItem}>
-          <span className={styles.resultLabel}>Tu cuota mensual:</span>
+          <span className={styles.resultLabel}>Tu cuota mensual 💳</span>
           <span className={`${styles.resultValue} ${styles.resultValueLarge}`}>
             {formatCurrency(selectedPlan?.valorCuota)}
           </span>
@@ -84,7 +94,7 @@ const SimulationStep = ({
         style={{ marginTop: "24px" }}
         onClick={onNextStep}
       >
-        ¡Pedilo ahora!
+        ¡Pedilo ahora! 🚀
       </button>
 
       <div className={styles.footerRow}>
