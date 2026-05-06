@@ -191,6 +191,8 @@ export default class SimuladorService {
 
   static async validarCodigoBanco(codigo, accountType = 'cbu') {
     try {
+
+      console.log("Validando código SERVICE:", { codigo, accountType });
       const url = `${LANDING_BACKEND_URL}/api/simulador-prestamos/validar-codigo-banco`;
       const apiKey = LANDING_BACKEND_API_KEY;
       const body = { codigo, accountType };

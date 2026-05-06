@@ -24,29 +24,45 @@ const CBUValidation = ({
   const [isUpdating, setIsUpdating] = useState(!isClient);
   const [accountType, setAccountType] = useState("cbu");
   const [termsAccepted, setTermsAccepted] = useState(false);
-  const [lengthError, setLengthError] = useState(null);
+  const [structureError, setStructureError] = useState(null);
 
   const CBU_LENGTH = accountType === 'cvu'
     ? CBU_CONFIG.CVU_LENGTH
     : CBU_CONFIG.CBU_LENGTH;
 
-  const PREFIX_LENGTH = accountType === 'cvu' ? 6 : 3;
+  const PREFIX_LENGTH = accountType === 'cvu' ? 8 : 3;
   const prefix = cbu.length >= PREFIX_LENGTH
     ? cbu.slice(0, PREFIX_LENGTH)
     : cbu.length === 0
       ? ""
       : null;
 
+  const validateCvuStructure = (value) => {
+    
+    if (value.slice(0, 3) !== CBU_CONFIG.CVU_PREFIX) {
+      return "El CVU debe comenzar con 000";
+    }
+    if (value[CBU_CONFIG.CVU_CHECK_DIGIT_POSITION] !== CBU_CONFIG.CVU_CHECK_DIGIT_VALUE) {
+      return "El octavo dígito del CVU debe ser 1";
+    }
+    const hasExcessDigits = value.length > CBU_LENGTH;
+    if (hasExcessDigits) {
+      return `El ${accountType.toUpperCase()} debe tener ${CBU_LENGTH} dígitos`;
+    }
+    return null;
+  };
+
   useEffect(() => {
     const shouldValidate = !isClient || (isClient && isUpdating);
 
-    if (prefix !== null && prefix.length === PREFIX_LENGTH && shouldValidate && cbu.length === CBU_LENGTH) {
+    if (prefix !== null && prefix?.length === PREFIX_LENGTH && shouldValidate && cbu?.length >= 8 && !structureError) {
+      console.log("ENTRO")
       validarCodigoBanco(prefix, accountType);
     }
   }, [prefix, isClient, isUpdating, accountType, validarCodigoBanco, cbu.length, CBU_LENGTH]);
 
   useEffect(() => {
-    setLengthError(null);
+    setStructureError(null);
   }, [accountType]);
 
   useEffect(() => {
@@ -176,9 +192,9 @@ const CBUValidation = ({
           )}
           <div>
             <div className={styles.bancoContainer}>
-              <label className={styles.bancoLabel}>{accountType.toUpperCase()}</label>
+              <label className={styles.bancoLabel}>{accountType.toUpperCase()} {`${cbu.length}/22`}</label>
               {bancoEncontrado && (
-                <span className={styles.bancoName}>✓ {bancoEncontrado.descripcion}</span>
+                <span className={styles.bancoName}>✓ {bancoEncontrado?.razon_social}</span>
               )}
             </div>
             <GenericInput
@@ -188,18 +204,23 @@ const CBUValidation = ({
               value={cbu}
               onChange={(e) => {
                 const rawValue = e.target.value;
-                const digitsOnly = rawValue.replace(/\D/g, "");
-                const hasExcessDigits = rawValue.replace(/\D/g, "").length > CBU_LENGTH;
-                if (hasExcessDigits) {
-                  setLengthError(`El ${accountType.toUpperCase()} debe tener ${CBU_LENGTH} dígitos`);
-                  return;
+                if(rawValue.length === 0) {
+                  setCodigoBancoError(null)
+                  setStructureError(null)
+                  setBancoEncontrado(null)
                 }
-                setLengthError(null);
+                const digitsOnly = rawValue.replace(/\D/g, "");
                 setCbu(digitsOnly);
+                if (accountType === 'cvu' && digitsOnly.length >= 8) {
+                  const structureError = validateCvuStructure(digitsOnly);
+                  setStructureError(structureError);
+                } else {
+                  setStructureError(null);
+                }
               }}
               placeholder='0000000000000000000000'
               required
-              error={error || codigoBancoError || lengthError}
+              error={error || codigoBancoError || structureError}
             />
           </div>
           {termsCheckbox}
@@ -211,7 +232,8 @@ const CBUValidation = ({
               validandoBanco ||
               loading ||
               codigoBancoError ||
-              !termsAccepted
+              !termsAccepted ||
+              (accountType === 'cvu' && structureError)
             }
           >
             Validar {accountType.toUpperCase()}

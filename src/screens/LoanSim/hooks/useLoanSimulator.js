@@ -455,12 +455,13 @@ export const useLoanSimulator = () => {
 
   const validarCodigoBancoHandler = useCallback(async (codigoValue, accountType = 'cbu') => {
     // codigoValue ya es el prefijo (3 o 6 dígitos), no el CBU/CVU completo
-    const longitudMinima = accountType === 'cvu' ? 6 : 3;
-
+    const longitudMinima = accountType === 'cvu' ? 8 : 3;
+    console.log("Validando código bancario:", { codigoValue, accountType });
     if (codigoValue && codigoValue.length === longitudMinima) {
       setValidandoBanco(true);
       try {
         const response = await SimuladorService.validarCodigoBanco(codigoValue, accountType);
+        console.log(response)
         if (response.success && response.exists) {
           setBancoEncontrado(response.data);
           setCodigoBancoError(null);
