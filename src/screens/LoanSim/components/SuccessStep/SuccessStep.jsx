@@ -18,7 +18,6 @@ const SuccessStep = ({ handleInfoPrestamo, loanInfo, loadingModal, simulationDat
   useEffect(() => {
     const checkCookie = async () => {
       const value = await getCookie(COOKIE_CONFIG.NAME);
-      console.log(value);
       setTwoHourDurationCookie(value);
     };
     checkCookie();
@@ -34,9 +33,9 @@ const SuccessStep = ({ handleInfoPrestamo, loanInfo, loadingModal, simulationDat
       </p>
       <div className={styles.buttonContainer}>
         <button
-          className={`primary-btn ${loadingModal || twoHourDurationCookie ? styles.disabled : ""}`}
+          className={`primary-btn ${loadingModal || !twoHourDurationCookie ? styles.disabled : ""}`}
           onClick={onInfoPrestamo}
-          disabled={loadingModal || twoHourDurationCookie}
+          disabled={loadingModal || !twoHourDurationCookie}
           style={{ flex: 1 }}
           aria-label='Info prestamo'
         >
