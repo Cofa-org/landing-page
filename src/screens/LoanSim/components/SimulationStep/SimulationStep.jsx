@@ -25,7 +25,7 @@ const SimulationStep = ({
 }) => {
   const formatCurrency = (value) =>
     new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS" }).format(value || 0);
-
+console.log(simulationData)
   const cfta = (simulationData?.tasa_nominal * 100).toFixed(2) || 0;
   const cfto = (selectedPlan?.tasaOp * 100).toFixed(2) || 0;
   const tna = (cfta * 0.79).toFixed(2);
@@ -64,7 +64,7 @@ const SimulationStep = ({
           <span className={styles.label}>{formatCurrency(maxOffer)}</span>
         </div>
       </div>
-
+      <span className={styles.depositInfo}>{`Se te depositaran $${simulationData?.capital_utilizado - simulationData?.cuotaADescontar} - Se descuenta cuota pendiente $${simulationData?.cuotaADescontar}`}</span>
       {/* Installments Selector */}
       <div className={styles.inputGroup}>
         <label className={styles.label}>
@@ -122,9 +122,7 @@ const SimulationStep = ({
         onClick={onNextStep}
       >
         ¡Pedilo ahora!
-        <MdArrowForward
-          color='#fff'
-        />
+        <MdArrowForward color='#fff' />
       </button>
 
       <div className={styles.footerRow}>

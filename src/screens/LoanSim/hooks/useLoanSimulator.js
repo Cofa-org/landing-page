@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
+import { getCookie, setCookie } from "../../../lib/utils.js";
 import { useDebounce } from "../../../hooks/useDebounce";
 import SimuladorService from "../../../services/simuladorService";
 import { COOKIE_CONFIG, LOAN_SIM_STEPS } from "../../../constants/LOAN_SIM.js";
@@ -39,7 +40,7 @@ export const useLoanSimulator = () => {
       setLoading(true);
       try {
         const response = await LinkResolutionService.consumeLink(shortId);
-
+  
         if (response.success && response.data) {
           setScoringData({
             scoringId: String(response.data.scoringId),
@@ -48,6 +49,7 @@ export const useLoanSimulator = () => {
             capitalMaximoOperador: response.data.capitalMaximoOperador || null,
             tasaOperador: response.data.tasaOperador || null,
             plazoMaximoOperador: response.data.plazoMaximoOperador || null,
+            cuotaADescontar: response.data.cuotaADescontar || null,
           });
         } else {
           setError(response.mensaje || "El enlace de acceso es inválido o ha expirado.");
@@ -103,6 +105,10 @@ export const useLoanSimulator = () => {
 
         if (response.success) {
           const newData = response.data;
+
+          if(scoringData.cuotaADescontar) {
+            newData.cuotaADescontar = scoringData.cuotaADescontar;
+          }
 
           setSimulationData(newData);
           const existingState = newData?.existingSimulation?.estado || null;
@@ -375,7 +381,7 @@ export const useLoanSimulator = () => {
           expires: COOKIE_CONFIG.EXPIRY_DAYS,
           partitioned: true,
         };
-        await cookieStore.set(cookieOptions);
+        await setCookie(COOKIE_CONFIG.NAME, scoringData.scoringId, COOKIE_CONFIG.EXPIRY_DAYS);
         setStep(LOAN_SIM_STEPS.COMPLETADO);
       } else {
         const esErrorCoherencia =
@@ -410,8 +416,7 @@ export const useLoanSimulator = () => {
   const handleInfoPrestamo = async () => {
     setLoadingModal(true);
     try {
-      const cookie = await cookieStore.get(COOKIE_CONFIG.NAME);
-      const scoringId = cookie?.value;
+      const scoringId = await getCookie(COOKIE_CONFIG.NAME);
       if (!scoringId) {
         setError("No se encontró el scoringId. Inténtalo de nuevo.");
         return false;
@@ -455,13 +460,12 @@ export const useLoanSimulator = () => {
 
   const validarCodigoBancoHandler = useCallback(async (codigoValue, accountType = 'cbu') => {
     // codigoValue ya es el prefijo (3 o 6 dígitos), no el CBU/CVU completo
-    const longitudMinima = accountType === 'cvu' ? 8 : 3;
-    console.log("Validando código bancario:", { codigoValue, accountType });
+    const longitudMinima = accountType === 'cvu' ? 6 : 3;
+
     if (codigoValue && codigoValue.length === longitudMinima) {
       setValidandoBanco(true);
       try {
         const response = await SimuladorService.validarCodigoBanco(codigoValue, accountType);
-        console.log(response)
         if (response.success && response.exists) {
           setBancoEncontrado(response.data);
           setCodigoBancoError(null);

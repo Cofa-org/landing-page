@@ -1,95 +1,36 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 import GenericForm from "../../../../Components/Forms/GenericForm/GenericForm";
 import GenericInput from "../../../../Components/Forms/GenericInput/GenericInput";
 import GenericButton from "../../../../Components/buttons/GenericButton/GenericButton.jsx";
-import { CBU_CONFIG } from "../../../../constants/LOAN_SIM.js";
+import { useCBUValidation } from "../../hooks/useCBUValidation";
 import styles from "./CBUValidation.module.css";
 
-const CBUValidation = ({
-  onValidate,
-  loading,
-  error,
-  onBack,
-  isClient,
-  existingCbu,
-  bancoEncontrado,
-  setBancoEncontrado,
-  codigoBancoError,
-  setCodigoBancoError,
-  validandoBanco,
-  validarCodigoBanco,
-}) => {
-  const [cbu, setCbu] = useState("");
-  const [isUpdating, setIsUpdating] = useState(!isClient);
-  const [accountType, setAccountType] = useState("cbu");
-  const [termsAccepted, setTermsAccepted] = useState(false);
-  const [structureError, setStructureError] = useState(null);
+const CBUValidation = ({ onValidate, loading, error, onBack, isClient, existingCbu }) => {
+  const {
+    cbu,
+    setCbu,
+    isUpdating,
+    accountType,
+    setAccountType,
+    termsAccepted,
+    setTermsAccepted,
+    structureError,
+    bancoEncontrado,
+    setBancoEncontrado,
+    codigoBancoError,
+    validandoBanco,
+    handleSubmit,
+    handleToggleUpdate,
+    CBU_LENGTH,
+  } = useCBUValidation(isClient, existingCbu, onValidate);
 
-  const CBU_LENGTH = accountType === 'cvu'
-    ? CBU_CONFIG.CVU_LENGTH
-    : CBU_CONFIG.CBU_LENGTH;
-
-  const PREFIX_LENGTH = accountType === 'cvu' ? 8 : 3;
-  const prefix = cbu.length >= PREFIX_LENGTH
-    ? cbu.slice(0, PREFIX_LENGTH)
-    : cbu.length === 0
-      ? ""
-      : null;
-
-  const validateCvuStructure = (value) => {
-    
-    if (value.slice(0, 3) !== CBU_CONFIG.CVU_PREFIX) {
-      return "El CVU debe comenzar con 000";
-    }
-    if (value[CBU_CONFIG.CVU_CHECK_DIGIT_POSITION] !== CBU_CONFIG.CVU_CHECK_DIGIT_VALUE) {
-      return "El octavo dígito del CVU debe ser 1";
-    }
-    const hasExcessDigits = value.length > CBU_LENGTH;
-    if (hasExcessDigits) {
-      return `El ${accountType.toUpperCase()} debe tener ${CBU_LENGTH} dígitos`;
-    }
-    return null;
-  };
-
-  useEffect(() => {
-    const shouldValidate = !isClient || (isClient && isUpdating);
-
-    if (prefix !== null && prefix?.length === PREFIX_LENGTH && shouldValidate && cbu?.length >= 8 && !structureError) {
-      console.log("ENTRO")
-      validarCodigoBanco(prefix, accountType);
-    }
-  }, [prefix, isClient, isUpdating, accountType, validarCodigoBanco, cbu.length, CBU_LENGTH]);
-
-  useEffect(() => {
-    setStructureError(null);
-  }, [accountType]);
-
-  useEffect(() => {
-    setBancoEncontrado(null);
-    setCodigoBancoError(null);
-  }, [accountType]);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (isClient && !isUpdating) {
-      onValidate(existingCbu, "cbu");
-    } else if (cbu) {
-      onValidate(cbu, accountType);
-    }
-  };
-
-  const handleToggleUpdate = () => {
-    setIsUpdating(true);
-    setCbu("");
-    setAccountType("cbu");
-  };
-
+  
   const termsCheckbox = (
     <div className={styles.termsContainer}>
       <label className={styles.termsLabel}>
         <input
-          type="checkbox"
+          type='checkbox'
           checked={termsAccepted}
           onChange={(e) => setTermsAccepted(e.target.checked)}
           className={styles.termsCheckbox}
@@ -97,9 +38,9 @@ const CBUValidation = ({
         <span>
           Acepto los{" "}
           <a
-            href="https://cofa.com.ar/terminos-y-condiciones"
-            target="_blank"
-            rel="noopener noreferrer"
+            href='https://cofa.com.ar/terminos-y-condiciones'
+            target='_blank'
+            rel='noopener noreferrer'
             className={styles.termsLink}
           >
             términos y condiciones
@@ -192,7 +133,9 @@ const CBUValidation = ({
           )}
           <div>
             <div className={styles.bancoContainer}>
-              <label className={styles.bancoLabel}>{accountType.toUpperCase()} {`${cbu.length}/22`}</label>
+              <label className={styles.bancoLabel}>
+                {accountType.toUpperCase()} {`${cbu.length}/22`}
+              </label>
               {bancoEncontrado && (
                 <span className={styles.bancoName}>✓ {bancoEncontrado?.razon_social}</span>
               )}
@@ -202,22 +145,7 @@ const CBUValidation = ({
               name={accountType}
               type='text'
               value={cbu}
-              onChange={(e) => {
-                const rawValue = e.target.value;
-                if(rawValue.length === 0) {
-                  setCodigoBancoError(null)
-                  setStructureError(null)
-                  setBancoEncontrado(null)
-                }
-                const digitsOnly = rawValue.replace(/\D/g, "");
-                setCbu(digitsOnly);
-                if (accountType === 'cvu' && digitsOnly.length >= 8) {
-                  const structureError = validateCvuStructure(digitsOnly);
-                  setStructureError(structureError);
-                } else {
-                  setStructureError(null);
-                }
-              }}
+              onChange={(e) => setCbu(e.target.value)}
               placeholder='0000000000000000000000'
               required
               error={error || codigoBancoError || structureError}
@@ -233,7 +161,7 @@ const CBUValidation = ({
               loading ||
               codigoBancoError ||
               !termsAccepted ||
-              (accountType === 'cvu' && structureError)
+              (accountType === "cvu" && structureError)
             }
           >
             Validar {accountType.toUpperCase()}
@@ -250,11 +178,6 @@ CBUValidation.propTypes = {
   error: PropTypes.string,
   isClient: PropTypes.bool,
   existingCbu: PropTypes.string,
-  bancoEncontrado: PropTypes.object,
-  codigoBancoError: PropTypes.string,
-  validandoBanco: PropTypes.bool,
-  validarCodigoBanco: PropTypes.func.isRequired,
-  scoringId: PropTypes.string,
 };
 
 export default CBUValidation;
