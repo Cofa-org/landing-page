@@ -5,7 +5,7 @@ import { COOKIE_CONFIG, UI_CONFIG } from "../../../../constants/LOAN_SIM.js";
 import LoanInfoModal from "../LoanInfoModal/LoanInfoModal.jsx";
 import { getCookie } from "../../../../lib/utils.js";
 
-const SuccessStep = ({ handleInfoPrestamo, loanInfo, loadingModal }) => {
+const SuccessStep = ({ handleInfoPrestamo, loanInfo, loadingModal, simulationData }) => {
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [twoHourDurationCookie, setTwoHourDurationCookie] = useState(null);
   const onInfoPrestamo = async () => {
@@ -18,6 +18,7 @@ const SuccessStep = ({ handleInfoPrestamo, loanInfo, loadingModal }) => {
   useEffect(() => {
     const checkCookie = async () => {
       const value = await getCookie(COOKIE_CONFIG.NAME);
+      console.log(value);
       setTwoHourDurationCookie(value);
     };
     checkCookie();
@@ -33,9 +34,9 @@ const SuccessStep = ({ handleInfoPrestamo, loanInfo, loadingModal }) => {
       </p>
       <div className={styles.buttonContainer}>
         <button
-          className={`primary-btn ${loadingModal || !twoHourDurationCookie ? styles.disabled : ""}`}
+          className={`primary-btn ${loadingModal || twoHourDurationCookie ? styles.disabled : ""}`}
           onClick={onInfoPrestamo}
-          disabled={loadingModal || !twoHourDurationCookie}
+          disabled={loadingModal || twoHourDurationCookie}
           style={{ flex: 1 }}
           aria-label='Info prestamo'
         >
@@ -53,6 +54,7 @@ const SuccessStep = ({ handleInfoPrestamo, loanInfo, loadingModal }) => {
         <LoanInfoModal
           loanInfo={loanInfo}
           closeModal={() => setShowInfoModal(false)}
+          simulationData={simulationData}
         />
       )}
     </div>

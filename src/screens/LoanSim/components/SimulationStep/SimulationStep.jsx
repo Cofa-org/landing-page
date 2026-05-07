@@ -25,12 +25,14 @@ const SimulationStep = ({
 }) => {
   const formatCurrency = (value) =>
     new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS" }).format(value || 0);
-console.log(simulationData)
   const cfta = (simulationData?.tasa_nominal * 100).toFixed(2) || 0;
   const cfto = (selectedPlan?.tasaOp * 100).toFixed(2) || 0;
   const tna = (cfta * 0.79).toFixed(2);
+  const usedCapital = simulationData?.capital_utilizado;
+  const discountInstallment = simulationData?.cuotaADescontar;
+  const installmentNbr = simulationData?.nroCuota;
+  const loanNbr = simulationData?.nroPrestamo;
 
-  // Installment nudge logic
   const sortedInstallments = [...installments].sort((a, b) => a - b);
   const maxPlazo = Math.max(...installments);
   const secondMaxPlazo =
@@ -64,7 +66,12 @@ console.log(simulationData)
           <span className={styles.label}>{formatCurrency(maxOffer)}</span>
         </div>
       </div>
-      <span className={styles.depositInfo}>{`Se te depositaran $${simulationData?.capital_utilizado - simulationData?.cuotaADescontar} - Se descuenta cuota pendiente $${simulationData?.cuotaADescontar}`}</span>
+      {discountInstallment && installmentNbr && loanNbr && (
+        <span className={styles.depositInfo}>
+          <i>{`Se te depositaran $${usedCapital - discountInstallment}.`}</i>
+          <i>{`Se descontara la cuota pendiente Nro. ${installmentNbr} del préstamo Nro. ${loanNbr} por un monto de $${discountInstallment}`}</i>
+        </span>
+      )}
       {/* Installments Selector */}
       <div className={styles.inputGroup}>
         <label className={styles.label}>

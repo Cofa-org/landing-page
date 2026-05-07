@@ -363,8 +363,10 @@
 }
 
 .depositInfo {
-  display: block;
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  /* text-align: center; */
   font-size: 13px;
   color: #6c757d;
   margin: var(--spacing-sm) 0 var(--spacing-md);

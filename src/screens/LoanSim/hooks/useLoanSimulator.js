@@ -50,6 +50,8 @@ export const useLoanSimulator = () => {
             tasaOperador: response.data.tasaOperador || null,
             plazoMaximoOperador: response.data.plazoMaximoOperador || null,
             cuotaADescontar: response.data.cuotaADescontar || null,
+            nroCuota: response.data.nroCuota || null,
+            nroPrestamo: response.data.nroPrestamo || null,
           });
         } else {
           setError(response.mensaje || "El enlace de acceso es inválido o ha expirado.");
@@ -109,7 +111,13 @@ export const useLoanSimulator = () => {
           if(scoringData.cuotaADescontar) {
             newData.cuotaADescontar = scoringData.cuotaADescontar;
           }
-
+          if(scoringData.nroCuota) {
+            newData.nroCuota = scoringData.nroCuota;
+          }
+          if(scoringData.nroPrestamo) {
+            newData.nroPrestamo = scoringData.nroPrestamo;
+          }
+    
           setSimulationData(newData);
           const existingState = newData?.existingSimulation?.estado || null;
 

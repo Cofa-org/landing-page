@@ -168,6 +168,7 @@ const LoanSimScreen = () => {
             handleInfoPrestamo={handleInfoPrestamo}
             loanInfo={loanInfo}
             loadingModal={loadingModal}
+            simulationData={simulationData}
           />
         );
 

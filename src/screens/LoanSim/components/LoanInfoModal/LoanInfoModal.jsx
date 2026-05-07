@@ -1,73 +1,36 @@
 import React from "react";
-import { jsPDF } from "jspdf";
+import { usePDFExport } from "../../../../hooks/usePDFExport";
 import styles from "./LoanInfoModal.module.css";
 
-const LoanInfoModal = ({ loanInfo, closeModal }) => {
-  const generatePDF = async () => {
-    const pdf = new jsPDF();
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const pageHeight = pdf.internal.pageSize.getHeight();
-    let yPosition = 40;
+const LoanInfoModal = ({ loanInfo, closeModal, simulationData }) => {
+  const usedCapital = simulationData?.capital_utilizado;
+  const discountInstallment = simulationData?.cuotaADescontar;
+  const installmentNbr = simulationData?.nroCuota;
+  const loanNbr = simulationData?.nroPrestamo;
 
-    // Cargar logo
-    const logoImg = new Image();
-    logoImg.src = "/Logo.png"; // Convierte Logo.svg a Logo.png y colócalo en public/
-    await new Promise((resolve) => {
-      logoImg.onload = resolve;
-    });
+  const fields = [
+    { label: "Fecha de solicitud", value: loanInfo.FechaDeSolicitud, type: "text" },
+    { label: "Capital del préstamo", value: loanInfo.CapitalDelPrestamo, type: "currency" },
+    ...(discountInstallment && installmentNbr && loanNbr
+      ? [{
+          label: "",
+          value: `Se te depositaran $${usedCapital - discountInstallment}. Se descontara la cuota pendiente Nro. ${installmentNbr} del préstamo Nro. ${loanNbr} por un monto de $${discountInstallment}`,
+          type: "text",
+        }]
+      : []),
+    { label: "Total de intereses", value: loanInfo.TotalDeIntereses, type: "currency" },
+    { label: "Cantidad de cuotas", value: loanInfo.CantidadDeCuotas, type: "text" },
+    { label: "Monto cuota", value: loanInfo.MontoCuota, type: "currency" },
+    { label: "CFTO", value: loanInfo.CFTO, type: "percent" },
+    { label: "TNA", value: loanInfo.TNA, type: "percent" },
+    { label: "CFTA", value: loanInfo.CFTA, type: "percent" },
+  ];
 
-    // Agregar logo
-    pdf.addImage(logoImg, "PNG", 10, 10, 30, 12);
-
-    // Título
-    pdf.setFontSize(20);
-    pdf.setTextColor(36, 149, 87); // Verde COFA
-    pdf.text("Información del Préstamo", pageWidth / 2, yPosition, { align: "center" });
-    yPosition += 30;
-
-    // Fondo para sección
-    pdf.setFillColor(240, 240, 240);
-    pdf.rect(10, yPosition - 10, pageWidth - 20, 120, "F");
-    yPosition += 10;
-
-    // Información
-    pdf.setFontSize(12);
-    pdf.setTextColor(0, 0, 0);
-    const info = [
-      `Fecha de solicitud: ${loanInfo.FechaDeSolicitud}`,
-      `Capital del préstamo: ${loanInfo.CapitalDelPrestamo}`,
-      `Total de intereses: ${loanInfo.TotalDeIntereses}`,
-      `Cantidad de cuotas: ${loanInfo.CantidadDeCuotas}`,
-      `Monto cuota: ${loanInfo.MontoCuota}`,
-      `CFTO: ${loanInfo.CFTO}`,
-      `TNA: ${loanInfo.TNA}`,
-      `CFTA: ${loanInfo.CFTA}`,
-    ];
-
-    info.forEach((item) => {
-      const colonIndex = item.indexOf(":");
-      const label = item.substring(0, colonIndex + 1);
-      const value = item.substring(colonIndex + 1).trim();
-      pdf.setFont("helvetica", "bold");
-      pdf.text(label, 20, yPosition);
-      pdf.setFont("helvetica", "normal");
-      pdf.text(value, 100, yPosition);
-      yPosition += 10;
-    });
-
-    // Pie de página
-    yPosition += 20;
-    pdf.setFontSize(10);
-    pdf.setTextColor(100, 100, 100);
-    const footerText = "Generado por COFA -";
-    const textWidth = pdf.getTextWidth(footerText);
-    const textX = pageWidth / 2 - textWidth / 2;
-    pdf.text(footerText, textX, pageHeight - 20);
-    // Agregar logo pequeño al lado
-    pdf.addImage(logoImg, "PNG", textX + textWidth + 5, pageHeight - 27, 20, 8);
-
-    pdf.save("informacion-prestamo.pdf");
-  };
+  const { generatePDF } = usePDFExport({
+    title: "Información del Préstamo",
+    filename: "informacion-prestamo.pdf",
+    fields,
+  });
 
   if (!loanInfo) return null;
 
@@ -91,6 +54,12 @@ const LoanInfoModal = ({ loanInfo, closeModal }) => {
           <li>
             <strong>Capital del préstamo:</strong> {loanInfo.CapitalDelPrestamo}
           </li>
+          {discountInstallment && installmentNbr && loanNbr && (
+            <li className={styles.loanmsg}>
+              <i>{`Se te depositaran $${usedCapital - discountInstallment}.`}</i>
+              <i>{`Se descontara la cuota pendiente Nro. ${installmentNbr} del préstamo Nro. ${loanNbr} por un monto de $${discountInstallment}`}</i>
+            </li>
+          )}
           <li>
             <strong>Total de intereses:</strong> {loanInfo.TotalDeIntereses}
           </li>
