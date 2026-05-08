@@ -9,7 +9,7 @@ import {
   CompliancePEPForm,
 } from "./subcomponents/ComplianceSubcomponents";
 import styles from "./ComplianceStep.module.css";
-import BackButton from "../../../../Components/buttons/backbutton/Backbutton.jsx";
+import BackButton from "../../../../Components/buttons/backbutton/BackButton.jsx";
 import { COMPLIANCE_STEPS } from "../../../../constants/LOAN_SIM.js";
 
 /**

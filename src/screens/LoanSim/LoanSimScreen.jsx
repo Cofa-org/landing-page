@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import BackButton from "../../Components/buttons/backbutton/Backbutton.jsx";
+import BackButton from "../../Components/buttons/backbutton/BackButton.jsx";
 import { Footer, Header } from "../../Components/index.js";
 import Loader from "../../Components/Loader/Loader.jsx";
 import { COMPLIANCE_STEPS, LOAN_SIM_STEPS } from "../../constants/LOAN_SIM.js";

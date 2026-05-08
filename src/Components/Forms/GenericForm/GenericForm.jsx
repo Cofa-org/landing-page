@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import styles from "./GenericForm.module.css";
-import BackButton from "../../buttons/backbutton/Backbutton.jsx";
+import BackButton from "../../buttons/backbutton/BackButton.jsx";
 
 /**
  * GenericForm component.
