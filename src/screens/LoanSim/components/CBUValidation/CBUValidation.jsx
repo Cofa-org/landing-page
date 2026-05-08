@@ -19,7 +19,6 @@ const CBUValidation = ({ onValidate, loading, error, onBack, isClient, existingC
     bancoEncontrado,
     setBancoEncontrado,
     codigoBancoError,
-    validandoBanco,
     handleSubmit,
     handleToggleUpdate,
     CBU_LENGTH,
@@ -72,7 +71,7 @@ const CBUValidation = ({ onValidate, loading, error, onBack, isClient, existingC
               type='submit'
               loading={loading}
               className={styles.flexButton}
-              disabled={loading || validandoBanco || codigoBancoError || error || !termsAccepted}
+              disabled={loading || error || !termsAccepted}
             >
               Sí, es correcto
             </GenericButton>
@@ -81,7 +80,7 @@ const CBUValidation = ({ onValidate, loading, error, onBack, isClient, existingC
               variant='outline'
               onClick={handleToggleUpdate}
               className={styles.flexButton}
-              disabled={loading || validandoBanco || codigoBancoError || error || !termsAccepted}
+              disabled={loading || error || !termsAccepted}
             >
               No, ingresar otro
             </GenericButton>
@@ -157,9 +156,7 @@ const CBUValidation = ({ onValidate, loading, error, onBack, isClient, existingC
             loading={loading}
             disabled={
               cbu.length !== CBU_LENGTH ||
-              validandoBanco ||
               loading ||
-              codigoBancoError ||
               !termsAccepted ||
               (accountType === "cvu" && structureError)
             }

@@ -10,7 +10,6 @@ export const useCBUValidation = (isClient, existingCbu, onValidate) => {
   const [structureError, setStructureError] = useState(null);
   const [bancoEncontrado, setBancoEncontrado] = useState(null);
   const [codigoBancoError, setCodigoBancoError] = useState(null);
-  const [validandoBanco, setValidandoBanco] = useState(false);
 
   const CBU_LENGTH = accountType === "cvu"
     ? CBU_CONFIG.CVU_LENGTH
@@ -42,7 +41,7 @@ export const useCBUValidation = (isClient, existingCbu, onValidate) => {
   const validarCodigoBanco = useCallback(async (codigoValue, accType = "cbu") => {
     const longitudMinima = accType === "cvu" ? 8 : 3;
     if (codigoValue && codigoValue.length === longitudMinima) {
-      setValidandoBanco(true);
+
       try {
         const response = await SimuladorService.validarCodigoBanco(codigoValue, accType);
         if (response.success && response.exists) {
@@ -50,15 +49,13 @@ export const useCBUValidation = (isClient, existingCbu, onValidate) => {
           setCodigoBancoError(null);
         } else {
           setBancoEncontrado(null);
-          setCodigoBancoError(response.message || "Alguno de los dígitos ingresados no es correcto");
+          // setCodigoBancoError(response.message || "Alguno de los dígitos ingresados no es correcto");
         }
       } catch (err) {
         console.error("Error validando código bancario:", err);
         setBancoEncontrado(null);
         setCodigoBancoError("Error al validar el código bancario");
-      } finally {
-        setValidandoBanco(false);
-      }
+      } 
     }
   }, []);
 
@@ -121,7 +118,6 @@ export const useCBUValidation = (isClient, existingCbu, onValidate) => {
     structureError,
     bancoEncontrado,
     codigoBancoError,
-    validandoBanco,
     setBancoEncontrado,
     setCodigoBancoError,
     validarCodigoBanco,
