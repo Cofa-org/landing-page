@@ -3,9 +3,9 @@ import styles from "./SuccessStep.module.css";
 import { MdCheckCircleOutline } from "react-icons/md";
 import { COOKIE_CONFIG, UI_CONFIG } from "../../../../constants/LOAN_SIM.js";
 import LoanInfoModal from "../LoanInfoModal/LoanInfoModal.jsx";
-import { use } from "react";
+import { getCookie } from "../../../../lib/utils.js";
 
-const SuccessStep = ({ handleInfoPrestamo, loanInfo, loadingModal }) => {
+const SuccessStep = ({ handleInfoPrestamo, loanInfo, loadingModal, simulationData }) => {
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [twoHourDurationCookie, setTwoHourDurationCookie] = useState(null);
   const onInfoPrestamo = async () => {
@@ -16,11 +16,11 @@ const SuccessStep = ({ handleInfoPrestamo, loanInfo, loadingModal }) => {
   };
 
   useEffect(() => {
-    const getCookie = async () => {
-      const cookie = await cookieStore.get(COOKIE_CONFIG.NAME);
-      setTwoHourDurationCookie(cookie);
+    const checkCookie = async () => {
+      const value = await getCookie(COOKIE_CONFIG.NAME);
+      setTwoHourDurationCookie(value);
     };
-    getCookie();
+    checkCookie();
   }, []);
 
   return (
@@ -53,6 +53,7 @@ const SuccessStep = ({ handleInfoPrestamo, loanInfo, loadingModal }) => {
         <LoanInfoModal
           loanInfo={loanInfo}
           closeModal={() => setShowInfoModal(false)}
+          simulationData={simulationData}
         />
       )}
     </div>

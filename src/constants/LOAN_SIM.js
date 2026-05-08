@@ -14,6 +14,10 @@ export const OTP_CONFIG = {
 
 export const CBU_CONFIG = {
   CBU_LENGTH: 22,
+  CVU_LENGTH: 22,
+  CVU_PREFIX: "000",
+  CVU_CHECK_DIGIT_POSITION: 7,
+  CVU_CHECK_DIGIT_VALUE: "1",
 };
 
 export const UI_CONFIG = {

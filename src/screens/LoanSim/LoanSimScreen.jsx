@@ -37,7 +37,6 @@ const LoanSimScreen = () => {
     solicitarOTP,
     verificarOTP,
     validarCBU,
-    validarCodigoBancoHandler,
     handleNextStep,
     handlePrevStep,
     handleInfoPrestamo,
@@ -160,7 +159,6 @@ const LoanSimScreen = () => {
             bancoEncontrado={bancoEncontrado}
             codigoBancoError={codigoBancoError}
             validandoBanco={validandoBanco}
-            validarCodigoBanco={validarCodigoBancoHandler}
           />
         );
 
@@ -170,6 +168,7 @@ const LoanSimScreen = () => {
             handleInfoPrestamo={handleInfoPrestamo}
             loanInfo={loanInfo}
             loadingModal={loadingModal}
+            simulationData={simulationData}
           />
         );
 

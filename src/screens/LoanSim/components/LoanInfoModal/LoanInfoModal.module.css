@@ -13,9 +13,9 @@
 
 .modal {
   background-color: #fff;
-  width: 650px;
+  width: clamp(300px, 90%, 650px);
   height: auto;
-  padding: 48px;
+  padding: 1rem;
   border-radius: 16.867px;
   position: relative;
 }
@@ -33,7 +33,7 @@
 }
 
 .title {
-  font-size: 30px;
+  font-size: clamp(1.5rem, 2vw, 2rem);
   font-weight: 700;
   text-align: center;
   margin-bottom: 16px;
@@ -41,13 +41,28 @@
 
 .infoList {
   list-style: none;
-  padding: 2rem;
+  padding: 1rem;
   text-align: left;
   line-height: 2rem;
 }
 
 .infoItem {
   margin-bottom: 10px;
+}
+
+.loanmsg {
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  /* text-align: center; */
+  font-size: 13px;
+  color: #6c757d;
+  margin: var(--spacing-sm) 0 var(--spacing-md);
+  line-height: 1.5;
+  padding: 10px 16px;
+  background-color: #f8f9fa;
+  border-radius: var(--border-radius-sm);
+  border-left: 3px solid var(--primary-color);
 }
 
 .downloadBtn {
@@ -59,7 +74,6 @@
   cursor: pointer;
   font-size: 16px;
   font-weight: bold;
-  margin-top: 20px;
   transition:
     background-color 0.3s ease,
     transform 0.2s ease;
