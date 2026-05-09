@@ -66,7 +66,7 @@ export const BlogListSection = () => {
       </div>
     );
   }
-  posts[0].featured_image = [];
+//  posts[0].featured_image = [];
   return (
     <div className='blog-list-page'>
       <div className='blog-list-container'>
