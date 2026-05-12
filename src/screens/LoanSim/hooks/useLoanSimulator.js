@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
+import { getCookie, setCookie } from "../../../lib/utils.js";
 import { useDebounce } from "../../../hooks/useDebounce";
 import SimuladorService from "../../../services/simuladorService";
 import { COOKIE_CONFIG, LOAN_SIM_STEPS } from "../../../constants/LOAN_SIM.js";
@@ -39,13 +40,18 @@ export const useLoanSimulator = () => {
       setLoading(true);
       try {
         const response = await LinkResolutionService.consumeLink(shortId);
-
+  
         if (response.success && response.data) {
           setScoringData({
             scoringId: String(response.data.scoringId),
             cuit: response.data.cuit || null,
             nombreCompleto: response.data.nombreCompleto || null,
             capitalMaximoOperador: response.data.capitalMaximoOperador || null,
+            tasaOperador: response.data.tasaOperador || null,
+            plazoMaximoOperador: response.data.plazoMaximoOperador || null,
+            cuotaADescontar: response.data.cuotaADescontar || null,
+            nroCuota: response.data.nroCuota || null,
+            nroPrestamo: response.data.nroPrestamo || null,
           });
         } else {
           setError(response.mensaje || "El enlace de acceso es inválido o ha expirado.");
@@ -80,6 +86,11 @@ export const useLoanSimulator = () => {
         const params = {
           scoringId: scoringData.scoringId,
         };
+      
+        if(scoringData.tasaOperador && scoringData.plazoMaximoOperador) {
+          params.tasaOperador = scoringData.tasaOperador;
+          params.plazoMaximoOperador = scoringData.plazoMaximoOperador;
+        }
 
         if (scoringData.capitalMaximoOperador) {
           params.capitalMaximoOperador = scoringData.capitalMaximoOperador;
@@ -88,7 +99,7 @@ export const useLoanSimulator = () => {
         if (!isInitial && currentAmount > 0) {
           params.capitalSeleccionado = currentAmount;
         }
-
+        
         const response = await SimuladorService.calcularPlanes(params, controller.signal);
 
         // Discard response if this request was superseded by a newer one.
@@ -97,6 +108,16 @@ export const useLoanSimulator = () => {
         if (response.success) {
           const newData = response.data;
 
+          if(scoringData.cuotaADescontar) {
+            newData.cuotaADescontar = scoringData.cuotaADescontar;
+          }
+          if(scoringData.nroCuota) {
+            newData.nroCuota = scoringData.nroCuota;
+          }
+          if(scoringData.nroPrestamo) {
+            newData.nroPrestamo = scoringData.nroPrestamo;
+          }
+    
           setSimulationData(newData);
           const existingState = newData?.existingSimulation?.estado || null;
 
@@ -112,13 +133,19 @@ export const useLoanSimulator = () => {
           if (isInitial) {
             const capMax = Number(newData.capital_maximo_a_ofrecer);
             setAmount(capMax);
-            setInstallment(newData.plazo_utilizado);
+            // Set default to maximum available plan to encourage higher cuota selection.
+            const plazosDisponibles = newData.planes_disponibles?.map((p) => p.plazo) || [];
+            setInstallment(
+              plazosDisponibles.length > 0
+                ? Math.max(...plazosDisponibles)
+                : (newData.plazo_utilizado ?? null),
+            );
           } else {
             // Keep the selected installment if still valid for the new capital;
-            // otherwise fall back to the first available plan to avoid a stale value.
+            // otherwise fall back to the maximum available plan to encourage higher cuota selection.
             const plazosDisponibles = newData.planes_disponibles?.map((p) => p.plazo) || [];
             setInstallment((prev) =>
-              plazosDisponibles.includes(prev) ? prev : (plazosDisponibles[0] ?? null),
+              plazosDisponibles.includes(prev) ? prev : (Math.max(...plazosDisponibles) ?? null),
             );
           }
         } else {
@@ -186,6 +213,7 @@ export const useLoanSimulator = () => {
           ...simulationData,
           planes_disponibles: undefined,
         };
+
         const payload = {
           scoringId: scoringData.scoringId,
           cuit: scoringData.cuit,
@@ -357,11 +385,11 @@ export const useLoanSimulator = () => {
       if (preaprobadoResponse.success) {
         const cookieOptions = {
           name: COOKIE_CONFIG.NAME,
-          value: preaprobadoResponse.data.scoringId,
+          value: scoringData.scoringId,
           expires: COOKIE_CONFIG.EXPIRY_DAYS,
           partitioned: true,
         };
-        await cookieStore.set(cookieOptions);
+        await setCookie(COOKIE_CONFIG.NAME, scoringData.scoringId, COOKIE_CONFIG.EXPIRY_DAYS);
         setStep(LOAN_SIM_STEPS.COMPLETADO);
       } else {
         const esErrorCoherencia =
@@ -380,7 +408,7 @@ export const useLoanSimulator = () => {
           return;
         } else {
           setError(
-            preaprobadoErr.message ||
+            preaprobadoResponse.message ||
               "¡Lo sentimos! No pudimos completar la operación, ponete en contacto con un operador 😕",
           );
           return;
@@ -396,8 +424,7 @@ export const useLoanSimulator = () => {
   const handleInfoPrestamo = async () => {
     setLoadingModal(true);
     try {
-      const cookie = await cookieStore.get(COOKIE_CONFIG.NAME);
-      const scoringId = cookie?.value;
+      const scoringId = await getCookie(COOKIE_CONFIG.NAME);
       if (!scoringId) {
         setError("No se encontró el scoringId. Inténtalo de nuevo.");
         return false;
@@ -439,17 +466,22 @@ export const useLoanSimulator = () => {
     }
   };
 
-  const validarCodigoBancoHandler = useCallback(async (codigoValue) => {
-    if (codigoValue && codigoValue.length === 3) {
+  const validarCodigoBancoHandler = useCallback(async (codigoValue, accountType = 'cbu') => {
+    // codigoValue ya es el prefijo (3 o 6 dígitos), no el CBU/CVU completo
+    const longitudMinima = accountType === 'cvu' ? 6 : 3;
+
+    if (codigoValue && codigoValue.length === longitudMinima) {
       setValidandoBanco(true);
       try {
-        const response = await SimuladorService.validarCodigoBanco(codigoValue);
+        const response = await SimuladorService.validarCodigoBanco(codigoValue, accountType);
         if (response.success && response.exists) {
           setBancoEncontrado(response.data);
           setCodigoBancoError(null);
         } else {
           setBancoEncontrado(null);
-          setCodigoBancoError("Alguno de los dígitos ingresados no es correcto");
+          setCodigoBancoError(
+            response.message || "Alguno de los dígitos ingresados no es correcto"
+          );
         }
       } catch (err) {
         console.error("Error validando código bancario:", err);
@@ -476,8 +508,10 @@ export const useLoanSimulator = () => {
     cbu,
     loanInfo,
     loadingModal,
+    setBancoEncontrado,
     bancoEncontrado,
     codigoBancoError,
+    setCodigoBancoError,
     validandoBanco,
     handleAmountChange,
     handleInstallmentChange,

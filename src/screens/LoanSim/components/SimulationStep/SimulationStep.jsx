@@ -1,6 +1,12 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { MdInfoOutline } from "react-icons/md";
+import {
+  MdInfoOutline,
+  MdAttachMoney,
+  MdCalendarToday,
+  MdOutlinePayments,
+  MdArrowForward,
+} from "react-icons/md";
 import styles from "../../LoanSimScreen.module.css";
 
 const SimulationStep = ({
@@ -19,20 +25,31 @@ const SimulationStep = ({
 }) => {
   const formatCurrency = (value) =>
     new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS" }).format(value || 0);
-
   const cfta = (simulationData?.tasa_nominal * 100).toFixed(2) || 0;
   const cfto = (selectedPlan?.tasaOp * 100).toFixed(2) || 0;
   const tna = (cfta * 0.79).toFixed(2);
+  const usedCapital = simulationData?.capital_utilizado;
+  const discountInstallment = simulationData?.cuotaADescontar;
+  const installmentNbr = simulationData?.nroCuota;
+  const loanNbr = simulationData?.nroPrestamo;
+
+  const sortedInstallments = [...installments].sort((a, b) => a - b);
+  const maxPlazo = Math.max(...installments);
+  const secondMaxPlazo =
+    sortedInstallments.length > 1 ? sortedInstallments[sortedInstallments.length - 2] : maxPlazo;
 
   return (
     <div className={styles.calculatorMainBox}>
-      <h2 className={styles.title}>Simulá tu préstamo</h2>
+      <h2 className={styles.title}>
+        <MdAttachMoney className={styles.headerIcon} />
+        Simulá tu préstamo
+      </h2>
       {nombreCompleto && <p className={styles.cuitDisplay}>{nombreCompleto}</p>}
 
       {/* Amount Slider */}
       <div className={styles.inputGroup}>
         <div className={styles.labelWrapper}>
-          <label className={styles.label}>Importe a solicitar</label>
+          <label className={styles.label}>¿Cuánto necesitás?</label>
           <span className={styles.amountValue}>{formatCurrency(amount)}</span>
         </div>
         <input
@@ -49,30 +66,57 @@ const SimulationStep = ({
           <span className={styles.label}>{formatCurrency(maxOffer)}</span>
         </div>
       </div>
-
+      {discountInstallment && installmentNbr && loanNbr && (
+        <span className={styles.depositInfo}>
+          <i>{`Se te depositaran $${usedCapital - discountInstallment}.`}</i>
+          <i>{`Se descontara la cuota pendiente Nro. ${installmentNbr} del préstamo Nro. ${loanNbr} por un monto de $${discountInstallment}`}</i>
+        </span>
+      )}
       {/* Installments Selector */}
       <div className={styles.inputGroup}>
-        <label className={styles.label}>Cantidad de cuotas</label>
+        <label className={styles.label}>
+          <MdCalendarToday className={styles.headerIcon} />
+          Elegí tu plan de cuotas
+        </label>
         <div className={styles.installmentGrid}>
-          {installments.map((plazo) => (
-            <button
-              key={plazo}
-              type='button'
-              className={`${styles.installmentBtn} ${
-                installment === plazo ? styles.installmentBtnActive : ""
-              }`}
-              onClick={() => onInstallmentChange(plazo)}
-            >
-              {plazo} cuotas
-            </button>
-          ))}
+          {sortedInstallments.map((plazo) => {
+            // const isRecommended = plazo === maxPlazo;
+            // const isPopular = plazo === secondMaxPlazo && sortedInstallments.length > 2;
+
+            let badgeText = "";
+            // if (isRecommended) badgeText = "CUOTA MÍNIMA";
+            // else if (isPopular) badgeText = "RECOMENDADO";
+
+            return (
+              <button
+                key={plazo}
+                type='button'
+                className={`${styles.installmentBtn} ${
+                  installment === plazo ? styles.installmentBtnActive : ""
+                }`}
+                onClick={() => onInstallmentChange(plazo)}
+              >
+                {badgeText && (
+                  <span
+                    className={`${styles.installmentBadge} ${!isRecommended ? styles.installmentBadgeSecondary : ""}`}
+                  >
+                    {badgeText}
+                  </span>
+                )}
+                {plazo === 1 ? `${plazo} cuota` : `${plazo} cuotas`}
+              </button>
+            );
+          })}
         </div>
       </div>
 
       {/* Results Section */}
       <div className={styles.resultsBox}>
         <div className={styles.resultItem}>
-          <span className={styles.resultLabel}>Tu cuota mensual:</span>
+          <span className={styles.resultLabel}>
+            <MdOutlinePayments style={{ marginRight: "8px", verticalAlign: "middle" }} />
+            Tu cuota mensual
+          </span>
           <span className={`${styles.resultValue} ${styles.resultValueLarge}`}>
             {formatCurrency(selectedPlan?.valorCuota)}
           </span>
@@ -80,11 +124,12 @@ const SimulationStep = ({
       </div>
 
       <button
-        className='primary-btn'
-        style={{ marginTop: "24px" }}
+        className={styles["primary-btn"]}
+        style={{ marginTop: "48px" }}
         onClick={onNextStep}
       >
         ¡Pedilo ahora!
+        <MdArrowForward color='#fff' />
       </button>
 
       <div className={styles.footerRow}>
@@ -97,7 +142,7 @@ const SimulationStep = ({
           </div>
         </div>
       </div>
-      {error && <p className={styles.error}>{`🫣 ${error}`}</p>}
+      {error && <p className={styles.error}>{`⚠️ ${error}`}</p>}
     </div>
   );
 };

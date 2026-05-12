@@ -1,54 +1,53 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 import GenericForm from "../../../../Components/Forms/GenericForm/GenericForm";
 import GenericInput from "../../../../Components/Forms/GenericInput/GenericInput";
 import GenericButton from "../../../../Components/buttons/GenericButton/GenericButton.jsx";
-import { CBU_CONFIG } from "../../../../constants/LOAN_SIM.js";
-
+import { useCBUValidation } from "../../hooks/useCBUValidation";
 import styles from "./CBUValidation.module.css";
 
-const CBUValidation = ({
-  onValidate,
-  loading,
-  error,
-  onBack,
-  isClient,
-  existingCbu,
-  bancoEncontrado,
-  codigoBancoError,
-  validandoBanco,
-  validarCodigoBanco,
-}) => {
-  const [cbu, setCbu] = useState("");
-  const [isUpdating, setIsUpdating] = useState(!isClient);
-  const [accountType, setAccountType] = useState("cbu");
+const CBUValidation = ({ onValidate, loading, error, onBack, isClient, existingCbu }) => {
+  const {
+    cbu,
+    setCbu,
+    isUpdating,
+    accountType,
+    setAccountType,
+    termsAccepted,
+    setTermsAccepted,
+    structureError,
+    bancoEncontrado,
+    setBancoEncontrado,
+    codigoBancoError,
+    handleSubmit,
+    handleToggleUpdate,
+    CBU_LENGTH,
+  } = useCBUValidation(isClient, existingCbu, onValidate);
 
-  // Validar código bancario cuando se ingresa
-  useEffect(() => {
-    if (!isClient || (isUpdating && accountType === "cbu")) {
-      if (cbu.length >= 3) {
-        const codigo = cbu.slice(0, 3);
-        validarCodigoBanco(codigo);
-      } else if (cbu.length === 0) {
-        validarCodigoBanco("");
-      }
-    }
-  }, [cbu, isClient, isUpdating, validarCodigoBanco]);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (isClient && !isUpdating) {
-      onValidate(existingCbu, "cbu");
-    } else if (cbu) {
-      onValidate(cbu, accountType);
-    }
-  };
-
-  const handleToggleUpdate = () => {
-    setIsUpdating(true);
-    setCbu("");
-    setAccountType("cbu");
-  };
+  
+  const termsCheckbox = (
+    <div className={styles.termsContainer}>
+      <label className={styles.termsLabel}>
+        <input
+          type='checkbox'
+          checked={termsAccepted}
+          onChange={(e) => setTermsAccepted(e.target.checked)}
+          className={styles.termsCheckbox}
+        />
+        <span>
+          Acepto los{" "}
+          <a
+            href='https://cofa.com.ar/terminos-y-condiciones'
+            target='_blank'
+            rel='noopener noreferrer'
+            className={styles.termsLink}
+          >
+            términos y condiciones
+          </a>
+        </span>
+      </label>
+    </div>
+  );
 
   return (
     <GenericForm
@@ -56,7 +55,7 @@ const CBUValidation = ({
       description={
         isClient && !isUpdating
           ? "Verificá que tu CBU sea el correcto para recibir el préstamo."
-          : `Ingresá los ${CBU_CONFIG.CBU_LENGTH} dígitos de tu ${accountType.toUpperCase()} para validar tu cuenta bancaria.`
+          : `Ingresá los ${CBU_LENGTH} dígitos de tu ${accountType.toUpperCase()} para validar tu cuenta bancaria.`
       }
       onSubmit={handleSubmit}
       onBack={onBack}
@@ -66,12 +65,13 @@ const CBUValidation = ({
         <div className={styles.clientContainer}>
           <div className={styles.cbuBox}>{existingCbu}</div>
           <p className={styles.helperText}>¿Es este tu CBU correcto?</p>
+          {termsCheckbox}
           <div className={styles.buttonGroup}>
             <GenericButton
               type='submit'
               loading={loading}
               className={styles.flexButton}
-              disabled={loading || validandoBanco || codigoBancoError || error}
+              disabled={loading || error || !termsAccepted}
             >
               Sí, es correcto
             </GenericButton>
@@ -80,7 +80,7 @@ const CBUValidation = ({
               variant='outline'
               onClick={handleToggleUpdate}
               className={styles.flexButton}
-              disabled={loading || validandoBanco || codigoBancoError || error}
+              disabled={loading || error || !termsAccepted}
             >
               No, ingresar otro
             </GenericButton>
@@ -132,9 +132,11 @@ const CBUValidation = ({
           )}
           <div>
             <div className={styles.bancoContainer}>
-              <label className={styles.bancoLabel}>{accountType.toUpperCase()}</label>
+              <label className={styles.bancoLabel}>
+                {accountType.toUpperCase()} {`${cbu.length}/22`}
+              </label>
               {bancoEncontrado && (
-                <span className={styles.bancoName}>✓ {bancoEncontrado.descripcion}</span>
+                <span className={styles.bancoName}>✓ {bancoEncontrado?.razon_social}</span>
               )}
             </div>
             <GenericInput
@@ -142,21 +144,21 @@ const CBUValidation = ({
               name={accountType}
               type='text'
               value={cbu}
-              onChange={(e) => {
-                const val = e.target.value.replace(/\D/g, "").slice(0, CBU_CONFIG.CBU_LENGTH);
-                setCbu(val);
-              }}
+              onChange={(e) => setCbu(e.target.value)}
               placeholder='0000000000000000000000'
               required
-              error={error || codigoBancoError}
-              maxLength={CBU_CONFIG.CBU_LENGTH}
+              error={error || codigoBancoError || structureError}
             />
           </div>
+          {termsCheckbox}
           <GenericButton
             type='submit'
             loading={loading}
             disabled={
-              cbu.length !== CBU_CONFIG.CBU_LENGTH || validandoBanco || loading || codigoBancoError
+              cbu.length !== CBU_LENGTH ||
+              loading ||
+              !termsAccepted ||
+              (accountType === "cvu" && structureError)
             }
           >
             Validar {accountType.toUpperCase()}
@@ -173,10 +175,6 @@ CBUValidation.propTypes = {
   error: PropTypes.string,
   isClient: PropTypes.bool,
   existingCbu: PropTypes.string,
-  bancoEncontrado: PropTypes.object,
-  codigoBancoError: PropTypes.string,
-  validandoBanco: PropTypes.bool,
-  validarCodigoBanco: PropTypes.func.isRequired,
 };
 
 export default CBUValidation;

@@ -42,7 +42,7 @@ const GenericInput = ({
           {...props}
         />
       </div>
-      {error && <span className={styles.errorText}>{error}</span>}
+      <span className={styles.errorText}>{error && error}</span>
     </div>
   );
 };
