@@ -79,7 +79,7 @@ const Footer = () => {
           </a>
           <a
             className='footer-entity-container'
-            href='https://www.bcra.gob.ar/BCRAyVos/Regimen_de_transparencia.asp'
+            href='https://www.bcra.gob.ar/regimen-de-transparencia/'
             target='_blank'
           >
             <img
