@@ -1,6 +1,7 @@
 /* Variables */
 
 :root {
+  color-scheme: light !important;
   --primary-color: #1A6A3D;
   --primary-color-10: rgba(36, 149, 87, 0.1);
   --text-color: #303030;
@@ -31,7 +32,7 @@
   margin: 0;
   box-sizing: border-box;
   font-family: "Roboto", sans-serif;
-  color: var(--text-color);
+  /* color: var(--text-color); */
 }
 html {
   scroll-behavior: smooth;
