@@ -8,14 +8,12 @@ import {
   MdArrowForward,
 } from "react-icons/md";
 import styles from "../../LoanSimScreen.module.css";
+import { useSimulationStep } from "../../hooks/useSimulationStep";
 
 const SimulationStep = ({
   amount,
   installment,
-  maxOffer,
-  installments,
   simulationData,
-  selectedPlan,
   loading,
   nombreCompleto,
   onAmountChange,
@@ -23,20 +21,22 @@ const SimulationStep = ({
   onNextStep,
   error,
 }) => {
-  const formatCurrency = (value) =>
-    new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS" }).format(value || 0);
-  const cfta = (simulationData?.tasa_nominal * 100).toFixed(2) || 0;
-  const cfto = (selectedPlan?.tasaOp * 100).toFixed(2) || 0;
-  const tna = (cfta * 0.79).toFixed(2);
-  const usedCapital = simulationData?.capital_utilizado;
-  const discountInstallment = simulationData?.cuotaADescontar;
-  const installmentNbr = simulationData?.nroCuota;
-  const loanNbr = simulationData?.nroPrestamo;
-
-  const sortedInstallments = [...installments].sort((a, b) => a - b);
-  const maxPlazo = Math.max(...installments);
-  const secondMaxPlazo =
-    sortedInstallments.length > 1 ? sortedInstallments[sortedInstallments.length - 2] : maxPlazo;
+  const {
+    formatCurrency,
+    installments,
+    maxOffer,
+    selectedPlan,
+    cfta,
+    cfto,
+    tna,
+    discountInstallment,
+    installmentNbr,
+    loanNbr,
+    capitalWithoutDiscount,
+    sortedInstallments,
+    maxPlazo,
+    secondMaxPlazo,
+  } = useSimulationStep({ simulationData, installment });
 
   return (
     <div className={styles.calculatorMainBox}>
@@ -68,8 +68,8 @@ const SimulationStep = ({
       </div>
       {discountInstallment && installmentNbr && loanNbr && (
         <span className={styles.depositInfo}>
-          <i>{`Se te depositaran $${usedCapital - discountInstallment}.`}</i>
-          <i>{`Se descontara la cuota pendiente Nro. ${installmentNbr} del préstamo Nro. ${loanNbr} por un monto de $${discountInstallment}`}</i>
+          <i>{`Se te depositaran ${formatCurrency(capitalWithoutDiscount)}.`}</i>
+          <i>{`Se descontara la cuota pendiente Nro. ${installmentNbr} del préstamo Nro. ${loanNbr} por un monto de ${formatCurrency(discountInstallment)}`}</i>
         </span>
       )}
       {/* Installments Selector */}
@@ -150,12 +150,9 @@ const SimulationStep = ({
 SimulationStep.propTypes = {
   amount: PropTypes.number.isRequired,
   installment: PropTypes.number,
-  maxOffer: PropTypes.number.isRequired,
-  installments: PropTypes.arrayOf(PropTypes.number).isRequired,
   simulationData: PropTypes.object,
-  selectedPlan: PropTypes.object,
   loading: PropTypes.bool,
-  cuit: PropTypes.string,
+  nombreCompleto: PropTypes.string,
   onAmountChange: PropTypes.func.isRequired,
   onInstallmentChange: PropTypes.func.isRequired,
   onNextStep: PropTypes.func.isRequired,

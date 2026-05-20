@@ -1,0 +1,79 @@
+TAREAS DE OPTIMIZACIÓN — SIMULADOR DE PRÉSTAMOS COFA
+====================================================
+
+Este documento lista los cambios específicos para optimizar el simulador de préstamos (/simulador).
+El simulador es la sección más pesada de la página y la que más afecta la experiencia del usuario en celulares.
+
+
+ANTES DE EMPEZAR
+----------------
+- Ejecutar "npm run dev" y verificar que el simulador funciona correctamente antes de hacer cambios
+- Hacer commit de los cambios actuales para poder volver atrás si algo rompe
+
+
+TAREA S1: El botón "Descargar PDF" carga más rápido
+----------------------------------------------------
+Qué se hace: El código que genera los PDFs (una librería llamada jspdf) es pesado. Actualmente se carga siempre cuando alguien abre cualquier página del sitio, aunque nunca vaya a pedir un PDF. Se cambia a que el código del PDF solo baje cuando la persona realmente hace clic en el botón "Descargar PDF".
+
+Impacto: MEDIO — reduce el peso inicial de la página
+Riesgo: BAJO
+
+Archivo que cambia:
+- src/hooks/usePDFExport.js
+
+Cómo verificar después:
+- Abrir DevTools (F12) → solapa Network → filtrar por "jspdf" o "pdf"
+- Hacer clic en "Descargar PDF" y verificar que el archivo baja en ese momento, no antes
+
+
+TAREA S2: Los componentes del simulador se actualizan solo cuando hace falta
+-----------------------------------------------------------------------------
+Qué se hace: El simulador tiene 5 componentes (pantallas/pasos) que se "pintan" de nuevo en cada interacción, aunque no hayan cambiado. Se envuelve cada uno con una técnica llamada React.memo para que solo se actualicen cuando realmente reciben información nueva.
+
+Componentes:
+- SimulationStep (el paso principal con el slider de monto)
+- ComplianceStep (el paso de cumplimiento regulatory)
+- CBUValidation (validación de CBU/banco)
+- EmailValidation (ingreso de email)
+- OTPValidation (validación de código por SMS)
+
+Impacto: MEDIO — mejora la velocidad de respuesta al interactuar con el simulador
+Riesgo: BAJO
+
+Archivos que cambian:
+- src/screens/LoanSim/components/SimulationStep/SimulationStep.jsx
+- src/screens/LoanSim/components/ComplianceStep/ComplianceStep.jsx
+- src/screens/LoanSim/components/CBUValidation/CBUValidation.jsx
+- src/screens/LoanSim/components/EmailValidation/EmailValidation.jsx
+- src/screens/LoanSim/components/OTPValidation/OTPValidation.jsx
+
+Cómo verificar después:
+- Hacer una simulación completa en el celular (USAR MODO RESPONSIVE en Chrome DevTools)
+- Mover el slider de monto — debe responder de forma fluida
+- Navegar entre pasos — sin demoras innecesarias
+
+
+TAREA S3 (OPCIONAL): Reorganizar el código interno del simulador
+----------------------------------------------------------------
+Qué se hace: El simulador maneja información con muchos fragmentos de estado separados (más de 14). Se unifica todo en una sola estructura para que sea más eficiente. También se corrige un problema donde el simulador podría estar llamando a la API dos veces con la misma información.
+
+Impacto: MEDIO
+Riesgo: MEDIO — requiere testing completo después
+
+Archivo que cambia:
+- src/screens/LoanSim/hooks/useLoanSimulator.js
+
+Cuándo hacer esta tarea:
+- SOLO después de completar S1 y S2
+- SOLO si queda tiempo disponible
+- Si algo rompe durante el testing, hacer "git checkout -- src/screens/LoanSim/" para volver atrás
+
+Cómo verificar después:
+- Completar una simulación completa
+- Verificar en DevTools → Network que no hay llamadas duplicadas con los mismos datos
+
+
+
+NOTA
+----
+- Estas tareas son parte del plan general de optimización. 
