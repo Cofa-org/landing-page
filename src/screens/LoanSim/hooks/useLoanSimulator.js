@@ -40,7 +40,7 @@ export const useLoanSimulator = () => {
       setLoading(true);
       try {
         const response = await LinkResolutionService.consumeLink(shortId);
-  
+    
         if (response.success && response.data) {
           setScoringData({
             scoringId: String(response.data.scoringId),
@@ -52,6 +52,7 @@ export const useLoanSimulator = () => {
             cuotaADescontar: response.data.cuotaADescontar || null,
             nroCuota: response.data.nroCuota || null,
             nroPrestamo: response.data.nroPrestamo || null,
+            motivo: response.data.motivo || null,
           });
         } else {
           setError(response.mensaje || "El enlace de acceso es inválido o ha expirado.");
@@ -94,6 +95,10 @@ export const useLoanSimulator = () => {
 
         if (scoringData.capitalMaximoOperador) {
           params.capitalMaximoOperador = scoringData.capitalMaximoOperador;
+        }
+      
+        if(scoringData.motivo) {
+          params.motivo = scoringData.motivo;
         }
 
         if (!isInitial && currentAmount > 0) {
