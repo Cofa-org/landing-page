@@ -30,5 +30,7 @@ dist-ssr
 *.txt
 /.claude
 CLAUDE.md
+/docs/
+/.agents/
 
 vite.config.js.timestamp-*.mjs
