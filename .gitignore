@@ -27,10 +27,9 @@ dist-ssr
 .env
 .env.development
 .env.production
-*.txt
+DATA.txt
 /.claude
 CLAUDE.md
-/docs/
 /.agents
 
 vite.config.js.timestamp-*.mjs
