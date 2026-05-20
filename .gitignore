@@ -29,5 +29,6 @@ dist-ssr
 .env.production
 *.txt
 /.claude
+CLAUDE.md
 
 vite.config.js.timestamp-*.mjs
