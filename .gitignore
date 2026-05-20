@@ -31,6 +31,6 @@ dist-ssr
 /.claude
 CLAUDE.md
 /docs/
-
+/.agents
 
 vite.config.js.timestamp-*.mjs
