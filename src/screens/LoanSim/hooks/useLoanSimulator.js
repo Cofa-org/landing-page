@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
-import { getCookie, setCookie } from "../../../lib/utils.js";
+import { getCookie, roundToFiveHundreds, setCookie } from "../../../lib/utils.js";
 import { useDebounce } from "../../../hooks/useDebounce";
 import SimuladorService from "../../../services/simuladorService";
 import { COOKIE_CONFIG, LOAN_SIM_STEPS } from "../../../constants/LOAN_SIM.js";
@@ -40,7 +40,7 @@ export const useLoanSimulator = () => {
       setLoading(true);
       try {
         const response = await LinkResolutionService.consumeLink(shortId);
-    
+
         if (response.success && response.data) {
           setScoringData({
             scoringId: String(response.data.scoringId),
@@ -87,8 +87,8 @@ export const useLoanSimulator = () => {
         const params = {
           scoringId: scoringData.scoringId,
         };
-      
-        if(scoringData.tasaOperador && scoringData.plazoMaximoOperador) {
+
+        if (scoringData.tasaOperador && scoringData.plazoMaximoOperador) {
           params.tasaOperador = scoringData.tasaOperador;
           params.plazoMaximoOperador = scoringData.plazoMaximoOperador;
         }
@@ -96,15 +96,15 @@ export const useLoanSimulator = () => {
         if (scoringData.capitalMaximoOperador) {
           params.capitalMaximoOperador = scoringData.capitalMaximoOperador;
         }
-      
-        if(scoringData.motivo) {
+
+        if (scoringData.motivo) {
           params.motivo = scoringData.motivo;
         }
 
         if (!isInitial && currentAmount > 0) {
           params.capitalSeleccionado = currentAmount;
         }
-        
+
         const response = await SimuladorService.calcularPlanes(params, controller.signal);
 
         // Discard response if this request was superseded by a newer one.
@@ -113,16 +113,16 @@ export const useLoanSimulator = () => {
         if (response.success) {
           const newData = response.data;
 
-          if(scoringData.cuotaADescontar) {
+          if (scoringData.cuotaADescontar) {
             newData.cuotaADescontar = scoringData.cuotaADescontar;
           }
-          if(scoringData.nroCuota) {
+          if (scoringData.nroCuota) {
             newData.nroCuota = scoringData.nroCuota;
           }
-          if(scoringData.nroPrestamo) {
+          if (scoringData.nroPrestamo) {
             newData.nroPrestamo = scoringData.nroPrestamo;
           }
-    
+
           setSimulationData(newData);
           const existingState = newData?.existingSimulation?.estado || null;
 
@@ -183,7 +183,11 @@ export const useLoanSimulator = () => {
     }
   }, [debouncedAmount, scoringData.scoringId, fetchSimulation]);
 
-  const handleAmountChange = (newAmount) => {
+  const handleAmountChange = (newAmount, discountInstallmentRounded) => {
+    if (newAmount <= discountInstallmentRounded) {
+      setAmount(discountInstallmentRounded);
+      return;
+    }
     setAmount(newAmount);
   };
 
@@ -471,9 +475,9 @@ export const useLoanSimulator = () => {
     }
   };
 
-  const validarCodigoBancoHandler = useCallback(async (codigoValue, accountType = 'cbu') => {
+  const validarCodigoBancoHandler = useCallback(async (codigoValue, accountType = "cbu") => {
     // codigoValue ya es el prefijo (3 o 6 dígitos), no el CBU/CVU completo
-    const longitudMinima = accountType === 'cvu' ? 6 : 3;
+    const longitudMinima = accountType === "cvu" ? 6 : 3;
 
     if (codigoValue && codigoValue.length === longitudMinima) {
       setValidandoBanco(true);
@@ -485,7 +489,7 @@ export const useLoanSimulator = () => {
         } else {
           setBancoEncontrado(null);
           setCodigoBancoError(
-            response.message || "Alguno de los dígitos ingresados no es correcto"
+            response.message || "Alguno de los dígitos ingresados no es correcto",
           );
         }
       } catch (err) {

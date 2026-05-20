@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { roundToFiveHundreds } from "../../../lib/utils.js";
 
 export const useSimulationStep = ({ simulationData, installment }) => {
   const formatCurrency = (value) =>
@@ -30,6 +31,7 @@ export const useSimulationStep = ({ simulationData, installment }) => {
 
   const usedCapital = simulationData?.capital_utilizado;
   const discountInstallment = simulationData?.cuotaADescontar;
+  const discountInstRoundToFiveHund = roundToFiveHundreds(discountInstallment)
   const installmentNbr = simulationData?.nroCuota;
   const loanNbr = simulationData?.nroPrestamo;
 
@@ -58,6 +60,7 @@ export const useSimulationStep = ({ simulationData, installment }) => {
     tna,
     usedCapital,
     discountInstallment,
+    discountInstRoundToFiveHund,
     installmentNbr,
     loanNbr,
     capitalWithoutDiscount,

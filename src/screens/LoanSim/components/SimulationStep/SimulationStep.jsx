@@ -9,6 +9,7 @@ import {
 } from "react-icons/md";
 import styles from "../../LoanSimScreen.module.css";
 import { useSimulationStep } from "../../hooks/useSimulationStep";
+import { roundToFiveHundreds } from "../../../../lib/utils.js";
 
 const SimulationStep = ({
   amount,
@@ -30,6 +31,7 @@ const SimulationStep = ({
     cfto,
     tna,
     discountInstallment,
+    discountInstRoundToFiveHund,
     installmentNbr,
     loanNbr,
     capitalWithoutDiscount,
@@ -54,15 +56,17 @@ const SimulationStep = ({
         </div>
         <input
           type='range'
-          min='5000'
+          min={discountInstallment ? discountInstRoundToFiveHund : "5000"}
           max={maxOffer}
           step='500'
           value={amount}
-          onChange={(e) => onAmountChange(Number(e.target.value))}
+          onChange={(e) => onAmountChange(Number(e.target.value), discountInstRoundToFiveHund)}
           className={styles.slider}
         />
         <div className={styles.labelWrapper}>
-          <span className={styles.label}>$ 5.000</span>
+          <span
+            className={styles.label}
+          >{`${discountInstallment ? formatCurrency(discountInstRoundToFiveHund) : "$ 5.000"}`}</span>
           <span className={styles.label}>{formatCurrency(maxOffer)}</span>
         </div>
       </div>

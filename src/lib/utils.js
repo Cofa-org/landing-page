@@ -7,6 +7,10 @@ export function formatCurrency(amount) {
   }).format(amount);
 }
 
+export function roundToFiveHundreds(amount) {
+  return Math.round(amount / 500) * 500;
+}
+
 export function formatDate(date) {
   return new Intl.DateTimeFormat("es-AR", {
     year: "numeric",
