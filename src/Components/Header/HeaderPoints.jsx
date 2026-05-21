@@ -71,7 +71,7 @@ const HeaderPoints = () => {
     <>
     <header className={scrolled && 'solid'}>
         <Link to={'/prestamos'}>
-          <img src='/Logo.svg' alt='logo'/>
+          <img src='/Logo.svg' alt='logo' width='218' height='46' />
         </Link>
         <nav className='nav-points'>
           {

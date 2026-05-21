@@ -65,6 +65,8 @@ const Footer = () => {
             <img
               src='/img/footer-fintech.webp'
               alt='Camara argentina de fintech logo'
+              width='106'
+              height='73'
               loading='lazy'
               decoding='async'
             />
@@ -77,6 +79,8 @@ const Footer = () => {
             <img
               src='/img/footer-financieros.webp'
               alt='usuarios financieros del banco central de la republica argentina'
+              width='105'
+              height='73'
               loading='lazy'
               decoding='async'
             />
@@ -89,6 +93,8 @@ const Footer = () => {
             <img
               src='/img/Transparencia.webp'
               alt='Regimen de trasparencia del banco central de la republica argentina'
+              width='106'
+              height='73'
               loading='lazy'
               decoding='async'
             />
@@ -101,6 +107,8 @@ const Footer = () => {
             <img
               src='/img/footer-datafiscal.webp'
               alt='Data fiscal'
+              width='106'
+              height='73'
               loading='lazy'
               decoding='async'
             />
@@ -113,6 +121,8 @@ const Footer = () => {
             <img
               src='/img/footer-aaip.webp'
               alt='AAIP registro bases datos'
+              width='105'
+              height='73'
               loading='lazy'
               decoding='async'
             />
@@ -130,6 +140,8 @@ const Footer = () => {
           <img
             src='/img/ssn-logo.svg'
             alt='logo ssn'
+            width='376'
+            height='56'
             loading='lazy'
             decoding='async'
           />
@@ -178,6 +190,8 @@ const Footer = () => {
           <img
             src='/img/ssn-logo.svg'
             alt='logo ssn'
+            width='376'
+            height='56'
             loading='lazy'
             decoding='async'
           />

@@ -23,6 +23,8 @@ const CofaTipsMain = () => {
                     className='cofa-tips-logo-vector1'
                     alt='Vector'
                     src='/img/logo_cofa_tips.svg'
+                    width='252'
+                    height='243'
                   />
                 </div>
               </div>

@@ -49,7 +49,9 @@ const Contact = () => {
         <div className='cofaContact'>
           <img
             src='/Logo.svg'
-            alt='logo'
+            alt='logo cofa'
+            width='218'
+            height='46'
           />
           <SocialNetworks />
           <div className='links'>

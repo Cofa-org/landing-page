@@ -14,7 +14,7 @@ const CofaTipsSection = () => {
                         <button className='primary-btn btn-cofa-tips'>Ir a COFA Tips <GoArrowRight /></button>
                     </Link>
                 </div>
-                <img src="/img/logo_cofa_tips.svg" alt="cofa-tips" />
+                <img src="/img/logo_cofa_tips.svg" alt="cofa-tips" width="252" height="243" />
             </div>
         </>
     );

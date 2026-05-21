@@ -25,7 +25,7 @@ const HeaderType2 = () => {
     <header className='header-type-2'>
         <div>
           <Link to={'/prestamos'}>
-            <img src='/Logo.svg' alt='logo'/>
+            <img src='/Logo.svg' alt='logo' width='218' height='46' />
           </Link>
         </div>
         <nav className='normal-nav'>

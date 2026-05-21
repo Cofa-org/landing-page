@@ -101,7 +101,9 @@ export const BlogListSection = () => {
                   <img
                     style={{ objectFit: "contain" }}
                     src='/img/logo_cofa_tips.svg'
-                    alt={post?.title}
+                    alt='logo-cofa-tips'
+                    width='252'
+                    height='243'
                     className='blog-card-image'
                   />
                 )}
@@ -128,7 +130,9 @@ export const BlogListSection = () => {
       <section className='contactInfo'>
         <img
           src='/Logo.svg'
-          alt='logo'
+          alt='logo-cofa'
+          width='218'
+          height='46'
         />
         <SocialNetworks />
       </section>

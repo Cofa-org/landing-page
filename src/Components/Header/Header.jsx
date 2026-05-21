@@ -121,7 +121,7 @@ const Header = () => {
   return (
     <header className={scrolled ? "solid" : ""}>
       <Link to={"/"}>
-        <img src='/Logo.svg' alt='Logo de COFA' />
+        <img src='/Logo.svg' alt='Logo de COFA' width='218' height='46' />
       </Link>
       
       <nav className="desktop-nav">

@@ -14,7 +14,7 @@ const WorkWithUs = () => {
             <button className='primary-btn btn-work'>Unirme a COFA <GoArrowRight /></button>
           </Link>
         </div>
-        <img src="/img/cvs.svg" alt="cvs-folder" />
+        <img src="/img/cvs.svg" alt="cvs-folder" width="250" height="220" />
       </div>
     </>
   )
