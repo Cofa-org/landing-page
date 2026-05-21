@@ -31,6 +31,7 @@ const Carrusel = ({ images }) => {
         autoPlay
         muted
         playsInline
+        preload="metadata"
         className={style.image}
         // style={{ width: "100%", height: "auto", maxHeight: "400px", borderRadius: "8px" }}
       >
