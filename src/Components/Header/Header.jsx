@@ -13,7 +13,7 @@ const NavLinks = ({ pageType, selectedLink, onLinkClick }) => {
     home: [
       { href: "#prestamos", text: "Inicio", id: "prestamos" },
       { href: "#nosotros", text: "Nosotros", id: "nosotros" },
-      { href: "#preguntas-frecuentes", text: "Preguntas frecuentes", id: "preguntas-frecuentes" },
+      { to: "/preguntas-frecuentes", text: "Preguntas frecuentes", id: "preguntas-frecuentes" },
       { to: "/cofa-tips", text: "Cofa tips", id: "cofa-tips" },
       { href: "#contacto", text: "Contacto", id: "contacto" },
     ],
@@ -27,7 +27,7 @@ const NavLinks = ({ pageType, selectedLink, onLinkClick }) => {
     other: [
       { to: "/#prestamos", text: "Inicio", id: "prestamos" },
       { to: "/#nosotros", text: "Nosotros", id: "nosotros" },
-      { to: "/#preguntas-frecuentes", text: "Preguntas frecuentes", id: "preguntas-frecuentes" },
+      { to: "/preguntas-frecuentes", text: "Preguntas frecuentes", id: "preguntas-frecuentes" },
       { to: "/cofa-tips", text: "Cofa tips", id: "cofa-tips" },
       { to: "/#contacto", text: "Contacto", id: "contacto" },
     ],
