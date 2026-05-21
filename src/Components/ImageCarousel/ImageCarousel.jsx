@@ -73,6 +73,8 @@ const ImageCarousel = ({ images, interval = 8000, showControls = false }) => {
               src={image.src}
               alt={`Slide ${index + 1}`}
               className={styles.carouselImage}
+              loading="lazy"
+              decoding="async"
             />
           </div>
         ))}

@@ -65,6 +65,8 @@ const Footer = () => {
             <img
               src='/img/footer-fintech.webp'
               alt='Camara argentina de fintech logo'
+              loading='lazy'
+              decoding='async'
             />
           </a>
           <a
@@ -75,6 +77,8 @@ const Footer = () => {
             <img
               src='/img/footer-financieros.webp'
               alt='usuarios financieros del banco central de la republica argentina'
+              loading='lazy'
+              decoding='async'
             />
           </a>
           <a
@@ -85,6 +89,8 @@ const Footer = () => {
             <img
               src='/img/Transparencia.webp'
               alt='Regimen de trasparencia del banco central de la republica argentina'
+              loading='lazy'
+              decoding='async'
             />
           </a>
           <a
@@ -95,6 +101,8 @@ const Footer = () => {
             <img
               src='/img/footer-datafiscal.webp'
               alt='Data fiscal'
+              loading='lazy'
+              decoding='async'
             />
           </a>
           <a
@@ -105,6 +113,8 @@ const Footer = () => {
             <img
               src='/img/footer-aaip.webp'
               alt='AAIP registro bases datos'
+              loading='lazy'
+              decoding='async'
             />
           </a>
           <a
@@ -120,6 +130,8 @@ const Footer = () => {
           <img
             src='/img/ssn-logo.svg'
             alt='logo ssn'
+            loading='lazy'
+            decoding='async'
           />
         </div>
       </div>
@@ -166,6 +178,8 @@ const Footer = () => {
           <img
             src='/img/ssn-logo.svg'
             alt='logo ssn'
+            loading='lazy'
+            decoding='async'
           />
         </div>
         <div>
