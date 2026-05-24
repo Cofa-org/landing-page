@@ -1,0 +1,47 @@
+# COFA Landing Page
+
+> Sitio web de préstamos personales digitales de COFA (Cobro Fácil S.R.L.), Fintech argentina inscripta en el BCRA (Nº 55287) y en la SSN (Nº 334). Más de 250.000 clientes. Dominio: https://cofa.com.ar
+
+## Stack
+- React 18 + Vite 4.5 + React Router DOM v6
+- Componentes funcionales y Hooks exclusivamente
+- CSS modular por componente (sin frameworks externos)
+- Formik para formularios, jsPDF para exportación, @google/generative-ai integrado
+
+## Rutas públicas
+| Ruta | Descripción |
+|---|---|
+| `/` o `/prestamos` | Home principal |
+| `/simulador` | Simulador de préstamos |
+| `/preguntas-frecuentes` | FAQ |
+| `/cofa-tips` | Blog / Notas |
+| `/blog/:slug` | Detalle de artículo |
+| `/el-mejor-trato` | Propuesta de valor |
+| `/sacar-prestamo` | Proceso de solicitud |
+| `/trabaja-con-nosotros` | Formulario laboral |
+| `/terminos-y-condiciones` | T&C generales |
+| `/terminos-y-condiciones-puntos-cofa` | T&C Puntos COFA |
+| `/politicas-de-privacidad` | Política de privacidad |
+| `/politicas-de-uso-ia` | Política de uso de IA |
+| `/sugerencias` | Formulario de sugerencias |
+| `/reclamos` | Formulario de reclamos |
+| `/quejas` | Formulario de quejas |
+| `/baja` | Baja de producto |
+| `/arrepentimiento` | Derecho de arrepentimiento |
+
+## Reglas para LLMs
+1. Usar solo componentes funcionales y Hooks de React
+2. Priorizar Web Vitals: dimensiones explícitas en imágenes, lazy loading en rutas, `preload="metadata"` en videos
+3. SEO semántico: un H1 por página, jerarquía de encabezados estricta, etiquetas semánticas HTML5
+4. Formik para todos los formularios de usuario
+5. No agregar librerías CSS externas; usar el sistema de clases existente
+6. El build usa `--base=./` — no romper rutas absolutas de assets
+7. **Despliegue:** `npm run build` genera la carpeta `dist/`. Se sube manualmente a Hostinger. No hay pipeline CI/CD ni rama de producción activa.
+
+## Contacto oficial
+- WhatsApp: +54 9 11 3757-0853
+- Email: consultas@cofa.com.ar
+- Domicilio legal: Moreno 1628 piso 3° of. 35, CABA, Argentina
+
+## Más contexto
+Para información completa (arquitectura, componentes, SEO detallado, datos del negocio): ver `llms-full.txt`

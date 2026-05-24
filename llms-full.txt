@@ -1,0 +1,289 @@
+# COFA Landing Page — Documentación Completa para LLMs
+
+> Versión extendida de `llms.txt`. Usar cuando se necesite contexto profundo sobre arquitectura, SEO, negocio o convenciones.
+
+---
+
+## 1. Identidad del Proyecto
+
+**Empresa:** Cobro Fácil S.R.L. — opera bajo la marca COFA
+**Producto:** Landing page pública de préstamos personales digitales 100% online
+**Dominio:** https://cofa.com.ar
+**Idioma:** Español argentino (es-AR)
+**Mercado:** Argentina exclusivamente (`areaServed: AR`)
+**Regulación:**
+- BCRA — Proveedor No Financiero de Crédito, inscripción Nº 55287
+- SSN — Agente institorio, inscripción Nº 334
+- AAIP — Datos personales (Ley 25.326)
+- UIF — Prevención de lavado de activos
+
+**Propuesta de valor:**
+- Más de 250.000 clientes satisfechos
+- Préstamos de hasta $800.000 ARS
+- 100% digital, 2 a 18 cuotas fijas en pesos
+- Acreditación en el mismo día hábil
+- Requisitos mínimos: mayor de 18 años, DNI vigente, CBU/CVU propio, comprobante de ingresos
+
+**Fundación:** 2008
+**Red social:** https://www.facebook.com/cofa.ar/
+
+---
+
+## 2. Stack Tecnológico
+
+| Capa | Tecnología | Versión |
+|---|---|---|
+| Runtime | Node.js | 22.x |
+| Package manager | npm | 11.x |
+| Framework UI | React | 18.2 |
+| Rendering | React DOM | 18.2 |
+| Build tool | Vite | 4.5.2 |
+| Compilador JS | @vitejs/plugin-react-swc | 3.3.2 |
+| Routing | React Router DOM | 6.30 |
+| Formularios | Formik | 2.4.5 |
+| PDF export | jsPDF | 4.2.1 |
+| Upload de archivos | React Dropzone | 14.2.3 |
+| Iconografía | React Icons | 4.11.0 |
+| IA generativa | @google/generative-ai | 0.24.1 |
+| Autenticación tokens | jose (JWT/JWE) | 6.1.3 |
+| Linter | ESLint | 8.45 |
+| Tipografía | Google Fonts — Roboto (400, 500, 700) | — |
+
+**Overrides importantes:** `lodash` y `lodash-es` fijados en `4.18.0` (seguridad).
+
+---
+
+## 3. Arquitectura del Proyecto
+
+```
+landing-page/
+├── index.html              # Punto de entrada HTML; contiene GTM, Meta Pixel, JSON-LD y preloads
+├── vite.config.js          # Config Vite con manualChunks para vendor splitting
+├── robots.txt              # Allow: / — todas las rutas indexables
+├── sitemap.xml             # Sitemap index → sitemap-pages.xml + sitemap-blog.xml
+├── llms.txt                # Resumen liviano para LLMs
+├── llms-full.txt           # Este archivo — contexto completo
+└── src/
+    ├── main.jsx            # Entry point React; monta <App> en #root
+    ├── App.jsx             # Wrapper con BrowserRouter + RouterScreens
+    ├── RouterScreens.jsx   # Definición de rutas con React.lazy + Suspense
+    ├── config.js           # Variables de entorno (VITE_LANDING_BACKEND_URL, VITE_LRS_URL, etc.)
+    ├── http.js             # Cliente HTTP centralizado (fetch wrapper)
+    ├── index.css           # Estilos globales base
+    ├── screens/            # Páginas (una por ruta; cada una es un chunk separado)
+    ├── Sections/           # Secciones reutilizables de página (Hero, AboutUs, etc.)
+    ├── Components/         # Componentes genéricos (Header, Footer, Carrusel, etc.)
+    ├── data/               # Constantes de negocio: FAQ, T&C, política de privacidad, etc.
+    ├── services/           # Llamadas a APIs externas (blog, mail, simulador, resolución de links)
+    ├── hooks/              # Custom hooks (useDebounce, usePDFExport)
+    ├── context/            # React Context providers
+    ├── constants/          # Constantes globales
+    └── lib/                # Utilidades y helpers
+```
+
+---
+
+## 4. Rutas y Pantallas
+
+Todas las rutas usan `React.lazy` + `Suspense` (code splitting por ruta). El fallback del Suspense es el componente `<Loader />`.
+
+| Ruta | Componente | Descripción |
+|---|---|---|
+| `/` | `HomeScreen` | Home: Hero + AboutUs + FAQ + CofaTips + WorkWithUs + Contact |
+| `/prestamos` | `HomeScreen` | Alias de Home (misma pantalla) |
+| `/simulador` | `LoanSimScreen` | Simulador interactivo de cuotas y montos |
+| `/preguntas-frecuentes` | `FrecuentQuestionScreen` | FAQ completa (18 preguntas) |
+| `/cofa-tips` | `CofaTipsScreen` | Listado de artículos del blog |
+| `/blog/:slug` | `BlogDetailScreen` | Artículo individual del blog (slug dinámico) |
+| `/el-mejor-trato` | `ElMejorTratoScreen` | Página de propuesta de valor |
+| `/sacar-prestamo` | `SacarPrestamoScreen` | Guía del proceso de solicitud |
+| `/trabaja-con-nosotros` | `FormWorkWithUs` | Formulario de empleo |
+| `/terminos-y-condiciones` | `TermsScreen` | T&C generales del servicio |
+| `/terminos-y-condiciones-puntos-cofa` | `TermsPointsScreen` | T&C del programa de puntos |
+| `/politicas-de-privacidad` | `PrivacyPoliciesScreen` | Política de privacidad (Ley 25.326) |
+| `/politicas-de-uso-ia` | `IaPoliciesScreen` | Política de uso de IA generativa |
+| `/sugerencias` | `SuggestionsScreen` | Formulario de sugerencias |
+| `/reclamos` | `ComplaintsScreen` | Formulario de reclamos (BCRA) |
+| `/quejas` | `QuejasScreen` | Formulario de quejas |
+| `/baja` | `DischargeScreen` | Solicitud de baja de producto |
+| `/arrepentimiento` | `RegretOrDischargeScreen` | Derecho de arrepentimiento (10 días corridos) |
+| `*` | `ErrorScreen` | 404 / error genérico |
+
+---
+
+## 5. Secciones de la Página Home
+
+El `HomeScreen` monta estas secciones en orden:
+
+1. **`<Header />`** — Navegación principal
+2. **`<Hero />`** — H1 "Préstamos" + `<AnimatedTitle>` + CTA WhatsApp + `<Carrusel>` (3 videos MP4)
+3. **`<AboutUs />`** — Información institucional, infocards con íconos React Icons
+4. **`<FrecuentQuestionSection />`** — Acordeón FAQ (datos de `src/data/info.js`)
+5. **`<CofaTipsSection />`** — Preview del blog (llama a `blogService.js`)
+6. **`<WorkWithUs />`** — Llamado a la acción para empleo
+7. **`<Contact />`** — Formulario de contacto + mapa
+8. **`<Footer />`** — Links regulatorios, logos institucionales, redes sociales
+
+---
+
+## 6. SEO y Metadatos
+
+### Meta tags en `index.html`
+- `lang="es"` en `<html>`
+- `hreflang="es-AR"` y `hreflang="x-default"` → `https://cofa.com.ar/`
+- `canonical` → `https://cofa.com.ar/`
+- `robots: index, follow`
+- `color-scheme: light`
+- OG tags: title, description, url, image (`/og-image.jpg`)
+- Twitter Card: `summary_large_image`
+
+### JSON-LD (Schema.org) — tres schemas en index.html
+1. **Organization** — COFA, URL, logo, fundingDate 2008, contactPoint Argentina
+2. **WebSite** — URL, nombre, idioma es-AR
+3. **FinancialService** — COFA Préstamos, serviceType "Personal Loans", OfferCatalog
+
+### JSON-LD adicional en HomeScreen.jsx
+- **FAQPage** — 2 preguntas y respuestas (requisitos y tiempo de depósito)
+- **BreadcrumbList** — Préstamos → Requisitos
+
+### Tipografía de carga optimizada
+- Fuente: Roboto 400/500/700
+- Estrategia: `<link rel="preload" as="style" onload="...">` (carga no bloqueante)
+- Fallback `<noscript>` con `<link rel="stylesheet">`
+- `preconnect` a `fonts.gstatic.com` y `fonts.googleapis.com`
+
+### Videos Hero
+- 3 videos MP4 en `/img/videos-cofa-X-dinero-contando.mp4`
+- Declarados con `rel="prefetch"` (no bloquean LCP)
+- El componente Carrusel usa `preload="metadata"`
+
+### Analítica
+- Google Tag Manager: `GTM-NKTF7GZQ`
+- Meta Pixel: `1085977612494127` (con manejo de error si está bloqueado)
+
+---
+
+## 7. Servicios y APIs
+
+| Servicio | Archivo | Descripción |
+|---|---|---|
+| Blog | `src/services/blogService.js` | Fetching de artículos desde Supabase |
+| Email | `src/services/mailService.js` | Envío de formularios de contacto |
+| Simulador | `src/services/simuladorService.js` | Lógica de cálculo de cuotas e intereses |
+| Link resolution | `src/services/linkResolutionService.js` | Resolución de URLs para recursos dinámicos |
+
+**Variables de entorno requeridas** (definidas en `.env`):
+- `VITE_LANDING_BACKEND_URL` — URL del backend interno
+- `VITE_LANDING_BACKEND_API_KEY` — API key del backend
+- `VITE_LRS_URL` — URL del LRS (repositorio de links)
+- `VITE_LRS_API_KEY` — API key del LRS
+
+---
+
+## 8. Producto Financiero — Datos Clave
+
+### Préstamos personales
+- Monto: hasta $800.000 ARS
+- Plazos: 2 a 18 cuotas mensuales fijas en pesos
+- Tasa: fija, varía por perfil crediticio y plazo
+- Acreditación: mismo día hábil o siguiente
+- Proceso: 100% digital (DNI + selfie + biometría + CBU)
+
+### Requisitos de solicitud
+- Mayor de 18 años residente en Argentina
+- DNI vigente
+- CBU o CVU a nombre del solicitante
+- Comprobante de ingresos (acepta trabajo informal)
+
+### Formas de pago de cuotas
+- Transferencia o depósito bancario
+- Débito intrabancario o en tarjeta de débito
+- Botones de pago habilitados en la web
+
+### Mora y penalidades
+- Interés punitorio: 50% de la tasa compensatoria nominal anual
+- Cargo administrativo adicional: 5% mensual sobre deuda + IVA
+- Reporte a Central de Deudores BCRA a partir de 30 días de atraso
+
+### Derecho de arrepentimiento
+- Plazo: 10 días corridos desde el desembolso
+- Canal: https://cofa.com.ar/arrepentimiento
+
+### Programa de Puntos COFA
+- Sistema de fidelización con puntos canjeables por descuentos en cuotas (hasta 50%)
+- T&C en: https://cofa.com.ar/terminos-y-condiciones-puntos-cofa
+- Canje: 1 Punto = $10 ARS de descuento
+- Formas de acumular: referidos, encuestas, finalizar préstamo, cumpleaños, seguir redes sociales
+
+---
+
+## 9. Convenciones y Patrones de Desarrollo
+
+### Estructura de componente estándar
+```jsx
+// Componente funcional, siempre con nombre descriptivo
+const MiComponente = () => {
+  // Hooks primero
+  // Handlers a continuación
+  // Return con JSX semántico
+  return <section>...</section>;
+};
+export default MiComponente;
+```
+
+### Reglas críticas
+1. **Cero class components** — Solo componentes funcionales y Hooks
+2. **Un H1 por ruta/pantalla** — Jerarquía estricta de encabezados (H1 > H2 > H3)
+3. **Dimensiones explícitas en imágenes** — `width` y `height` en todos los `<img>` para evitar CLS
+4. **Lazy loading** — `loading="lazy" decoding="async"` en imágenes below-the-fold
+5. **Code splitting** — Toda pantalla nueva debe agregarse con `React.lazy()` en `RouterScreens.jsx`
+6. **Formularios con Formik** — No usar estado local para formularios complejos
+7. **CSS modular** — Archivos `.module.css` o `.css` por componente; no crear clases globales innecesarias
+8. **No instalar nuevas dependencias CSS** — Sin Tailwind, Bootstrap, Chakra, etc.
+
+### Build y despliegue
+```bash
+npm run dev          # Servidor de desarrollo (Vite HMR)
+npm run build        # Producción → vite build --base=./  (genera carpeta dist/)
+npm run preview      # Preview del build de producción localmente
+npm run lint         # ESLint estricto (0 warnings tolerados)
+```
+
+**Flujo de producción real:** `npm run build` → subir la carpeta `dist/` manualmente a Hostinger (drag & drop o FTP). No existe rama `produccion` activa ni pipeline CI/CD. El script `npm run subir` presente en `package.json` está desactualizado y **no debe usarse**.
+
+**Advertencia crítica de build:** La flag `--base=./` genera rutas relativas en todos los assets compilados. No usar rutas absolutas (`/assets/...`) en código que deba funcionar en producción.
+
+---
+
+## 10. Optimizaciones de Rendimiento Implementadas
+
+| Optimización | Estado | Impacto |
+|---|---|---|
+| Route-level code splitting (React.lazy) | ✅ Implementado | Bundle inicial reducido |
+| Vendor chunk separation (manualChunks Vite) | ✅ Implementado | Caché de dependencias |
+| Font loading no bloqueante (preload + onload) | ✅ Implementado | LCP mejorado |
+| Video prefetch (no preload) | ✅ Implementado | No bloquea LCP |
+| Video preload="metadata" en Carrusel | ✅ Implementado | Menor uso de bandwidth |
+| Image lazy loading en componentes | ✅ Implementado | FID/INP mejorado |
+| FinancialService JSON-LD schema | ✅ Implementado | Rich results en Google |
+| Canonical + hreflang | ✅ Implementado | SEO técnico |
+| Dimensiones explícitas en imágenes (CLS) | ⚠️ En progreso | Crítico para CLS |
+| Purga de CSS no utilizado (~11 KiB) | ⏳ Pendiente | Menor payload |
+
+**Objetivos de Core Web Vitals:**
+- LCP < 2.5s
+- INP < 200ms
+- CLS < 0.1
+
+---
+
+## 11. Contacto y Canales Oficiales
+
+| Canal | Detalle |
+|---|---|
+| WhatsApp | +54 9 11 3757-0853 (wa.me/5491137570853) |
+| Email | consultas@cofa.com.ar |
+| Facebook | https://www.facebook.com/cofa.ar/ |
+| Domicilio legal | Moreno 1628 piso 3° of. 35, CABA, Argentina |
+| Sitemap | https://cofa.com.ar/sitemap.xml |
+| Robots.txt | https://cofa.com.ar/robots.txt |
