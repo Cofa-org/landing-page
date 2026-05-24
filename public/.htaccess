@@ -1,0 +1,46 @@
+# -----------------------------------------------
+# SPA routing — React Router (todas las rutas al index.html)
+# -----------------------------------------------
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
+</IfModule>
+
+# -----------------------------------------------
+# Sitemap
+# -----------------------------------------------
+<Files "sitemap.xml">
+  ForceType application/xml
+  Header set Content-Type "application/xml"
+</Files>
+
+# -----------------------------------------------
+# Cache-Control — evitar re-descargas innecesarias
+# -----------------------------------------------
+<IfModule mod_headers.c>
+
+  # Videos — 1 año (nombre de archivo fijo, cambiar nombre si se actualiza el contenido)
+  <FilesMatch "\.(mp4|webm|ogv)$">
+    Header set Cache-Control "public, max-age=31536000"
+  </FilesMatch>
+
+  # Imágenes y SVG — 30 días
+  <FilesMatch "\.(svg|webp|png|jpg|jpeg|gif|ico)$">
+    Header set Cache-Control "public, max-age=2592000"
+  </FilesMatch>
+
+  # Fuentes
+  <FilesMatch "\.(woff|woff2|ttf|eot)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # JS y CSS con hash en el nombre — inmutables (Vite les genera hash)
+  <FilesMatch "\.(js|css)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+</IfModule>

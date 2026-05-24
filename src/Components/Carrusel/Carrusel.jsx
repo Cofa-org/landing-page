@@ -32,7 +32,8 @@ const Carrusel = ({ images }) => {
         ref={videoRef}
         muted
         playsInline
-        preload="metadata"
+        preload="none"
+        poster="/img/hero-img.webp"
         className={style.image}
       >
         Tu navegador no soporta videos.
