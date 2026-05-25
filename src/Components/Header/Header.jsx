@@ -5,7 +5,7 @@ import { IoMdArrowBack } from "react-icons/io";
 import { useScrollContext } from "../../context";
 import "./Header.css";
 
-const NAV_SECTIONS = ["prestamos", "nosotros", "preguntas-frecuentes", "contacto"];
+const NAV_SECTIONS = ["prestamos", "nosotros", "preguntas-frecuentes", "cofa-tips", "contacto"];
 
 // Componente para los enlaces de navegación, para evitar duplicación
 const NavLinks = ({ pageType, selectedLink, onLinkClick }) => {

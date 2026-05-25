@@ -6,7 +6,7 @@ import { GoArrowRight } from "react-icons/go";
 const CofaTipsSection = () => {
     return (
         <>
-            <div className='container-cofa-tips'>
+            <div className='container-cofa-tips' id='cofa-tips'>
                 <div className='info-cofa-tips'>
                     <h1>COFA Tips</h1>
                     <p>Encontrá consejos financieros, noticias y guías para tomar las mejores decisiones con tu dinero. <br /> ¡La seguridad es lo primero!</p>

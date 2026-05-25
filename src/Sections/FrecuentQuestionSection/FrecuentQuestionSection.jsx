@@ -6,7 +6,7 @@ import { GoArrowRight } from "react-icons/go";
 const FrecuentQuestionSection = () => {
     return (
         <>
-            <div className='container-fq-section'>
+            <div className='container-fq-section' id='preguntas-frecuentes'>
                 <div className='info-fq-section'>
                     <h1>Preguntas Frecuentes</h1>
                     <p>Encontrá respuestas rápidas a tus consultas sobre nuestros servicios, requisitos y operatoria de préstamos. <br /> ¡Estamos para ayudarte!</p>
