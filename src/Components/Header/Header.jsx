@@ -82,7 +82,7 @@ const Header = () => {
           }
         });
       },
-      { threshold: 0.6 }
+      { rootMargin: "-20% 0px -40% 0px", threshold: 0 }
     );
 
     NAV_SECTIONS.forEach((id) => {
