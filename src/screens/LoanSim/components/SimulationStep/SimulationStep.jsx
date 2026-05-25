@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import PropTypes from "prop-types";
 import {
   MdInfoOutline,
@@ -162,4 +162,4 @@ SimulationStep.propTypes = {
   onNextStep: PropTypes.func.isRequired,
 };
 
-export default SimulationStep;
+export default memo(SimulationStep);

@@ -37,9 +37,11 @@ const HeroLoanSim = ({
 
       <div className={styles.heroImageContainer}>
         <img
-          src='/img/hero-loan-sim.png'
+          src='/img/hero-loan-sim.webp'
           alt='Simulador de Préstamos COFA'
           className={styles.heroImage}
+          width={800}
+          height={600}
         />
       </div>
     </section>

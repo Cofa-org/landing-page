@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import PropTypes from "prop-types";
 import GenericForm from "../../../../Components/Forms/GenericForm/GenericForm";
 import GenericInput from "../../../../Components/Forms/GenericInput/GenericInput";
@@ -58,4 +58,4 @@ EmailValidation.propTypes = {
   error: PropTypes.string,
 };
 
-export default EmailValidation;
+export default memo(EmailValidation);

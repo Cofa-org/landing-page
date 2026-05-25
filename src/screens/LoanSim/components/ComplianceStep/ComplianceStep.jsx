@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, memo } from "react";
 import PropTypes from "prop-types";
 import {
   ComplianceStatusCheck,
@@ -149,4 +149,4 @@ ComplianceStep.propTypes = {
   error: PropTypes.string,
 };
 
-export default ComplianceStep;
+export default memo(ComplianceStep);
