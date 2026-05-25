@@ -104,10 +104,12 @@ const Header = () => {
       setSelectedLink('cofa-tips');
     } else if (pageType === 'home') {
       setSelectedLink('prestamos');
+    } else if (pathname === '/preguntas-frecuentes') {
+      setSelectedLink('preguntas-frecuentes');
     } else {
-        setSelectedLink('');
+      setSelectedLink('');
     }
-  }, [pageType]);
+  }, [pageType, pathname]);
 
 
   const handleToggleNavbar = (open) => {

@@ -129,7 +129,7 @@ export const frecuentQuestions = [
   },
   {
     name: "¿Qué pasas si me atraso?",
-    content: "Se generan intereses punitorios desde el día siguiente al vencimiento. Un atraso prolongado puede afectar tu acceso a nuevos créditos tanto en COFA como en otras entidades.",
+    content: "Se generan intereses punitorios desde el día siguiente al vencimiento. Un atraso prolongado puede afectar tu acceso a nuevos créditos tanto en COFA como en otras entidades. De todos modos, si tenés dificultades para pagar la cuota, te recomendamos comunicarte con nosotros lo antes posible. En muchos casos podemos ayudarte a encontrar una alternativa o acordar una forma de pago que se adapte mejor a tu situación.",
     id: 9,
   },
   {
