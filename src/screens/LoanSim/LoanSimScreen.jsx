@@ -1,15 +1,17 @@
-import { useEffect } from "react";
+import { useEffect, lazy, Suspense } from "react";
 import BackButton from "../../Components/buttons/backbutton/BackButton.jsx";
 import { Footer, Header } from "../../Components/index.js";
 import Loader from "../../Components/Loader/Loader.jsx";
 import { COMPLIANCE_STEPS, LOAN_SIM_STEPS } from "../../constants/LOAN_SIM.js";
 import { HeroLoanSim } from "../../Sections/index.js";
-import CBUValidation from "./components/CBUValidation/CBUValidation";
-import ComplianceStep from "./components/ComplianceStep/ComplianceStep";
-import EmailValidation from "./components/EmailValidation/EmailValidation";
-import OTPValidation from "./components/OTPValidation/OTPValidation";
-import SimulationStep from "./components/SimulationStep/SimulationStep";
-import SuccessStep from "./components/SuccessStep/SuccessStep";
+
+// Lazy load de los pasos del simulador
+const SimulationStep = lazy(() => import("./components/SimulationStep/SimulationStep"));
+const EmailValidation = lazy(() => import("./components/EmailValidation/EmailValidation"));
+const OTPValidation = lazy(() => import("./components/OTPValidation/OTPValidation"));
+const ComplianceStep = lazy(() => import("./components/ComplianceStep/ComplianceStep"));
+const CBUValidation = lazy(() => import("./components/CBUValidation/CBUValidation"));
+const SuccessStep = lazy(() => import("./components/SuccessStep/SuccessStep"));
 import { useComplianceForm } from "./hooks/useComplianceForm.js";
 import { useLoanSimulator } from "./hooks/useLoanSimulator";
 import styles from "./LoanSimScreen.module.css";
@@ -79,9 +81,9 @@ const LoanSimScreen = () => {
   );
 
   const renderStep = () => {
-    switch (step) {
-      case LOAN_SIM_STEPS.SIMULACION:
-        return (
+    return (
+      <Suspense fallback={<div className={styles.loaderContainer}><Loader /></div>}>
+        {step === LOAN_SIM_STEPS.SIMULACION && (
           <SimulationStep
             amount={amount}
             installment={installment}
@@ -93,20 +95,16 @@ const LoanSimScreen = () => {
             onNextStep={handleNextStep}
             error={error}
           />
-        );
-
-      case LOAN_SIM_STEPS.EMAIL_VALIDATION:
-        return (
+        )}
+        {step === LOAN_SIM_STEPS.EMAIL_VALIDATION && (
           <EmailValidation
             onValidate={solicitarOTP}
             onBack={handlePrevStep}
             loading={validating}
             error={error}
           />
-        );
-
-      case LOAN_SIM_STEPS.OTP_VALIDATION:
-        return (
+        )}
+        {step === LOAN_SIM_STEPS.OTP_VALIDATION && (
           <OTPValidation
             onValidate={verificarOTP}
             onResend={solicitarOTP}
@@ -115,31 +113,26 @@ const LoanSimScreen = () => {
             error={error}
             email={email}
           />
-        );
-
-      case LOAN_SIM_STEPS.COMPLIANCE:
-        if (initialComplianceStep === null) {
-          return (
+        )}
+        {step === LOAN_SIM_STEPS.COMPLIANCE && (
+          initialComplianceStep === null ? (
             <div className={styles.calculatorContainer}>
               <div className={styles.loaderContainer}>
                 <Loader />
               </div>
             </div>
-          );
-        }
-        return (
-          <ComplianceStep
-            scoringId={scoringId}
-            onValidate={guardarCompliance}
-            onBack={handlePrevStep}
-            loading={validating}
-            complianceForm={complianceForm}
-            error={error}
-          />
-        );
-
-      case LOAN_SIM_STEPS.CBU_VALIDATION:
-        return (
+          ) : (
+            <ComplianceStep
+              scoringId={scoringId}
+              onValidate={guardarCompliance}
+              onBack={handlePrevStep}
+              loading={validating}
+              complianceForm={complianceForm}
+              error={error}
+            />
+          )
+        )}
+        {step === LOAN_SIM_STEPS.CBU_VALIDATION && (
           <CBUValidation
             onValidate={validarCBU}
             loading={validating}
@@ -151,22 +144,18 @@ const LoanSimScreen = () => {
             codigoBancoError={codigoBancoError}
             validandoBanco={validandoBanco}
           />
-        );
-
-      case LOAN_SIM_STEPS.COMPLETADO:
-        return (
+        )}
+        {step === LOAN_SIM_STEPS.COMPLETADO && (
           <SuccessStep
             handleInfoPrestamo={handleInfoPrestamo}
             loanInfo={loanInfo}
             loadingModal={loadingModal}
             simulationData={simulationData}
           />
-        );
-
-      default:
-        return null;
-    }
-  };
+        )}
+      </Suspense>
+    );
+  }
 
   const renderBackButton = () => {
     if (
