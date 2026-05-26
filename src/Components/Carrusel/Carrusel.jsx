@@ -31,6 +31,7 @@ const Carrusel = ({ images }) => {
       <video
         ref={videoRef}
         muted
+        autoPlay
         playsInline
         preload="none"
         poster="/img/hero-img.webp"
