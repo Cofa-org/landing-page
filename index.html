@@ -1,89 +1,58 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-
-<head>
-  <!-- testing deployment 1-->
-  <meta charset="UTF-8" />
-  <!-- Google Tag Manager -->
-  <script>
-    (function (w, d, s, l, i) {
-      w[l] = w[l] || [];
-      w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
-      var f = d.getElementsByTagName(s)[0],
-        j = d.createElement(s),
-        dl = l != "dataLayer" ? "&l=" + l : "";
-      j.async = true;
-      j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
-      f.parentNode.insertBefore(j, f);
-    })(window, document, "script", "dataLayer", "GTM-NKTF7GZQ");
-  </script>
-  <!-- End Google Tag Manager -->
-
-  <!-- Meta Pixel Code -->
-  <script>
-    (function (f, b, e, v, n, t, s) {
-      if (f.fbq) return;
-      n = f.fbq = function () {
-        n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments);
-      };
-      if (!f._fbq) f._fbq = n;
-      n.push = n;
-      n.loaded = !0;
-      n.version = "2.0";
-      n.queue = [];
-      t = b.createElement(e);
-      t.async = !0;
-      t.src = v;
-
-      // Manejo de error si está bloqueado
-      t.onerror = function () {
-        console.warn("Facebook Pixel bloqueado o no disponible.");
-      };
-
-      s = b.getElementsByTagName(e)[0];
-      s.parentNode.insertBefore(t, s);
-    })(window, document, "script", "https://connect.facebook.net/en_US/fbevents.js");
-
-    try {
-      fbq("init", "1085977612494127");
-      fbq("track", "PageView");
-    } catch (err) {
-      console.warn("fbq no disponible:", err);
-    }
-  </script>
-
-  <!-- End Meta Pixel Code -->
-
-  <meta charset="UTF-8" />
-  <meta property="og:type" content="website" />
-  <meta property="og:title" content="Préstamos en el día en Argentina | COFA" />
-  <meta property="og:description" content="Solicitá tu préstamo 100% digital con mínimos requisitos." />
-  <meta property="og:url" content="https://cofa.com.ar/" />
-  <meta property="og:image" content="https://cofa.com.ar/og-image.jpg" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="preload"
-    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
-    as="style" onload="this.onload=null;this.rel='stylesheet'" />
-  <noscript>
-    <link rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" />
-  </noscript>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
-  <meta name="description"
-    content="Préstamos digitales rápidos con mínimos requisitos. Con COFA accedé a tu dinero en el día, 100% digital y con total seguridad. ¡Solicitá hoy tu préstamo!" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="color-scheme" content="light">
-  <meta name="robots" content="index, follow" />
-  <link rel="canonical" href="https://cofa.com.ar/" />
-  <link rel="preconnect" href="https://www.googletagmanager.com" />
-  <link rel="preconnect" href="https://connect.facebook.net" />
-  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
-  <link rel="dns-prefetch" href="https://connect.facebook.net" />
-  <link rel="alternate" href="https://cofa.com.ar/" hreflang="es-AR" />
-  <link rel="alternate" href="https://cofa.com.ar/" hreflang="x-default" />
-  <script type="application/ld+json">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- ✅ CRÍTICO: Preload de imagen LCP - desktop/tablet (viewport más común) -->
+    <link
+      rel="preload"
+      as="image"
+      href="/img/hero-loan-sim-600.webp"
+      fetchpriority="high"
+    />
+    
+    <!-- ✅ DNS Prefetch para recursos externos -->
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+    
+    <!-- Meta tags -->
+    <meta name="description" content="Préstamos digitales rápidos con mínimos requisitos. Con COFA accedé a tu dinero en el día, 100% digital y con total seguridad. ¡Solicitá hoy tu préstamo!" />
+    <meta name="color-scheme" content="light" />
+    <meta name="robots" content="index, follow" />
+    
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Préstamos en el día en Argentina | COFA" />
+    <meta property="og:description" content="Solicitá tu préstamo 100% digital con mínimos requisitos." />
+    <meta property="og:url" content="https://cofa.com.ar/" />
+    <meta property="og:image" content="https://cofa.com.ar/og-image.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    
+    <!-- Canonical y alternates -->
+    <link rel="canonical" href="https://cofa.com.ar/" />
+    <link rel="alternate" href="https://cofa.com.ar/" hreflang="es-AR" />
+    <link rel="alternate" href="https://cofa.com.ar/" hreflang="x-default" />
+    
+    <!-- ✅ Fuentes con preload (DESPUÉS de imagen LCP) -->
+    <link
+      rel="preload"
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <noscript>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" />
+    </noscript>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="/fav.png" />
+    
+    <title>Préstamos Digitales en el Día | COFA Fintech con 18 Años de Trayectoria | Soluciones Financieras Hoy</title>
+    
+    <!-- ✅ Schema.org JSON-LD -->
+    <script type="application/ld+json">
       {
         "@context": "https://schema.org",
         "@type": "Organization",
@@ -93,17 +62,15 @@
         "foundingDate": "2008",
         "foundingLocation": "Argentina",
         "sameAs": ["https://www.facebook.com/cofa.ar/"],
-        "contactPoint": [
-          {
-            "@type": "ContactPoint",
-            "contactType": "customer service",
-            "areaServed": "AR",
-            "availableLanguage": ["es-AR"]
-          }
-        ]
+        "contactPoint": [{
+          "@type": "ContactPoint",
+          "contactType": "customer service",
+          "areaServed": "AR",
+          "availableLanguage": ["es-AR"]
+        }]
       }
     </script>
-  <script type="application/ld+json">
+    <script type="application/ld+json">
       {
         "@context": "https://schema.org",
         "@type": "WebSite",
@@ -112,47 +79,50 @@
         "inLanguage": "es-AR"
       }
     </script>
-  <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "FinancialService",
-  "name": "COFA Préstamos",
-  "description": "Préstamos digitales rápidos con aprobación en el día, mínimos requisitos y total seguridad.",
-  "url": "https://cofa.com.ar",
-  "areaServed": "AR",
-  "serviceType": "Personal Loans",
-  "hasOfferCatalog": {
-    "@type": "OfferCatalog",
-    "name": "Planes de Préstamo COFA",
-    "itemListElement": [
+    <script type="application/ld+json">
       {
-        "@type": "Offer",
-        "name": "Préstamo Personal",
-        "description": "Desde $50.000 hasta $800.000 en 2 a 18 meses"
+        "@context": "https://schema.org",
+        "@type": "FinancialService",
+        "name": "COFA Préstamos",
+        "description": "Préstamos digitales rápidos con aprobación en el día, mínimos requisitos y total seguridad.",
+        "url": "https://cofa.com.ar",
+        "areaServed": "AR",
+        "serviceType": "Personal Loans",
+        "hasOfferCatalog": {
+          "@type": "OfferCatalog",
+          "name": "Planes de Préstamo COFA",
+          "itemListElement": [{
+            "@type": "Offer",
+            "name": "Préstamo Personal",
+            "description": "Desde $50.000 hasta $800.000 en 2 a 18 meses"
+          }]
+        }
       }
-    ]
-  }
-}
-  </script>
+    </script>
+  </head>
 
-  <link rel="icon" href="/fav.png" />
-  <title>
-    Préstamos Digitales en el Día | COFA Fintech con 18 Años de Trayectoria | Soluciones Financieras
-    Hoy
-  </title>
-</head>
+  <body>
+    <!-- Noscript para tracking -->
+    <noscript>
+      <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NKTF7GZQ" height="0" width="0" style="display:none;visibility:hidden"></iframe>
+    </noscript>
 
-<body>
-  <!-- Google Tag Manager (noscript) -->
-  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NKTF7GZQ" height="0" width="0"
-      style="display: none; visibility: hidden"></iframe></noscript>
-  <!-- End Google Tag Manager (noscript) -->
+    <div id="root"></div>
 
-  <noscript><img height="1" width="1" style="display: none"
-      src="https://www.facebook.com/tr?id=1085977612494127&ev=PageView&noscript=1" /></noscript>
+    <!-- ✅ Scripts de módulo React/Vite -->
+    <script type="module" src="/src/main.jsx"></script>
 
-  <div id="root"></div>
-  <script type="module" src="/src/main.jsx"></script>
-</body>
-
+    <!-- ✅ Google Tag Manager - cargado asap pero no bloquea render -->
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      // Usar requestIdleCallback si está disponible para no bloquear
+      var idleCallback = window.requestIdleCallback || function(cb) { setTimeout(cb, 1); };
+      idleCallback(function() {
+        var gtmScript = document.createElement('script');
+        gtmScript.async = true;
+        gtmScript.src = 'https://www.googletagmanager.com/gtm.js?id=GTM-NKTF7GZQ';
+        document.head.appendChild(gtmScript);
+      });
+    </script>
+  </body>
 </html>

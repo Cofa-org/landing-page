@@ -10,15 +10,16 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: (id) => {
-          // Solo agrupar si es código de vendor real, no icons
+          // Solo agrupar si es código de vendor real
           if (id.includes('node_modules')) {
-            // React core - siempre juntos
-            if (id.includes('react-dom') || id.includes('react/')) {
+            // React core - siempre juntos (debe incluir formik que usa createContext)
+            if (
+              id.includes('react-dom') ||
+              id.includes('react/') ||
+              id.includes('formik') ||
+              id.includes('jose')
+            ) {
               return 'vendor-react'
-            }
-            // Forms y auth
-            if (id.includes('formik') || id.includes('jose')) {
-              return 'vendor-forms'
             }
             // PDF - solo cargar cuando se necesita (lazy load via dynamic import)
             if (id.includes('jspdf')) {

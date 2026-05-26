@@ -48,6 +48,9 @@ const LoanSimScreen = () => {
     setStep,
   } = useLoanSimulator();
 
+  // Bloquear render hasta que scoringId esté disponible (evita cascading renders)
+  const isInitializing = !scoringId;
+
   useEffect(() => {
     if (step === LOAN_SIM_STEPS.COMPLIANCE) {
       verificarComplianceExistente();
@@ -183,18 +186,38 @@ const LoanSimScreen = () => {
     );
   }
 
+  // Loading screen completo mientras se inicializa (consumeLink + fetchSimulation)
+  if (isInitializing) {
+    return (
+      <>
+        <Header />
+        <div className={styles.homeCalculator_calculatorBox}>
+          <div className={styles.calculatorContainer}>
+            <div className={styles.loaderContainer}>
+              <Loader />
+              <p className={styles.loadingText}>Preparando tu simulación...</p>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </>
+    );
+  }
+
   return (
     <>
       <Header />
-      <HeroLoanSim />
-      <div className={styles.homeCalculator_calculatorBox}>
-        <div
-          className={`${styles.calculatorContainer} ${loading || validating ? styles.loadingOverlay : ""}`}
-        >
-          {renderBackButton()}
-          {renderStep()}
+      <main id="main-content">
+        <HeroLoanSim />
+        <div className={styles.homeCalculator_calculatorBox}>
+          <div
+            className={`${styles.calculatorContainer} ${loading || validating ? styles.loadingOverlay : ""}`}
+          >
+            {renderBackButton()}
+            {renderStep()}
+          </div>
         </div>
-      </div>
+      </main>
       <Footer />
     </>
   );
