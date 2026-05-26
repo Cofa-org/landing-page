@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, memo } from "react";
 import PropTypes from "prop-types";
 import GenericForm from "../../../../Components/Forms/GenericForm/GenericForm";
 import GenericInput from "../../../../Components/Forms/GenericInput/GenericInput";
@@ -177,4 +177,4 @@ CBUValidation.propTypes = {
   existingCbu: PropTypes.string,
 };
 
-export default CBUValidation;
+export default memo(CBUValidation);

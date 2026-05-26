@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import PropTypes from "prop-types";
 import GenericForm from "../../../../Components/Forms/GenericForm/GenericForm.jsx";
 import GenericButton from "../../../../Components/buttons/GenericButton/GenericButton.jsx";
@@ -90,4 +90,4 @@ OTPValidation.propTypes = {
   onBack: PropTypes.func,
 };
 
-export default OTPValidation;
+export default memo(OTPValidation);

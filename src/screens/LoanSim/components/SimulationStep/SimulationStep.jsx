@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import PropTypes from "prop-types";
 import {
   MdInfoOutline,
@@ -51,11 +51,13 @@ const SimulationStep = ({
       {/* Amount Slider */}
       <div className={styles.inputGroup}>
         <div className={styles.labelWrapper}>
-          <label className={styles.label}>¿Cuánto necesitás?</label>
+          <label className={styles.label} htmlFor="amount-slider">¿Cuánto necesitás?</label>
           <span className={styles.amountValue}>{formatCurrency(amount)}</span>
         </div>
         <input
+          id="amount-slider"
           type='range'
+          aria-label="Cantidad de dinero a solicitar"
           min={discountInstallment ? discountInstRoundToFiveHund : "5000"}
           max={maxOffer}
           step='500'
@@ -162,4 +164,4 @@ SimulationStep.propTypes = {
   onNextStep: PropTypes.func.isRequired,
 };
 
-export default SimulationStep;
+export default memo(SimulationStep);

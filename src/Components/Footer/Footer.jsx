@@ -131,7 +131,16 @@ const Footer = () => {
             className='footer-entity-container'
             href='https://www.argentina.gob.ar/aaip/datospersonales/reclama/33711334799--RL-2019-106873898-APN-DNPDP#AAIP'
             target='_blank'
+            aria-label='Reclamar ante la Agencia de Acceso a la Información Pública por Protección de Datos Personales'
           >
+            <img
+              src='/img/footer-pdp.webp'
+              alt='Logo de Protección de Datos Personales (AAIP)'
+              width='106'
+              height='73'
+              loading='lazy'
+              decoding='async'
+            />
           </a>
         </div>
         <div className='ssn-container'>

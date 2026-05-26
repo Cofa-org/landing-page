@@ -1,5 +1,4 @@
 import { useCallback } from "react";
-import { jsPDF } from "jspdf";
 
 /**
  * Hook para exportar datos a PDF con formato COFA.
@@ -23,6 +22,8 @@ export function usePDFExport(options) {
   } = options;
 
   const generatePDF = useCallback(async () => {
+    // Import dinámico — jspdf solo carga cuando el usuario hace clic en "Descargar PDF"
+    const { jsPDF } = await import('jspdf');
     const pdf = new jsPDF();
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();

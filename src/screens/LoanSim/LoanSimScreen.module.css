@@ -25,6 +25,13 @@
   min-height: 450px;
 }
 
+.loadingText {
+  margin-top: var(--spacing-lg);
+  font-size: 16px;
+  color: var(--text-color);
+  text-align: center;
+}
+
 .calculatorMainBox {
   height: 100%;
   display: flex;
@@ -280,7 +287,7 @@
 .cuitDisplay {
   font-size: 14px;
   font-weight: 500;
-  color: #6c757d;
+  color: #495057;
   text-align: center;
   margin-bottom: var(--spacing-md);
   background: #f8f9fa;

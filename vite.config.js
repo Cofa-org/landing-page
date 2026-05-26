@@ -9,12 +9,29 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-          'vendor-forms': ['formik', 'jose'],
-          'vendor-pdf': ['jspdf'],
-          'vendor-ai': ['@google/generative-ai'],
-          'vendor-ui': ['react-icons', 'react-dropzone'],
+        manualChunks: (id) => {
+          // Solo agrupar si es código de vendor real
+          if (id.includes('node_modules')) {
+            // React core - siempre juntos (debe incluir formik que usa createContext)
+            if (
+              id.includes('react-dom') ||
+              id.includes('react/') ||
+              id.includes('formik') ||
+              id.includes('jose')
+            ) {
+              return 'vendor-react'
+            }
+            // PDF - solo cargar cuando se necesita (lazy load via dynamic import)
+            if (id.includes('jspdf')) {
+              return 'vendor-pdf'
+            }
+            // AI - no se usa en el simulador
+            if (id.includes('@google/generative-ai')) {
+              return 'vendor-ai'
+            }
+            // NO agrupar react-icons - dejar que cada subpath sea su propio chunk
+            // Vite hace treeshaking mejor cuando no forzamos grupos
+          }
         },
       },
     },

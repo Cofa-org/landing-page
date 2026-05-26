@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, lazy, Suspense } from "react";
 import styles from "./SuccessStep.module.css";
 import { MdCheckCircleOutline } from "react-icons/md";
 import { COOKIE_CONFIG, UI_CONFIG } from "../../../../constants/LOAN_SIM.js";
-import LoanInfoModal from "../LoanInfoModal/LoanInfoModal.jsx";
 import { getCookie } from "../../../../lib/utils.js";
+
+const LoanInfoModal = lazy(() => import("../LoanInfoModal/LoanInfoModal.jsx"));
 
 const SuccessStep = ({ handleInfoPrestamo, loanInfo, loadingModal, simulationData }) => {
   const [showInfoModal, setShowInfoModal] = useState(false);
@@ -50,11 +51,13 @@ const SuccessStep = ({ handleInfoPrestamo, loanInfo, loadingModal, simulationDat
         </button>
       </div>
       {showInfoModal && (
-        <LoanInfoModal
-          loanInfo={loanInfo}
-          closeModal={() => setShowInfoModal(false)}
-          simulationData={simulationData}
-        />
+        <Suspense fallback={<div>Cargando detalle...</div>}>
+          <LoanInfoModal
+            loanInfo={loanInfo}
+            closeModal={() => setShowInfoModal(false)}
+            simulationData={simulationData}
+          />
+        </Suspense>
       )}
     </div>
   );
