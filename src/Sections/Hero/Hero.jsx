@@ -6,9 +6,9 @@ import { AnimatedTitle, Carrusel } from "../../Components";
 const Hero = () => {
   const arrImages = [
     // "/img/hero-img.webp",
-    "/img/videos-cofa-2-dinero-contando.mp4",
-    "/img/videos-cofa-3-dinero-contando.mp4",
-    "/img/videos-cofa-4-dinero-contando.mp4",
+    "/img/videos-cofa-2-dinero-contando.webm",
+    "/img/videos-cofa-3-dinero-contando.webm",
+    "/img/videos-cofa-4-dinero-contando.webm",
   ];
 
   return (
