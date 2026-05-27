@@ -32,7 +32,6 @@ export const useCBUValidation = (isClient, existingCbu, onValidate) => {
     }
     const hasExcessDigits = value.length > CBU_LENGTH;
     if (hasExcessDigits) {
-      console.log("entro");
       return `El ${accountType.toUpperCase()} debe tener ${CBU_LENGTH} dígitos`;
     }
     return null;
