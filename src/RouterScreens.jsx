@@ -21,6 +21,7 @@ const SacarPrestamoScreen = lazy(() => import("./screens/SacarPrestamoScreen/Sac
 const FormWorkWithUs = lazy(() => import("./Sections/WorkWithUs/FormWorkWithUs"));
 const BlogDetailScreen = lazy(() => import("./screens/blogDetailScreen/BlogDetailScreen.jsx"));
 const IaPoliciesScreen = lazy(() => import("./screens/IaPoliciesScreen.jsx/IaPoliciesScreen.jsx"));
+const ReqAutoridadesScreen = lazy(() => import("./screens/ReqAutoridadesScreen/ReqAutoridadesScreen.jsx"));
 
 /* import SuggestionsScreen from './screens/SuggestionsScreen/SuggestionsScreen' */
 
@@ -82,6 +83,11 @@ const RouterScreens = () => {
           element={<ComplaintsScreen />}
         />{" "}
         {/* Reclamos */}
+        <Route
+          path='/requerimientos-autoridades'
+          element={<ReqAutoridadesScreen />}
+        />{" "}
+        {/* Requerimientos Autoridades */}
         <Route
           path='/quejas'
           element={<QuejasScreen />}

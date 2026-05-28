@@ -86,6 +86,9 @@ const Contact = () => {
         <div>
           <Link to={"/reclamos"}>Reclamos</Link>
         </div>
+        <div>
+          <Link to={"/requerimientos-autoridades"}>Req. de autoridades</Link>
+        </div>
       </div>
       <div className='contactListLink'>
         <Link to={"/arrepentimiento"}>

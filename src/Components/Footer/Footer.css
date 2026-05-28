@@ -133,7 +133,7 @@ footer .registeredBrand {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 450px;
+  height: auto;
 }
 
 .footer-box-right div:nth-child(3) {
@@ -146,22 +146,16 @@ footer .registeredBrand {
 
 @media screen and (max-width: 1400px) {
   .footer-box-right div:nth-child(1) {
-    height: 420px;
+    height: auto;
     border-left: var(--primary-color) 1px solid;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
   }
-  .ssn-container-mobible {
-    display: flex;
-  }
-  .ssn-container-mobible img {
-    width: 60%;
-  }
 }
 @media screen and (max-width: 1200px) {
   .footer-box-right div:nth-child(1) {
-    height: 450px;
+    height: auto;
   }
 }
 

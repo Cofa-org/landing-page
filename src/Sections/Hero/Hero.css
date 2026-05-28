@@ -608,6 +608,7 @@ circle {
   height: calc(100vh - 100px);
   display: flex;
   align-items: center;
+  overflow-y: auto; /* Allow scrolling if content is too tall */
   /* margin-top: 5%; */
 }
 
