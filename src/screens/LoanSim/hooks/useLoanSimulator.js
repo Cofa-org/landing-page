@@ -5,6 +5,7 @@ import { useDebounce } from "../../../hooks/useDebounce";
 import SimuladorService from "../../../services/simuladorService";
 import { COOKIE_CONFIG, LOAN_SIM_STEPS } from "../../../constants/LOAN_SIM.js";
 import LinkResolutionService from "../../../services/linkResolutionService.js";
+import { ERROR_CAUSE } from "../../../constants/error";
 
 export const useLoanSimulator = () => {
   const [searchParams] = useSearchParams();
@@ -36,10 +37,11 @@ export const useLoanSimulator = () => {
   useEffect(() => {
     const initVerification = async () => {
       if (!shortId) {
-        setError("No se ha proporcionado un shortId de acceso válido.");
+        setStep(LOAN_SIM_STEPS.LEAD_REGISTRATION);
         return;
       }
       setLoading(true);
+      setStep(LOAN_SIM_STEPS.SIMULACION);
       try {
         const response = await LinkResolutionService.consumeLink(shortId);
 
@@ -204,6 +206,10 @@ export const useLoanSimulator = () => {
     // For now, this step is isolated - no automatic navigation
   }, []);
 
+  const handleRejected = useCallback(() => {
+    setStep(LOAN_SIM_STEPS.RECHAZADO);
+  }, []);
+
   const handleNextStep = async () => {
     if (step === LOAN_SIM_STEPS.SIMULACION) {
       setLoading(true);
@@ -265,6 +271,12 @@ export const useLoanSimulator = () => {
       } finally {
         setLoading(false);
       }
+    } else if (step === LOAN_SIM_STEPS.LEAD_REGISTRATION) {
+      setStep(LOAN_SIM_STEPS.DNI_UPLOAD);
+    } else if (step === LOAN_SIM_STEPS.DNI_UPLOAD) {
+      setStep(LOAN_SIM_STEPS.RECIBO_UPLOAD);
+    } else if (step === LOAN_SIM_STEPS.RECIBO_UPLOAD) {
+      setStep(LOAN_SIM_STEPS.WELCOME);
     } else if (step === LOAN_SIM_STEPS.EMAIL_VALIDATION) setStep(LOAN_SIM_STEPS.OTP_VALIDATION);
     else if (step === LOAN_SIM_STEPS.OTP_VALIDATION) setStep(LOAN_SIM_STEPS.COMPLIANCE);
     else if (step === LOAN_SIM_STEPS.COMPLIANCE) setStep(LOAN_SIM_STEPS.CBU_VALIDATION);
@@ -273,7 +285,10 @@ export const useLoanSimulator = () => {
 
   const handlePrevStep = async () => {
     let nextStep = null;
-    if (step === LOAN_SIM_STEPS.EMAIL_VALIDATION) nextStep = LOAN_SIM_STEPS.SIMULACION;
+    if (step === LOAN_SIM_STEPS.DNI_UPLOAD) nextStep = LOAN_SIM_STEPS.LEAD_REGISTRATION;
+    else if (step === LOAN_SIM_STEPS.RECIBO_UPLOAD) nextStep = LOAN_SIM_STEPS.DNI_UPLOAD;
+    else if (step === LOAN_SIM_STEPS.WELCOME) nextStep = LOAN_SIM_STEPS.RECIBO_UPLOAD;
+    else if (step === LOAN_SIM_STEPS.EMAIL_VALIDATION) nextStep = LOAN_SIM_STEPS.SIMULACION;
     else if (step === LOAN_SIM_STEPS.OTP_VALIDATION) nextStep = LOAN_SIM_STEPS.EMAIL_VALIDATION;
     else if (step === LOAN_SIM_STEPS.COMPLIANCE) nextStep = LOAN_SIM_STEPS.SIMULACION;
     else if (step === LOAN_SIM_STEPS.CBU_VALIDATION) nextStep = LOAN_SIM_STEPS.SIMULACION;
@@ -404,15 +419,15 @@ export const useLoanSimulator = () => {
         const cookieOptions = {
           name: COOKIE_CONFIG.NAME,
           value: scoringData.scoringId,
-          expires: COOKIE_CONFIG.EXPIRY_DAYS,
+          expires: COOKIE_CONFIG.EXPIRY_MS,
           partitioned: true,
         };
-        await setCookie(COOKIE_CONFIG.NAME, scoringData.scoringId, COOKIE_CONFIG.EXPIRY_DAYS);
+        await setCookie(COOKIE_CONFIG.NAME, scoringData.scoringId, COOKIE_CONFIG.EXPIRY_MS);
         setStep(LOAN_SIM_STEPS.COMPLETADO);
       } else {
-        const esErrorCoherencia =
-          preaprobadoResponse.message?.includes("Inconsistencia financiera") ||
-          preaprobadoResponse.message?.includes("COHERENCIA_FINANCIERA_ERROR");
+        const esErrorCoherencia = preaprobadoResponse.message?.includes(
+          ERROR_CAUSE.COHERENCIA_FINANCIERA_ERROR,
+        );
 
         if (esErrorCoherencia) {
           setError(
@@ -547,5 +562,6 @@ export const useLoanSimulator = () => {
     leadData,
     leadToken,
     handleLeadSuccess,
+    handleRejected,
   };
 };

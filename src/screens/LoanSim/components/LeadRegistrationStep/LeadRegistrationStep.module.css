@@ -1,1 +1,51 @@
-/* Empty CSS module - reuses GenericForm/GenericInput/GenericButton styles */
+.processingOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.97);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  gap: 20px;
+  border-radius: 16px;
+  padding: 1rem;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.processingTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+  text-align: center;
+}
+
+.processingSubtitle {
+  font-size: 0.9rem;
+  color: #666;
+  margin: 0;
+  text-align: center;
+  max-width: 260px;
+  line-height: 1.5;
+}
+
+.dots {
+  display: inline-block;
+}
+
+@keyframes blink {
+  0%, 20% { opacity: 0; }
+  40%, 100% { opacity: 1; }
+}
+
+.dot1 { animation: blink 1.4s infinite 0s; }
+.dot2 { animation: blink 1.4s infinite 0.2s; }
+.dot3 { animation: blink 1.4s infinite 0.4s; }

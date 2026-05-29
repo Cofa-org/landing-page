@@ -1,5 +1,8 @@
 import { useState, useCallback } from "react";
 import LeadRegistrationService from "../../../services/leadRegistrationService";
+import { ERROR_CAUSE, ERROR_MESSAGE } from "../../../constants/error";
+import { setCookie } from "../../../lib/utils";
+import { COOKIE_LEAD_TOKEN_CONFIG } from "../../../constants/LOAN_SIM";
 
 const DNI_REGEX = /^\d{7,8}$/;
 const NAME_REGEX = /^[a-zA-ZÁÉÍÓÚáéíóúÑñ\s]{2,50}$/;
@@ -56,7 +59,13 @@ export const useLeadRegistration = () => {
         { dni: formData.dni.trim(), nombre_completo: formData.nombre_completo.trim(), apellido: formData.apellido.trim() },
         signal
       );
+ 
       if (response.success && response.data) {
+        await setCookie(
+          COOKIE_LEAD_TOKEN_CONFIG.NAME,
+          response.data.token,
+          COOKIE_LEAD_TOKEN_CONFIG.EXPIRY_MS
+        );
         return {
           success: true,
           data: {
@@ -67,10 +76,23 @@ export const useLeadRegistration = () => {
           },
         };
       }
+      const isScoringRechazado =
+        response.cause === ERROR_CAUSE.SCORING_RECHAZADO ||
+        (response.message && response.message.includes(ERROR_MESSAGE.SCORING_RECHAZADO));
+      if (isScoringRechazado) {
+        return { success: false, rejected: true };
+      }
       setSubmitError(response.message || "Error al registrar. Intentá nuevamente.");
       return { success: false };
     } catch (err) {
+      console.error("LEAD_REGISTRATION_ERROR:", err);
       if (err.name === "AbortError") return { success: false, aborted: true };
+      const isScoringRechazado =
+        err.cause === ERROR_CAUSE.SCORING_RECHAZADO ||
+        (err.message && err.message.includes(ERROR_MESSAGE.SCORING_RECHAZADO));
+      if (isScoringRechazado) {
+        return { success: false, rejected: true };
+      }
       const msg = err.message || "Error de conexión. Intentá nuevamente.";
       setSubmitError(msg);
       return { success: false, error: msg };

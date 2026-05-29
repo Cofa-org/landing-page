@@ -8,11 +8,15 @@ import { HeroLoanSim } from "../../Sections/index.js";
 // Lazy load de los pasos del simulador
 const SimulationStep = lazy(() => import("./components/SimulationStep/SimulationStep"));
 const LeadRegistrationStep = lazy(() => import("./components/LeadRegistrationStep/LeadRegistrationStep"));
+const DNIUploadStep = lazy(() => import("./components/DNIUploadStep/DNIUploadStep"));
+const ReciboUploadStep = lazy(() => import("./components/ReciboUploadStep/ReciboUploadStep"));
+const WelcomeStep = lazy(() => import("./components/WelcomeStep/WelcomeStep"));
 const EmailValidation = lazy(() => import("./components/EmailValidation/EmailValidation"));
 const OTPValidation = lazy(() => import("./components/OTPValidation/OTPValidation"));
 const ComplianceStep = lazy(() => import("./components/ComplianceStep/ComplianceStep"));
 const CBUValidation = lazy(() => import("./components/CBUValidation/CBUValidation"));
 const SuccessStep = lazy(() => import("./components/SuccessStep/SuccessStep"));
+const RejectedStep = lazy(() => import("./components/RejectedStep/RejectedStep"));
 import { useComplianceForm } from "./hooks/useComplianceForm.js";
 import { useLoanSimulator } from "./hooks/useLoanSimulator";
 import styles from "./LoanSimScreen.module.css";
@@ -49,6 +53,7 @@ const LoanSimScreen = () => {
     setStep,
     leadData,
     handleLeadSuccess,
+    handleRejected,
   } = useLoanSimulator();
 
   // Bloquear render hasta que scoringId esté disponible (evita cascading renders)
@@ -90,8 +95,16 @@ const LoanSimScreen = () => {
     return (
       <Suspense fallback={<div className={styles.loaderContainer}><Loader /></div>}>
         {step === LOAN_SIM_STEPS.LEAD_REGISTRATION && (
-          <LeadRegistrationStep onSuccess={handleLeadSuccess} loading={loading} error={error} />
+          <LeadRegistrationStep onSuccess={handleLeadSuccess} onRejected={handleRejected} onNext={handleNextStep} loading={loading} error={error} />
         )}
+        {step === LOAN_SIM_STEPS.RECHAZADO && <RejectedStep />}
+        {step === LOAN_SIM_STEPS.DNI_UPLOAD && (
+          <DNIUploadStep leadId={leadData?.id} onSuccess={handleNextStep} onBack={handlePrevStep} loading={validating || loading} error={error} />
+        )}
+        {step === LOAN_SIM_STEPS.RECIBO_UPLOAD && (
+          <ReciboUploadStep leadId={leadData?.id} onSuccess={handleNextStep} onBack={handlePrevStep} loading={validating || loading} error={error} />
+        )}
+        {step === LOAN_SIM_STEPS.WELCOME && <WelcomeStep />}
         {step === LOAN_SIM_STEPS.SIMULACION && (
           <SimulationStep
             amount={amount}
@@ -169,9 +182,13 @@ const LoanSimScreen = () => {
   const renderBackButton = () => {
     if (
       step !== LOAN_SIM_STEPS.LEAD_REGISTRATION &&
+      step !== LOAN_SIM_STEPS.DNI_UPLOAD &&
+      step !== LOAN_SIM_STEPS.RECIBO_UPLOAD &&
+      step !== LOAN_SIM_STEPS.WELCOME &&
       step !== LOAN_SIM_STEPS.COMPLIANCE &&
       step !== LOAN_SIM_STEPS.SIMULACION &&
-      step !== LOAN_SIM_STEPS.COMPLETADO
+      step !== LOAN_SIM_STEPS.COMPLETADO &&
+      step !== LOAN_SIM_STEPS.RECHAZADO
     )
       return <BackButton onClick={handlePrevStep} />;
     return null;

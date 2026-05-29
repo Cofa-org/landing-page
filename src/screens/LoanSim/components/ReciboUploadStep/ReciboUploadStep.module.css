@@ -1,0 +1,119 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 8px 0;
+}
+
+.title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #333;
+  margin: 0;
+  text-align: center;
+}
+
+.description {
+  font-size: 0.95rem;
+  color: #666;
+  margin: 0;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.uploadAreaWrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.uploadArea {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed #ccc;
+  border-radius: 12px;
+  padding: 32px 16px;
+  cursor: pointer;
+  color: #888;
+  gap: 8px;
+  transition: border-color 0.2s;
+  min-height: 180px;
+}
+
+.uploadArea:hover {
+  border-color: #28a460;
+  color: #28a460;
+}
+
+.cameraIcon {
+  font-size: 2rem;
+}
+
+.fileInput {
+  display: none;
+}
+
+.preview {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  min-height: 180px;
+}
+
+.preview img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+}
+
+.checkIcon {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: #28a460;
+  color: #fff;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.error {
+  color: #d32f2f;
+  font-size: 0.875rem;
+  text-align: center;
+  margin: 0;
+}
+
+.retakeBtn {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.backLink {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 0.875rem;
+  cursor: pointer;
+  text-align: center;
+  padding: 8px;
+  text-decoration: underline;
+}
+
+.backLink:hover {
+  color: #333;
+}

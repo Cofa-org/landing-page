@@ -1,11 +1,15 @@
 export const LOAN_SIM_STEPS = {
   LEAD_REGISTRATION: "LEAD_REGISTRATION",
+  DNI_UPLOAD: "DNI_UPLOAD",
+  RECIBO_UPLOAD: "RECIBO_UPLOAD",
+  WELCOME: "WELCOME",
   SIMULACION: "SIMULACION",
   EMAIL_VALIDATION: "EMAIL_VALIDATION",
   OTP_VALIDATION: "OTP_VALIDATION",
   COMPLIANCE: "COMPLIANCE",
   CBU_VALIDATION: "CBU_VALIDATION",
   COMPLETADO: "COMPLETADO",
+  RECHAZADO: "RECHAZADO",
 };
 
 export const OTP_CONFIG = {
@@ -27,7 +31,12 @@ export const UI_CONFIG = {
 
 export const COOKIE_CONFIG = {
   NAME: "scoringId",
-  EXPIRY_DAYS: Date.now() + 2 * 60 * 60 * 1000, // 2 hours
+  EXPIRY_MS: Date.now() + 2 * 60 * 60 * 1000, // 2 hours
+};
+
+export const COOKIE_LEAD_TOKEN_CONFIG = {
+  NAME: "leadToken",
+  EXPIRY_MS: Date.now() + 2 * 60 * 60 * 1000, // 2 hours in ms
 };
 
 export const COMPLIANCE_STEPS = Object.freeze({
