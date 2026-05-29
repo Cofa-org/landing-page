@@ -11,7 +11,7 @@ import { FaArrowRightLong, FaCheck } from "react-icons/fa6";
 import MailService from "../../services/mailService.js";
 import Notification from "../Notifications/Notification.jsx";
 
-const MyDropzone = ({ field, form: { setFieldValue } }) => {
+const MyDropzone = ({ field, form: { setFieldValue, setFieldError } }) => {
   const [fileNames, setFileNames] = useState([]);
 
   const handleDeleteFiles = () => {
@@ -20,7 +20,31 @@ const MyDropzone = ({ field, form: { setFieldValue } }) => {
   };
 
   const { getRootProps, getInputProps } = useDropzone({
-    onDrop: async (acceptedFiles) => {
+    maxFiles: 1,
+    maxSize: 10 * 1024 * 1024,
+    accept: {
+      'application/pdf': ['.pdf'],
+      'image/jpeg': ['.jpeg', '.jpg'],
+      'image/png': ['.png'],
+      'application/msword': ['.doc'],
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
+      'application/vnd.ms-excel': ['.xls'],
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
+      'text/plain': ['.txt'],
+      'text/csv': ['.csv']
+    },
+    onDrop: async (acceptedFiles, fileRejections) => {
+      if (fileRejections.length > 0) {
+        const rejectedTypes = fileRejections.some(rej => rej.errors.some(err => err.code === 'file-invalid-type'));
+        if (rejectedTypes) {
+          setFieldError(field.name, "Tipo de archivo no permitido. Formatos válidos: PDF, Word, Excel, JPG, PNG, TXT, CSV.");
+        } else {
+          setFieldError(field.name, "Archivo rechazado (límite de 1 archivo, hasta 10MB).");
+        }
+        return;
+      }
+
+      if (acceptedFiles.length === 0) return;
       const file = acceptedFiles[0];
       const names = acceptedFiles.map((file) => file.name);
 
@@ -66,7 +90,7 @@ const MyDropzone = ({ field, form: { setFieldValue } }) => {
           <PiCloudArrowUp />
           <h3>Importá acá tu archivo</h3>
           <input {...getInputProps()} />
-          <p>Arrastrá o hacé click para seleccionar</p>
+          <p>Arrastrá o hacé click para seleccionar (Máx. 10MB)</p>
         </div>
       )}
     </div>

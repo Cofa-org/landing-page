@@ -22,9 +22,25 @@ const MyDropzoneMulti = ({ field, form: { setFieldValue, setFieldError }, ...pro
   const { getRootProps, getInputProps } = useDropzone({
     maxFiles: 5,
     maxSize: 10 * 1024 * 1024, // 10MB per file
+    accept: {
+      'application/pdf': ['.pdf'],
+      'image/jpeg': ['.jpeg', '.jpg'],
+      'image/png': ['.png'],
+      'application/msword': ['.doc'],
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
+      'application/vnd.ms-excel': ['.xls'],
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
+      'text/plain': ['.txt'],
+      'text/csv': ['.csv']
+    },
     onDrop: async (acceptedFiles, fileRejections) => {
       if (fileRejections.length > 0) {
-        setFieldError(field.name, "Algunos archivos fueron rechazados (límite de 5 archivos, 10MB por archivo).");
+        const rejectedTypes = fileRejections.some(rej => rej.errors.some(err => err.code === 'file-invalid-type'));
+        if (rejectedTypes) {
+          setFieldError(field.name, "Tipo de archivo no permitido. Solo se aceptan PDF, Word, Excel, JPG, PNG, TXT y CSV.");
+        } else {
+          setFieldError(field.name, "Algunos archivos fueron rechazados (límite de 5 archivos, 10MB por archivo en total).");
+        }
       }
 
       let currentFiles = [...selectedFiles];
@@ -60,7 +76,7 @@ const MyDropzoneMulti = ({ field, form: { setFieldValue, setFieldError }, ...pro
         <PiCloudArrowUpIcon size={32} />
         <h3>Importá acá tus archivos</h3>
         <input {...getInputProps()} />
-        <p>Arrastrá o hacé click para seleccionar (Máximo 5 archivos, hasta 10MB en total)</p>
+        <p>Arrastrá o hacé click para seleccionar (Máximo 5 archivos, hasta 10MB en total. Formatos: PDF, Word, Excel, JPG, PNG, TXT, CSV)</p>
       </div>
       {selectedFiles.length > 0 && (
         <div style={{ marginTop: '10px' }}>
