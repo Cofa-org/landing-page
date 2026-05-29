@@ -13,6 +13,7 @@ import Notification from "../Notifications/Notification.jsx";
 
 const MyDropzone = ({ field, form: { setFieldValue, setFieldError } }) => {
   const [fileNames, setFileNames] = useState([]);
+  const [localError, setLocalError] = useState("");
 
   const handleDeleteFiles = () => {
     // Lógica para eliminar los archivos
@@ -37,13 +38,14 @@ const MyDropzone = ({ field, form: { setFieldValue, setFieldError } }) => {
       if (fileRejections.length > 0) {
         const rejectedTypes = fileRejections.some(rej => rej.errors.some(err => err.code === 'file-invalid-type'));
         if (rejectedTypes) {
-          setFieldError(field.name, "Tipo de archivo no permitido. Formatos válidos: PDF, Word, Excel, JPG, PNG, TXT, CSV.");
+          setLocalError("Tipo de archivo no permitido. Formatos válidos: PDF, Word, Excel, JPG, PNG, TXT, CSV.");
         } else {
-          setFieldError(field.name, "Archivo rechazado (límite de 1 archivo, hasta 10MB).");
+          setLocalError("Archivo rechazado (límite de 1 archivo, hasta 10MB).");
         }
         return;
       }
 
+      setLocalError("");
       if (acceptedFiles.length === 0) return;
       const file = acceptedFiles[0];
       const names = acceptedFiles.map((file) => file.name);
@@ -93,6 +95,7 @@ const MyDropzone = ({ field, form: { setFieldValue, setFieldError } }) => {
           <p>Arrastrá o hacé click para seleccionar (Máx. 10MB)</p>
         </div>
       )}
+      {localError && <div className="error-message" style={{ marginTop: '8px' }}>{localError}</div>}
     </div>
   );
 };

@@ -11,6 +11,7 @@ import "../Forms/style.css";
 
 const MyDropzoneMulti = ({ field, form: { setFieldValue, setFieldError }, ...props }) => {
   const [selectedFiles, setSelectedFiles] = useState([]);
+  const [localError, setLocalError] = useState("");
 
   const handleDeleteFile = (index) => {
     const newFiles = [...selectedFiles];
@@ -37,12 +38,14 @@ const MyDropzoneMulti = ({ field, form: { setFieldValue, setFieldError }, ...pro
       if (fileRejections.length > 0) {
         const rejectedTypes = fileRejections.some(rej => rej.errors.some(err => err.code === 'file-invalid-type'));
         if (rejectedTypes) {
-          setFieldError(field.name, "Tipo de archivo no permitido. Solo se aceptan PDF, Word, Excel, JPG, PNG, TXT y CSV.");
+          setLocalError("Tipo de archivo no permitido. Solo se aceptan PDF, Word, Excel, JPG, PNG, TXT y CSV.");
         } else {
-          setFieldError(field.name, "Algunos archivos fueron rechazados (límite de 5 archivos, 10MB por archivo en total).");
+          setLocalError("Algunos archivos fueron rechazados (límite de 5 archivos, 10MB por archivo en total).");
         }
+        return;
       }
 
+      setLocalError("");
       let currentFiles = [...selectedFiles];
       
       for (const file of acceptedFiles) {
@@ -61,11 +64,11 @@ const MyDropzoneMulti = ({ field, form: { setFieldValue, setFieldError }, ...pro
       // Check total size
       const totalSize = currentFiles.reduce((acc, curr) => acc + (curr.buffer.byteLength || 0), 0);
       if (totalSize > 10 * 1024 * 1024) {
-        setFieldError(field.name, "El tamaño total de los archivos supera los 10MB.");
+        setLocalError("El tamaño total de los archivos supera los 10MB.");
       } else {
         setSelectedFiles(currentFiles);
         setFieldValue(field.name, currentFiles);
-        setFieldError(field.name, "");
+        setLocalError("");
       }
     },
   });
@@ -91,6 +94,7 @@ const MyDropzoneMulti = ({ field, form: { setFieldValue, setFieldError }, ...pro
           </ul>
         </div>
       )}
+      {localError && <div className="error-message" style={{ marginTop: '8px' }}>{localError}</div>}
     </div>
   );
 };
