@@ -7,6 +7,7 @@ import { HeroLoanSim } from "../../Sections/index.js";
 
 // Lazy load de los pasos del simulador
 const SimulationStep = lazy(() => import("./components/SimulationStep/SimulationStep"));
+const LeadRegistrationStep = lazy(() => import("./components/LeadRegistrationStep/LeadRegistrationStep"));
 const EmailValidation = lazy(() => import("./components/EmailValidation/EmailValidation"));
 const OTPValidation = lazy(() => import("./components/OTPValidation/OTPValidation"));
 const ComplianceStep = lazy(() => import("./components/ComplianceStep/ComplianceStep"));
@@ -46,10 +47,12 @@ const LoanSimScreen = () => {
     existingCompliance,
     verificarComplianceExistente,
     setStep,
+    leadData,
+    handleLeadSuccess,
   } = useLoanSimulator();
 
   // Bloquear render hasta que scoringId esté disponible (evita cascading renders)
-  const isInitializing = !scoringId;
+  const isInitializing = !scoringId && step === LOAN_SIM_STEPS.SIMULACION;
 
   useEffect(() => {
     if (step === LOAN_SIM_STEPS.COMPLIANCE) {
@@ -86,6 +89,9 @@ const LoanSimScreen = () => {
   const renderStep = () => {
     return (
       <Suspense fallback={<div className={styles.loaderContainer}><Loader /></div>}>
+        {step === LOAN_SIM_STEPS.LEAD_REGISTRATION && (
+          <LeadRegistrationStep onSuccess={handleLeadSuccess} loading={loading} error={error} />
+        )}
         {step === LOAN_SIM_STEPS.SIMULACION && (
           <SimulationStep
             amount={amount}
@@ -162,6 +168,7 @@ const LoanSimScreen = () => {
 
   const renderBackButton = () => {
     if (
+      step !== LOAN_SIM_STEPS.LEAD_REGISTRATION &&
       step !== LOAN_SIM_STEPS.COMPLIANCE &&
       step !== LOAN_SIM_STEPS.SIMULACION &&
       step !== LOAN_SIM_STEPS.COMPLETADO

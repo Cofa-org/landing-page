@@ -15,7 +15,7 @@ export const useLoanSimulator = () => {
   const [validating, setValidating] = useState(false);
   const [error, setError] = useState(null);
   const [scoringData, setScoringData] = useState({ scoringId: null, cuit: null });
-  const [step, setStep] = useState(LOAN_SIM_STEPS.SIMULACION);
+  const [step, setStep] = useState(LOAN_SIM_STEPS.LEAD_REGISTRATION);
   const [email, setEmail] = useState("");
   const [cbu, setCbu] = useState("");
   const debouncedAmount = useDebounce(amount, 500);
@@ -26,6 +26,8 @@ export const useLoanSimulator = () => {
   const [bancoEncontrado, setBancoEncontrado] = useState(null);
   const [codigoBancoError, setCodigoBancoError] = useState(null);
   const [validandoBanco, setValidandoBanco] = useState(false);
+  const [leadData, setLeadData] = useState(null);
+  const [leadToken, setLeadToken] = useState(null);
   // Ref to the AbortController for the current calcularPlanes request.
   // Allows cancelling in-flight fetches when the user changes the capital rapidly.
   const fetchAbortControllerRef = useRef(null);
@@ -194,6 +196,13 @@ export const useLoanSimulator = () => {
   const handleInstallmentChange = (newInstallment) => {
     setInstallment(newInstallment);
   };
+
+  const handleLeadSuccess = useCallback((data) => {
+    setLeadData(data.lead);
+    setLeadToken(data.token);
+    // Future: will set scoringData and navigate to next step
+    // For now, this step is isolated - no automatic navigation
+  }, []);
 
   const handleNextStep = async () => {
     if (step === LOAN_SIM_STEPS.SIMULACION) {
@@ -535,5 +544,8 @@ export const useLoanSimulator = () => {
     setStep,
     existingCompliance,
     verificarComplianceExistente,
+    leadData,
+    leadToken,
+    handleLeadSuccess,
   };
 };
