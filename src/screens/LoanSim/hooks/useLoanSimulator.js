@@ -3,9 +3,11 @@ import { useSearchParams } from "react-router-dom";
 import { getCookie, roundToFiveHundreds, setCookie } from "../../../lib/utils.js";
 import { useDebounce } from "../../../hooks/useDebounce";
 import SimuladorService from "../../../services/simuladorService";
-import { COOKIE_CONFIG, LOAN_SIM_STEPS } from "../../../constants/LOAN_SIM.js";
+import { COOKIE_CONFIG, COOKIE_LEAD_TOKEN_CONFIG, LOAN_SIM_STEPS, ONBOARDING_STATES } from "../../../constants/LOAN_SIM.js";
 import LinkResolutionService from "../../../services/linkResolutionService.js";
+import LeadRegistrationService from "../../../services/leadRegistrationService.js";
 import { ERROR_CAUSE } from "../../../constants/error";
+import { getDecodedToken } from "../../../lib/token.js";
 
 export const useLoanSimulator = () => {
   const [searchParams] = useSearchParams();
@@ -29,6 +31,7 @@ export const useLoanSimulator = () => {
   const [validandoBanco, setValidandoBanco] = useState(false);
   const [leadData, setLeadData] = useState(null);
   const [leadToken, setLeadToken] = useState(null);
+  const [restoringOnboarding, setRestoringOnboarding] = useState(false);
   // Ref to the AbortController for the current calcularPlanes request.
   // Allows cancelling in-flight fetches when the user changes the capital rapidly.
   const fetchAbortControllerRef = useRef(null);
@@ -186,6 +189,68 @@ export const useLoanSimulator = () => {
       fetchSimulation(debouncedAmount);
     }
   }, [debouncedAmount, scoringData.scoringId, fetchSimulation]);
+
+  // Restore onboarding state from cookie if no shortId in URL
+  useEffect(() => {
+    const restoreOnboardingState = async () => {
+      if (shortId) return; // Skip if there's a shortId in URL
+      
+      setRestoringOnboarding(true);
+      try {
+        const leadTokenValue = await getCookie(COOKIE_LEAD_TOKEN_CONFIG.NAME);
+        console.log(leadTokenValue);
+        if (!leadTokenValue) {
+          setRestoringOnboarding(false);
+          return;
+        }
+
+        // Decode the JWT token to extract leadId
+        const decoded = getDecodedToken(leadTokenValue);
+        if (!decoded || !decoded.leadId) {
+          setRestoringOnboarding(false);
+          return;
+        }
+        const leadId = decoded.leadId;
+        console.log("Extracted leadId:", leadId);
+        if (!leadId) {
+          setRestoringOnboarding(false);
+          return;
+        }
+
+        const response = await LeadRegistrationService.obtenerEstadoOnboarding(leadId);
+        console.log("Onboarding state response:", response);
+        if (response.success && response.data) {
+          const estadoOnboarding = response.data.estado_onboarding;
+          
+          // Map onboarding state to loan sim step
+          let targetStep = LOAN_SIM_STEPS.LEAD_REGISTRATION;
+          if (estadoOnboarding === ONBOARDING_STATES.LEAD_CREADO) {
+            targetStep = LOAN_SIM_STEPS.DNI_UPLOAD;
+          } else if (estadoOnboarding === ONBOARDING_STATES.DNI_SUBIDO) {
+            targetStep = LOAN_SIM_STEPS.RECIBO_UPLOAD;
+          } else if (estadoOnboarding === ONBOARDING_STATES.RECIBO_SUBIDO) {
+            targetStep = LOAN_SIM_STEPS.WELCOME;
+          } else if (estadoOnboarding === ONBOARDING_STATES.ONBOARDING_COMPLETO) {
+            targetStep = LOAN_SIM_STEPS.SIMULACION;
+          }
+
+          // Store lead data
+          if (response.data.lead) {
+            setLeadData(response.data.lead);
+          }
+          setLeadToken(leadTokenValue);
+          setStep(targetStep);
+        }
+      } catch (err) {
+        console.error("RESTORE_ONBOARDING_ERROR:", err);
+        // Continue normally if restoration fails
+      } finally {
+        setRestoringOnboarding(false);
+      }
+    };
+
+    restoreOnboardingState();
+  }, [shortId]);
 
   const handleAmountChange = (newAmount, discountInstallmentRounded) => {
     if (newAmount <= discountInstallmentRounded) {
@@ -563,5 +628,6 @@ export const useLoanSimulator = () => {
     leadToken,
     handleLeadSuccess,
     handleRejected,
+    restoringOnboarding,
   };
 };

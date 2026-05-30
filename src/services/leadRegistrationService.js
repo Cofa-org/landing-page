@@ -77,4 +77,52 @@ export default class LeadRegistrationService {
       throw error;
     }
   }
+
+  static async obtenerEstadoOnboarding(leadId, signal = null) {
+    try {
+      const url = `${LANDING_BACKEND_URL}/api/lead-registration/${leadId}/estado`;
+      const token = await getCookie(COOKIE_LEAD_TOKEN_CONFIG.NAME);
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "x-api-key": LANDING_BACKEND_API_KEY,
+          "Authorization": `Bearer ${token}`,
+        },
+        signal,
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Error al obtener el estado del lead");
+      }
+      return data;
+    } catch (error) {
+      console.error("OBTENER_ESTADO_ONBOARDING_ERROR:", error);
+      throw error;
+    }
+  }
+
+  static async obtenerLead(leadId, signal = null) {
+    try {
+      const url = `${LANDING_BACKEND_URL}/api/lead-registration/${leadId}`;
+      const token = await getCookie(COOKIE_LEAD_TOKEN_CONFIG.NAME);
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "x-api-key": LANDING_BACKEND_API_KEY,
+          "Authorization": `Bearer ${token}`,
+        },
+        signal,
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Error al obtener el lead");
+      }
+      return data;
+    } catch (error) {
+      console.error("OBTENER_LEAD_ERROR:", error);
+      throw error;
+    }
+  }
 }
