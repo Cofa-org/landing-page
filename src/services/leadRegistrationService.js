@@ -102,6 +102,33 @@ export default class LeadRegistrationService {
     }
   }
 
+  static async actualizarEstadoOnboarding({ leadId, estado }, signal = null) {
+    try {
+      const url = `${LANDING_BACKEND_URL}/api/lead-registration/actualizar-estado`;
+      const token = await getCookie(COOKIE_LEAD_TOKEN_CONFIG.NAME);
+      const body = { leadId, estado };
+      const response = await fetch(url, {
+        method: "PUT",
+        headers: {
+          "x-api-key": LANDING_BACKEND_API_KEY,
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+        signal,
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Error al actualizar estado de onboarding");
+      }
+      return data;
+    } catch (error) {
+      console.error("ACTUALIZAR_ESTADO_ONBOARDING_ERROR:", error);
+      throw error;
+    }
+  }
+
   static async obtenerLead(leadId, signal = null) {
     try {
       const url = `${LANDING_BACKEND_URL}/api/lead-registration/${leadId}`;

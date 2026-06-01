@@ -3,11 +3,9 @@ import { useSearchParams } from "react-router-dom";
 import { getCookie, roundToFiveHundreds, setCookie } from "../../../lib/utils.js";
 import { useDebounce } from "../../../hooks/useDebounce";
 import SimuladorService from "../../../services/simuladorService";
-import { COOKIE_CONFIG, COOKIE_LEAD_TOKEN_CONFIG, LOAN_SIM_STEPS, ONBOARDING_STATES } from "../../../constants/LOAN_SIM.js";
+import { COOKIE_CONFIG, LOAN_SIM_STEPS } from "../../../constants/LOAN_SIM.js";
 import LinkResolutionService from "../../../services/linkResolutionService.js";
-import LeadRegistrationService from "../../../services/leadRegistrationService.js";
 import { ERROR_CAUSE } from "../../../constants/error";
-import { getDecodedToken } from "../../../lib/token.js";
 
 export const useLoanSimulator = () => {
   const [searchParams] = useSearchParams();
@@ -29,9 +27,6 @@ export const useLoanSimulator = () => {
   const [bancoEncontrado, setBancoEncontrado] = useState(null);
   const [codigoBancoError, setCodigoBancoError] = useState(null);
   const [validandoBanco, setValidandoBanco] = useState(false);
-  const [leadData, setLeadData] = useState(null);
-  const [leadToken, setLeadToken] = useState(null);
-  const [restoringOnboarding, setRestoringOnboarding] = useState(false);
   // Ref to the AbortController for the current calcularPlanes request.
   // Allows cancelling in-flight fetches when the user changes the capital rapidly.
   const fetchAbortControllerRef = useRef(null);
@@ -190,68 +185,6 @@ export const useLoanSimulator = () => {
     }
   }, [debouncedAmount, scoringData.scoringId, fetchSimulation]);
 
-  // Restore onboarding state from cookie if no shortId in URL
-  useEffect(() => {
-    const restoreOnboardingState = async () => {
-      if (shortId) return; // Skip if there's a shortId in URL
-      
-      setRestoringOnboarding(true);
-      try {
-        const leadTokenValue = await getCookie(COOKIE_LEAD_TOKEN_CONFIG.NAME);
-        console.log(leadTokenValue);
-        if (!leadTokenValue) {
-          setRestoringOnboarding(false);
-          return;
-        }
-
-        // Decode the JWT token to extract leadId
-        const decoded = getDecodedToken(leadTokenValue);
-        if (!decoded || !decoded.leadId) {
-          setRestoringOnboarding(false);
-          return;
-        }
-        const leadId = decoded.leadId;
-        console.log("Extracted leadId:", leadId);
-        if (!leadId) {
-          setRestoringOnboarding(false);
-          return;
-        }
-
-        const response = await LeadRegistrationService.obtenerEstadoOnboarding(leadId);
-        console.log("Onboarding state response:", response);
-        if (response.success && response.data) {
-          const estadoOnboarding = response.data.estado_onboarding;
-          
-          // Map onboarding state to loan sim step
-          let targetStep = LOAN_SIM_STEPS.LEAD_REGISTRATION;
-          if (estadoOnboarding === ONBOARDING_STATES.LEAD_CREADO) {
-            targetStep = LOAN_SIM_STEPS.DNI_UPLOAD;
-          } else if (estadoOnboarding === ONBOARDING_STATES.DNI_SUBIDO) {
-            targetStep = LOAN_SIM_STEPS.RECIBO_UPLOAD;
-          } else if (estadoOnboarding === ONBOARDING_STATES.RECIBO_SUBIDO) {
-            targetStep = LOAN_SIM_STEPS.WELCOME;
-          } else if (estadoOnboarding === ONBOARDING_STATES.ONBOARDING_COMPLETO) {
-            targetStep = LOAN_SIM_STEPS.SIMULACION;
-          }
-
-          // Store lead data
-          if (response.data.lead) {
-            setLeadData(response.data.lead);
-          }
-          setLeadToken(leadTokenValue);
-          setStep(targetStep);
-        }
-      } catch (err) {
-        console.error("RESTORE_ONBOARDING_ERROR:", err);
-        // Continue normally if restoration fails
-      } finally {
-        setRestoringOnboarding(false);
-      }
-    };
-
-    restoreOnboardingState();
-  }, [shortId]);
-
   const handleAmountChange = (newAmount, discountInstallmentRounded) => {
     if (newAmount <= discountInstallmentRounded) {
       setAmount(discountInstallmentRounded);
@@ -263,17 +196,6 @@ export const useLoanSimulator = () => {
   const handleInstallmentChange = (newInstallment) => {
     setInstallment(newInstallment);
   };
-
-  const handleLeadSuccess = useCallback((data) => {
-    setLeadData(data.lead);
-    setLeadToken(data.token);
-    // Future: will set scoringData and navigate to next step
-    // For now, this step is isolated - no automatic navigation
-  }, []);
-
-  const handleRejected = useCallback(() => {
-    setStep(LOAN_SIM_STEPS.RECHAZADO);
-  }, []);
 
   const handleNextStep = async () => {
     if (step === LOAN_SIM_STEPS.SIMULACION) {
@@ -336,12 +258,6 @@ export const useLoanSimulator = () => {
       } finally {
         setLoading(false);
       }
-    } else if (step === LOAN_SIM_STEPS.LEAD_REGISTRATION) {
-      setStep(LOAN_SIM_STEPS.DNI_UPLOAD);
-    } else if (step === LOAN_SIM_STEPS.DNI_UPLOAD) {
-      setStep(LOAN_SIM_STEPS.RECIBO_UPLOAD);
-    } else if (step === LOAN_SIM_STEPS.RECIBO_UPLOAD) {
-      setStep(LOAN_SIM_STEPS.WELCOME);
     } else if (step === LOAN_SIM_STEPS.EMAIL_VALIDATION) setStep(LOAN_SIM_STEPS.OTP_VALIDATION);
     else if (step === LOAN_SIM_STEPS.OTP_VALIDATION) setStep(LOAN_SIM_STEPS.COMPLIANCE);
     else if (step === LOAN_SIM_STEPS.COMPLIANCE) setStep(LOAN_SIM_STEPS.CBU_VALIDATION);
@@ -350,10 +266,7 @@ export const useLoanSimulator = () => {
 
   const handlePrevStep = async () => {
     let nextStep = null;
-    if (step === LOAN_SIM_STEPS.DNI_UPLOAD) nextStep = LOAN_SIM_STEPS.LEAD_REGISTRATION;
-    else if (step === LOAN_SIM_STEPS.RECIBO_UPLOAD) nextStep = LOAN_SIM_STEPS.DNI_UPLOAD;
-    else if (step === LOAN_SIM_STEPS.WELCOME) nextStep = LOAN_SIM_STEPS.RECIBO_UPLOAD;
-    else if (step === LOAN_SIM_STEPS.EMAIL_VALIDATION) nextStep = LOAN_SIM_STEPS.SIMULACION;
+    if (step === LOAN_SIM_STEPS.EMAIL_VALIDATION) nextStep = LOAN_SIM_STEPS.SIMULACION;
     else if (step === LOAN_SIM_STEPS.OTP_VALIDATION) nextStep = LOAN_SIM_STEPS.EMAIL_VALIDATION;
     else if (step === LOAN_SIM_STEPS.COMPLIANCE) nextStep = LOAN_SIM_STEPS.SIMULACION;
     else if (step === LOAN_SIM_STEPS.CBU_VALIDATION) nextStep = LOAN_SIM_STEPS.SIMULACION;
@@ -624,10 +537,5 @@ export const useLoanSimulator = () => {
     setStep,
     existingCompliance,
     verificarComplianceExistente,
-    leadData,
-    leadToken,
-    handleLeadSuccess,
-    handleRejected,
-    restoringOnboarding,
   };
 };

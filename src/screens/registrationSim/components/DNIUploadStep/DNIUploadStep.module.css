@@ -5,6 +5,16 @@
   padding: 8px 0;
 }
 
+.formTemplateContainer {
+  min-height: 425px;
+}
+
+.formTemplate {
+    gap: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
 .title {
   font-size: 1.4rem;
   font-weight: 700;

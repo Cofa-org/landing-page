@@ -1,6 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import Loader from "./Components/Loader/Loader";
+import OnboardingFlowScreen from "./screens/registrationSim/OnboardingFlowScreen.jsx";
 
 // Lazy-loaded screens
 const HomeScreen = lazy(() => import("./screens/HomeScreen/HomeScreen"));
@@ -62,6 +63,10 @@ const RouterScreens = () => {
         <Route
           path='/simulador'
           element={<LoanSimScreen />}
+        />
+        <Route
+          path='/registro-simulador'
+          element={<OnboardingFlowScreen />}
         />
         {/* Preguntas Frecuentes */}
         <Route

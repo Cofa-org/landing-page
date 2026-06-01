@@ -51,7 +51,6 @@ export async function getCookie(name) {
 }
 
 export async function setCookie(name, value, expires) {
-
   if (hasCookieStore) {
     await window.cookieStore.set({ name, value, expires });
     return;

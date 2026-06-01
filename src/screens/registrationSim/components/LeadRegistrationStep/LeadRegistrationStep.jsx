@@ -1,9 +1,9 @@
 import React, { memo, useState } from "react";
 import PropTypes from "prop-types";
-import GenericForm from "../../../../Components/Forms/GenericForm/GenericForm";
-import GenericInput from "../../../../Components/Forms/GenericInput/GenericInput";
+import GenericForm from "../../../../Components/Forms/GenericForm/GenericForm.jsx";
+import GenericInput from "../../../../Components/Forms/GenericInput/GenericInput.jsx";
 import GenericButton from "../../../../Components/buttons/GenericButton/GenericButton.jsx";
-import { useLeadRegistration } from "../../hooks/useLeadRegistration";
+import { useLeadRegistration } from "../../hooks/useLeadRegistration.js";
 import styles from "./LeadRegistrationStep.module.css";
 import Loader from "../../../../Components/Loader/Loader.jsx";
 
@@ -34,7 +34,7 @@ const LeadRegistrationStep = ({ onSuccess, onRejected, onNext, loading, error: e
       title='Completá tus datos'
       description='Ingresá tu información personal para comenzar con la simulación de tu préstamo.'
       onSubmit={handleSubmit}
-      style={{ position: "relative" }}
+      // style={{ position: "relative" }}
     >
       {isSubmitting && (
         <div className={styles.processingOverlay}>
@@ -86,7 +86,7 @@ const LeadRegistrationStep = ({ onSuccess, onRejected, onNext, loading, error: e
         loading={isLoading}
         disabled={!isFormValid || isLoading}
       >
-        Comenzar Simulación
+        Enviar
       </GenericButton>
       {displayError && (
         <p style={{ color: "#d32f2f", fontSize: "14px", textAlign: "center", marginTop: "8px" }}>

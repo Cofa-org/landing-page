@@ -3,10 +3,10 @@ import PropTypes from "prop-types";
 import { FaCamera, FaCheck } from "react-icons/fa";
 import GenericButton from "../../../../Components/buttons/GenericButton/GenericButton.jsx";
 import GenericForm from "../../../../Components/Forms/GenericForm/GenericForm.jsx";
-import { useReciboUpload } from "../../hooks/useReciboUpload";
+import { useReciboUpload } from "../../hooks/useReciboUpload.js";
 import styles from "./ReciboUploadStep.module.css";
 
-const ReciboUploadStep = ({ leadId, onSuccess, onBack, loading, error: externalError }) => {
+const ReciboUploadStep = ({ leadId, onSuccess, loading, error: externalError }) => {
   const {
     preview,
     isUploading,
@@ -33,6 +33,8 @@ const ReciboUploadStep = ({ leadId, onSuccess, onBack, loading, error: externalE
       title="Subí tu recibo de sueldo"
       description="Necesitamos una foto clara de tu recibo de sueldo para verificar tu capacidad de pago."
       onSubmit={handleSubmit}
+      className={styles.formTemplateContainer}
+      children_className={styles.formTemplate}
     >
 
       <div className={styles.uploadAreaWrapper}>
@@ -68,10 +70,6 @@ const ReciboUploadStep = ({ leadId, onSuccess, onBack, loading, error: externalE
       >
         Continuar
       </GenericButton>
-
-      <GenericButton variant="secondary" onClick={onBack}>
-        Volver atrás
-      </GenericButton>
     </GenericForm>
   );
 };
@@ -79,7 +77,6 @@ const ReciboUploadStep = ({ leadId, onSuccess, onBack, loading, error: externalE
 ReciboUploadStep.propTypes = {
   leadId: PropTypes.number,
   onSuccess: PropTypes.func,
-  onBack: PropTypes.func,
   loading: PropTypes.bool,
   error: PropTypes.string,
 };

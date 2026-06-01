@@ -3,10 +3,10 @@ import PropTypes from "prop-types";
 import { FaCamera, FaCheck } from "react-icons/fa";
 import GenericButton from "../../../../Components/buttons/GenericButton/GenericButton.jsx";
 import GenericForm from "../../../../Components/Forms/GenericForm/GenericForm.jsx";
-import { useDNIUpload } from "../../hooks/useDNIUpload";
+import { useDNIUpload } from "../../hooks/useDNIUpload.js";
 import styles from "./DNIUploadStep.module.css";
 
-const DNIUploadStep = ({ leadId, onSuccess, onBack, loading, error: externalError }) => {
+const DNIUploadStep = ({ leadId, onSuccess, loading, error: externalError }) => {
   const {
     previewFront,
     previewBack,
@@ -37,6 +37,8 @@ const DNIUploadStep = ({ leadId, onSuccess, onBack, loading, error: externalErro
       title="Subí tu DNI"
       description="Necesitamos fotos claras de ambas caras de tu DNI para verificar tu identidad."
       onSubmit={handleSubmit}
+      className={styles.formTemplateContainer}
+      children_className={styles.formTemplate}
     >
 
       <div className={styles.uploadRow}>
@@ -98,10 +100,6 @@ const DNIUploadStep = ({ leadId, onSuccess, onBack, loading, error: externalErro
       >
         Continuar
       </GenericButton>
-
-      <GenericButton variant="secondary" onClick={onBack}>
-        Volver atrás
-      </GenericButton>
     </GenericForm>
   );
 };
@@ -109,7 +107,6 @@ const DNIUploadStep = ({ leadId, onSuccess, onBack, loading, error: externalErro
 DNIUploadStep.propTypes = {
   leadId: PropTypes.number,
   onSuccess: PropTypes.func,
-  onBack: PropTypes.func,
   loading: PropTypes.bool,
   error: PropTypes.string,
 };

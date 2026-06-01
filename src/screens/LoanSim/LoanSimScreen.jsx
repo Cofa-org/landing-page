@@ -7,17 +7,12 @@ import { HeroLoanSim } from "../../Sections/index.js";
 
 // Lazy load de los pasos del simulador
 const SimulationStep = lazy(() => import("./components/SimulationStep/SimulationStep"));
-const LeadRegistrationStep = lazy(() => import("./components/LeadRegistrationStep/LeadRegistrationStep"));
-const DNIUploadStep = lazy(() => import("./components/DNIUploadStep/DNIUploadStep"));
-const ReciboUploadStep = lazy(() => import("./components/ReciboUploadStep/ReciboUploadStep"));
-const WelcomeStep = lazy(() => import("./components/WelcomeStep/WelcomeStep"));
 const EmailValidation = lazy(() => import("./components/EmailValidation/EmailValidation"));
 const OTPValidation = lazy(() => import("./components/OTPValidation/OTPValidation"));
 const ComplianceStep = lazy(() => import("./components/ComplianceStep/ComplianceStep"));
 const CBUValidation = lazy(() => import("./components/CBUValidation/CBUValidation"));
 const SuccessStep = lazy(() => import("./components/SuccessStep/SuccessStep"));
 const RejectedStep = lazy(() => import("./components/RejectedStep/RejectedStep"));
-import { useComplianceForm } from "./hooks/useComplianceForm.js";
 import { useLoanSimulator } from "./hooks/useLoanSimulator";
 import styles from "./LoanSimScreen.module.css";
 
@@ -51,9 +46,6 @@ const LoanSimScreen = () => {
     existingCompliance,
     verificarComplianceExistente,
     setStep,
-    leadData,
-    handleLeadSuccess,
-    handleRejected,
   } = useLoanSimulator();
 
   // Bloquear render hasta que scoringId esté disponible (evita cascading renders)
@@ -93,18 +85,13 @@ const LoanSimScreen = () => {
 
   const renderStep = () => {
     return (
-      <Suspense fallback={<div className={styles.loaderContainer}><Loader /></div>}>
-        {step === LOAN_SIM_STEPS.LEAD_REGISTRATION && (
-          <LeadRegistrationStep onSuccess={handleLeadSuccess} onRejected={handleRejected} onNext={handleNextStep} loading={loading} error={error} />
-        )}
-        {step === LOAN_SIM_STEPS.RECHAZADO && <RejectedStep />}
-        {step === LOAN_SIM_STEPS.DNI_UPLOAD && (
-          <DNIUploadStep leadId={leadData?.id} onSuccess={handleNextStep} onBack={handlePrevStep} loading={validating || loading} error={error} />
-        )}
-        {step === LOAN_SIM_STEPS.RECIBO_UPLOAD && (
-          <ReciboUploadStep leadId={leadData?.id} onSuccess={handleNextStep} onBack={handlePrevStep} loading={validating || loading} error={error} />
-        )}
-        {step === LOAN_SIM_STEPS.WELCOME && <WelcomeStep />}
+      <Suspense
+        fallback={
+          <div className={styles.loaderContainer}>
+            <Loader />
+          </div>
+        }
+      >
         {step === LOAN_SIM_STEPS.SIMULACION && (
           <SimulationStep
             amount={amount}
@@ -136,8 +123,8 @@ const LoanSimScreen = () => {
             email={email}
           />
         )}
-        {step === LOAN_SIM_STEPS.COMPLIANCE && (
-          initialComplianceStep === null ? (
+        {step === LOAN_SIM_STEPS.COMPLIANCE &&
+          (initialComplianceStep === null ? (
             <div className={styles.calculatorContainer}>
               <div className={styles.loaderContainer}>
                 <Loader />
@@ -152,8 +139,7 @@ const LoanSimScreen = () => {
               complianceForm={complianceForm}
               error={error}
             />
-          )
-        )}
+          ))}
         {step === LOAN_SIM_STEPS.CBU_VALIDATION && (
           <CBUValidation
             onValidate={validarCBU}
@@ -177,14 +163,10 @@ const LoanSimScreen = () => {
         )}
       </Suspense>
     );
-  }
+  };
 
   const renderBackButton = () => {
     if (
-      step !== LOAN_SIM_STEPS.LEAD_REGISTRATION &&
-      step !== LOAN_SIM_STEPS.DNI_UPLOAD &&
-      step !== LOAN_SIM_STEPS.RECIBO_UPLOAD &&
-      step !== LOAN_SIM_STEPS.WELCOME &&
       step !== LOAN_SIM_STEPS.COMPLIANCE &&
       step !== LOAN_SIM_STEPS.SIMULACION &&
       step !== LOAN_SIM_STEPS.COMPLETADO &&
@@ -201,9 +183,7 @@ const LoanSimScreen = () => {
           <h2 className={styles.title}>Simulador de Préstamo</h2>
           <div className={styles.errorContainer}>
             <p className={styles.errorMsg}>{error}</p>
-            <p className={styles.errorSubtext}>
-              Por favor, ponte en contacto con un operador.
-            </p>
+            <p className={styles.errorSubtext}>Por favor, ponte en contacto con un operador.</p>
           </div>
         </div>
       </div>
@@ -231,7 +211,7 @@ const LoanSimScreen = () => {
   return (
     <>
       <Header />
-      <main id="main-content">
+      <main id='main-content'>
         <HeroLoanSim />
         <div className={styles.homeCalculator_calculatorBox}>
           <div
