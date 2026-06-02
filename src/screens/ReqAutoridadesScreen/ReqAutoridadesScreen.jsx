@@ -1,7 +1,7 @@
 import React from 'react';
 import { Footer, HeaderType2 } from '../../Components';
 import { Contact, HeroSuggestions } from '../../Sections';
-import ReqAutoridadesForm from '../../Components/Forms/ReqAutoridadesForm';
+import ReqAutoridadesForm from './components/ReqAutoridadesForm';
 
 const ReqAutoridadesScreen = () => {
   return (
