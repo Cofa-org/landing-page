@@ -58,6 +58,7 @@ const MyDropzone = ({ field, form: { setFieldValue, setFieldError } }) => {
         setFieldValue(field.name, {
           originalname: file.name,
           buffer: buffer,
+          type: file.type || "application/pdf"
         });
       } catch (error) {
         console.error(error);
@@ -121,7 +122,7 @@ const ContactForm = ({ type }) => {
 
     if (values.files && values.files.buffer) {
       const file = values.files;
-      const blob = new Blob([new Uint8Array(file.buffer)], { type: "application/pdf" });
+      const blob = new Blob([new Uint8Array(file.buffer)], { type: file.type });
       formData.append("archivoPDF", blob, file.originalname);
     }
 

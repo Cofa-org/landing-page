@@ -59,7 +59,7 @@ const PersonalLendForm = ({ type = "EL-MEJOR-TRATO" }) => {
 
     if (values.files && values.files.buffer) {
       const file = values.files;
-      const blob = new Blob([new Uint8Array(file.buffer)], { type: "application/pdf" });
+      const blob = new Blob([new Uint8Array(file.buffer)], { type: file.type || "application/pdf" });
       formData.append("archivoPDF", blob, file.originalname);
     }
 
