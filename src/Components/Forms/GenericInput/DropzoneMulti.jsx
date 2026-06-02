@@ -49,6 +49,7 @@ const DropzoneMulti = ({ field, form: { setFieldValue }, ...props }) => {
           currentFiles.push({
             originalname: file.name,
             buffer: buffer,
+            type: file.type || "application/octet-stream"
           });
         } catch (error) {
           console.error(error);

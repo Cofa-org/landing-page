@@ -22,7 +22,7 @@ export const useReqAutoridadesForm = () => {
 
     if (values.files && values.files.length > 0) {
       values.files.forEach(file => {
-        const blob = new Blob([new Uint8Array(file.buffer)], { type: "application/octet-stream" });
+        const blob = new Blob([new Uint8Array(file.buffer)], { type: file.type });
         formData.append("archivos", blob, file.originalname);
       });
     }
