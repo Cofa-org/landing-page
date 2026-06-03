@@ -9,9 +9,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap:var(--spacing-lg);
-  min-height: 425px;
+  gap: var(--spacing-3xl);
+  min-height: 760px;
 }
 
 .content {
@@ -46,7 +45,9 @@
   font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
-  transition: background 0.2s, transform 0.1s;
+  transition:
+    background 0.2s,
+    transform 0.1s;
   text-decoration: none;
   display: inline-block;
 }

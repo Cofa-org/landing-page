@@ -64,9 +64,9 @@ export const useOnboardingFlow = (onComplete) => {
           setRestoringOnboarding(false);
           return;
         }
-
+        console.log(decoded);
         const response = await LeadRegistrationService.obtenerEstadoOnboarding(leadId);
-
+console.log("Estado de onboarding obtenido:", response);
         if (response.success && response.data) {
           const estadoOnboarding = response.data.estado_onboarding;
        

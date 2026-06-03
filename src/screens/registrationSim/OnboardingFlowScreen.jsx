@@ -11,9 +11,7 @@ import RejectedStep from "./components/RejectedStep/RejectedStep.jsx";
 const LeadRegistrationStep = React.lazy(
   () => import("./components/LeadRegistrationStep/LeadRegistrationStep.jsx"),
 );
-const DNIUploadStep = React.lazy(
-  () => import("./components/DNIUploadStep/DNIUploadStep.jsx"),
-);
+const DNIUploadStep = React.lazy(() => import("./components/DNIUploadStep/DNIUploadStep.jsx"));
 const ReciboUploadStep = React.lazy(
   () => import("./components/ReciboUploadStep/ReciboUploadStep.jsx"),
 );
@@ -69,10 +67,8 @@ const OnboardingFlowScreen = () => {
             onComplete={handleWelcomeComplete}
           />
         );
-        case LOAN_SIM_STEPS.RECHAZADO:
-        return (
-          <RejectedStep />
-        )
+      case LOAN_SIM_STEPS.RECHAZADO:
+        return <RejectedStep />;
       default:
         return null;
     }
@@ -81,13 +77,21 @@ const OnboardingFlowScreen = () => {
   return (
     <>
       <Header />
-      <main id="main-content">
+      <main id='main-content'>
         <HeroLoanSim />
         <div className={styles.homeCalculator_calculatorBox}>
           <div
             className={`${styles.calculatorContainer} ${isLoading ? styles.loadingOverlay : ""}`}
           >
-            {shouldShowBackButton() && <BackButton onClick={navigateToPrev} />}
+            {shouldShowBackButton() && (
+              <BackButton
+                onClick={navigateToPrev}
+                style={{
+                  "width": "100%",
+                  "margin-bottom": "1rem",
+                }}
+              />
+            )}
             <Suspense
               fallback={
                 <div className={styles.loaderContainer}>

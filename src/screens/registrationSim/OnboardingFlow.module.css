@@ -8,7 +8,7 @@
 
 .calculatorContainer {
   border-radius: var(--border-radius-lg);
-  padding: var(--spacing-sm);
+  padding: var(--spacing-xl);
   box-shadow: var(--shadow);
   width: 100%;
   max-width: 700px;
@@ -28,4 +28,13 @@
 .loadingOverlay {
   opacity: 0.6;
   pointer-events: none;
+}
+
+@media (max-width: 480px) {
+  .calculatorContainer {
+    padding: var(--spacing-md);
+    width: 100%;
+    max-width: none;
+    border-radius: var(--border-radius-md);
+  }
 }

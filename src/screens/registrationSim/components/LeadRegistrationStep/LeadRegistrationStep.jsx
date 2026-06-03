@@ -13,8 +13,19 @@ const LeadRegistrationStep = ({ onSuccess, onRejected, onNext, loading, error: e
   const [honeypot, setHoneypot] = useState("");
   const [turnstileToken, setTurnstileToken] = useState("");
   const turnstileRef = useRef(null);
-  const { formData, errors, isSubmitting, submitError, isFormValid, handleChange, crearLead, currentSlide, setCurrentSlide, handleExpire, handleError } =
-    useLeadRegistration(turnstileToken);
+  const {
+    formData,
+    errors,
+    isSubmitting,
+    submitError,
+    isFormValid,
+    handleChange,
+    crearLead,
+    currentSlide,
+    setCurrentSlide,
+    handleExpire,
+    handleError,
+  } = useLeadRegistration(turnstileToken);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -51,30 +62,28 @@ const LeadRegistrationStep = ({ onSuccess, onRejected, onNext, loading, error: e
       description='Ingresá tu información personal para comenzar con la simulación de tu préstamo.'
       onSubmit={handleSubmit}
       // style={{ position: "relative" }}
+      className={styles.formTemplateContainer}
+      children_className={styles.formTemplate}
     >
       {isSubmitting && (
         <div className={styles.processingOverlay}>
           <div className={styles.carouselContainer}>
             <div className={styles.carouselSlide}>
               <div className={styles.illustrationWrapper}>
-                <img 
-                  src={SECURITY_SLIDES[currentSlide].image} 
-                  alt={SECURITY_SLIDES[currentSlide].title} 
-                  className={styles.slideImage} 
+                <img
+                  src={SECURITY_SLIDES[currentSlide].image}
+                  alt={SECURITY_SLIDES[currentSlide].title}
+                  className={styles.slideImage}
                 />
               </div>
-              <h3 className={styles.slideTitle}>
-                {SECURITY_SLIDES[currentSlide].title}
-              </h3>
-              <p className={styles.slideDescription}>
-                {SECURITY_SLIDES[currentSlide].description}
-              </p>
+              <h3 className={styles.slideTitle}>{SECURITY_SLIDES[currentSlide].title}</h3>
+              <p className={styles.slideDescription}>{SECURITY_SLIDES[currentSlide].description}</p>
             </div>
-            
+
             <div className={styles.progressTrack}>
-              <div 
-                key={currentSlide} 
-                className={styles.progressBar} 
+              <div
+                key={currentSlide}
+                className={styles.progressBar}
               />
             </div>
 
@@ -92,7 +101,9 @@ const LeadRegistrationStep = ({ onSuccess, onRejected, onNext, loading, error: e
 
             <div className={styles.systemStatus}>
               {/* <Loader /> */}
-              <span>Verificando tu solicitud de forma segura...</span>
+              <span>
+                Verificando tu solicitud de forma segura, esto puede demorar algunos segundos...
+              </span>
             </div>
           </div>
         </div>
@@ -140,11 +151,11 @@ const LeadRegistrationStep = ({ onSuccess, onRejected, onNext, loading, error: e
       />
       {/* Honey Pot — campo oculto anti-spam */}
       <input
-        type="text"
-        name="email"
+        type='text'
+        name='email'
         tabIndex={-1}
-        autoComplete="off"
-        aria-hidden="true"
+        autoComplete='off'
+        aria-hidden='true'
         value={honeypot}
         onChange={(e) => setHoneypot(e.target.value)}
         style={{

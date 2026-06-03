@@ -2,17 +2,22 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 8px 0;
+  padding: var(--spacing-xl);
 }
 
 .formTemplateContainer {
-  min-height: 425px;
+  min-height: 760px;
+  width: 100%;
+  margin: 0px;
+  min-width: 100%;
+  padding: var(--spacing-xl);
 }
 
 .formTemplate {
-    gap: 1rem;
-    display: flex;
-    flex-direction: column;
+  gap: var(--spacing-3xl);
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-xl);
 }
 
 .title {
@@ -33,13 +38,15 @@
 
 .uploadRow {
   display: flex;
+  justify-content: center;
   gap: 16px;
   flex-wrap: wrap;
 }
 
 .uploadBox {
   flex: 1;
-  min-width: 140px;
+  min-width: 240px;
+  max-width: 250px;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -119,7 +126,7 @@
   position: absolute;
   bottom: 8px;
   left: 8px;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0, 0, 0, 0.6);
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -141,4 +148,26 @@
 
 .backLink:hover {
   color: #333;
+}
+
+@media (max-width: 480px) {
+  .formTemplateContainer {
+    min-height: 760px;
+    width: 100%;
+    margin: 0px;
+    min-width: 100%;
+    padding: var(--spacing-md);
+  }
+  .formTemplate {
+    gap: var(--spacing-3xl);
+    display: flex;
+    flex-direction: column;
+    padding: var(--spacing-sm);
+  }
+  .container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: var(--spacing-md);
+  }
 }
