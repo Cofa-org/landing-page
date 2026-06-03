@@ -1,26 +1,42 @@
-import React, { memo, useState } from "react";
+import React, { memo, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import GenericForm from "../../../../Components/Forms/GenericForm/GenericForm.jsx";
 import GenericInput from "../../../../Components/Forms/GenericInput/GenericInput.jsx";
 import GenericButton from "../../../../Components/buttons/GenericButton/GenericButton.jsx";
-import { useLeadRegistration } from "../../hooks/useLeadRegistration.js";
+import { useLeadRegistration, SECURITY_SLIDES } from "../../hooks/useLeadRegistration.js";
+import Turnstile from "../../../../Components/Turnstile/Turnstile.jsx";
+import { TURNSTILE_SITE_KEY } from "../../../../config.js";
 import styles from "./LeadRegistrationStep.module.css";
-import Loader from "../../../../Components/Loader/Loader.jsx";
 
 const LeadRegistrationStep = ({ onSuccess, onRejected, onNext, loading, error: externalError }) => {
   const [successMessage, setSuccessMessage] = useState("");
-  const { formData, errors, isSubmitting, submitError, isFormValid, handleChange, crearLead } =
-    useLeadRegistration();
+  const [honeypot, setHoneypot] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const turnstileRef = useRef(null);
+  const { formData, errors, isSubmitting, submitError, isFormValid, handleChange, crearLead, currentSlide, setCurrentSlide, handleExpire, handleError } =
+    useLeadRegistration(turnstileToken);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!turnstileToken) return;
+    if (honeypot) return; // Silently ignore — probable bot
+
     setSuccessMessage("");
-    const result = await crearLead();
+
+    const result = await crearLead(turnstileToken);
+
     if (result.success && onSuccess) {
       setSuccessMessage("¡Datos enviados correctamente!");
       onSuccess(result.data);
       if (onNext) onNext();
-    } else if (result.rejected && onRejected) {
+      return;
+    }
+
+    turnstileRef.current?.reset();
+    setTurnstileToken("");
+
+    if (result.rejected && onRejected) {
       onRejected();
     }
   };
@@ -38,13 +54,47 @@ const LeadRegistrationStep = ({ onSuccess, onRejected, onNext, loading, error: e
     >
       {isSubmitting && (
         <div className={styles.processingOverlay}>
-          <Loader />
-          <p className={styles.processingTitle}>
-            Estamos procesando tus datos<span className={`${styles.dots} ${styles.dot1}`}>.</span>
-            <span className={styles.dot2}>.</span>
-            <span className={styles.dot3}>.</span>
-          </p>
-          <p className={styles.processingSubtitle}>Esto puede tardar unos segundos</p>
+          <div className={styles.carouselContainer}>
+            <div className={styles.carouselSlide}>
+              <div className={styles.illustrationWrapper}>
+                <img 
+                  src={SECURITY_SLIDES[currentSlide].image} 
+                  alt={SECURITY_SLIDES[currentSlide].title} 
+                  className={styles.slideImage} 
+                />
+              </div>
+              <h3 className={styles.slideTitle}>
+                {SECURITY_SLIDES[currentSlide].title}
+              </h3>
+              <p className={styles.slideDescription}>
+                {SECURITY_SLIDES[currentSlide].description}
+              </p>
+            </div>
+            
+            <div className={styles.progressTrack}>
+              <div 
+                key={currentSlide} 
+                className={styles.progressBar} 
+              />
+            </div>
+
+            <div className={styles.dotsContainer}>
+              {SECURITY_SLIDES.map((_, index) => (
+                <span
+                  key={index}
+                  className={`${styles.carouselDot} ${
+                    index === currentSlide ? styles.carouselDotActive : ""
+                  }`}
+                  onClick={() => setCurrentSlide(index)}
+                />
+              ))}
+            </div>
+
+            <div className={styles.systemStatus}>
+              {/* <Loader /> */}
+              <span>Verificando tu solicitud de forma segura...</span>
+            </div>
+          </div>
         </div>
       )}
       <GenericInput
@@ -81,10 +131,35 @@ const LeadRegistrationStep = ({ onSuccess, onRejected, onNext, loading, error: e
         error={errors.apellido}
         autoComplete='off'
       />
+      <Turnstile
+        ref={turnstileRef}
+        siteKey={TURNSTILE_SITE_KEY}
+        onVerify={setTurnstileToken}
+        onExpire={handleExpire}
+        onError={handleError}
+      />
+      {/* Honey Pot — campo oculto anti-spam */}
+      <input
+        type="text"
+        name="email"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        value={honeypot}
+        onChange={(e) => setHoneypot(e.target.value)}
+        style={{
+          position: "absolute",
+          left: "-9999px",
+          top: "auto",
+          width: "1px",
+          height: "1px",
+          overflow: "hidden",
+        }}
+      />
       <GenericButton
         type='submit'
         loading={isLoading}
-        disabled={!isFormValid || isLoading}
+        disabled={!isFormValid || !turnstileToken || isLoading}
       >
         Enviar
       </GenericButton>

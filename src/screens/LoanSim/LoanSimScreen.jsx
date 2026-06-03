@@ -12,8 +12,8 @@ const OTPValidation = lazy(() => import("./components/OTPValidation/OTPValidatio
 const ComplianceStep = lazy(() => import("./components/ComplianceStep/ComplianceStep"));
 const CBUValidation = lazy(() => import("./components/CBUValidation/CBUValidation"));
 const SuccessStep = lazy(() => import("./components/SuccessStep/SuccessStep"));
-const RejectedStep = lazy(() => import("./components/RejectedStep/RejectedStep"));
 import { useLoanSimulator } from "./hooks/useLoanSimulator";
+import { useComplianceForm } from "./hooks/useComplianceForm";
 import styles from "./LoanSimScreen.module.css";
 
 const LoanSimScreen = () => {

@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import LeadRegistrationService from "../../../services/leadRegistrationService";
 import { ERROR_CAUSE, ERROR_MESSAGE } from "../../../constants/error";
 import { setCookie } from "../../../lib/utils";
@@ -7,11 +7,60 @@ import { COOKIE_LEAD_TOKEN_CONFIG } from "../../../constants/LOAN_SIM";
 const DNI_REGEX = /^\d{7,8}$/;
 const NAME_REGEX = /^[a-zA-ZÁÉÍÓÚáéíóúÑñ\s]{2,50}$/;
 
-export const useLeadRegistration = () => {
+export const SECURITY_SLIDES = [
+  {
+    title: "Detección de Fraude Inteligente",
+    description: "Analizamos patrones en tiempo real utilizando inteligencia artificial para evitar transacciones no autorizadas.",
+    image: "/img/cofa-tips-2.webp"
+  },
+  {
+    title: "Protección Financiera Activa",
+    description: "Tu dinero y tus datos están respaldados por protocolos internacionales de seguridad financiera.",
+    image: "/img/cofa-tips-3.webp"
+  },
+  {
+    title: "Encriptación de Nivel Bancario",
+    description: "Ciframos cada dato enviado con estándares AES-256 de nivel bancario para garantizar la total privacidad de tu información.",
+    image: "/img/cofa-tips-4.webp"
+  },
+  {
+    title: "Verificación de Identidad Digital",
+    description: "Validamos tu identidad de forma segura para garantizar un proceso transparente y prevenir la suplantación.",
+    image: "/img/cofa-tips-2.webp"
+  },
+  {
+    title: "Tranquilidad y Confianza Cofa",
+    description: "Cofa es una plataforma transparente, segura y comprometida con el desarrollo de tu salud financiera.",
+    image: "/img/cofa-tips-3.webp"
+  }
+];
+
+export const useLeadRegistration = (turnstileToken) => {
   const [formData, setFormData] = useState({ dni: "", nombre_completo: "", apellido: "" });
   const [errors, setErrors] = useState({ dni: "", nombre_completo: "", apellido: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  // Carousel animation controlled by isSubmitting
+  useEffect(() => {
+    if (!isSubmitting) {
+      setCurrentSlide(0);
+      return;
+    }
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % SECURITY_SLIDES.length);
+    }, 6000);
+    return () => clearInterval(interval);
+  }, [isSubmitting]);
+
+  const handleExpire = useCallback(() => {
+    turnstileToken = "";
+  }, []);
+
+  const handleError = useCallback(() => {
+    turnstileToken = "";
+  }, []);
 
   const validateField = useCallback((name, value) => {
     const trimmed = value.trim();
@@ -56,8 +105,8 @@ export const useLeadRegistration = () => {
   }, [formData, validateField]);
 
   const crearLead = useCallback(
-    async (signal = null) => {
-      if (!validateForm()) return { success: false };
+    async (turnstileToken, signal = null) => {
+      if (!validateForm()) return { success: false, validationFailed: true };
       setIsSubmitting(true);
       setSubmitError("");
       try {
@@ -66,6 +115,7 @@ export const useLeadRegistration = () => {
             dni: formData.dni.trim(),
             nombre_completo: formData.nombre_completo.trim(),
             apellido: formData.apellido.trim(),
+            turnstileToken,
           },
           signal,
         );
@@ -110,7 +160,7 @@ export const useLeadRegistration = () => {
         setIsSubmitting(false);
       }
     },
-    [formData, validateForm],
+    [formData, validateForm, turnstileToken],
   );
 
   const isFormValid =
@@ -119,7 +169,20 @@ export const useLeadRegistration = () => {
     formData.apellido.trim() !== "" &&
     !errors.dni &&
     !errors.nombre_completo &&
-    !errors.apellido;
+    !errors.apellido &&
+    turnstileToken !== "";
 
-  return { formData, errors, isSubmitting, submitError, isFormValid, handleChange, crearLead };
+  return {
+    formData,
+    errors,
+    isSubmitting,
+    submitError,
+    isFormValid,
+    handleChange,
+    crearLead,
+    currentSlide,
+    setCurrentSlide,
+    handleExpire,
+    handleError,
+  };
 };;
