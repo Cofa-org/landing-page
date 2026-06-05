@@ -30,7 +30,7 @@ const BACK_BUTTON_STEPS = [
   LOAN_SIM_STEPS.WELCOME,
 ];
 
-export const useOnboardingFlow = (onComplete) => {
+export const useOnboardingFlow = () => {
   const [leadData, setLeadData] = useState(null);
   const [leadToken, setLeadToken] = useState(null);
   const [onboardingStep, setOnboardingStep] = useState(LOAN_SIM_STEPS.LEAD_REGISTRATION);
@@ -64,9 +64,9 @@ export const useOnboardingFlow = (onComplete) => {
           setRestoringOnboarding(false);
           return;
         }
-        console.log(decoded);
+
         const response = await LeadRegistrationService.obtenerEstadoOnboarding(leadId);
-console.log("Estado de onboarding obtenido:", response);
+
         if (response.success && response.data) {
           const estadoOnboarding = response.data.estado_onboarding;
        
@@ -83,7 +83,6 @@ console.log("Estado de onboarding obtenido:", response);
           } else if (estadoOnboarding === ONBOARDING_STATES.RECHAZADO) {
             targetStep = LOAN_SIM_STEPS.RECHAZADO;
           }
-
           if (response.data) {
             setLeadData(response.data);
           }
@@ -140,7 +139,6 @@ console.log("Estado de onboarding obtenido:", response);
   }, []);
 
   const handleRejected = useCallback(() => {
-    console.log("Lead rechazado, reseteando onboarding");
     setLeadData(null);
     setLeadToken(null);
     setOnboardingStep(LOAN_SIM_STEPS.RECHAZADO);
@@ -148,10 +146,8 @@ console.log("Estado de onboarding obtenido:", response);
   }, []);
 
   const handleWelcomeComplete = useCallback(() => {
-    if (onComplete) {
-      onComplete();
-    }
-  }, [onComplete]);
+      console.log("Onboarding completo.");
+  }, []);
 
   const resetOnboarding = useCallback(() => {
     setLeadData(null);

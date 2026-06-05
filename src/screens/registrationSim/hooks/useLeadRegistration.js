@@ -25,6 +25,7 @@ const mapFingerprintToHuellaData = (fingerprint) => {
     uniqueness_score: fingerprint.info?.uniqueness?.score || null,
     es_vpn: fingerprint.info?.classification?.vpn || false,
     es_tor: fingerprint.info?.classification?.tor || false,
+    es_bot: fingerprint.info?.classification?.bot || false,
     es_datacenter: fingerprint.info?.classification?.datacenter || false,
     nivel_peligro: fingerprint.info?.classification?.danger_level ?? null,
   };
@@ -144,11 +145,12 @@ export const useLeadRegistration = (turnstileToken) => {
       // Obtener fingerprint y mapear a huellaData
       let fingerprint = null;
       try {
-        fingerprint = await getFingerprint();
+        fingerprint = await getFingerprint({ dni: formData.dni.trim() });
       } catch (err) {
         console.warn("Fingerprint could not be obtained:", err);
       }
       const huellaData = mapFingerprintToHuellaData(fingerprint);
+      const requestId = fingerprint?.requestId || null;
 
       try {
         const response = await LeadRegistrationService.crearLead(
@@ -158,6 +160,7 @@ export const useLeadRegistration = (turnstileToken) => {
             apellido: formData.apellido.trim(),
             turnstileToken,
             huella_dispositivo: huellaData,
+            request_id: requestId,
           },
           signal,
         );
