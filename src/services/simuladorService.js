@@ -1,6 +1,6 @@
 import { LANDING_BACKEND_URL, LANDING_BACKEND_API_KEY } from "../config";
 import { HTTP_METHOD } from "../constants/HTTP_METHODS.js";
-import { HttpApi } from "../http.js";
+import { HttpApi } from "../lib/http.js";
 
 export default class SimuladorService {
   static async calcularPlanes(

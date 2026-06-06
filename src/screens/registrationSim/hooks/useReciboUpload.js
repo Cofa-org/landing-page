@@ -46,6 +46,7 @@ export const useReciboUpload = () => {
   }, [reciboFile]);
 
   const isFormValid = !!reciboFile;
+  const isImage = reciboFile ? reciboFile.type.startsWith("image/") : false;
 
   return {
     reciboFile,
@@ -53,6 +54,7 @@ export const useReciboUpload = () => {
     isUploading,
     uploadError,
     isFormValid,
+    isImage,
     handleFileChange,
     clearFile,
     subirRecibo,

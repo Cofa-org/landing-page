@@ -39,13 +39,13 @@ export const useOnboardingFlow = () => {
   const getLeadId = useCallback(() => {
     return leadData?.leadId ?? null;
   }, [leadData]);
-
+  
   useEffect(() => {
     const restoreOnboardingState = async () => {
       setRestoringOnboarding(true);
       try {
         const leadTokenValue = await getCookie(COOKIE_LEAD_TOKEN_CONFIG.NAME);
-        
+        console.log("RESTORE_ONBOARDING_LEAD_TOKEN_VALUE:", leadTokenValue);
         if (!leadTokenValue) {
           setOnboardingStep(LOAN_SIM_STEPS.LEAD_REGISTRATION);
           setRestoringOnboarding(false);
@@ -66,20 +66,20 @@ export const useOnboardingFlow = () => {
         }
 
         const response = await LeadRegistrationService.obtenerEstadoOnboarding(leadId);
-
+  
         if (response.success && response.data) {
           const estadoOnboarding = response.data.estado_onboarding;
-       
+          console.log("RESTORE_ONBOARDING_SUCCESS:", { leadId, estadoOnboarding });
           // Map onboarding state to loan sim step
           let targetStep = LOAN_SIM_STEPS.LEAD_REGISTRATION;
           if (estadoOnboarding === ONBOARDING_STATES.LEAD_CREADO) {
             targetStep = LOAN_SIM_STEPS.DNI_UPLOAD;
           } else if (estadoOnboarding === ONBOARDING_STATES.DNI_SUBIDO) {
             targetStep = LOAN_SIM_STEPS.RECIBO_UPLOAD;
-          } else if (estadoOnboarding === ONBOARDING_STATES.RECIBO_SUBIDO) {
+          } else if (estadoOnboarding === ONBOARDING_STATES.RECIBO_SUBIDO || 
+            estadoOnboarding === ONBOARDING_STATES.ONBOARDING_COMPLETO
+          ) {
             targetStep = LOAN_SIM_STEPS.WELCOME;
-          } else if (estadoOnboarding === ONBOARDING_STATES.ONBOARDING_COMPLETO) {
-            targetStep = LOAN_SIM_STEPS.SIMULACION;
           } else if (estadoOnboarding === ONBOARDING_STATES.RECHAZADO) {
             targetStep = LOAN_SIM_STEPS.RECHAZADO;
           }
@@ -105,7 +105,7 @@ export const useOnboardingFlow = () => {
       setOnboardingStep(next);
     }
   }, []);
- 
+
   const navigateToPrev = useCallback(async () => {
     const prev = PREV_STEP_MAP[onboardingStep];
 
@@ -120,11 +120,10 @@ export const useOnboardingFlow = () => {
           };
           const estadoBackendPrev = estadoMap[prev];
 
-            await LeadRegistrationService.actualizarEstadoOnboarding({
-              leadId,
-              estado: estadoBackendPrev ? estadoBackendPrev : null,
-            });
-       
+          await LeadRegistrationService.actualizarEstadoOnboarding({
+            leadId,
+            estado: estadoBackendPrev ? estadoBackendPrev : null,
+          });
         }
       } catch (err) {
         console.error("Error al sincronizar estado de onboarding:", err);
@@ -142,11 +141,6 @@ export const useOnboardingFlow = () => {
     setLeadData(null);
     setLeadToken(null);
     setOnboardingStep(LOAN_SIM_STEPS.RECHAZADO);
-  
-  }, []);
-
-  const handleWelcomeComplete = useCallback(() => {
-      console.log("Onboarding completo.");
   }, []);
 
   const resetOnboarding = useCallback(() => {
@@ -185,7 +179,6 @@ export const useOnboardingFlow = () => {
     // Handlers de steps
     handleLeadSuccess,
     handleRejected,
-    handleWelcomeComplete,
 
     // Utilidad
     getLeadId,

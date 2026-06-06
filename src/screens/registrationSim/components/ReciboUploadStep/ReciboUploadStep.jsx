@@ -1,6 +1,6 @@
 import React, { memo } from "react";
 import PropTypes from "prop-types";
-import { FaCamera, FaCheck } from "react-icons/fa";
+import { FaCamera, FaCheck, FaFilePdf } from "react-icons/fa";
 import GenericButton from "../../../../Components/buttons/GenericButton/GenericButton.jsx";
 import GenericForm from "../../../../Components/Forms/GenericForm/GenericForm.jsx";
 import { useReciboUpload } from "../../hooks/useReciboUpload.js";
@@ -12,6 +12,7 @@ const ReciboUploadStep = ({ leadId, onSuccess, loading, error: externalError }) 
     isUploading,
     uploadError,
     isFormValid,
+    isImage,
     handleFileChange,
     clearFile,
     subirRecibo,
@@ -40,7 +41,14 @@ const ReciboUploadStep = ({ leadId, onSuccess, loading, error: externalError }) 
       <div className={styles.uploadAreaWrapper}>
         {preview ? (
           <div className={styles.preview}>
-            <img src={preview} alt="Recibo de sueldo" />
+            {isImage ? (
+              <img src={preview} alt="Recibo de sueldo" />
+            ) : (
+              <div className={styles.pdfIcon}>
+                <FaFilePdf />
+                <span>PDF seleccionado</span>
+              </div>
+            )}
             <span className={styles.checkIcon}><FaCheck /></span>
             <button type="button" className={styles.retakeBtn} onClick={clearFile}>Cambiar</button>
           </div>
@@ -50,7 +58,7 @@ const ReciboUploadStep = ({ leadId, onSuccess, loading, error: externalError }) 
             <span>Tocar para subir</span>
             <input
               type="file"
-              accept="image/*"
+              accept="image/*,application/pdf"
               capture="environment"
               onChange={handleFileChange}
               className={styles.fileInput}

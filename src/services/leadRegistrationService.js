@@ -1,15 +1,32 @@
 import { LANDING_BACKEND_URL, LANDING_BACKEND_API_KEY } from "../config";
 import { HTTP_METHOD } from "../constants/HTTP_METHODS.js";
-import { HttpApi } from "../http.js";
+import { HttpApi } from "../lib/http.js";
 import { getCookie } from "../lib/utils";
 import { COOKIE_LEAD_TOKEN_CONFIG } from "../constants/LOAN_SIM.js";
 
 export default class LeadRegistrationService {
-  static async crearLead({ dni, nombre_completo, apellido, turnstileToken, huella_dispositivo, request_id }, signal = null) {
+  static async crearLead(
+    { dni, nombre_completo, apellido, turnstileToken, huella_dispositivo, request_id },
+    signal = null,
+  ) {
     try {
       const url = `${LANDING_BACKEND_URL}/api/lead-registration/crear`;
-      const body = { dni, nombre_completo, apellido, turnstileToken, huella_dispositivo, request_id };
-      const response = await HttpApi(url, body, HTTP_METHOD.POST, LANDING_BACKEND_API_KEY, null, signal);
+      const body = {
+        dni,
+        nombre_completo,
+        apellido,
+        turnstileToken,
+        huella_dispositivo,
+        request_id,
+      };
+      const response = await HttpApi(
+        url,
+        body,
+        HTTP_METHOD.POST,
+        LANDING_BACKEND_API_KEY,
+        null,
+        signal,
+      );
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -30,7 +47,14 @@ export default class LeadRegistrationService {
       const formData = new FormData();
       formData.append("dniFront", dniFront);
       formData.append("dniBack", dniBack);
-      const response = await HttpApi(url, formData, HTTP_METHOD.POST, LANDING_BACKEND_API_KEY, token, signal);
+      const response = await HttpApi(
+        url,
+        formData,
+        HTTP_METHOD.POST,
+        LANDING_BACKEND_API_KEY,
+        token,
+        signal,
+      );
 
       const data = await response.json();
       if (!response.ok) {
@@ -49,7 +73,14 @@ export default class LeadRegistrationService {
       const token = await getCookie(COOKIE_LEAD_TOKEN_CONFIG.NAME);
       const formData = new FormData();
       formData.append("file", file);
-      const response = await HttpApi(url, formData, HTTP_METHOD.POST, LANDING_BACKEND_API_KEY, token, signal);
+      const response = await HttpApi(
+        url,
+        formData,
+        HTTP_METHOD.POST,
+        LANDING_BACKEND_API_KEY,
+        token,
+        signal,
+      );
 
       const data = await response.json();
       if (!response.ok) {
@@ -66,7 +97,14 @@ export default class LeadRegistrationService {
     try {
       const url = `${LANDING_BACKEND_URL}/api/lead-registration/${leadId}/estado`;
       const token = await getCookie(COOKIE_LEAD_TOKEN_CONFIG.NAME);
-      const response = await HttpApi(url, null, HTTP_METHOD.GET, LANDING_BACKEND_API_KEY, token, signal);
+      const response = await HttpApi(
+        url,
+        null,
+        HTTP_METHOD.GET,
+        LANDING_BACKEND_API_KEY,
+        token,
+        signal,
+      );
 
       const data = await response.json();
       if (!response.ok) {
@@ -84,7 +122,14 @@ export default class LeadRegistrationService {
       const url = `${LANDING_BACKEND_URL}/api/lead-registration/actualizar-estado`;
       const token = await getCookie(COOKIE_LEAD_TOKEN_CONFIG.NAME);
       const body = { leadId, estado };
-      const response = await HttpApi(url, body, HTTP_METHOD.PUT, LANDING_BACKEND_API_KEY, token, signal);
+      const response = await HttpApi(
+        url,
+        body,
+        HTTP_METHOD.PUT,
+        LANDING_BACKEND_API_KEY,
+        token,
+        signal,
+      );
 
       const data = await response.json();
       if (!response.ok) {
@@ -101,7 +146,14 @@ export default class LeadRegistrationService {
     try {
       const url = `${LANDING_BACKEND_URL}/api/lead-registration/${leadId}`;
       const token = await getCookie(COOKIE_LEAD_TOKEN_CONFIG.NAME);
-      const response = await HttpApi(url, null, HTTP_METHOD.GET, LANDING_BACKEND_API_KEY, token, signal);
+      const response = await HttpApi(
+        url,
+        null,
+        HTTP_METHOD.GET,
+        LANDING_BACKEND_API_KEY,
+        token,
+        signal,
+      );
 
       const data = await response.json();
       if (!response.ok) {
@@ -118,7 +170,14 @@ export default class LeadRegistrationService {
     try {
       const url = `${LANDING_BACKEND_URL}/api/lead-registration/${leadId}/completo`;
       const token = await getCookie(COOKIE_LEAD_TOKEN_CONFIG.NAME);
-      const response = await HttpApi(url, null, HTTP_METHOD.POST, LANDING_BACKEND_API_KEY, token, signal);
+      const response = await HttpApi(
+        url,
+        null,
+        HTTP_METHOD.POST,
+        LANDING_BACKEND_API_KEY,
+        token,
+        signal,
+      );
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.message || "Error al marcar onboarding como completo");

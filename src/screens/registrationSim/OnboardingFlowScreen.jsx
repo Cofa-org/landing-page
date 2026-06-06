@@ -24,10 +24,8 @@ const OnboardingFlowScreen = () => {
     navigateToPrev,
     handleLeadSuccess,
     handleRejected,
-    handleWelcomeComplete,
     getLeadId,
     shouldShowBackButton,
-    isLoading,
   } = useOnboardingFlow();
 
   const renderStep = () => {
@@ -38,7 +36,6 @@ const OnboardingFlowScreen = () => {
             onSuccess={handleLeadSuccess}
             onRejected={handleRejected}
             onNext={() => navigateToNext(LOAN_SIM_STEPS.LEAD_REGISTRATION)}
-            loading={isLoading}
             error={null}
           />
         );
@@ -47,7 +44,6 @@ const OnboardingFlowScreen = () => {
           <DNIUploadStep
             leadId={getLeadId()}
             onSuccess={() => navigateToNext(LOAN_SIM_STEPS.DNI_UPLOAD)}
-            loading={isLoading}
             error={null}
           />
         );
@@ -56,15 +52,14 @@ const OnboardingFlowScreen = () => {
           <ReciboUploadStep
             leadId={getLeadId()}
             onSuccess={() => navigateToNext(LOAN_SIM_STEPS.RECIBO_UPLOAD)}
-            loading={isLoading}
             error={null}
           />
         );
       case LOAN_SIM_STEPS.WELCOME:
         return (
           <WelcomeStep
+            leadId={getLeadId()}
             onBack={navigateToPrev}
-            onComplete={handleWelcomeComplete}
           />
         );
       case LOAN_SIM_STEPS.RECHAZADO:
@@ -80,15 +75,13 @@ const OnboardingFlowScreen = () => {
       <main id='main-content'>
         <HeroLoanSim />
         <div className={styles.homeCalculator_calculatorBox}>
-          <div
-            className={`${styles.calculatorContainer} ${isLoading ? styles.loadingOverlay : ""}`}
-          >
+          <div className={styles.calculatorContainer}>
             {shouldShowBackButton() && (
               <BackButton
                 onClick={navigateToPrev}
                 style={{
-                  "width": "100%",
-                  "margin-bottom": "1rem",
+                  width: "100%",
+                  "marginBottom": "1rem",
                 }}
               />
             )}

@@ -2,29 +2,36 @@ import React, { memo } from "react";
 import PropTypes from "prop-types";
 import GenericButton from "../../../../Components/buttons/GenericButton/GenericButton.jsx";
 import styles from "./WelcomeStep.module.css";
+import { useWelcomeStep } from "../../hooks/useWelcomeStep.js";
 
-const WelcomeStep = ({ onBack, onComplete }) => {
+const WelcomeStep = ({ leadId, onBack }) => {
   const handleBack = () => onBack && onBack();
-  const handleComplete = () => onComplete && onComplete();
+
+    const {handleWelcomeComplete} = useWelcomeStep();
 
   return (
     <div className={styles.container}>
-      {/* <div className={styles.content}> */}
+      <img
+        src="/img/welcome_success_celebration.webp"
+        alt="Registro exitoso"
+        className={styles.illustration}
+      />
+      <div className={styles.content}>
         <h1 className={styles.title}>Bienvenido a Cofa!</h1>
         <p className={styles.subtitle}>
           Tu registro fue completado exitosamente.
         </p>
-        <GenericButton onClick={handleComplete}>
+        <GenericButton onClick={() => handleWelcomeComplete(leadId)}>
           Quiero mi préstamo
         </GenericButton>
-      {/* </div> */}
+      </div>
     </div>
   );
 };
 
 WelcomeStep.propTypes = {
   onBack: PropTypes.func,
-  onComplete: PropTypes.func,
+  leadId: PropTypes.number,
 };
 
 export default memo(WelcomeStep);

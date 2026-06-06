@@ -1,4 +1,4 @@
-import { HttpApi } from "../http";
+import { HttpApi } from "../lib/http.js";
 import { HTTP_METHOD } from "../constants/HTTP_METHODS.js";
 import { LANDING_BACKEND_URL, LANDING_BACKEND_API_KEY } from "../config.js";
 
