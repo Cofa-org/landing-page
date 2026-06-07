@@ -26,6 +26,9 @@ export const useDNIUpload = () => {
   }, []);
 
   const subirDNI = useCallback(async (leadId) => {
+    console.log("leadId", leadId);
+    console.log("dniFront", dniFront);
+    console.log("dniBack", dniBack);
     if (!leadId) return { success: false, error: "Lead no encontrado" };
     if (!dniFront || !dniBack) return { success: false, error: "Ambas caras del DNI son requeridas" };
 

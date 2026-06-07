@@ -45,7 +45,7 @@ export const useOnboardingFlow = () => {
       setRestoringOnboarding(true);
       try {
         const leadTokenValue = await getCookie(COOKIE_LEAD_TOKEN_CONFIG.NAME);
-        console.log("RESTORE_ONBOARDING_LEAD_TOKEN_VALUE:", leadTokenValue);
+      
         if (!leadTokenValue) {
           setOnboardingStep(LOAN_SIM_STEPS.LEAD_REGISTRATION);
           setRestoringOnboarding(false);
