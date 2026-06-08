@@ -23,7 +23,7 @@ const DNIUploadStep = ({ leadId, onSuccess, loading, error: externalError }) => 
 
   const isLoading = loading || isUploading;
   const displayError = uploadError || externalError;
-  console.log("leadId", leadId);
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     const result = await subirDNI(leadId);

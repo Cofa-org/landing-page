@@ -69,7 +69,7 @@ export const useOnboardingFlow = () => {
   
         if (response.success && response.data) {
           const estadoOnboarding = response.data.estado_onboarding;
-          console.log("RESTORE_ONBOARDING_SUCCESS:", { leadId, estadoOnboarding });
+         
           // Map onboarding state to loan sim step
           let targetStep = LOAN_SIM_STEPS.LEAD_REGISTRATION;
           if (estadoOnboarding === ONBOARDING_STATES.LEAD_CREADO) {
