@@ -37,9 +37,13 @@ export const useOnboardingFlow = () => {
   const [restoringOnboarding, setRestoringOnboarding] = useState(false);
 
   const getLeadId = useCallback(() => {
-    return leadData?.leadId ?? null;
-  }, [leadData]);
-  
+    if (leadData?.leadId) return leadData.leadId;
+    if (leadToken) {
+      const decoded = getDecodedToken(leadToken);
+      return decoded?.leadId ?? null;
+    }
+    return null;
+  }, [leadData, leadToken]);
   useEffect(() => {
     const restoreOnboardingState = async () => {
       setRestoringOnboarding(true);
@@ -112,17 +116,18 @@ export const useOnboardingFlow = () => {
     if (prev) {
       try {
         const leadId = getLeadId();
-        if (leadId) {
-          const estadoMap = {
-            [LOAN_SIM_STEPS.DNI_UPLOAD]: "LEAD_CREADO",
-            [LOAN_SIM_STEPS.RECIBO_UPLOAD]: "DNI_SUBIDO",
-            [LOAN_SIM_STEPS.WELCOME]: "RECIBO_SUBIDO",
-          };
-          const estadoBackendPrev = estadoMap[prev];
+        const estadoMap = {
+          [LOAN_SIM_STEPS.DNI_UPLOAD]: "LEAD_CREADO",
+          [LOAN_SIM_STEPS.RECIBO_UPLOAD]: "DNI_SUBIDO",
+          [LOAN_SIM_STEPS.WELCOME]: "RECIBO_SUBIDO",
+        };
+        const estadoBackendPrev = estadoMap[prev];
 
+        // Solo sincronizar si hay un estado previo que actualizar
+        if (leadId && estadoBackendPrev) {
           await LeadRegistrationService.actualizarEstadoOnboarding({
             leadId,
-            estado: estadoBackendPrev ? estadoBackendPrev : null,
+            estado: estadoBackendPrev,
           });
         }
       } catch (err) {

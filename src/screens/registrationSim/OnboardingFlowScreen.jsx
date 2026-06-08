@@ -27,7 +27,6 @@ const OnboardingFlowScreen = () => {
     getLeadId,
     shouldShowBackButton,
   } = useOnboardingFlow();
-
   const renderStep = () => {
     switch (onboardingStep) {
       case LOAN_SIM_STEPS.LEAD_REGISTRATION:

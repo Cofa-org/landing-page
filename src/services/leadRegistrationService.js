@@ -42,13 +42,11 @@ export default class LeadRegistrationService {
 
   static async subirDni({ leadId }, { dniFront, dniBack }, signal = null) {
     try {
-      console.log("dniFront", dniFront, "dniBack", dniBack);
       const url = `${LANDING_BACKEND_URL}/api/lead-registration/subir-dni/${leadId}`;
       const token = await getCookie(COOKIE_LEAD_TOKEN_CONFIG.NAME);
       const formData = new FormData();
       formData.append("dniFront", dniFront);
       formData.append("dniBack", dniBack);
-      console.log("formData", formData.entries());
       const response = await HttpApi(
         url,
         formData,
