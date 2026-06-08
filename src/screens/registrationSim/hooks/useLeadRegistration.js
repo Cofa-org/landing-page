@@ -33,6 +33,7 @@ const mapFingerprintToHuellaData = (fingerprint) => {
 
 const DNI_REGEX = /^\d{7,8}$/;
 const NAME_REGEX = /^[a-zA-ZÁÉÍÓÚáéíóúÑñ\s]{2,50}$/;
+const CELULAR_REGEX = /^549\d{10}$/;
 
 export const SECURITY_SLIDES = [
   {
@@ -68,8 +69,8 @@ export const SECURITY_SLIDES = [
 ];
 
 export const useLeadRegistration = (turnstileToken) => {
-  const [formData, setFormData] = useState({ dni: "", nombre_completo: "", apellido: "" });
-  const [errors, setErrors] = useState({ dni: "", nombre_completo: "", apellido: "" });
+  const [formData, setFormData] = useState({ dni: "", nombre_completo: "", apellido: "", celular: "" });
+  const [errors, setErrors] = useState({ dni: "", nombre_completo: "", apellido: "", celular: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -111,6 +112,10 @@ export const useLeadRegistration = (turnstileToken) => {
         if (!NAME_REGEX.test(trimmed))
           return "El apellido debe tener entre 2 y 50 caracteres alfabéticos";
         return "";
+      case "celular":
+        if (formData.celular && !CELULAR_REGEX.test(formData.celular))
+          return "El celular debe ser un número argentino válido (Ej: 5491123456789)";
+        return "";
       default:
         return "";
     }
@@ -131,6 +136,7 @@ export const useLeadRegistration = (turnstileToken) => {
       dni: validateField("dni", formData.dni),
       nombre_completo: validateField("nombre_completo", formData.nombre_completo),
       apellido: validateField("apellido", formData.apellido),
+      celular: validateField("celular", formData.celular),
     };
     setErrors(newErrors);
     return !newErrors.dni && !newErrors.nombre_completo && !newErrors.apellido;
@@ -161,6 +167,7 @@ export const useLeadRegistration = (turnstileToken) => {
             turnstileToken,
             huella_dispositivo: huellaData,
             request_id: requestId,
+            celular: formData.celular,
           },
           signal,
         );
@@ -215,6 +222,7 @@ export const useLeadRegistration = (turnstileToken) => {
     !errors.dni &&
     !errors.nombre_completo &&
     !errors.apellido &&
+    !errors.celular &&
     turnstileToken !== "";
 
   return {

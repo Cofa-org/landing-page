@@ -13,18 +13,21 @@ const ONBOARDING_STEPS = {
 };
 
 const NEXT_STEP_MAP = {
-  [LOAN_SIM_STEPS.LEAD_REGISTRATION]: LOAN_SIM_STEPS.DNI_UPLOAD,
+  [LOAN_SIM_STEPS.LEAD_REGISTRATION]: LOAN_SIM_STEPS.PHONE_VALIDATION,
+  [LOAN_SIM_STEPS.PHONE_VALIDATION]: LOAN_SIM_STEPS.DNI_UPLOAD,
   [LOAN_SIM_STEPS.DNI_UPLOAD]: LOAN_SIM_STEPS.RECIBO_UPLOAD,
   [LOAN_SIM_STEPS.RECIBO_UPLOAD]: LOAN_SIM_STEPS.WELCOME,
 };
 
 const PREV_STEP_MAP = {
-  [LOAN_SIM_STEPS.WELCOME]: LOAN_SIM_STEPS.RECIBO_UPLOAD,
+  [LOAN_SIM_STEPS.PHONE_VALIDATION]: LOAN_SIM_STEPS.LEAD_REGISTRATION,
+  [LOAN_SIM_STEPS.DNI_UPLOAD]: LOAN_SIM_STEPS.PHONE_VALIDATION,
   [LOAN_SIM_STEPS.RECIBO_UPLOAD]: LOAN_SIM_STEPS.DNI_UPLOAD,
-  [LOAN_SIM_STEPS.DNI_UPLOAD]: LOAN_SIM_STEPS.LEAD_REGISTRATION,
+  [LOAN_SIM_STEPS.WELCOME]: LOAN_SIM_STEPS.RECIBO_UPLOAD,
 };
 
 const BACK_BUTTON_STEPS = [
+  LOAN_SIM_STEPS.PHONE_VALIDATION,
   LOAN_SIM_STEPS.DNI_UPLOAD,
   LOAN_SIM_STEPS.RECIBO_UPLOAD,
   LOAN_SIM_STEPS.WELCOME,
@@ -76,8 +79,10 @@ export const useOnboardingFlow = () => {
          
           // Map onboarding state to loan sim step
           let targetStep = LOAN_SIM_STEPS.LEAD_REGISTRATION;
-          if (estadoOnboarding === ONBOARDING_STATES.LEAD_CREADO) {
+          if (estadoOnboarding === ONBOARDING_STATES.CELULAR_VALIDADO) {
             targetStep = LOAN_SIM_STEPS.DNI_UPLOAD;
+          } else if (estadoOnboarding === ONBOARDING_STATES.LEAD_CREADO) {
+            targetStep = LOAN_SIM_STEPS.PHONE_VALIDATION;
           } else if (estadoOnboarding === ONBOARDING_STATES.DNI_SUBIDO) {
             targetStep = LOAN_SIM_STEPS.RECIBO_UPLOAD;
           } else if (estadoOnboarding === ONBOARDING_STATES.RECIBO_SUBIDO || 
@@ -117,7 +122,8 @@ export const useOnboardingFlow = () => {
       try {
         const leadId = getLeadId();
         const estadoMap = {
-          [LOAN_SIM_STEPS.DNI_UPLOAD]: "LEAD_CREADO",
+          [LOAN_SIM_STEPS.PHONE_VALIDATION]: "LEAD_CREADO",
+          [LOAN_SIM_STEPS.DNI_UPLOAD]: "CELULAR_VALIDADO",
           [LOAN_SIM_STEPS.RECIBO_UPLOAD]: "DNI_SUBIDO",
           [LOAN_SIM_STEPS.WELCOME]: "RECIBO_SUBIDO",
         };
@@ -140,6 +146,8 @@ export const useOnboardingFlow = () => {
   const handleLeadSuccess = useCallback((data) => {
     setLeadData(data.lead);
     setLeadToken(data.token);
+    // Siempre navegar a PHONE_VALIDATION después de crearLead exitoso
+    setOnboardingStep(LOAN_SIM_STEPS.PHONE_VALIDATION);
   }, []);
 
   const handleRejected = useCallback(() => {

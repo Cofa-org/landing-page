@@ -6,7 +6,7 @@ import { COOKIE_LEAD_TOKEN_CONFIG } from "../constants/LOAN_SIM.js";
 
 export default class LeadRegistrationService {
   static async crearLead(
-    { dni, nombre_completo, apellido, turnstileToken, huella_dispositivo, request_id },
+    { dni, nombre_completo, apellido, turnstileToken, huella_dispositivo, request_id, celular },
     signal = null,
   ) {
     try {
@@ -18,6 +18,7 @@ export default class LeadRegistrationService {
         turnstileToken,
         huella_dispositivo,
         request_id,
+        celular,
       };
       const response = await HttpApi(
         url,
@@ -185,6 +186,54 @@ export default class LeadRegistrationService {
       return data;
     } catch (error) {
       console.error("ONBOARDING_COMPLETO_ERROR:", error);
+      throw error;
+    }
+  }
+
+  static async solicitarOTPCelular({ leadId, celular }, signal = null) {
+    try {
+      const url = `${LANDING_BACKEND_URL}/api/lead-registration/solicitar-otp-celular`;
+      const token = await getCookie(COOKIE_LEAD_TOKEN_CONFIG.NAME);
+      const body = { celular };
+      const response = await HttpApi(
+        url,
+        body,
+        HTTP_METHOD.POST,
+        LANDING_BACKEND_API_KEY,
+        token,
+        signal,
+      );
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Error al solicitar OTP de celular");
+      }
+      return data;
+    } catch (error) {
+      console.error("SOLICITAR_OTP_CELULAR_SERVICE_ERROR:", error);
+      throw error;
+    }
+  }
+
+  static async verificarOTPCelular({ leadId, codigo }, signal = null) {
+    try {
+      const url = `${LANDING_BACKEND_URL}/api/lead-registration/verificar-otp-celular`;
+      const token = await getCookie(COOKIE_LEAD_TOKEN_CONFIG.NAME);
+      const body = { codigo };
+      const response = await HttpApi(
+        url,
+        body,
+        HTTP_METHOD.POST,
+        LANDING_BACKEND_API_KEY,
+        token,
+        signal,
+      );
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Error al verificar OTP de celular");
+      }
+      return data;
+    } catch (error) {
+      console.error("VERIFICAR_OTP_CELULAR_SERVICE_ERROR:", error);
       throw error;
     }
   }

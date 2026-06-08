@@ -1,12 +1,20 @@
 import React, { memo } from "react";
 import PropTypes from "prop-types";
-import GenericForm from "../../../../Components/Forms/GenericForm/GenericForm.jsx";
-import GenericButton from "../../../../Components/buttons/GenericButton/GenericButton.jsx";
+import GenericForm from "../Forms/GenericForm/GenericForm.jsx";
+import GenericButton from "../buttons/GenericButton/GenericButton.jsx";
 import styles from "./OTPValidation.module.css";
-import { OTP_CONFIG } from "../../../../constants/LOAN_SIM.js";
+import { OTP_CONFIG } from "../../constants/LOAN_SIM.js";
 import { useOTPValidation } from "../../hooks/useOTPValidation.js";
 
-const OTPValidation = ({ onValidate, onResend, onBack, loading, error, email }) => {
+const OTPValidation = ({
+  onValidate,
+  onResend,
+  onBack,
+  loading,
+  error,
+  destination,
+  destinationType = "email",
+}) => {
   const {
     otp,
     inputRefs,
@@ -18,12 +26,20 @@ const OTPValidation = ({ onValidate, onResend, onBack, loading, error, email }) 
     handlePaste,
     handleSubmit,
     handleResendClick,
-  } = useOTPValidation({ email, onValidate, onResend });
+  } = useOTPValidation({ destination, onValidate, onResend });
+
+  const title =
+    destinationType === "phone" ? "Verificá tu celular" : "Verificá tu email";
+
+  const description =
+    destinationType === "phone"
+      ? `Ingresá el código de ${OTP_CONFIG.OTP_LENGTH} dígitos que enviamos al ${destination}`
+      : `Ingresá el código de ${OTP_CONFIG.OTP_LENGTH} dígitos que enviamos a ${destination}`;
 
   return (
     <GenericForm
-      title='Verificá tu email'
-      description={`Ingresá el código de ${OTP_CONFIG.OTP_LENGTH} dígitos que enviamos a ${email}`}
+      title={title}
+      description={description}
       onSubmit={handleSubmit}
       onBack={onBack}
       style={{
@@ -81,13 +97,19 @@ const OTPValidation = ({ onValidate, onResend, onBack, loading, error, email }) 
   );
 };
 
+OTPValidation.defaultProps = {
+  destinationType: "email",
+  destination: "",
+};
+
 OTPValidation.propTypes = {
   onValidate: PropTypes.func.isRequired,
   onResend: PropTypes.func,
+  onBack: PropTypes.func,
   loading: PropTypes.bool,
   error: PropTypes.string,
-  email: PropTypes.string.isRequired,
-  onBack: PropTypes.func,
+  destination: PropTypes.string,
+  destinationType: PropTypes.oneOf(["phone", "email"]),
 };
 
 export default memo(OTPValidation);

@@ -1,10 +1,12 @@
-import React, { Suspense, memo } from "react";
+import React, { Suspense, memo, useCallback, useState } from "react";
 import BackButton from "../../Components/buttons/backbutton/BackButton.jsx";
 import { Footer, Header } from "../../Components/index.js";
 import Loader from "../../Components/Loader/Loader.jsx";
 import { HeroLoanSim } from "../../Sections/index.js";
 import { LOAN_SIM_STEPS } from "../../constants/LOAN_SIM.js";
 import { useOnboardingFlow } from "./hooks/useOnboardingFlow.js";
+import OTPValidation from "../../Components/OTPValidation/OTPValidation.jsx";
+import LeadRegistrationService from "../../services/leadRegistrationService.js";
 import styles from "./OnboardingFlow.module.css";
 import RejectedStep from "./components/RejectedStep/RejectedStep.jsx";
 
@@ -26,7 +28,44 @@ const OnboardingFlowScreen = () => {
     handleRejected,
     getLeadId,
     shouldShowBackButton,
+    leadData,
   } = useOnboardingFlow();
+  const [validating, setValidating] = useState(false);
+  const [error, setError] = useState(null);
+
+  const handleVerificarOTP = useCallback(async (codigo) => {
+    const leadId = getLeadId();
+    if (!leadId) return;
+    setValidating(true);
+    setError(null);
+    try {
+      const result = await LeadRegistrationService.verificarOTPCelular({ leadId, codigo });
+      if (result.success) {
+        navigateToNext(onboardingStep);
+      }
+    } catch (err) {
+      setError(err.message || "Código incorrecto o expirado");
+    } finally {
+      setValidating(false);
+    }
+  }, [getLeadId, onboardingStep]);
+
+  const handleReenviarOTP = useCallback(async (destination) => {
+    const leadId = getLeadId();
+    if (!leadId || !destination) return;
+    setValidating(true);
+    setError(null);
+    try {
+      await LeadRegistrationService.solicitarOTPCelular({ leadId, celular: destination });
+    } catch (err) {
+      setError(err.message || "Error al reenviar el código");
+    } finally {
+      setValidating(false);
+    }
+  }, [getLeadId]);
+
+  const handlePrevStep = navigateToPrev;
+
   const renderStep = () => {
     switch (onboardingStep) {
       case LOAN_SIM_STEPS.LEAD_REGISTRATION:
@@ -52,6 +91,18 @@ const OnboardingFlowScreen = () => {
             leadId={getLeadId()}
             onSuccess={() => navigateToNext(LOAN_SIM_STEPS.RECIBO_UPLOAD)}
             error={null}
+          />
+        );
+      case LOAN_SIM_STEPS.PHONE_VALIDATION:
+        return (
+          <OTPValidation
+            destination={leadData?.celular}
+            destinationType="phone"
+            onValidate={handleVerificarOTP}
+            onResend={handleReenviarOTP}
+            onBack={handlePrevStep}
+            loading={validating}
+            error={error}
           />
         );
       case LOAN_SIM_STEPS.WELCOME:

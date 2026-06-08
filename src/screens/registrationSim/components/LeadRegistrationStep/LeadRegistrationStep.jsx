@@ -142,6 +142,18 @@ const LeadRegistrationStep = ({ onSuccess, onRejected, onNext, loading, error: e
         error={errors.apellido}
         autoComplete='off'
       />
+      <GenericInput
+        label='Celular'
+        name='celular'
+        type='tel'
+        inputMode='tel'
+        value={formData.celular}
+        onChange={handleChange}
+        placeholder='Ej: 5491123456789'
+        required
+        error={errors.celular}
+        autoComplete='tel'
+      />
       <Turnstile
         ref={turnstileRef}
         siteKey={TURNSTILE_SITE_KEY}

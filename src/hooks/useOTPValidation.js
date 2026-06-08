@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
-import { OTP_CONFIG } from "../../../constants/LOAN_SIM.js";
+import { OTP_CONFIG } from "../constants/LOAN_SIM.js";
 
-export const useOTPValidation = ({ email, onValidate, onResend }) => {
+export const useOTPValidation = ({ destination, onValidate, onResend }) => {
   const [otp, setOtp] = useState(() => new Array(OTP_CONFIG.OTP_LENGTH).fill(""));
   const inputRefs = useRef([]);
   const [cooldown, setCooldown] = useState(0);
@@ -75,7 +75,7 @@ export const useOTPValidation = ({ email, onValidate, onResend }) => {
   const handleResendClick = async () => {
     if (cooldown > 0) return;
     if (onResend) {
-      await onResend(email, true);
+      await onResend(destination);
       const expiry = Date.now() + OTP_CONFIG.COOLDOWN_DURATION * 1000;
       localStorage.setItem("otp_cooldown_expiry", expiry.toString());
       setCooldown(OTP_CONFIG.COOLDOWN_DURATION);

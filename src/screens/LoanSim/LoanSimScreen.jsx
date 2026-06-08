@@ -8,7 +8,7 @@ import { HeroLoanSim } from "../../Sections/index.js";
 // Lazy load de los pasos del simulador
 const SimulationStep = lazy(() => import("./components/SimulationStep/SimulationStep"));
 const EmailValidation = lazy(() => import("./components/EmailValidation/EmailValidation"));
-const OTPValidation = lazy(() => import("./components/OTPValidation/OTPValidation"));
+const OTPValidation = lazy(() => import("../../Components/OTPValidation/OTPValidation.jsx"));
 const ComplianceStep = lazy(() => import("./components/ComplianceStep/ComplianceStep"));
 const CBUValidation = lazy(() => import("./components/CBUValidation/CBUValidation"));
 const SuccessStep = lazy(() => import("./components/SuccessStep/SuccessStep"));
@@ -120,7 +120,8 @@ const LoanSimScreen = () => {
             onBack={handlePrevStep}
             loading={validating}
             error={error}
-            email={email}
+            destination={email}
+            destinationType="email"
           />
         )}
         {step === LOAN_SIM_STEPS.COMPLIANCE &&

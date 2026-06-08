@@ -240,7 +240,7 @@ export const useLoanSimulator = () => {
         };
 
         const response = await SimuladorService.guardarPlan(payload);
-
+        
         if (
           (response.success && !existingSimulation?.email_validado) ||
           (response.data && !existingSimulation?.email_validado)
@@ -286,14 +286,14 @@ export const useLoanSimulator = () => {
     }
   };
 
-  const solicitarOTP = async (emailValue, isResend = false) => {
+  const solicitarOTP = async (emailValue) => {
     setValidating(true);
     setError(null);
     try {
       const params = {
         scoringId: scoringData.scoringId,
         email: emailValue,
-        isResend,
+        isResend: true,
       };
       const response = await SimuladorService.solicitarOTP(params);
       if (response.success || response.data) {
