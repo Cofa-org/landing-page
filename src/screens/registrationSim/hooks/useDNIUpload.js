@@ -1,0 +1,76 @@
+import { useState, useCallback } from "react";
+import LeadRegistrationService from "../../../services/leadRegistrationService";
+
+export const useDNIUpload = () => {
+  const [dniFront, setDniFront] = useState(null);
+  const [dniBack, setDniBack] = useState(null);
+  const [previewFront, setPreviewFront] = useState(null);
+  const [previewBack, setPreviewBack] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+
+  const handleFileChange = useCallback((e, setFile, setPreview) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setFile(file);
+    setPreview(URL.createObjectURL(file));
+    setUploadError("");
+  }, []);
+
+  const clearFiles = useCallback(() => {
+    setDniFront(null);
+    setDniBack(null);
+    setPreviewFront(null);
+    setPreviewBack(null);
+    setUploadError("");
+  }, []);
+
+  const subirDNI = useCallback(async (leadId) => {
+    console.log("leadId", leadId);
+    console.log("dniFront", dniFront);
+    console.log("dniBack", dniBack);
+    if (!leadId) return { success: false, error: "Lead no encontrado" };
+    if (!dniFront || !dniBack) return { success: false, error: "Ambas caras del DNI son requeridas" };
+
+    setIsUploading(true);
+    setUploadError("");
+
+    try {
+      const response = await LeadRegistrationService.subirDni(
+        { leadId },
+        { dniFront, dniBack }
+      );
+      if (response.success) {
+        return { success: true };
+      }
+      const msg = response.message || "Error al subir el DNI";
+      setUploadError(msg);
+      return { success: false, error: msg };
+    } catch (err) {
+      const msg = err.message || "Error de conexión";
+      setUploadError(msg);
+      return { success: false, error: msg };
+    } finally {
+      setIsUploading(false);
+    }
+  }, [dniFront, dniBack]);
+
+  const isFormValid = dniFront && dniBack;
+
+  return {
+    dniFront,
+    dniBack,
+    previewFront,
+    previewBack,
+    isUploading,
+    uploadError,
+    isFormValid,
+    handleFileChange,
+    clearFiles,
+    subirDNI,
+    setDniFront,
+    setDniBack,
+    setPreviewFront,
+    setPreviewBack,
+  };
+};

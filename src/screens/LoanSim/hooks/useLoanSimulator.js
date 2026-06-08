@@ -5,6 +5,7 @@ import { useDebounce } from "../../../hooks/useDebounce";
 import SimuladorService from "../../../services/simuladorService";
 import { COOKIE_CONFIG, LOAN_SIM_STEPS } from "../../../constants/LOAN_SIM.js";
 import LinkResolutionService from "../../../services/linkResolutionService.js";
+import { ERROR_CAUSE } from "../../../constants/error";
 
 export const useLoanSimulator = () => {
   const [searchParams] = useSearchParams();
@@ -15,7 +16,7 @@ export const useLoanSimulator = () => {
   const [validating, setValidating] = useState(false);
   const [error, setError] = useState(null);
   const [scoringData, setScoringData] = useState({ scoringId: null, cuit: null });
-  const [step, setStep] = useState(LOAN_SIM_STEPS.SIMULACION);
+  const [step, setStep] = useState(LOAN_SIM_STEPS.LEAD_REGISTRATION);
   const [email, setEmail] = useState("");
   const [cbu, setCbu] = useState("");
   const debouncedAmount = useDebounce(amount, 500);
@@ -34,10 +35,11 @@ export const useLoanSimulator = () => {
   useEffect(() => {
     const initVerification = async () => {
       if (!shortId) {
-        setError("No se ha proporcionado un shortId de acceso válido.");
+        setStep(LOAN_SIM_STEPS.LEAD_REGISTRATION);
         return;
       }
       setLoading(true);
+      setStep(LOAN_SIM_STEPS.SIMULACION);
       try {
         const response = await LinkResolutionService.consumeLink(shortId);
 
@@ -395,15 +397,15 @@ export const useLoanSimulator = () => {
         const cookieOptions = {
           name: COOKIE_CONFIG.NAME,
           value: scoringData.scoringId,
-          expires: COOKIE_CONFIG.EXPIRY_DAYS,
+          expires: COOKIE_CONFIG.EXPIRY_MS,
           partitioned: true,
         };
-        await setCookie(COOKIE_CONFIG.NAME, scoringData.scoringId, COOKIE_CONFIG.EXPIRY_DAYS);
+        await setCookie(COOKIE_CONFIG.NAME, scoringData.scoringId, COOKIE_CONFIG.EXPIRY_MS);
         setStep(LOAN_SIM_STEPS.COMPLETADO);
       } else {
-        const esErrorCoherencia =
-          preaprobadoResponse.message?.includes("Inconsistencia financiera") ||
-          preaprobadoResponse.message?.includes("COHERENCIA_FINANCIERA_ERROR");
+        const esErrorCoherencia = preaprobadoResponse.message?.includes(
+          ERROR_CAUSE.COHERENCIA_FINANCIERA_ERROR,
+        );
 
         if (esErrorCoherencia) {
           setError(

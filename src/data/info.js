@@ -426,7 +426,7 @@ export const privacyPolicies = [
   {
     title: "Enlaces a Terceros",
     content:
-      "Este sitio web pudiera contener enlaces a otros sitios que pudieran ser de su interés. Una vez que usted hace click en estos enlaces y abandona nuestra página, ya no tenemos control sobre al sitio al que es redirigido y por lo tanto no somos responsables de los términos o privacidad ni de la protección de sus datos en esos otros sitios terceros. Dichos sitios están sujetos a sus propias políticas de privacidad por lo cual es recomendable que las consulte para confirmar que usted está de acuerdo con estas.",
+      "Este sitio web pudiera contener enlaces a otros sitios que pudieran ser de su interés. Una vez que usted hace click en estos enlaces y abandona nuestra página, ya no tenemos control sobre al sitio al que es redirigido y por lo tanto no somos responsables de los términos o privacidad ni de la protección de sus datos en esos otros sitios terceros. Dichos sitios están sujetos a sus propias políticas de privacidad por lo cual es recomendable que las consulte para confirmar que usted está de acuerdo con estas.\n\nNuestro sitio utiliza Cloudflare Turnstile, una alternativa de CAPTCHA enfocada en la privacidad. Para más detalles, consultá la Adenda de Privacidad de Turnstile de Cloudflare: https://www.cloudflare.com/turnstile-privacy-addendum/.",
   },
   {
     title: "Control de su información personal",

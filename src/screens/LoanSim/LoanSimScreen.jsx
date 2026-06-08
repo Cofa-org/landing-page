@@ -12,8 +12,8 @@ const OTPValidation = lazy(() => import("./components/OTPValidation/OTPValidatio
 const ComplianceStep = lazy(() => import("./components/ComplianceStep/ComplianceStep"));
 const CBUValidation = lazy(() => import("./components/CBUValidation/CBUValidation"));
 const SuccessStep = lazy(() => import("./components/SuccessStep/SuccessStep"));
-import { useComplianceForm } from "./hooks/useComplianceForm.js";
 import { useLoanSimulator } from "./hooks/useLoanSimulator";
+import { useComplianceForm } from "./hooks/useComplianceForm";
 import styles from "./LoanSimScreen.module.css";
 
 const LoanSimScreen = () => {
@@ -49,7 +49,7 @@ const LoanSimScreen = () => {
   } = useLoanSimulator();
 
   // Bloquear render hasta que scoringId esté disponible (evita cascading renders)
-  const isInitializing = !scoringId;
+  const isInitializing = !scoringId && step === LOAN_SIM_STEPS.SIMULACION;
 
   useEffect(() => {
     if (step === LOAN_SIM_STEPS.COMPLIANCE) {
@@ -85,7 +85,13 @@ const LoanSimScreen = () => {
 
   const renderStep = () => {
     return (
-      <Suspense fallback={<div className={styles.loaderContainer}><Loader /></div>}>
+      <Suspense
+        fallback={
+          <div className={styles.loaderContainer}>
+            <Loader />
+          </div>
+        }
+      >
         {step === LOAN_SIM_STEPS.SIMULACION && (
           <SimulationStep
             amount={amount}
@@ -117,8 +123,8 @@ const LoanSimScreen = () => {
             email={email}
           />
         )}
-        {step === LOAN_SIM_STEPS.COMPLIANCE && (
-          initialComplianceStep === null ? (
+        {step === LOAN_SIM_STEPS.COMPLIANCE &&
+          (initialComplianceStep === null ? (
             <div className={styles.calculatorContainer}>
               <div className={styles.loaderContainer}>
                 <Loader />
@@ -133,8 +139,7 @@ const LoanSimScreen = () => {
               complianceForm={complianceForm}
               error={error}
             />
-          )
-        )}
+          ))}
         {step === LOAN_SIM_STEPS.CBU_VALIDATION && (
           <CBUValidation
             onValidate={validarCBU}
@@ -158,13 +163,14 @@ const LoanSimScreen = () => {
         )}
       </Suspense>
     );
-  }
+  };
 
   const renderBackButton = () => {
     if (
       step !== LOAN_SIM_STEPS.COMPLIANCE &&
       step !== LOAN_SIM_STEPS.SIMULACION &&
-      step !== LOAN_SIM_STEPS.COMPLETADO
+      step !== LOAN_SIM_STEPS.COMPLETADO &&
+      step !== LOAN_SIM_STEPS.RECHAZADO
     )
       return <BackButton onClick={handlePrevStep} />;
     return null;
@@ -177,9 +183,7 @@ const LoanSimScreen = () => {
           <h2 className={styles.title}>Simulador de Préstamo</h2>
           <div className={styles.errorContainer}>
             <p className={styles.errorMsg}>{error}</p>
-            <p className={styles.errorSubtext}>
-              Por favor, ponte en contacto con un operador.
-            </p>
+            <p className={styles.errorSubtext}>Por favor, ponte en contacto con un operador.</p>
           </div>
         </div>
       </div>
@@ -207,7 +211,7 @@ const LoanSimScreen = () => {
   return (
     <>
       <Header />
-      <main id="main-content">
+      <main id='main-content'>
         <HeroLoanSim />
         <div className={styles.homeCalculator_calculatorBox}>
           <div
