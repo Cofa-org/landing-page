@@ -21,7 +21,7 @@ const NEXT_STEP_MAP = {
 
 const PREV_STEP_MAP = {
   [LOAN_SIM_STEPS.PHONE_VALIDATION]: LOAN_SIM_STEPS.LEAD_REGISTRATION,
-  [LOAN_SIM_STEPS.DNI_UPLOAD]: LOAN_SIM_STEPS.PHONE_VALIDATION,
+  [LOAN_SIM_STEPS.DNI_UPLOAD]: LOAN_SIM_STEPS.LEAD_REGISTRATION,
   [LOAN_SIM_STEPS.RECIBO_UPLOAD]: LOAN_SIM_STEPS.DNI_UPLOAD,
   [LOAN_SIM_STEPS.WELCOME]: LOAN_SIM_STEPS.RECIBO_UPLOAD,
 };
@@ -92,7 +92,8 @@ export const useOnboardingFlow = () => {
           } else if (estadoOnboarding === ONBOARDING_STATES.RECHAZADO) {
             targetStep = LOAN_SIM_STEPS.RECHAZADO;
           }
-          if (response.data) {
+          // Solo actualizar leadData si no tiene informacion completa (sin celular)
+          if (leadData?.celular) {
             setLeadData(response.data);
           }
           setLeadToken(leadTokenValue);
@@ -144,6 +145,7 @@ export const useOnboardingFlow = () => {
   }, [onboardingStep, getLeadId]);
 
   const handleLeadSuccess = useCallback((data) => {
+
     setLeadData(data.lead);
     setLeadToken(data.token);
     // Siempre navegar a PHONE_VALIDATION después de crearLead exitoso

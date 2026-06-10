@@ -2,7 +2,7 @@ import { useEffect, lazy, Suspense } from "react";
 import BackButton from "../../Components/buttons/backbutton/BackButton.jsx";
 import { Footer, Header } from "../../Components/index.js";
 import Loader from "../../Components/Loader/Loader.jsx";
-import { COMPLIANCE_STEPS, LOAN_SIM_STEPS } from "../../constants/LOAN_SIM.js";
+import { COMPLIANCE_STEPS, LOAN_SIM_STEPS, OTP_CONFIG } from "../../constants/LOAN_SIM.js";
 import { HeroLoanSim } from "../../Sections/index.js";
 
 // Lazy load de los pasos del simulador
@@ -121,7 +121,7 @@ const LoanSimScreen = () => {
             loading={validating}
             error={error}
             destination={email}
-            destinationType="email"
+            destinationType={OTP_CONFIG.DESTINATION_TYPE.EMAIL}
           />
         )}
         {step === LOAN_SIM_STEPS.COMPLIANCE &&

@@ -14,8 +14,13 @@ export const LOAN_SIM_STEPS = {
 };
 
 export const OTP_CONFIG = {
-  OTP_LENGTH: 6,
+  OTP_PHONE_LENGTH: 4, // 4 dígitos para celular
+  OTP_EMAIL_LENGTH: 6, // 6 dígitos para email
   COOLDOWN_DURATION: 120, // seconds in frontend
+  DESTINATION_TYPE: {
+    PHONE: "phone",
+    EMAIL: "email",
+  },
 };
 
 export const CBU_CONFIG = {

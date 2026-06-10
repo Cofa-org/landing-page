@@ -121,28 +121,6 @@ const LeadRegistrationStep = ({ onSuccess, onRejected, onNext, loading, error: e
         autoComplete='off'
       />
       <GenericInput
-        label='Nombre completo'
-        name='nombre_completo'
-        type='text'
-        value={formData.nombre_completo}
-        onChange={handleChange}
-        placeholder='Ej: Juan Carlos'
-        required
-        error={errors.nombre_completo}
-        autoComplete='off'
-      />
-      <GenericInput
-        label='Apellido'
-        name='apellido'
-        type='text'
-        value={formData.apellido}
-        onChange={handleChange}
-        placeholder='Ej: García'
-        required
-        error={errors.apellido}
-        autoComplete='off'
-      />
-      <GenericInput
         label='Celular'
         name='celular'
         type='tel'

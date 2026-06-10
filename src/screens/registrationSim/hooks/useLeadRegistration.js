@@ -32,7 +32,6 @@ const mapFingerprintToHuellaData = (fingerprint) => {
 };
 
 const DNI_REGEX = /^\d{7,8}$/;
-const NAME_REGEX = /^[a-zA-ZÁÉÍÓÚáéíóúÑñ\s]{2,50}$/;
 const CELULAR_REGEX = /^549\d{10}$/;
 
 export const SECURITY_SLIDES = [
@@ -69,8 +68,8 @@ export const SECURITY_SLIDES = [
 ];
 
 export const useLeadRegistration = (turnstileToken) => {
-  const [formData, setFormData] = useState({ dni: "", nombre_completo: "", apellido: "", celular: "" });
-  const [errors, setErrors] = useState({ dni: "", nombre_completo: "", apellido: "", celular: "" });
+  const [formData, setFormData] = useState({ dni: "", celular: "" });
+  const [errors, setErrors] = useState({ dni: "", celular: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -102,16 +101,6 @@ export const useLeadRegistration = (turnstileToken) => {
         if (!trimmed) return "El DNI es requerido";
         if (!DNI_REGEX.test(trimmed)) return "El DNI debe tener 7 u 8 dígitos";
         return "";
-      case "nombre_completo":
-        if (!trimmed) return "El nombre completo es requerido";
-        if (!NAME_REGEX.test(trimmed))
-          return "El nombre debe tener entre 2 y 50 caracteres alfabéticos";
-        return "";
-      case "apellido":
-        if (!trimmed) return "El apellido es requerido";
-        if (!NAME_REGEX.test(trimmed))
-          return "El apellido debe tener entre 2 y 50 caracteres alfabéticos";
-        return "";
       case "celular":
         if (formData.celular && !CELULAR_REGEX.test(formData.celular))
           return "El celular debe ser un número argentino válido (Ej: 5491123456789)";
@@ -134,12 +123,10 @@ export const useLeadRegistration = (turnstileToken) => {
   const validateForm = useCallback(() => {
     const newErrors = {
       dni: validateField("dni", formData.dni),
-      nombre_completo: validateField("nombre_completo", formData.nombre_completo),
-      apellido: validateField("apellido", formData.apellido),
       celular: validateField("celular", formData.celular),
     };
     setErrors(newErrors);
-    return !newErrors.dni && !newErrors.nombre_completo && !newErrors.apellido;
+    return !newErrors.dni;
   }, [formData, validateField]);
 
   const crearLead = useCallback(
@@ -162,8 +149,6 @@ export const useLeadRegistration = (turnstileToken) => {
         const response = await LeadRegistrationService.crearLead(
           {
             dni: formData.dni.trim(),
-            nombre_completo: formData.nombre_completo.trim(),
-            apellido: formData.apellido.trim(),
             turnstileToken,
             huella_dispositivo: huellaData,
             request_id: requestId,
@@ -178,13 +163,14 @@ export const useLeadRegistration = (turnstileToken) => {
             response.data.token,
             COOKIE_LEAD_TOKEN_CONFIG.EXPIRY_MS,
           );
+          console.log("RESPONSE", response)
           return {
             success: true,
             data: {
               lead: response.data.lead,
               token: response.data.token,
               scoringId: response.data.lead.id_scoring,
-              nombreCompleto: `${formData.nombre_completo.trim()} ${formData.apellido.trim()}`,
+              nombreCompleto: response.data.lead?.nombre_completo || null,
             },
           };
         }
@@ -217,11 +203,7 @@ export const useLeadRegistration = (turnstileToken) => {
 
   const isFormValid =
     formData.dni.trim() !== "" &&
-    formData.nombre_completo.trim() !== "" &&
-    formData.apellido.trim() !== "" &&
     !errors.dni &&
-    !errors.nombre_completo &&
-    !errors.apellido &&
     !errors.celular &&
     turnstileToken !== "";
 

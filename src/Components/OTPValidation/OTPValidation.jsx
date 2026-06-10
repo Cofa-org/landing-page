@@ -15,6 +15,11 @@ const OTPValidation = ({
   destination,
   destinationType = "email",
 }) => {
+  const otpLength =
+    destinationType === OTP_CONFIG.DESTINATION_TYPE.PHONE
+      ? OTP_CONFIG.OTP_PHONE_LENGTH
+      : OTP_CONFIG.OTP_EMAIL_LENGTH;
+
   const {
     otp,
     inputRefs,
@@ -26,15 +31,15 @@ const OTPValidation = ({
     handlePaste,
     handleSubmit,
     handleResendClick,
-  } = useOTPValidation({ destination, onValidate, onResend });
+  } = useOTPValidation({ destination, onValidate, onResend, otpLength });
 
   const title =
-    destinationType === "phone" ? "Verificá tu celular" : "Verificá tu email";
+    destinationType === OTP_CONFIG.DESTINATION_TYPE.PHONE ? "Verificá tu celular" : "Verificá tu email";
 
   const description =
-    destinationType === "phone"
-      ? `Ingresá el código de ${OTP_CONFIG.OTP_LENGTH} dígitos que enviamos al ${destination}`
-      : `Ingresá el código de ${OTP_CONFIG.OTP_LENGTH} dígitos que enviamos a ${destination}`;
+    destinationType === OTP_CONFIG.DESTINATION_TYPE.PHONE
+      ? `Ingresá el código de ${otpLength} dígitos que enviamos al ${destination}`
+      : `Ingresá el código de ${otpLength} dígitos que enviamos a ${destination}`;
 
   return (
     <GenericForm

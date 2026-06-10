@@ -1,12 +1,12 @@
-import React, { Suspense, memo, useCallback, useState } from "react";
+import React, { Suspense, memo, useCallback } from "react";
 import BackButton from "../../Components/buttons/backbutton/BackButton.jsx";
 import { Footer, Header } from "../../Components/index.js";
 import Loader from "../../Components/Loader/Loader.jsx";
 import { HeroLoanSim } from "../../Sections/index.js";
-import { LOAN_SIM_STEPS } from "../../constants/LOAN_SIM.js";
+import { LOAN_SIM_STEPS, OTP_CONFIG } from "../../constants/LOAN_SIM.js";
 import { useOnboardingFlow } from "./hooks/useOnboardingFlow.js";
+import { usePhoneOTP } from "./hooks/usePhoneOTP.js";
 import OTPValidation from "../../Components/OTPValidation/OTPValidation.jsx";
-import LeadRegistrationService from "../../services/leadRegistrationService.js";
 import styles from "./OnboardingFlow.module.css";
 import RejectedStep from "./components/RejectedStep/RejectedStep.jsx";
 
@@ -30,41 +30,17 @@ const OnboardingFlowScreen = () => {
     shouldShowBackButton,
     leadData,
   } = useOnboardingFlow();
-  const [validating, setValidating] = useState(false);
-  const [error, setError] = useState(null);
 
-  const handleVerificarOTP = useCallback(async (codigo) => {
-    const leadId = getLeadId();
-    if (!leadId) return;
-    setValidating(true);
-    setError(null);
-    try {
-      const result = await LeadRegistrationService.verificarOTPCelular({ leadId, codigo });
-      if (result.success) {
-        navigateToNext(onboardingStep);
-      }
-    } catch (err) {
-      setError(err.message || "Código incorrecto o expirado");
-    } finally {
-      setValidating(false);
-    }
-  }, [getLeadId, onboardingStep]);
-
-  const handleReenviarOTP = useCallback(async (destination) => {
-    const leadId = getLeadId();
-    if (!leadId || !destination) return;
-    setValidating(true);
-    setError(null);
-    try {
-      await LeadRegistrationService.solicitarOTPCelular({ leadId, celular: destination });
-    } catch (err) {
-      setError(err.message || "Error al reenviar el código");
-    } finally {
-      setValidating(false);
-    }
-  }, [getLeadId]);
+  const { verificarOTP, reenviarOTP, validating, error } = usePhoneOTP(getLeadId);
 
   const handlePrevStep = navigateToPrev;
+
+  const handleVerificarOTP = useCallback(async (codigo) => {
+      const result = await verificarOTP(codigo);
+      if (result?.success) {
+        navigateToNext(onboardingStep);
+      }
+  }, [verificarOTP, onboardingStep]);
 
   const renderStep = () => {
     switch (onboardingStep) {
@@ -97,9 +73,9 @@ const OnboardingFlowScreen = () => {
         return (
           <OTPValidation
             destination={leadData?.celular}
-            destinationType="phone"
+            destinationType={OTP_CONFIG.DESTINATION_TYPE.PHONE}
             onValidate={handleVerificarOTP}
-            onResend={handleReenviarOTP}
+            onResend={reenviarOTP}
             onBack={handlePrevStep}
             loading={validating}
             error={error}

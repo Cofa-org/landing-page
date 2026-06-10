@@ -5,16 +5,15 @@ import { getCookie } from "../lib/utils";
 import { COOKIE_LEAD_TOKEN_CONFIG } from "../constants/LOAN_SIM.js";
 
 export default class LeadRegistrationService {
+
   static async crearLead(
-    { dni, nombre_completo, apellido, turnstileToken, huella_dispositivo, request_id, celular },
+    { dni, turnstileToken, huella_dispositivo, request_id, celular },
     signal = null,
   ) {
     try {
       const url = `${LANDING_BACKEND_URL}/api/lead-registration/crear`;
       const body = {
         dni,
-        nombre_completo,
-        apellido,
         turnstileToken,
         huella_dispositivo,
         request_id,

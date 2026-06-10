@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { OTP_CONFIG } from "../constants/LOAN_SIM.js";
 
-export const useOTPValidation = ({ destination, onValidate, onResend }) => {
-  const [otp, setOtp] = useState(() => new Array(OTP_CONFIG.OTP_LENGTH).fill(""));
+export const useOTPValidation = ({ destination, onValidate, onResend, otpLength = OTP_CONFIG.OTP_EMAIL_LENGTH }) => {
+  const [otp, setOtp] = useState(() => new Array(otpLength).fill(""));
   const inputRefs = useRef([]);
   const [cooldown, setCooldown] = useState(0);
 
@@ -39,7 +39,7 @@ export const useOTPValidation = ({ destination, onValidate, onResend }) => {
     const newOtp = [...otp];
     newOtp[index] = value.substring(value.length - 1);
     setOtp(newOtp);
-    if (value && index < OTP_CONFIG.OTP_LENGTH - 1) {
+    if (value && index < otpLength - 1) {
       inputRefs.current[index + 1]?.focus();
     }
   };
@@ -55,25 +55,26 @@ export const useOTPValidation = ({ destination, onValidate, onResend }) => {
     const pasteData = e.clipboardData
       .getData("text")
       .replace(/\D/g, "")
-      .slice(0, OTP_CONFIG.OTP_LENGTH);
+      .slice(0, otpLength);
     if (!pasteData) return;
     const newOtp = [...otp];
     pasteData.split("").forEach((char, i) => {
-      if (i < OTP_CONFIG.OTP_LENGTH) newOtp[i] = char;
+      if (i < otpLength) newOtp[i] = char;
     });
     setOtp(newOtp);
-    const nextIndex = Math.min(pasteData.length, OTP_CONFIG.OTP_LENGTH - 1);
+    const nextIndex = Math.min(pasteData.length, otpLength - 1);
     inputRefs.current[nextIndex]?.focus();
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const code = otp.join("");
-    if (code.length === OTP_CONFIG.OTP_LENGTH) onValidate(code);
+    if (code.length === otpLength) onValidate(code);
   };
 
   const handleResendClick = async () => {
     if (cooldown > 0) return;
+  
     if (onResend) {
       await onResend(destination);
       const expiry = Date.now() + OTP_CONFIG.COOLDOWN_DURATION * 1000;
