@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from "react";
 import LeadRegistrationService from "../../../services/leadRegistrationService";
 import { ERROR_CAUSE, ERROR_MESSAGE } from "../../../constants/error";
 import { setCookie } from "../../../lib/utils";
-import { COOKIE_LEAD_TOKEN_CONFIG } from "../../../constants/LOAN_SIM";
+import { COOKIE_LEAD_TOKEN_CONFIG, DNI_AGE_CALIBRATION } from "../../../constants/LOAN_SIM";
 import { getFingerprint } from "../../../lib/fingerprint.js";
 
 /**
@@ -34,6 +34,7 @@ const mapFingerprintToHuellaData = (fingerprint) => {
 const DNI_REGEX = /^\d{7,8}$/;
 const CELULAR_REGEX = /^549\d{10}$/;
 
+
 const calcularEdad = (fechaNacimiento) => {
   const fecha = new Date(fechaNacimiento);
   const hoy = new Date();
@@ -41,6 +42,26 @@ const calcularEdad = (fechaNacimiento) => {
   const mes = hoy.getMonth() - fecha.getMonth();
   if (mes < 0 || (mes === 0 && hoy.getDate() < fecha.getDate())) edad--;
   return edad;
+};
+
+/**
+ * Calcula la edad estimada a partir del DNI argentino.
+ * Retorna null para DNIs extranjeros (>= 90M) o DNIs no numéricos.
+ * La fórmula se ajusta automáticamente con el año actual.
+ */
+const calcularEdadDesdeDNI = (dni) => {
+  const dniNumber = Number(dni);
+  if (!dniNumber || dniNumber >= 90000000) return null;
+
+  const currentYear = new Date().getFullYear();
+  const yearsSinceCalibration = currentYear - DNI_AGE_CALIBRATION.calibrationYear;
+  const dniInMillions = dniNumber / 1_000_000;
+
+  return (
+    DNI_AGE_CALIBRATION.baseAge +
+    yearsSinceCalibration +
+    (DNI_AGE_CALIBRATION.baseDniMillions - dniInMillions) * DNI_AGE_CALIBRATION.yearsPerMillion
+  );
 };
 
 export const SECURITY_SLIDES = [
@@ -106,10 +127,25 @@ export const useLeadRegistration = (turnstileToken) => {
   const validateField = useCallback((name, value) => {
     const trimmed = value.trim();
     switch (name) {
-      case "dni":
+      case "dni": {
         if (!trimmed) return "El DNI es requerido";
         if (!DNI_REGEX.test(trimmed)) return "El DNI debe tener 7 u 8 dígitos";
+        // Validar edad estimada solo para DNIs argentinos (< 90M).
+        // Los DNIs extranjeros ya piden fechaNacimiento explícita.
+        const dniNumber = Number(trimmed);
+        if (dniNumber < 90000000) {
+          const edadEstimada = calcularEdadDesdeDNI(trimmed);
+          if (edadEstimada !== null) {
+            if (edadEstimada < DNI_AGE_CALIBRATION.tolerance.min) {
+              return ERROR_MESSAGE.EDAD_INVALIDA;
+            }
+            if (edadEstimada > DNI_AGE_CALIBRATION.tolerance.max) {
+              return ERROR_MESSAGE.EDAD_INVALIDA;
+            }
+          }
+        }
         return "";
+      }
       case "celular":
         if (formData.celular && !CELULAR_REGEX.test(formData.celular))
           return "El celular debe ser un número argentino válido (Ej: 5491123456789)";
@@ -148,12 +184,22 @@ export const useLeadRegistration = (turnstileToken) => {
       newErrors.fechaNacimiento = validateField("fechaNacimiento", formData.fechaNacimiento);
     }
     setErrors(newErrors);
-    return !newErrors.dni && !newErrors.fechaNacimiento;
+    return {
+      isValid: !newErrors.dni && !newErrors.fechaNacimiento,
+      errors: newErrors,
+    };
   }, [formData, validateField]);
 
   const crearLead = useCallback(
     async (turnstileToken, signal = null) => {
-      if (!validateForm()) return { success: false, validationFailed: true };
+      const validation = validateForm();
+      if (!validation.isValid) {
+        // Si la validación local detectó un error de edad, redirigir a rechazo.
+        if (validation.errors.dni === ERROR_MESSAGE.EDAD_INVALIDA) {
+          return { success: false, rejected: true };
+        }
+        return { success: false, validationFailed: true };
+      }
       setIsSubmitting(true);
       setSubmitError("");
 
@@ -211,6 +257,10 @@ export const useLeadRegistration = (turnstileToken) => {
       } catch (err) {
         console.error("LEAD_REGISTRATION_ERROR:", err);
         if (err.name === "AbortError") return { success: false, aborted: true };
+        // Detección unificada por causa: EDAD_INVALIDA → rechazo.
+        if (err.cause === ERROR_CAUSE.EDAD_INVALIDA) {
+          return { success: false, rejected: true };
+        }
         const isScoringRechazado =
           err.cause === ERROR_CAUSE.SCORING_RECHAZADO ||
           (err.message && err.message.includes(ERROR_MESSAGE.SCORING_RECHAZADO));

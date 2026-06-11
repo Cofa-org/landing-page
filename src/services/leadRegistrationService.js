@@ -30,7 +30,9 @@ export default class LeadRegistrationService {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || "Error al registrar el lead");
+        const err = new Error(errorData.message || "Error al registrar el lead");
+        if (errorData.cause) err.cause = errorData.cause;
+        throw err;
       }
 
       return await response.json();
