@@ -34,6 +34,15 @@ const mapFingerprintToHuellaData = (fingerprint) => {
 const DNI_REGEX = /^\d{7,8}$/;
 const CELULAR_REGEX = /^549\d{10}$/;
 
+const calcularEdad = (fechaNacimiento) => {
+  const fecha = new Date(fechaNacimiento);
+  const hoy = new Date();
+  let edad = hoy.getFullYear() - fecha.getFullYear();
+  const mes = hoy.getMonth() - fecha.getMonth();
+  if (mes < 0 || (mes === 0 && hoy.getDate() < fecha.getDate())) edad--;
+  return edad;
+};
+
 export const SECURITY_SLIDES = [
   {
     title: "Detección de Fraude Inteligente",
@@ -68,8 +77,8 @@ export const SECURITY_SLIDES = [
 ];
 
 export const useLeadRegistration = (turnstileToken) => {
-  const [formData, setFormData] = useState({ dni: "", celular: "" });
-  const [errors, setErrors] = useState({ dni: "", celular: "" });
+  const [formData, setFormData] = useState({ dni: "", celular: "", fechaNacimiento: "" });
+  const [errors, setErrors] = useState({ dni: "", celular: "", fechaNacimiento: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -105,6 +114,16 @@ export const useLeadRegistration = (turnstileToken) => {
         if (formData.celular && !CELULAR_REGEX.test(formData.celular))
           return "El celular debe ser un número argentino válido (Ej: 5491123456789)";
         return "";
+      case "fechaNacimiento": {
+        if (!value) return "La fecha de nacimiento es requerida";
+        const fecha = new Date(value);
+        if (isNaN(fecha.getTime())) return "Fecha inválida";
+        if (fecha > new Date()) return "La fecha no puede ser futura";
+        const edad = calcularEdad(value);
+        if (edad < 18) return "Debés tener al menos 18 años";
+        if (edad > 60) return "Debés tener 60 años o menos";
+        return "";
+      }
       default:
         return "";
     }
@@ -125,8 +144,11 @@ export const useLeadRegistration = (turnstileToken) => {
       dni: validateField("dni", formData.dni),
       celular: validateField("celular", formData.celular),
     };
+    if (Number(formData.dni) >= 90000000) {
+      newErrors.fechaNacimiento = validateField("fechaNacimiento", formData.fechaNacimiento);
+    }
     setErrors(newErrors);
-    return !newErrors.dni;
+    return !newErrors.dni && !newErrors.fechaNacimiento;
   }, [formData, validateField]);
 
   const crearLead = useCallback(
@@ -146,6 +168,7 @@ export const useLeadRegistration = (turnstileToken) => {
       const requestId = fingerprint?.requestId || null;
 
       try {
+        const showFechaNacimiento = Number(formData.dni) >= 90000000;
         const response = await LeadRegistrationService.crearLead(
           {
             dni: formData.dni.trim(),
@@ -153,6 +176,9 @@ export const useLeadRegistration = (turnstileToken) => {
             huella_dispositivo: huellaData,
             request_id: requestId,
             celular: formData.celular,
+            ...(showFechaNacimiento && formData.fechaNacimiento && {
+              fecha_nacimiento: formData.fechaNacimiento,
+            }),
           },
           signal,
         );
@@ -163,7 +189,7 @@ export const useLeadRegistration = (turnstileToken) => {
             response.data.token,
             COOKIE_LEAD_TOKEN_CONFIG.EXPIRY_MS,
           );
-          console.log("RESPONSE", response)
+          
           return {
             success: true,
             data: {
@@ -201,10 +227,12 @@ export const useLeadRegistration = (turnstileToken) => {
     [formData, validateForm, turnstileToken],
   );
 
+  const showFechaNacimiento = Number(formData.dni) >= 90000000;
   const isFormValid =
     formData.dni.trim() !== "" &&
     !errors.dni &&
     !errors.celular &&
+    (!showFechaNacimiento || (formData.fechaNacimiento && !errors.fechaNacimiento)) &&
     turnstileToken !== "";
 
   return {

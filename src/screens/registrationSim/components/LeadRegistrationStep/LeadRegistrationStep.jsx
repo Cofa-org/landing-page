@@ -54,6 +54,8 @@ const LeadRegistrationStep = ({ onSuccess, onRejected, onNext, loading, error: e
 
   const isLoading = loading || isSubmitting;
 
+  const showFechaNacimiento = Number(formData.dni) >= 90000000;
+
   const displayError = submitError || externalError;
 
   return (
@@ -120,6 +122,17 @@ const LeadRegistrationStep = ({ onSuccess, onRejected, onNext, loading, error: e
         error={errors.dni}
         autoComplete='off'
       />
+      {showFechaNacimiento && (
+        <GenericInput
+          label='Fecha de nacimiento'
+          name='fechaNacimiento'
+          type='date'
+          value={formData.fechaNacimiento}
+          onChange={handleChange}
+          required
+          error={errors.fechaNacimiento}
+        />
+      )}
       <GenericInput
         label='Celular'
         name='celular'
