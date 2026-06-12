@@ -12,6 +12,8 @@ export default class SimuladorService {
       tasaOperador,
       plazoMaximoOperador,
       motivo,
+      huella_dispositivo,
+      request_id,
     },
     signal = null,
   ) {
@@ -26,6 +28,8 @@ export default class SimuladorService {
         tasaOperador,
         plazoMaximoOperador,
         motivo,
+        huella_dispositivo,
+        request_id,
       };
 
       const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, null, signal);

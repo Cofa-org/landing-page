@@ -12,6 +12,9 @@ const OTPValidation = lazy(() => import("../../Components/OTPValidation/OTPValid
 const ComplianceStep = lazy(() => import("./components/ComplianceStep/ComplianceStep"));
 const CBUValidation = lazy(() => import("./components/CBUValidation/CBUValidation"));
 const SuccessStep = lazy(() => import("./components/SuccessStep/SuccessStep"));
+const DeviceMismatchStep = lazy(() =>
+  import("./components/DeviceMismatchStep/DeviceMismatchStep"),
+);
 import { useLoanSimulator } from "./hooks/useLoanSimulator";
 import { useComplianceForm } from "./hooks/useComplianceForm";
 import styles from "./LoanSimScreen.module.css";
@@ -162,6 +165,7 @@ const LoanSimScreen = () => {
             simulationData={simulationData}
           />
         )}
+        {step === LOAN_SIM_STEPS.DEVICE_MISMATCH && <DeviceMismatchStep />}
       </Suspense>
     );
   };
@@ -171,7 +175,8 @@ const LoanSimScreen = () => {
       step !== LOAN_SIM_STEPS.COMPLIANCE &&
       step !== LOAN_SIM_STEPS.SIMULACION &&
       step !== LOAN_SIM_STEPS.COMPLETADO &&
-      step !== LOAN_SIM_STEPS.RECHAZADO
+      step !== LOAN_SIM_STEPS.RECHAZADO &&
+      step !== LOAN_SIM_STEPS.DEVICE_MISMATCH
     )
       return <BackButton onClick={handlePrevStep} />;
     return null;

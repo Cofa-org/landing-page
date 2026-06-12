@@ -6,6 +6,7 @@ import SimuladorService from "../../../services/simuladorService";
 import { COOKIE_CONFIG, LOAN_SIM_STEPS } from "../../../constants/LOAN_SIM.js";
 import LinkResolutionService from "../../../services/linkResolutionService.js";
 import { ERROR_CAUSE } from "../../../constants/error";
+import { getFingerprint, mapFingerprintToHuellaData } from "../../../lib/fingerprint.js";
 
 export const useLoanSimulator = () => {
   const [searchParams] = useSearchParams();
@@ -27,6 +28,9 @@ export const useLoanSimulator = () => {
   const [bancoEncontrado, setBancoEncontrado] = useState(null);
   const [codigoBancoError, setCodigoBancoError] = useState(null);
   const [validandoBanco, setValidandoBanco] = useState(false);
+  // Huella del dispositivo (cacheada al iniciar el flujo del simulador)
+  const [huellaData, setHuellaData] = useState(null);
+  const [huellaRequestId, setHuellaRequestId] = useState(null);
   // Ref to the AbortController for the current calcularPlanes request.
   // Allows cancelling in-flight fetches when the user changes the capital rapidly.
   const fetchAbortControllerRef = useRef(null);
@@ -56,6 +60,17 @@ export const useLoanSimulator = () => {
             nroPrestamo: response.data.nroPrestamo || null,
             motivo: response.data.motivo || null,
           });
+
+          // Obtener huella del dispositivo actual (cacheada para toda la sesión)
+          try {
+            const fingerprint = await getFingerprint({
+              scoringId: response.data.scoringId,
+            });
+            setHuellaData(mapFingerprintToHuellaData(fingerprint));
+            setHuellaRequestId(fingerprint?.requestId || null);
+          } catch (fpErr) {
+            console.warn("SIMULATOR_FINGERPRINT_ERROR:", fpErr);
+          }
         } else {
           setError(response.mensaje || "El enlace de acceso es inválido o ha expirado.");
         }
@@ -107,6 +122,14 @@ export const useLoanSimulator = () => {
           params.capitalSeleccionado = currentAmount;
         }
 
+        // Incluir huella del dispositivo si está disponible
+        if (huellaData) {
+          params.huella_dispositivo = huellaData;
+        }
+        if (huellaRequestId) {
+          params.request_id = huellaRequestId;
+        }
+
         const response = await SimuladorService.calcularPlanes(params, controller.signal);
 
         // Discard response if this request was superseded by a newer one.
@@ -156,11 +179,17 @@ export const useLoanSimulator = () => {
             );
           }
         } else {
+          if (response.cause === ERROR_CAUSE.DEVICE_FINGERPRINT_MISMATCH) {
+            setStep(LOAN_SIM_STEPS.DEVICE_MISMATCH);
+            return;
+          }
           setError(response.message || "¡Ups! Ha ocurrido un error en la simulación");
         }
       } catch (err) {
         // Ignore errors from cancelled (aborted) requests — they are expected.
         if (err.name === "AbortError") return;
+        // El catch solo se ejecuta para errores de red/HTTP (response.ok === false).
+        // Los errores de aplicación vienen como response.success === false arriba.
         setError(err.message || "Error al conectar con el servidor");
         console.error("SIMULATION_HOOK_ERROR:", err);
       } finally {
@@ -170,7 +199,7 @@ export const useLoanSimulator = () => {
         }
       }
     },
-    [scoringData.scoringId],
+    [scoringData.scoringId, huellaData, huellaRequestId],
   );
 
   useEffect(() => {
