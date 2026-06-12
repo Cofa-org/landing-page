@@ -1,5 +1,5 @@
 import { Thumbmark } from "@thumbmarkjs/thumbmarkjs";
-import { VITE_THUMBMARKJS_API_KEY } from "../config.js";
+import { THUMBMARKJS_API_KEY } from "../config.js";
 /**
  * Obtiene el fingerprint del dispositivo con metadata opcional.
  * Se crea una nueva instancia por llamado (no singleton) porque metadata
@@ -11,7 +11,7 @@ import { VITE_THUMBMARKJS_API_KEY } from "../config.js";
 export const getDeviceFingerprint = async (metadata = {}) => {
   try {
     const instance = new Thumbmark({
-      api_key: VITE_THUMBMARKJS_API_KEY,
+      api_key: THUMBMARKJS_API_KEY,
       metadata,
     });
     return await instance.get();
