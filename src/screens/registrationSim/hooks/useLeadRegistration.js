@@ -226,7 +226,7 @@ export const useLeadRegistration = (turnstileToken) => {
         if (isScoringRechazado) {
           return { success: false, rejected: true };
         }
-        if (err.cause === ERROR_CAUSE.EDAD_INVALIDA) {
+        if (response.cause === ERROR_CAUSE.EDAD_INVALIDA) {
           return { success: false, rejected: true };
         }
         setSubmitError(response.message || "Error al registrar. Intentá nuevamente.");
