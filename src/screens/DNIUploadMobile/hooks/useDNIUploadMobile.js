@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import LeadRegistrationService from "../../../../services/leadRegistrationService";
+import LeadRegistrationService from "./../../../services/leadRegistrationService.js";
 
 export const useDNIUploadMobile = (leadId, token) => {
   const [dniFront, setDniFront] = useState(null);
@@ -31,7 +31,7 @@ export const useDNIUploadMobile = (leadId, token) => {
       const response = await LeadRegistrationService.subirDniMobile(
         { leadId },
         { dniFront, dniBack },
-        token
+        token,
       );
       if (response.success) {
         setUploadSuccess(true);
