@@ -1,6 +1,6 @@
 import { LANDING_BACKEND_URL, LANDING_BACKEND_API_KEY } from "../config";
 import { HTTP_METHOD } from "../constants/HTTP_METHODS.js";
-import { HttpApi } from "../http.js";
+import { HttpApi } from "../lib/http.js";
 
 export default class SimuladorService {
   static async calcularPlanes(
@@ -12,6 +12,8 @@ export default class SimuladorService {
       tasaOperador,
       plazoMaximoOperador,
       motivo,
+      huella_dispositivo,
+      request_id,
     },
     signal = null,
   ) {
@@ -26,6 +28,8 @@ export default class SimuladorService {
         tasaOperador,
         plazoMaximoOperador,
         motivo,
+        huella_dispositivo,
+        request_id,
       };
 
       const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, null, signal);

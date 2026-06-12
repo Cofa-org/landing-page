@@ -5,6 +5,8 @@ import { useDebounce } from "../../../hooks/useDebounce";
 import SimuladorService from "../../../services/simuladorService";
 import { COOKIE_CONFIG, LOAN_SIM_STEPS } from "../../../constants/LOAN_SIM.js";
 import LinkResolutionService from "../../../services/linkResolutionService.js";
+import { ERROR_CAUSE } from "../../../constants/error";
+import { getFingerprint, mapFingerprintToHuellaData } from "../../../lib/fingerprint.js";
 
 export const useLoanSimulator = () => {
   const [searchParams] = useSearchParams();
@@ -15,7 +17,7 @@ export const useLoanSimulator = () => {
   const [validating, setValidating] = useState(false);
   const [error, setError] = useState(null);
   const [scoringData, setScoringData] = useState({ scoringId: null, cuit: null });
-  const [step, setStep] = useState(LOAN_SIM_STEPS.SIMULACION);
+  const [step, setStep] = useState(LOAN_SIM_STEPS.LEAD_REGISTRATION);
   const [email, setEmail] = useState("");
   const [cbu, setCbu] = useState("");
   const debouncedAmount = useDebounce(amount, 500);
@@ -26,6 +28,9 @@ export const useLoanSimulator = () => {
   const [bancoEncontrado, setBancoEncontrado] = useState(null);
   const [codigoBancoError, setCodigoBancoError] = useState(null);
   const [validandoBanco, setValidandoBanco] = useState(false);
+  // Huella del dispositivo (cacheada al iniciar el flujo del simulador)
+  const [huellaData, setHuellaData] = useState(null);
+  const [huellaRequestId, setHuellaRequestId] = useState(null);
   // Ref to the AbortController for the current calcularPlanes request.
   // Allows cancelling in-flight fetches when the user changes the capital rapidly.
   const fetchAbortControllerRef = useRef(null);
@@ -34,10 +39,11 @@ export const useLoanSimulator = () => {
   useEffect(() => {
     const initVerification = async () => {
       if (!shortId) {
-        setError("No se ha proporcionado un shortId de acceso válido.");
+        setStep(LOAN_SIM_STEPS.LEAD_REGISTRATION);
         return;
       }
       setLoading(true);
+      setStep(LOAN_SIM_STEPS.SIMULACION);
       try {
         const response = await LinkResolutionService.consumeLink(shortId);
 
@@ -54,6 +60,17 @@ export const useLoanSimulator = () => {
             nroPrestamo: response.data.nroPrestamo || null,
             motivo: response.data.motivo || null,
           });
+
+          // Obtener huella del dispositivo actual (cacheada para toda la sesión)
+          try {
+            const fingerprint = await getFingerprint({
+              scoringId: response.data.scoringId,
+            });
+            setHuellaData(mapFingerprintToHuellaData(fingerprint));
+            setHuellaRequestId(fingerprint?.requestId || null);
+          } catch (fpErr) {
+            console.warn("SIMULATOR_FINGERPRINT_ERROR:", fpErr);
+          }
         } else {
           setError(response.mensaje || "El enlace de acceso es inválido o ha expirado.");
         }
@@ -105,6 +122,14 @@ export const useLoanSimulator = () => {
           params.capitalSeleccionado = currentAmount;
         }
 
+        // Incluir huella del dispositivo si está disponible
+        if (huellaData) {
+          params.huella_dispositivo = huellaData;
+        }
+        if (huellaRequestId) {
+          params.request_id = huellaRequestId;
+        }
+
         const response = await SimuladorService.calcularPlanes(params, controller.signal);
 
         // Discard response if this request was superseded by a newer one.
@@ -154,11 +179,17 @@ export const useLoanSimulator = () => {
             );
           }
         } else {
+          if (response.cause === ERROR_CAUSE.DEVICE_FINGERPRINT_MISMATCH) {
+            setStep(LOAN_SIM_STEPS.DEVICE_MISMATCH);
+            return;
+          }
           setError(response.message || "¡Ups! Ha ocurrido un error en la simulación");
         }
       } catch (err) {
         // Ignore errors from cancelled (aborted) requests — they are expected.
         if (err.name === "AbortError") return;
+        // El catch solo se ejecuta para errores de red/HTTP (response.ok === false).
+        // Los errores de aplicación vienen como response.success === false arriba.
         setError(err.message || "Error al conectar con el servidor");
         console.error("SIMULATION_HOOK_ERROR:", err);
       } finally {
@@ -168,7 +199,7 @@ export const useLoanSimulator = () => {
         }
       }
     },
-    [scoringData.scoringId],
+    [scoringData.scoringId, huellaData, huellaRequestId],
   );
 
   useEffect(() => {
@@ -238,7 +269,7 @@ export const useLoanSimulator = () => {
         };
 
         const response = await SimuladorService.guardarPlan(payload);
-
+        
         if (
           (response.success && !existingSimulation?.email_validado) ||
           (response.data && !existingSimulation?.email_validado)
@@ -284,14 +315,14 @@ export const useLoanSimulator = () => {
     }
   };
 
-  const solicitarOTP = async (emailValue, isResend = false) => {
+  const solicitarOTP = async (emailValue) => {
     setValidating(true);
     setError(null);
     try {
       const params = {
         scoringId: scoringData.scoringId,
         email: emailValue,
-        isResend,
+        isResend: true,
       };
       const response = await SimuladorService.solicitarOTP(params);
       if (response.success || response.data) {
@@ -395,15 +426,15 @@ export const useLoanSimulator = () => {
         const cookieOptions = {
           name: COOKIE_CONFIG.NAME,
           value: scoringData.scoringId,
-          expires: COOKIE_CONFIG.EXPIRY_DAYS,
+          expires: COOKIE_CONFIG.EXPIRY_MS,
           partitioned: true,
         };
-        await setCookie(COOKIE_CONFIG.NAME, scoringData.scoringId, COOKIE_CONFIG.EXPIRY_DAYS);
+        await setCookie(COOKIE_CONFIG.NAME, scoringData.scoringId, COOKIE_CONFIG.EXPIRY_MS);
         setStep(LOAN_SIM_STEPS.COMPLETADO);
       } else {
-        const esErrorCoherencia =
-          preaprobadoResponse.message?.includes("Inconsistencia financiera") ||
-          preaprobadoResponse.message?.includes("COHERENCIA_FINANCIERA_ERROR");
+        const esErrorCoherencia = preaprobadoResponse.message?.includes(
+          ERROR_CAUSE.COHERENCIA_FINANCIERA_ERROR,
+        );
 
         if (esErrorCoherencia) {
           setError(

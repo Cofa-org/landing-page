@@ -1,0 +1,68 @@
+import { useState, useCallback } from "react";
+import LeadRegistrationService from "../../../../services/leadRegistrationService";
+
+export const useDNIUploadMobile = (leadId, token) => {
+  const [dniFront, setDniFront] = useState(null);
+  const [dniBack, setDniBack] = useState(null);
+  const [previewFront, setPreviewFront] = useState(null);
+  const [previewBack, setPreviewBack] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+  const [uploadSuccess, setUploadSuccess] = useState(false);
+
+  const handleFileChange = useCallback((e, setFile, setPreview) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setFile(file);
+    setPreview(URL.createObjectURL(file));
+    setUploadError("");
+  }, []);
+
+  const submitDNI = useCallback(async () => {
+    if (!leadId || !dniFront || !dniBack) {
+      setUploadError("Ambas fotos son requeridas");
+      return { success: false };
+    }
+
+    setIsUploading(true);
+    setUploadError("");
+
+    try {
+      const response = await LeadRegistrationService.subirDniMobile(
+        { leadId },
+        { dniFront, dniBack },
+        token
+      );
+      if (response.success) {
+        setUploadSuccess(true);
+        return { success: true };
+      }
+      setUploadError(response.message || "Error al subir las fotos");
+      return { success: false };
+    } catch (err) {
+      setUploadError(err.message || "Error de conexión");
+      return { success: false };
+    } finally {
+      setIsUploading(false);
+    }
+  }, [leadId, dniFront, dniBack, token]);
+
+  const isFormValid = dniFront && dniBack;
+
+  return {
+    dniFront,
+    dniBack,
+    previewFront,
+    previewBack,
+    isUploading,
+    uploadError,
+    uploadSuccess,
+    isFormValid,
+    handleFileChange,
+    submitDNI,
+    setDniFront,
+    setDniBack,
+    setPreviewFront,
+    setPreviewBack,
+  };
+};

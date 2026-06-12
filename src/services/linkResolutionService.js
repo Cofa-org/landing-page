@@ -1,6 +1,6 @@
 import { LRS_API_KEY, LRS_URL } from "../config.js";
 import { HTTP_METHOD } from "../constants/HTTP_METHODS.js";
-import { HttpApi } from "../http.js";
+import { HttpApi } from "../lib/http.js";
 
 export default class LinkResolutionService {
   static async consumeLink(shortId) {

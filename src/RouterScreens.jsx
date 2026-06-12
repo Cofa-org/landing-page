@@ -1,6 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import Loader from "./Components/Loader/Loader";
+import OnboardingFlowScreen from "./screens/registrationSim/OnboardingFlowScreen.jsx";
 
 // Lazy-loaded screens
 const HomeScreen = lazy(() => import("./screens/HomeScreen/HomeScreen"));
@@ -10,24 +11,47 @@ const ComplaintsScreen = lazy(() => import("./screens/ComplaintsScreen/Complaint
 const DischargeScreen = lazy(() => import("./screens/DischargeScreen/DischargeScreen"));
 const ElMejorTratoScreen = lazy(() => import("./screens/ElMejorTratoScreen/ElMejorTratoScreen"));
 const ErrorScreen = lazy(() => import("./screens/ErrorScreen/ErrorScreen"));
-const PrivacyPoliciesScreen = lazy(() => import("./screens/PrivacyPoliciesScreen/PrivacyPoliciesScreen"));
+const PrivacyPoliciesScreen = lazy(
+  () => import("./screens/PrivacyPoliciesScreen/PrivacyPoliciesScreen"),
+);
 const QuejasScreen = lazy(() => import("./screens/QuejasScreen/QuejasScreen"));
-const RegretOrDischargeScreen = lazy(() => import("./screens/RegretOrDischargeScreen/RegretOrDischargeScreen"));
+const RegretOrDischargeScreen = lazy(
+  () => import("./screens/RegretOrDischargeScreen/RegretOrDischargeScreen"),
+);
 const SuggestionsScreen = lazy(() => import("./screens/SuggestionsScreen/SuggestionsScreen"));
 const TermsPointsScreen = lazy(() => import("./screens/TermsScreen/TermsPointsScreen"));
 const TermsScreen = lazy(() => import("./screens/TermsScreen/TermsScreen"));
-const FrecuentQuestionScreen = lazy(() => import("./screens/FrecuentQuestionScreen/FrecuentQuestionScreen"));
+const FrecuentQuestionScreen = lazy(
+  () => import("./screens/FrecuentQuestionScreen/FrecuentQuestionScreen"),
+);
 const SacarPrestamoScreen = lazy(() => import("./screens/SacarPrestamoScreen/SacarPrestamoScreen"));
 const FormWorkWithUs = lazy(() => import("./Sections/WorkWithUs/FormWorkWithUs"));
 const BlogDetailScreen = lazy(() => import("./screens/blogDetailScreen/BlogDetailScreen.jsx"));
 const IaPoliciesScreen = lazy(() => import("./screens/IaPoliciesScreen.jsx/IaPoliciesScreen.jsx"));
 const ReqAutoridadesScreen = lazy(() => import("./screens/ReqAutoridadesScreen/ReqAutoridadesScreen.jsx"));
+const DNIUploadMobileScreen = lazy(() => import("./screens/DNIUploadMobile/DNIUploadMobileScreen"));
 
 /* import SuggestionsScreen from './screens/SuggestionsScreen/SuggestionsScreen' */
 
 const RouterScreens = () => {
+  
   return (
-    <Suspense fallback={<Loader />}>
+    <Suspense
+      fallback={
+        <div
+          style={{
+            minHeight: "100vh",
+            marginAuto: "auto",
+            width: "50%",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Loader />
+        </div>
+      }
+    >
       <Routes>
         <Route
           path='/'
@@ -41,6 +65,10 @@ const RouterScreens = () => {
         <Route
           path='/simulador'
           element={<LoanSimScreen />}
+        />
+        <Route
+          path='/registro-simulador'
+          element={<OnboardingFlowScreen />}
         />
         {/* Preguntas Frecuentes */}
         <Route
@@ -123,9 +151,13 @@ const RouterScreens = () => {
         />
         {/* Cofa Tips */}
         {/* <Route path='/asistencias' element={<AssistenceScreen/>}/> */} {/* Asistencias */}
-        {/* <Route path='/asistencias/terminos-multiasistencia' element={<TermsV2 type={'MULTIASISTENCIA'}/>}/> 
+        {/* <Route path='/asistencias/terminos-multiasistencia' element={<TermsV2 type={'MULTIASISTENCIA'}/>}/>
           <Route path='/asistencias/terminos-salud-integral' element={<TermsV2 type={'SALUDINTEGRAL'}/>}/>
           <Route path='/asistencias/terminos-desempleo' element={<TermsV2 type={'DESEMPLEO'}/>}/> */}
+        <Route
+          path='/subir-dni'
+          element={<DNIUploadMobileScreen />}
+        />
         <Route
           path='*'
           element={<ErrorScreen />}
