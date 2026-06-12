@@ -8,7 +8,6 @@ import { getFingerprint, mapFingerprintToHuellaData } from "../../../lib/fingerp
 const DNI_REGEX = /^\d{7,8}$/;
 const CELULAR_REGEX = /^549\d{10}$/;
 
-
 const calcularEdad = (fechaNacimiento) => {
   const fecha = new Date(fechaNacimiento);
   const hoy = new Date();
@@ -196,9 +195,10 @@ export const useLeadRegistration = (turnstileToken) => {
             huella_dispositivo: huellaData,
             request_id: requestId,
             celular: formData.celular,
-            ...(showFechaNacimiento && formData.fechaNacimiento && {
-              fecha_nacimiento: formData.fechaNacimiento,
-            }),
+            ...(showFechaNacimiento &&
+              formData.fechaNacimiento && {
+                fecha_nacimiento: formData.fechaNacimiento,
+              }),
           },
           signal,
         );
@@ -209,7 +209,7 @@ export const useLeadRegistration = (turnstileToken) => {
             response.data.token,
             COOKIE_LEAD_TOKEN_CONFIG.EXPIRY_MS,
           );
-          
+
           return {
             success: true,
             data: {
@@ -226,21 +226,15 @@ export const useLeadRegistration = (turnstileToken) => {
         if (isScoringRechazado) {
           return { success: false, rejected: true };
         }
+        if (err.cause === ERROR_CAUSE.EDAD_INVALIDA) {
+          return { success: false, rejected: true };
+        }
         setSubmitError(response.message || "Error al registrar. Intentá nuevamente.");
         return { success: false };
       } catch (err) {
         console.error("LEAD_REGISTRATION_ERROR:", err);
         if (err.name === "AbortError") return { success: false, aborted: true };
         // Detección unificada por causa: EDAD_INVALIDA → rechazo.
-        if (err.cause === ERROR_CAUSE.EDAD_INVALIDA) {
-          return { success: false, rejected: true };
-        }
-        const isScoringRechazado =
-          err.cause === ERROR_CAUSE.SCORING_RECHAZADO ||
-          (err.message && err.message.includes(ERROR_MESSAGE.SCORING_RECHAZADO));
-        if (isScoringRechazado) {
-          return { success: false, rejected: true };
-        }
         const msg = err.message || "Error de conexión. Intentá nuevamente.";
         setSubmitError(msg);
         return { success: false, error: msg };
