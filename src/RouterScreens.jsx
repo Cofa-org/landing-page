@@ -29,6 +29,7 @@ const FormWorkWithUs = lazy(() => import("./Sections/WorkWithUs/FormWorkWithUs")
 const BlogDetailScreen = lazy(() => import("./screens/blogDetailScreen/BlogDetailScreen.jsx"));
 const IaPoliciesScreen = lazy(() => import("./screens/IaPoliciesScreen.jsx/IaPoliciesScreen.jsx"));
 const ReqAutoridadesScreen = lazy(() => import("./screens/ReqAutoridadesScreen/ReqAutoridadesScreen.jsx"));
+const DNIUploadMobileScreen = lazy(() => import("./screens/DNIUploadMobile/DNIUploadMobileScreen"));
 
 /* import SuggestionsScreen from './screens/SuggestionsScreen/SuggestionsScreen' */
 
@@ -150,9 +151,13 @@ const RouterScreens = () => {
         />
         {/* Cofa Tips */}
         {/* <Route path='/asistencias' element={<AssistenceScreen/>}/> */} {/* Asistencias */}
-        {/* <Route path='/asistencias/terminos-multiasistencia' element={<TermsV2 type={'MULTIASISTENCIA'}/>}/> 
+        {/* <Route path='/asistencias/terminos-multiasistencia' element={<TermsV2 type={'MULTIASISTENCIA'}/>}/>
           <Route path='/asistencias/terminos-salud-integral' element={<TermsV2 type={'SALUDINTEGRAL'}/>}/>
           <Route path='/asistencias/terminos-desempleo' element={<TermsV2 type={'DESEMPLEO'}/>}/> */}
+        <Route
+          path='/subir-dni'
+          element={<DNIUploadMobileScreen />}
+        />
         <Route
           path='*'
           element={<ErrorScreen />}

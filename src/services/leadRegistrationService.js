@@ -69,6 +69,32 @@ export default class LeadRegistrationService {
     }
   }
 
+  static async subirDniMobile({ leadId }, { dniFront, dniBack }, tokenOverride, signal = null) {
+    try {
+      const url = `${LANDING_BACKEND_URL}/api/lead-registration/subir-dni/${leadId}`;
+      const formData = new FormData();
+      formData.append("dniFront", dniFront);
+      formData.append("dniBack", dniBack);
+      const response = await HttpApi(
+        url,
+        formData,
+        HTTP_METHOD.POST,
+        LANDING_BACKEND_API_KEY,
+        tokenOverride,
+        signal,
+      );
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Error al subir el DNI");
+      }
+      return data;
+    } catch (error) {
+      console.error("SUBIR_DNI_MOBILE_SERVICE_ERROR:", error);
+      throw error;
+    }
+  }
+
   static async subirRecibo({ leadId }, file, signal = null) {
     try {
       const url = `${LANDING_BACKEND_URL}/api/lead-registration/subir-recibo/${leadId}`;

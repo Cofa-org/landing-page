@@ -29,6 +29,7 @@ const OnboardingFlowScreen = () => {
     getLeadId,
     shouldShowBackButton,
     leadData,
+    leadToken,
   } = useOnboardingFlow();
 
   const { verificarOTP, reenviarOTP, validating, error } = usePhoneOTP(getLeadId);
@@ -57,6 +58,7 @@ const OnboardingFlowScreen = () => {
         return (
           <DNIUploadStep
             leadId={getLeadId()}
+            leadToken={leadToken}
             onSuccess={() => navigateToNext(LOAN_SIM_STEPS.DNI_UPLOAD)}
             error={null}
           />
