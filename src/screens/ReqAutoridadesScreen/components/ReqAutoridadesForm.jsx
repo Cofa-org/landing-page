@@ -9,17 +9,18 @@ import "../../../Components/Forms/style.css";
 import "./ReqAutoridadesForm.css";
 import { SECTIONS } from "../../../constants/REQ_AUTORIDADES";
 
+const initialDatosInvestigada = SECTIONS.datos_investigada.reduce((acc, curr) => ({ ...acc, [curr]: "" }), {});
+
 const ReqAutoridadesForm = () => {
   const { isSent, notification, handleSubmit, validate, closeNotification } = useReqAutoridadesForm();
   return (
     <div className='quejas-sugerencias req-autoridades-wrapper'>
       <Formik
         initialValues={{
-          datos_organismo: [],
+          datos_organismo: "",
           tipo_requerimiento: [],
-          datos_investigada: [],
+          datos_investigada: initialDatosInvestigada,
           informacion_requerida: [],
-          transferencia_judicial: [],
           files: [],
           declaracion_final: false,
         }}
@@ -30,17 +31,16 @@ const ReqAutoridadesForm = () => {
           <GenericForm 
             onSubmit={formikSubmit} 
             className="form-container req-autoridades-form-override"
+            children_className="req-autoridades-content-override"
           >
-            <div className='input-container-100'>
-              <label style={{ fontWeight: 'bold', fontSize: '15px', color: '#333' }}>1. Datos del organismo solicitante</label>
-              <div className='checkboxes-grid' style={{ marginTop: '8px' }}>
-                {SECTIONS.datos_organismo.map(item => (
-                  <label key={item} className="checkbox-label">
-                    <Field type="checkbox" name="datos_organismo" value={item} />
-                    {item}
-                  </label>
-                ))}
-              </div>
+            <div className='input-container input-container-100'>
+              <label htmlFor="datos_organismo" style={{ fontWeight: 'bold', fontSize: '15px', color: '#333' }}>1. Datos del organismo solicitante</label>
+              <Field 
+                type="text"
+                id="datos_organismo"
+                name="datos_organismo" 
+                placeholder="Ingrese los datos del organismo solicitante"
+              />
             </div>
 
             <div className='input-container-100'>
@@ -57,12 +57,12 @@ const ReqAutoridadesForm = () => {
 
             <div className='input-container-100'>
               <label style={{ fontWeight: 'bold', fontSize: '15px', color: '#333' }}>3. Datos de la persona investigada / consultada</label>
-              <div className='checkboxes-grid' style={{ marginTop: '8px' }}>
+              <div className='investigada-grid' style={{ marginTop: '8px' }}>
                 {SECTIONS.datos_investigada.map(item => (
-                  <label key={item} className="checkbox-label">
-                    <Field type="checkbox" name="datos_investigada" value={item} />
-                    {item}
-                  </label>
+                  <div key={item} className="input-container">
+                    <label style={{ fontSize: '13px', fontWeight: '500' }}>{item}</label>
+                    <Field type="text" name={`datos_investigada["${item}"]`} />
+                  </div>
                 ))}
               </div>
             </div>
@@ -80,19 +80,7 @@ const ReqAutoridadesForm = () => {
             </div>
 
             <div className='input-container-100'>
-              <label style={{ fontWeight: 'bold', fontSize: '15px', color: '#333' }}>5. Transferencia judicial de fondos</label>
-              <div className='checkboxes-grid' style={{ marginTop: '8px' }}>
-                {SECTIONS.transferencia_judicial.map(item => (
-                  <label key={item} className="checkbox-label">
-                    <Field type="checkbox" name="transferencia_judicial" value={item} />
-                    {item}
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            <div className='input-container-100'>
-              <label style={{ fontWeight: 'bold', fontSize: '15px', color: '#333' }}>6. Adjuntar documentación</label>
+              <label style={{ fontWeight: 'bold', fontSize: '15px', color: '#333' }}>5. Adjuntar documentación</label>
               <p style={{ marginTop: '2px', marginBottom: '8px', fontSize: '13px', color: '#666' }}>
                 Puede adjuntar: Oficio judicial firmado, Resolución judicial, Constancias bancarias, Anexos. (Máximo 5 archivos, hasta 10MB en total)
               </p>
@@ -103,7 +91,7 @@ const ReqAutoridadesForm = () => {
             </div>
 
             <div className='input-container-100'>
-              <label style={{ fontWeight: 'bold', fontSize: '15px', color: '#333' }}>7. Declaraciones finales</label>
+              <label style={{ fontWeight: 'bold', fontSize: '15px', color: '#333' }}>6. Declaraciones finales</label>
               <label className="checkbox-label" style={{ alignItems: 'flex-start', marginTop: '6px' }}>
                 <Field type="checkbox" name="declaracion_final" style={{ marginTop: '2px' }} />
                 <span style={{ fontSize: '13px' }}>Declaro que la información suministrada es veraz y que el requerimiento se realiza en ejercicio de facultades legales</span>

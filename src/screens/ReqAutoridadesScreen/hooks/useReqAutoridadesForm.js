@@ -14,6 +14,12 @@ export const useReqAutoridadesForm = () => {
       if (key !== 'files') {
         if (Array.isArray(values[key])) {
           formData.append(key, values[key].join(", "));
+        } else if (typeof values[key] === 'object' && values[key] !== null) {
+          const formattedObject = Object.entries(values[key])
+            .filter(([_, val]) => val && String(val).trim() !== "")
+            .map(([k, v]) => `${k}: ${v}`)
+            .join(" | ");
+          formData.append(key, formattedObject || "N/A");
         } else {
           formData.append(key, values[key]);
         }

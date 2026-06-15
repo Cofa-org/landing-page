@@ -1,16 +1,4 @@
 export const SECTIONS = {
-  datos_organismo: [
-    "Organismo / Juzgado / Fiscalía", 
-    "Jurisdicción", 
-    "Fuero", 
-    "Secretaría", 
-    "Número de expediente", 
-    "Carátula", 
-    "Nombre del funcionario solicitante", 
-    "Cargo", 
-    "Correo institucional", 
-    "Teléfono institucional"
-  ],
   tipo_requerimiento: [
     "Pedido de información", 
     "Bloqueo preventivo", 
@@ -42,13 +30,5 @@ export const SECTIONS = {
     "Documentación contractual", 
     "Grabaciones / logs", 
     "Otros"
-  ],
-  transferencia_judicial: [
-    "Titular de la cuenta destino", 
-    "CUIT/CUIL", 
-    "Banco", 
-    "Tipo de cuenta", 
-    "CBU", 
-    "Constancia bancaria adjunta"
   ]
 };
