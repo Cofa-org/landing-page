@@ -171,16 +171,20 @@ const ContactForm = ({ type }) => {
     }
   };
 
-  const handleSubmit = async (values) => {
-    setIsSelectorOpen(true);
-    if (type == "RECLAMO") {
-      const valuesWithSelection = {
-        ...values,
-        reasonSelected: { ...reasonSelected, reason: getReason().title },
-      };
-      sendMailRequest(valuesWithSelection);
-    } else {
-      sendMailRequest(values);
+  const handleSubmit = async (values, { setSubmitting }) => {
+    try {
+      setIsSelectorOpen(true);
+      if (type == "RECLAMO") {
+        const valuesWithSelection = {
+          ...values,
+          reasonSelected: { ...reasonSelected, reason: getReason().title },
+        };
+        await sendMailRequest(valuesWithSelection);
+      } else {
+        await sendMailRequest(values);
+      }
+    } finally {
+      setSubmitting(false);
     }
   };
 

@@ -139,8 +139,12 @@ const WorkWithUsForm = () => {
     }
   };
 
-  const handleSubmit = async (values) => {
-    sendMailRequest(values);
+  const handleSubmit = async (values, { setSubmitting }) => {
+    try {
+      await sendMailRequest(values);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const validate = (values) => {
