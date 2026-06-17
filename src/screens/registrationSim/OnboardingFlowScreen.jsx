@@ -41,9 +41,10 @@ const OnboardingFlowScreen = () => {
   const handleVerificarOTP = useCallback(async (codigo) => {
       const result = await verificarOTP(codigo);
       if (result?.success) {
-        navigateToNext(onboardingStep);
+        // Pasamos esCliente para que navigateToNext sepa si saltear DNI_UPLOAD.
+        navigateToNext(onboardingStep, { esCliente: leadData?.es_cliente });
       }
-  }, [verificarOTP, onboardingStep]);
+  }, [verificarOTP, onboardingStep, leadData]);
 
   const renderStep = () => {
     switch (onboardingStep) {
