@@ -18,6 +18,7 @@ const ReciboUploadStep = React.lazy(
   () => import("./components/ReciboUploadStep/ReciboUploadStep.jsx"),
 );
 const WelcomeStep = React.lazy(() => import("./components/WelcomeStep/WelcomeStep.jsx"));
+const AnalysisStep = React.lazy(() => import("./components/AnalysisStep/AnalysisStep.jsx"));
 
 const OnboardingFlowScreen = () => {
   const {
@@ -26,6 +27,7 @@ const OnboardingFlowScreen = () => {
     navigateToPrev,
     handleLeadSuccess,
     handleRejected,
+    handleAnalysis,
     getLeadId,
     shouldShowBackButton,
     leadData,
@@ -50,6 +52,7 @@ const OnboardingFlowScreen = () => {
           <LeadRegistrationStep
             onSuccess={handleLeadSuccess}
             onRejected={handleRejected}
+            onAnalysis={handleAnalysis}
             onNext={() => navigateToNext(LOAN_SIM_STEPS.LEAD_REGISTRATION)}
             error={null}
           />
@@ -92,6 +95,8 @@ const OnboardingFlowScreen = () => {
         );
       case LOAN_SIM_STEPS.RECHAZADO:
         return <RejectedStep />;
+      case LOAN_SIM_STEPS.EN_ANALISIS:
+        return <AnalysisStep />;
       default:
         return null;
     }

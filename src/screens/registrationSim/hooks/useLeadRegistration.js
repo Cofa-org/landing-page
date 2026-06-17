@@ -210,6 +210,10 @@ export const useLeadRegistration = (turnstileToken) => {
             COOKIE_LEAD_TOKEN_CONFIG.EXPIRY_MS,
           );
 
+          if (response.data.analysisRequired) {
+            return { success: false, analysis: true, data: response.data };
+          }
+
           return {
             success: true,
             data: {

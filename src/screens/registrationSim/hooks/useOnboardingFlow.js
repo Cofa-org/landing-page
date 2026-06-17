@@ -91,6 +91,8 @@ export const useOnboardingFlow = () => {
             targetStep = LOAN_SIM_STEPS.WELCOME;
           } else if (estadoOnboarding === ONBOARDING_STATES.RECHAZADO) {
             targetStep = LOAN_SIM_STEPS.RECHAZADO;
+          } else if (estadoOnboarding === ONBOARDING_STATES.EN_ANALISIS) {
+            targetStep = LOAN_SIM_STEPS.EN_ANALISIS;
           }
           // Solo actualizar leadData si no tiene informacion completa (sin celular)
           if (leadData?.celular) {
@@ -158,6 +160,12 @@ export const useOnboardingFlow = () => {
     setOnboardingStep(LOAN_SIM_STEPS.RECHAZADO);
   }, []);
 
+  const handleAnalysis = useCallback((data) => {
+    if (data?.lead) setLeadData(data.lead);
+    if (data?.token) setLeadToken(data.token);
+    setOnboardingStep(LOAN_SIM_STEPS.EN_ANALISIS);
+  }, []);
+
   const resetOnboarding = useCallback(() => {
     setLeadData(null);
     setLeadToken(null);
@@ -194,6 +202,7 @@ export const useOnboardingFlow = () => {
     // Handlers de steps
     handleLeadSuccess,
     handleRejected,
+    handleAnalysis,
 
     // Utilidad
     getLeadId,

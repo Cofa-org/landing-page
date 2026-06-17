@@ -8,7 +8,7 @@ import Turnstile from "../../../../Components/Turnstile/Turnstile.jsx";
 import { TURNSTILE_SITE_KEY } from "../../../../config.js";
 import styles from "./LeadRegistrationStep.module.css";
 
-const LeadRegistrationStep = ({ onSuccess, onRejected, onNext, loading, error: externalError }) => {
+const LeadRegistrationStep = ({ onSuccess, onRejected, onAnalysis, onNext, loading, error: externalError }) => {
   const [successMessage, setSuccessMessage] = useState("");
   const [honeypot, setHoneypot] = useState("");
   const [turnstileToken, setTurnstileToken] = useState("");
@@ -46,7 +46,10 @@ const LeadRegistrationStep = ({ onSuccess, onRejected, onNext, loading, error: e
 
     turnstileRef.current?.reset();
     setTurnstileToken("");
-
+    if (result.analysis && onAnalysis) {
+      onAnalysis(result.data);
+      return;
+    }
     if (result.rejected && onRejected) {
       onRejected();
     }
@@ -194,6 +197,7 @@ const LeadRegistrationStep = ({ onSuccess, onRejected, onNext, loading, error: e
 LeadRegistrationStep.propTypes = {
   onSuccess: PropTypes.func,
   onRejected: PropTypes.func,
+  onAnalysis: PropTypes.func,
   onNext: PropTypes.func,
   loading: PropTypes.bool,
   error: PropTypes.string,
