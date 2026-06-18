@@ -34,6 +34,10 @@ export const useLoanSimulator = () => {
   // Ref to the AbortController for the current calcularPlanes request.
   // Allows cancelling in-flight fetches when the user changes the capital rapidly.
   const fetchAbortControllerRef = useRef(null);
+  // Ref to the latest fetchSimulation callback. Updated on every render so the
+  // initial/debounced effects can call it without depending on its identity
+  // (which would otherwise re-fire the effects when huellaData changes).
+  const fetchSimulationRef = useRef(null);
   const shortId = searchParams.get("id");
 
   useEffect(() => {
@@ -48,6 +52,24 @@ export const useLoanSimulator = () => {
         const response = await LinkResolutionService.consumeLink(shortId);
 
         if (response.success && response.data) {
+          // Get the fingerprint BEFORE any state update that triggers the initial
+          // fetch. This way, scoringId and huellaData are set in the same React
+          // batch → 1 re-render → 1 fetchSimulation call → 1 backend insert.
+          // If we set scoringId first, the initial fetch effect fires without
+          // huellaData; then when huellaData arrives a second render triggers the
+          // effect again → 2 calls → 2 simulations persisted.
+          let fingerprint = null;
+          try {
+            fingerprint = await getFingerprint({
+              scoringId: response.data.scoringId,
+            });
+          } catch (fpErr) {
+            console.warn("SIMULATOR_FINGERPRINT_ERROR:", fpErr);
+          }
+
+          // All setState calls below execute in the same synchronous chunk.
+          // React 18 batches them into a single render → the initial fetch
+          // effect runs exactly once with both scoringId and huellaData ready.
           setScoringData({
             scoringId: String(response.data.scoringId),
             cuit: response.data.cuit || null,
@@ -61,16 +83,8 @@ export const useLoanSimulator = () => {
             motivo: response.data.motivo || null,
           });
 
-          // Obtener huella del dispositivo actual (cacheada para toda la sesión)
-          try {
-            const fingerprint = await getFingerprint({
-              scoringId: response.data.scoringId,
-            });
-            setHuellaData(mapFingerprintToHuellaData(fingerprint));
-            setHuellaRequestId(fingerprint?.requestId || null);
-          } catch (fpErr) {
-            console.warn("SIMULATOR_FINGERPRINT_ERROR:", fpErr);
-          }
+          setHuellaData(mapFingerprintToHuellaData(fingerprint));
+          setHuellaRequestId(fingerprint?.requestId || null);
         } else {
           setError(response.mensaje || "El enlace de acceso es inválido o ha expirado.");
         }
@@ -202,17 +216,24 @@ export const useLoanSimulator = () => {
     [scoringData.scoringId, huellaData, huellaRequestId],
   );
 
+  // Keep the ref pointing to the latest fetchSimulation on every render so the
+  // effects below can call the current version without re-firing on reference
+  // changes of the useCallback.
+  fetchSimulationRef.current = fetchSimulation;
+
   useEffect(() => {
     if (scoringData.scoringId) {
-      fetchSimulation(0, true);
+      fetchSimulationRef.current(0, true);
     }
-  }, [scoringData.scoringId, fetchSimulation]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scoringData.scoringId]);
 
   useEffect(() => {
     if (debouncedAmount > 0 && scoringData.scoringId) {
-      fetchSimulation(debouncedAmount);
+      fetchSimulationRef.current(debouncedAmount);
     }
-  }, [debouncedAmount, scoringData.scoringId, fetchSimulation]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedAmount, scoringData.scoringId]);
 
   const handleAmountChange = (newAmount, discountInstallmentRounded) => {
     if (newAmount <= discountInstallmentRounded) {
