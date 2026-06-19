@@ -80,7 +80,9 @@ export const useLoanSimulator = () => {
           } catch (initErr) {
             console.error("INICIAR_SESION_SIMULADOR_ERROR:", initErr);
             setError(
-              "No se pudo iniciar la sesión del simulador. Por favor, intenta nuevamente.",
+              initErr.message
+                ? `${initErr.message} 😊`
+                : "No se pudo iniciar la sesión del simulador. Por favor, intenta nuevamente.",
             );
             return;
           }
@@ -109,7 +111,7 @@ export const useLoanSimulator = () => {
           );
         }
       } catch (err) {
-        setError(err.message || "Error al verificar el acceso");
+        setError(err.message ? `${err.message} 😊` : "Error al verificar el acceso");
         console.error("VERIFY_LINK_ERROR:", err);
       } finally {
         setLoading(false);
@@ -217,14 +219,18 @@ export const useLoanSimulator = () => {
             setStep(LOAN_SIM_STEPS.DEVICE_MISMATCH);
             return;
           }
-          setError(response.message || "¡Ups! Ha ocurrido un error en la simulación");
+          setError(
+            response.message
+              ? `${response.message} 😊`
+              : "¡Ups! Ha ocurrido un error en la simulación",
+          );
         }
       } catch (err) {
         // Ignore errors from cancelled (aborted) requests — they are expected.
         if (err.name === "AbortError") return;
         // El catch solo se ejecuta para errores de red/HTTP (response.ok === false).
         // Los errores de aplicación vienen como response.success === false arriba.
-        setError(err.message || "Error al conectar con el servidor");
+        setError(err.message ? `${err.message} 😊` : "Error al conectar con el servidor");
         console.error("SIMULATION_HOOK_ERROR:", err);
       } finally {
         // Only clear the loading state if this request is still the active one.
@@ -319,11 +325,15 @@ export const useLoanSimulator = () => {
         } else if (response.success && existingSimulation?.email_validado) {
           setStep(LOAN_SIM_STEPS.COMPLIANCE);
         } else {
-          setError(response.message || "¡Ups! Ha ocurrido un error al guardar la simulación");
+          setError(
+            response.message
+              ? `${response.message} 😊`
+              : "¡Ups! Ha ocurrido un error al guardar la simulación",
+          );
           return;
         }
       } catch (err) {
-        setError(err.message || "Error al guardar la simulación");
+        setError(err.message ? `${err.message} 😊` : "Error al guardar la simulación");
         console.error("SAVE_PLAN_ERROR:", err);
       } finally {
         setLoading(false);
@@ -370,10 +380,12 @@ export const useLoanSimulator = () => {
         setEmail(emailValue);
         setStep(LOAN_SIM_STEPS.OTP_VALIDATION);
       } else {
-        setError(response.message || "Error al validar el email");
+        setError(
+          response.message ? `${response.message} 😊` : "Error al validar el email",
+        );
       }
     } catch (err) {
-      setError(err.message || "Error de conexión al validar email");
+      setError(err.message ? `${err.message} 😊` : "Error de conexión al validar email");
     } finally {
       setValidating(false);
     }
@@ -424,10 +436,18 @@ export const useLoanSimulator = () => {
       if (response.success || response.data) {
         setStep(LOAN_SIM_STEPS.CBU_VALIDATION);
       } else {
-        setError(response.message || "Error al guardar información de compliance");
+        setError(
+          response.message
+            ? `${response.message} 😊`
+            : "Error al guardar información de compliance",
+        );
       }
     } catch (err) {
-      setError(err.message || "Error de conexión al guardar compliance");
+      setError(
+        err.message
+          ? `${err.message} 😊`
+          : "Error de conexión al guardar compliance",
+      );
     } finally {
       setValidating(false);
     }
@@ -489,14 +509,15 @@ export const useLoanSimulator = () => {
           return;
         } else {
           setError(
-            preaprobadoResponse.message ||
-              "¡Lo sentimos! No pudimos completar la operación, ponete en contacto con un operador 😕",
+            preaprobadoResponse.message
+              ? `${preaprobadoResponse.message} 😊`
+              : "¡Lo sentimos! No pudimos completar la operación, ponete en contacto con un operador 😕",
           );
           return;
         }
       }
     } catch (err) {
-      setError(err.message || "¡Ups! Hubo un problema, volvé a intentarlo 🔄");
+      setError(err.message ? `${err.message} 😊` : "¡Ups! Hubo un problema, volvé a intentarlo 🔄");
     } finally {
       setValidating(false);
     }
@@ -515,12 +536,20 @@ export const useLoanSimulator = () => {
         setLoanInfo(response.data);
         return true;
       } else {
-        setError("Error al obtener la información del préstamo.");
+        setError(
+          response.message
+            ? `${response.message} 😊`
+            : "Error al obtener la información del préstamo.",
+        );
         return false;
       }
     } catch (error) {
       console.error("Error obteniendo info del préstamo:", error);
-      setError("Error al obtener la información del préstamo.");
+      setError(
+        error.message
+          ? `${error.message} 😊`
+          : "Error al obtener la información del préstamo.",
+      );
       return false;
     } finally {
       setLoadingModal(false);
@@ -561,7 +590,9 @@ export const useLoanSimulator = () => {
         } else {
           setBancoEncontrado(null);
           setCodigoBancoError(
-            response.message || "Alguno de los dígitos ingresados no es correcto",
+            response.message
+              ? `${response.message} 😊`
+              : "Alguno de los dígitos ingresados no es correcto",
           );
         }
       } catch (err) {
