@@ -86,7 +86,9 @@ export const useLoanSimulator = () => {
           setHuellaData(mapFingerprintToHuellaData(fingerprint));
           setHuellaRequestId(fingerprint?.requestId || null);
         } else {
-          setError(response.mensaje || "El enlace de acceso es inválido o ha expirado.");
+          setError(
+            `${response.message} 😕` || "El enlace de acceso es inválido o ha expirado 🤔.",
+          );
         }
       } catch (err) {
         setError(err.message || "Error al verificar el acceso");
@@ -373,7 +375,7 @@ export const useLoanSimulator = () => {
         setStep(LOAN_SIM_STEPS.COMPLIANCE);
       } else {
         setError(
-          response.mensaje ||
+          `${response.message} 🤔` ||
             "¡Ups! El código que ingresaste no es correcto. Inténtalo de nuevo 😊",
         );
       }
@@ -426,7 +428,7 @@ export const useLoanSimulator = () => {
 
       if (!cbuResponse.success) {
         setError(
-          cbuResponse.mensaje ||
+          `${cbuResponse.message} 😕` ||
             "¡Lo sentimos! No pudimos validar tu CBU. Revisá los datos e intentá nuevamente 😕",
         );
         return;
