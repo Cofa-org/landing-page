@@ -14,7 +14,7 @@ export const usePhoneOTP = (getLeadId) => {
       setError(null);
       try {
         const result = await LeadRegistrationService.verificarOTPCelular({ leadId, codigo });
-        console.log(result);
+       
         if (!result.success) {
           setError(
             `${result.message} 😊` ||
