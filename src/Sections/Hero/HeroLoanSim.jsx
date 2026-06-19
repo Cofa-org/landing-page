@@ -10,8 +10,8 @@ import { IoIosCheckmarkCircleOutline } from "react-icons/io";
 const HeroLoanSim = ({
   title = "Tu Préstamo,",
   highlightedTitle = "a tu Medida",
-  description = "Simulá tu préstamo 100% online y obtené una respuesta en minutos. Sin vueltas, con la transparencia que buscás.",
-  trustItems = ["Mínimos Requisitos", "100% Online", "En el día", "Seguro y Confiable"],
+  description = "Simulá tu préstamo 100% digital y obtené una respuesta en minutos. Sin vueltas, con la transparencia que buscás.",
+  trustItems = ["Mínimos Requisitos", "100% Digital", "En el día", "Seguro y Confiable"],
 }) => {
   return (
     <section className={styles.heroContainer}>

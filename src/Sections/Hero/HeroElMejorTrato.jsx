@@ -16,7 +16,7 @@ const HeroElMejorTrato = ({}) => {
                         <span className='primary-text'>Préstamos </span><br/> Personales
                     </h1>
                     <p>¡Hola! Bienvenido a la mejor Fintech de préstamos. Con nosotros, las posibilidades son infinitas. Solo completá el formulario y en pocos minutos te ayudaremos a obtener tu préstamo.</p>
-                    <p>Mínimos Requisitos - 100% Online - Adelantos de hasta $800.000 - En el día</p>
+                    <p>Mínimos Requisitos - 100% Digital - Adelantos de hasta $800.000 - En el día</p>
                     <div className='email-info'>
                         <span className="email-circle">
                             <MdMailOutline />
@@ -64,7 +64,7 @@ const HeroElMejorTrato = ({}) => {
                         <h2>Préstamos personales</h2>
                         <p><IoIosCheckmarkCircleOutline />Mínimos Requisitos</p>
                         <p><IoIosCheckmarkCircleOutline />En el día</p>
-                        <p><IoIosCheckmarkCircleOutline />100% Online</p>
+                        <p><IoIosCheckmarkCircleOutline />100% Digital</p>
                         <p><IoIosCheckmarkCircleOutline />Adelantos de hasta $180.000</p>
                     </div>
                     <div className='info-card-exc card-el-mejor-trato'>

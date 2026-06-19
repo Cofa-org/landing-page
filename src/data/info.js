@@ -12,7 +12,7 @@ export const infoList = [
     Icon: TbCheckupList,
     title: "Pedí tu préstamo",
     content:
-      "Decinos cuánto necesitás y nosotros te ayudamos!\nOtorgamos préstamos online en el acto.",
+      "Decinos cuánto necesitás y nosotros te ayudamos!\nOtorgamos préstamos 100% digitales y en el acto.",
   },
   {
     Icon: CiMoneyBill,
@@ -78,7 +78,7 @@ export const ourServices = [
 export const frecuentQuestions = [
   {
     name: "¿Qué tipo de préstamos ofrecen?",
-    content: "Ofrecemos préstamos personales 100 % digitales, simples y accesibles. El proceso es totalmente online y pensado para personas con distintos niveles de experiencia digital. Podés solicitar un monto adaptado a tus necesidades y devolverlo en cuotas fijas.",
+    content: "Ofrecemos préstamos personales, simples y accesibles. El proceso es 100% digital y pensado para personas con distintos niveles de experiencia tecnológica. Podés solicitar un monto adaptado a tus necesidades y devolverlo en cuotas fijas.",
     id: 1,
   },
   {

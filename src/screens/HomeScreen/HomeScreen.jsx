@@ -15,7 +15,7 @@ const HomeScreen = () => {
       "name": "¿Qué requisitos necesito para solicitar un préstamo en COFA?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Ser mayor de 18 años, DNI vigente, CBU propio y comprobante de ingresos. La evaluación es 100% online y la acreditación puede ser en el día según elegibilidad."
+        "text": "Ser mayor de 18 años, DNI vigente, CBU propio y comprobante de ingresos. La evaluación es 100% digital y la acreditación puede ser en el día según elegibilidad."
       }
     },
     {
