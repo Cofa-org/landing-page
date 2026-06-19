@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { getCookie, roundToFiveHundreds, setCookie } from "../../../lib/utils.js";
 import { useDebounce } from "../../../hooks/useDebounce";
 import SimuladorService from "../../../services/simuladorService";
-import { COOKIE_CONFIG, LOAN_SIM_STEPS } from "../../../constants/LOAN_SIM.js";
+import { COOKIE_CONFIG, COOKIE_SIMULADOR_TOKEN_CONFIG, LOAN_SIM_STEPS } from "../../../constants/LOAN_SIM.js";
 import LinkResolutionService from "../../../services/linkResolutionService.js";
 import { ERROR_CAUSE } from "../../../constants/error";
 import { getFingerprint, mapFingerprintToHuellaData } from "../../../lib/fingerprint.js";
@@ -65,6 +65,24 @@ export const useLoanSimulator = () => {
             });
           } catch (fpErr) {
             console.warn("SIMULATOR_FINGERPRINT_ERROR:", fpErr);
+          }
+
+          // Intercambiar scoringId/cuit por un JWT del simulador ANTES de
+          // setScoringData: si lo hacemos después, el effect que dispara
+          // calcularPlanes al detectar scoringId correría antes de que el
+          // cookie del token esté escrita → 401 en la primera llamada.
+          // Espejo del patrón de useLeadRegistration: tras crearLead, setCookie(COOKIE_LEAD_TOKEN_CONFIG).
+          try {
+            await SimuladorService.iniciarSesion({
+              scoringId: String(response.data.scoringId),
+              cuit: response.data.cuit || null,
+            });
+          } catch (initErr) {
+            console.error("INICIAR_SESION_SIMULADOR_ERROR:", initErr);
+            setError(
+              "No se pudo iniciar la sesión del simulador. Por favor, intenta nuevamente.",
+            );
+            return;
           }
 
           // All setState calls below execute in the same synchronous chunk.

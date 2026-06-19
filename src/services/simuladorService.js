@@ -1,6 +1,8 @@
 import { LANDING_BACKEND_URL, LANDING_BACKEND_API_KEY } from "../config";
 import { HTTP_METHOD } from "../constants/HTTP_METHODS.js";
 import { HttpApi } from "../lib/http.js";
+import { getCookie, setCookie } from "../lib/utils";
+import { COOKIE_SIMULADOR_TOKEN_CONFIG } from "../constants/LOAN_SIM.js";
 
 export default class SimuladorService {
   static async calcularPlanes(
@@ -32,7 +34,8 @@ export default class SimuladorService {
         request_id,
       };
 
-      const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, null, signal);
+      const token = await getCookie(COOKIE_SIMULADOR_TOKEN_CONFIG.NAME);
+      const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, token, signal);
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -47,12 +50,40 @@ export default class SimuladorService {
     }
   }
 
+  static async iniciarSesion({ scoringId, cuit }) {
+    try {
+      const url = `${LANDING_BACKEND_URL}/api/simulador-prestamos/init`;
+      const apiKey = LANDING_BACKEND_API_KEY;
+      const body = { scoringId, cuit };
+
+      const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, null);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Error al iniciar sesión del simulador");
+      }
+
+      const jsonResponse = await response.json();
+      // Guardar token en cookie para que las 11 llamadas siguientes lo lean.
+      await setCookie(
+        COOKIE_SIMULADOR_TOKEN_CONFIG.NAME,
+        jsonResponse.data.token,
+        COOKIE_SIMULADOR_TOKEN_CONFIG.EXPIRY_MS,
+      );
+      return jsonResponse;
+    } catch (error) {
+      console.error("INICIAR_SESION_SIMULADOR_ERROR:", error);
+      throw error;
+    }
+  }
+
   static async guardarPlan(payload) {
     try {
       const URL = `${LANDING_BACKEND_URL}/api/simulador-prestamos/guardar`;
       const apiKey = LANDING_BACKEND_API_KEY;
       const body = payload;
-      const response = await HttpApi(URL, body, HTTP_METHOD.POST, apiKey, null);
+      const token = await getCookie(COOKIE_SIMULADOR_TOKEN_CONFIG.NAME);
+      const response = await HttpApi(URL, body, HTTP_METHOD.POST, apiKey, token);
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Error al guardar plan");
@@ -74,7 +105,8 @@ export default class SimuladorService {
         isResend,
       };
 
-      const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, null);
+      const token = await getCookie(COOKIE_SIMULADOR_TOKEN_CONFIG.NAME);
+      const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, token);
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Error al solicitar OTP");
@@ -98,7 +130,8 @@ export default class SimuladorService {
         scoringId,
       };
 
-      const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, null);
+      const token = await getCookie(COOKIE_SIMULADOR_TOKEN_CONFIG.NAME);
+      const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, token);
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -121,7 +154,8 @@ export default class SimuladorService {
         scoringId,
         accountType,
       };
-      const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, null);
+      const token = await getCookie(COOKIE_SIMULADOR_TOKEN_CONFIG.NAME);
+      const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, token);
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Error al validar CBU");
@@ -142,7 +176,8 @@ export default class SimuladorService {
         cantidad_cuotas,
         monto,
       };
-      const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, null);
+      const token = await getCookie(COOKIE_SIMULADOR_TOKEN_CONFIG.NAME);
+      const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, token);
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Error al obtener ID preaprobado");
@@ -158,7 +193,8 @@ export default class SimuladorService {
     try {
       const url = `${LANDING_BACKEND_URL}/api/simulador-prestamos/info/${scoringId}`;
       const apiKey = LANDING_BACKEND_API_KEY;
-      const response = await HttpApi(url, null, HTTP_METHOD.GET, apiKey, null);
+      const token = await getCookie(COOKIE_SIMULADOR_TOKEN_CONFIG.NAME);
+      const response = await HttpApi(url, null, HTTP_METHOD.GET, apiKey, token);
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -176,7 +212,8 @@ export default class SimuladorService {
     try {
       const url = `${LANDING_BACKEND_URL}/api/simulador-prestamos/compliance`;
       const apiKey = LANDING_BACKEND_API_KEY;
-      const response = await HttpApi(url, payload, HTTP_METHOD.POST, apiKey, null);
+      const token = await getCookie(COOKIE_SIMULADOR_TOKEN_CONFIG.NAME);
+      const response = await HttpApi(url, payload, HTTP_METHOD.POST, apiKey, token);
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Error al guardar información de compliance");
@@ -192,7 +229,8 @@ export default class SimuladorService {
     try {
       const url = `${LANDING_BACKEND_URL}/api/simulador-prestamos/compliance/verificar?cuit=${encodeURIComponent(cuit)}`;
       const apiKey = LANDING_BACKEND_API_KEY;
-      const response = await HttpApi(url, null, HTTP_METHOD.GET, apiKey, null);
+      const token = await getCookie(COOKIE_SIMULADOR_TOKEN_CONFIG.NAME);
+      const response = await HttpApi(url, null, HTTP_METHOD.GET, apiKey, token);
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Error al verificar compliance existente");
@@ -211,7 +249,8 @@ export default class SimuladorService {
       const apiKey = LANDING_BACKEND_API_KEY;
       const body = { codigo, accountType };
 
-      const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, null);
+      const token = await getCookie(COOKIE_SIMULADOR_TOKEN_CONFIG.NAME);
+      const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, token);
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -230,7 +269,8 @@ export default class SimuladorService {
       const url = `${LANDING_BACKEND_URL}/api/simulador-prestamos/estado`;
       const apiKey = LANDING_BACKEND_API_KEY;
       const body = { scoringId, estado };
-      const response = await HttpApi(url, body, HTTP_METHOD.PUT, apiKey, null);
+      const token = await getCookie(COOKIE_SIMULADOR_TOKEN_CONFIG.NAME);
+      const response = await HttpApi(url, body, HTTP_METHOD.PUT, apiKey, token);
 
       if (!response.ok) {
         const errorData = await response.json();
