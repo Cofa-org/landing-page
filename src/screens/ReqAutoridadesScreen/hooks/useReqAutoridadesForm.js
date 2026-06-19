@@ -70,6 +70,9 @@ export const useReqAutoridadesForm = () => {
     if (!values.declaracion_final) {
       errors.declaracion_final = "Debe aceptar la declaración final para enviar el requerimiento.";
     }
+    if (!values.files || values.files.length === 0) {
+      errors.files = "Debe adjuntar al menos un archivo.";
+    }
     return errors;
   };
 
