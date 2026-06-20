@@ -10,7 +10,7 @@ import { THUMBMARKJS_API_KEY } from "../config.js";
  */
 export const getDeviceFingerprint = async (metadata = {}) => {
   try {
-    console.log("THUMBMARKJS_API_KEY:", THUMBMARKJS_API_KEY);
+    
     const instance = new Thumbmark({
       api_key: THUMBMARKJS_API_KEY,
       metadata,
