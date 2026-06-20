@@ -10,6 +10,7 @@ export const LOAN_SIM_STEPS = {
   CBU_VALIDATION: "CBU_VALIDATION",
   COMPLETADO: "COMPLETADO",
   RECHAZADO: "RECHAZADO",
+  EN_ANALISIS: "EN_ANALISIS",
   PHONE_VALIDATION: "PHONE_VALIDATION",
   DEVICE_MISMATCH: "DISPOSITIVO_RECHAZADO",
 };
@@ -46,6 +47,14 @@ export const COOKIE_LEAD_TOKEN_CONFIG = {
   EXPIRY_MS: Date.now() + 2 * 60 * 60 * 1000, // 2 hours in ms
 };
 
+export const COOKIE_SIMULADOR_TOKEN_CONFIG = {
+  NAME: "simuladorToken",
+  // 24 hours in ms — espejo de la duración del JWT (Task 0/1) para que la
+  // cookie no expire antes que el token. El usuario puede pausar y volver
+  // al día siguiente sin perder la sesión del simulador.
+  EXPIRY_MS: Date.now() + 24 * 60 * 60 * 1000,
+};
+
 export const COMPLIANCE_STEPS = Object.freeze({
   STATUS_CHECK: "STATUS_CHECK",
   INITIAL: "INITIAL",
@@ -62,6 +71,7 @@ export const ONBOARDING_STATES = {
   RECIBO_SUBIDO: "RECIBO_SUBIDO",
   ONBOARDING_COMPLETO: "ONBOARDING_COMPLETO",
   RECHAZADO: "RECHAZADO",
+  EN_ANALISIS: "EN_ANALISIS",
   CELULAR_VALIDADO: "CELULAR_VALIDADO",
 };
 

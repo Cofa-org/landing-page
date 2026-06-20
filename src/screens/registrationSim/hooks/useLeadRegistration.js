@@ -210,6 +210,10 @@ export const useLeadRegistration = (turnstileToken) => {
             COOKIE_LEAD_TOKEN_CONFIG.EXPIRY_MS,
           );
 
+          if (response.data.analysisRequired) {
+            return { success: false, analysis: true, data: response.data };
+          }
+
           return {
             success: true,
             data: {
@@ -229,13 +233,15 @@ export const useLeadRegistration = (turnstileToken) => {
         if (response.cause === ERROR_CAUSE.EDAD_INVALIDA) {
           return { success: false, rejected: true };
         }
-        setSubmitError(response.message || "Error al registrar. Intentá nuevamente.");
+        setSubmitError(
+          response.message ? `${response.message} 😊` : "Error al registrar. Intentá nuevamente.",
+        );
         return { success: false };
       } catch (err) {
         console.error("LEAD_REGISTRATION_ERROR:", err);
         if (err.name === "AbortError") return { success: false, aborted: true };
         // Detección unificada por causa: EDAD_INVALIDA → rechazo.
-        const msg = err.message || "Error de conexión. Intentá nuevamente.";
+        const msg = err.message ? `${err.message} 😊` : "Error de conexión. Intentá nuevamente.";
         setSubmitError(msg);
         return { success: false, error: msg };
       } finally {

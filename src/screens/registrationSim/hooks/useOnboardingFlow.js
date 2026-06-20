@@ -14,17 +14,35 @@ const ONBOARDING_STEPS = {
 
 const NEXT_STEP_MAP = {
   [LOAN_SIM_STEPS.LEAD_REGISTRATION]: LOAN_SIM_STEPS.PHONE_VALIDATION,
-  [LOAN_SIM_STEPS.PHONE_VALIDATION]: LOAN_SIM_STEPS.DNI_UPLOAD,
+  // PHONE_VALIDATION → se decide dinámicamente en navigateToNext según es_cliente.
   [LOAN_SIM_STEPS.DNI_UPLOAD]: LOAN_SIM_STEPS.RECIBO_UPLOAD,
   [LOAN_SIM_STEPS.RECIBO_UPLOAD]: LOAN_SIM_STEPS.WELCOME,
 };
 
+/**
+ * Decide el siguiente step después de PHONE_VALIDATION.
+ * Si el lead es cliente (es_cliente === true), saltea DNI_UPLOAD.
+ * @param {boolean|null|undefined} esCliente
+ * @returns {string} LOAN_SIM_STEPS.RECIBO_UPLOAD | LOAN_SIM_STEPS.DNI_UPLOAD
+ */
+const getNextStepAfterPhoneValidation = (esCliente) =>
+  esCliente === true ? LOAN_SIM_STEPS.RECIBO_UPLOAD : LOAN_SIM_STEPS.DNI_UPLOAD;
+
 const PREV_STEP_MAP = {
   [LOAN_SIM_STEPS.PHONE_VALIDATION]: LOAN_SIM_STEPS.LEAD_REGISTRATION,
   [LOAN_SIM_STEPS.DNI_UPLOAD]: LOAN_SIM_STEPS.LEAD_REGISTRATION,
-  [LOAN_SIM_STEPS.RECIBO_UPLOAD]: LOAN_SIM_STEPS.DNI_UPLOAD,
+  // RECIBO_UPLOAD → se decide dinámicamente en navigateToPrev según es_cliente.
   [LOAN_SIM_STEPS.WELCOME]: LOAN_SIM_STEPS.RECIBO_UPLOAD,
 };
+
+/**
+ * Decide el step previo cuando el actual es RECIBO_UPLOAD.
+ * Si el lead es cliente (es_cliente === true), no hay DNI_UPLOAD al cual volver.
+ * @param {boolean|null|undefined} esCliente
+ * @returns {string} LOAN_SIM_STEPS.PHONE_VALIDATION | LOAN_SIM_STEPS.DNI_UPLOAD
+ */
+const getPrevStepFromReciboUpload = (esCliente) =>
+  esCliente === true ? LOAN_SIM_STEPS.PHONE_VALIDATION : LOAN_SIM_STEPS.DNI_UPLOAD;
 
 const BACK_BUTTON_STEPS = [
   LOAN_SIM_STEPS.PHONE_VALIDATION,
@@ -91,10 +109,20 @@ export const useOnboardingFlow = () => {
             targetStep = LOAN_SIM_STEPS.WELCOME;
           } else if (estadoOnboarding === ONBOARDING_STATES.RECHAZADO) {
             targetStep = LOAN_SIM_STEPS.RECHAZADO;
+          } else if (estadoOnboarding === ONBOARDING_STATES.EN_ANALISIS) {
+            targetStep = LOAN_SIM_STEPS.EN_ANALISIS;
           }
           // Solo actualizar leadData si no tiene informacion completa (sin celular)
           if (leadData?.celular) {
             setLeadData(response.data);
+          }
+          // Mergear es_cliente para que navigateToPrev pueda decidir correctamente
+          // cuando el usuario refresca en RECIBO_UPLOAD.
+          if (response.data.es_cliente !== undefined) {
+            setLeadData((prev) => ({
+              ...(prev || {}),
+              es_cliente: response.data.es_cliente,
+            }));
           }
           setLeadToken(leadTokenValue);
           setOnboardingStep(targetStep);
@@ -109,15 +137,26 @@ export const useOnboardingFlow = () => {
     restoreOnboardingState();
   }, []);
 
-  const navigateToNext = useCallback((currentStep) => {
-    const next = NEXT_STEP_MAP[currentStep];
+  const navigateToNext = useCallback((currentStep, extras = {}) => {
+    let next;
+    if (currentStep === LOAN_SIM_STEPS.PHONE_VALIDATION) {
+      next = getNextStepAfterPhoneValidation(extras.esCliente);
+    } else {
+      next = NEXT_STEP_MAP[currentStep];
+    }
     if (next) {
       setOnboardingStep(next);
     }
   }, []);
 
   const navigateToPrev = useCallback(async () => {
-    const prev = PREV_STEP_MAP[onboardingStep];
+    // Para RECIBO_UPLOAD el prev depende de es_cliente:
+    //   - cliente  → PHONE_VALIDATION (no hay DNI_UPLOAD al cual volver)
+    //   - no cliente → DNI_UPLOAD (comportamiento histórico)
+    const prev =
+      onboardingStep === LOAN_SIM_STEPS.RECIBO_UPLOAD
+        ? getPrevStepFromReciboUpload(leadData?.es_cliente)
+        : PREV_STEP_MAP[onboardingStep];
 
     if (prev) {
       try {
@@ -142,7 +181,7 @@ export const useOnboardingFlow = () => {
       }
       setOnboardingStep(prev);
     }
-  }, [onboardingStep, getLeadId]);
+  }, [onboardingStep, getLeadId, leadData]);
 
   const handleLeadSuccess = useCallback((data) => {
 
@@ -156,6 +195,12 @@ export const useOnboardingFlow = () => {
     setLeadData(null);
     setLeadToken(null);
     setOnboardingStep(LOAN_SIM_STEPS.RECHAZADO);
+  }, []);
+
+  const handleAnalysis = useCallback((data) => {
+    if (data?.lead) setLeadData(data.lead);
+    if (data?.token) setLeadToken(data.token);
+    setOnboardingStep(LOAN_SIM_STEPS.EN_ANALISIS);
   }, []);
 
   const resetOnboarding = useCallback(() => {
@@ -194,6 +239,7 @@ export const useOnboardingFlow = () => {
     // Handlers de steps
     handleLeadSuccess,
     handleRejected,
+    handleAnalysis,
 
     // Utilidad
     getLeadId,

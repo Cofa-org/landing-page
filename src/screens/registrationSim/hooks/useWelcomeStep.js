@@ -1,5 +1,11 @@
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import LeadRegistrationService from "../../../services/leadRegistrationService.js";
+
+const WELCOME_IMAGES = [
+  "/img/welcome_growth_opportunity.webp",
+  "/img/welcome_trust_partnership.webp",
+  "/img/welcome_success_celebration.webp",
+];
 
 export const useWelcomeStep = () => {
   const [onboardingCompletado, setOnboardingCompletado] = useState(false);
@@ -22,5 +28,12 @@ export const useWelcomeStep = () => {
     }
   }, []);
 
-  return { handleWelcomeComplete, onboardingCompletado };
+  // Imagen random estable durante toda la vida del hook.
+  // Se re-sortea cada vez que el componente que usa el hook se monta de nuevo.
+  const welcomeImage = useMemo(
+    () => WELCOME_IMAGES[Math.floor(Math.random() * WELCOME_IMAGES.length)],
+    [],
+  );
+
+  return { handleWelcomeComplete, onboardingCompletado, welcomeImage };
 };

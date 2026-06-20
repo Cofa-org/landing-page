@@ -7,12 +7,13 @@ import { useWelcomeStep } from "../../hooks/useWelcomeStep.js";
 const WelcomeStep = ({ leadId, onBack }) => {
   const handleBack = () => onBack && onBack();
 
-  const { handleWelcomeComplete, onboardingCompletado } = useWelcomeStep();
+  const { handleWelcomeComplete, onboardingCompletado, welcomeImage } =
+    useWelcomeStep();
 
   return (
     <div className={styles.container}>
       <img
-        src='/img/welcome_success_celebration.webp'
+        src={welcomeImage}
         alt='Registro exitoso'
         className={styles.illustration}
       />
