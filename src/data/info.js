@@ -82,7 +82,7 @@ export const frecuentQuestions = [
     id: 1,
   },
   {
-    name: "¿Cuales son los requisitos para solicitar un préstamo?",
+    name: "¿Cuáles son los requisitos para solicitar un préstamo?",
     content: "Ser mayor de 18 años, residir en Argentina, tener DNI vigente, contar con una cuenta a la vista o de pago (CBU o CVU) a tu nombre y acreditar un ingreso. El proceso incluye verificación de identidad digital.",
     id: 2,
   },
@@ -99,7 +99,7 @@ export const frecuentQuestions = [
     ]
   },
   {
-    name: "¿Cuales son los montos y cuotas disponibles?",
+    name: "¿Cuáles son los montos y cuotas disponibles?",
     content: "El monto máximo depende de tu perfil crediticio. La cantidad y monto de las cuotas disponibles se muestra al momento de la solicitud, junto con las tasas y el Costo Financiero Total (CFT).",
     id: 4,
   },
@@ -128,7 +128,7 @@ export const frecuentQuestions = [
     id: 8,
   },
   {
-    name: "¿Qué pasas si me atraso?",
+    name: "¿Qué pasa si me atraso?",
     content: "Se generan intereses punitorios desde el día siguiente al vencimiento. Un atraso prolongado puede afectar tu acceso a nuevos créditos tanto en COFA como en otras entidades. De todos modos, si tenés dificultades para pagar la cuota, te recomendamos comunicarte con nosotros lo antes posible. En muchos casos podemos ayudarte a encontrar una alternativa o acordar una forma de pago que se adapte mejor a tu situación.",
     id: 9,
   },
