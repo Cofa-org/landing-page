@@ -107,9 +107,9 @@ export const useLoanSimulator = () => {
           setHuellaData(mapFingerprintToHuellaData(fingerprint));
           setHuellaRequestId(fingerprint?.requestId || null);
         } else {
-          setError(
-            `${response.message} 😕` || "El enlace de acceso es inválido o ha expirado 🤔.",
-          );
+          const errorMessage =
+            response.message || response.error?.message || "El enlace de acceso es inválido o ha expirado";
+          setError(`${errorMessage} 😕`);
         }
       } catch (err) {
         setError(err.message ? `${err.message} 😊` : "Error al verificar el acceso");
@@ -406,8 +406,9 @@ export const useLoanSimulator = () => {
         setStep(LOAN_SIM_STEPS.COMPLIANCE);
       } else {
         setError(
-          `${response.message} 🤔` ||
-            "¡Ups! El código que ingresaste no es correcto. Inténtalo de nuevo 😊",
+          response.message
+            ? `${response.message} 🤔`
+            : "¡Ups! El código que ingresaste no es correcto. Inténtalo de nuevo 😊",
         );
       }
     } catch (err) {
