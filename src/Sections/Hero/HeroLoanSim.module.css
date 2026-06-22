@@ -1,11 +1,11 @@
 .heroContainer {
-  padding: var(--spacing-2xl) 15vh;
+  padding: var(--spacing-xl) 15vh var(--spacing-md) 15vh;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
   background-color: var(--background-color);
-  min-height: 50vh;
+  min-height: 40vh;
   position: relative;
   overflow: hidden;
 }
@@ -68,6 +68,7 @@
 .heroImage {
   width: 90%;
   height: auto;
+  max-height: 50vh;
   object-fit: contain;
 }
 
@@ -83,7 +84,7 @@
 /* Responsive */
 @media screen and (max-width: 1200px) {
   .heroContainer {
-    padding: var(--spacing-3xl) 5vh;
+    padding: var(--spacing-xl) 5vh var(--spacing-md) 5vh;
   }
 
   .heroContent h1 {
