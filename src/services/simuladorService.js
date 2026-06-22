@@ -22,6 +22,8 @@ export default class SimuladorService {
     try {
       const url = `${LANDING_BACKEND_URL}/api/simulador-prestamos/calcular`;
       const apiKey = LANDING_BACKEND_API_KEY;
+      console.log("API_KEY_CALCULAR", apiKey);
+
       const body = {
         scoringId,
         plazoSeleccionado,
@@ -52,6 +54,7 @@ export default class SimuladorService {
 
   static async iniciarSesion({ scoringId, cuit }) {
     try {
+      console.log("API_KEY_INIT", LANDING_BACKEND_API_KEY);
       const url = `${LANDING_BACKEND_URL}/api/simulador-prestamos/init`;
       const apiKey = LANDING_BACKEND_API_KEY;
       const body = { scoringId, cuit };

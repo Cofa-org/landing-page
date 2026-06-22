@@ -4,6 +4,20 @@ const LRS_URL = import.meta.env.VITE_LRS_URL;
 const LRS_API_KEY = import.meta.env.VITE_LRS_API_KEY;
 const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY;
 const THUMBMARKJS_API_KEY = import.meta.env.VITE_THUMBMARKJS_API_KEY;
+console.log(
+  "LANDING_BACKEND_URL",
+  LANDING_BACKEND_URL,
+  "LANDING_BACKEND_API_KEY",
+  LANDING_BACKEND_API_KEY
+);
+console.log(
+  "LRS_URL",
+  LRS_URL,
+  "LRS_API_KEY",
+  LRS_API_KEY,
+  "TURNSTILE_SITE_KEY",
+  TURNSTILE_SITE_KEY
+)
 
 export {
   LANDING_BACKEND_URL,
