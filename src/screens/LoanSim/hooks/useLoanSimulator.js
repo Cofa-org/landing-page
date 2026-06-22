@@ -49,8 +49,9 @@ export const useLoanSimulator = () => {
       setLoading(true);
       setStep(LOAN_SIM_STEPS.SIMULACION);
       try {
+        console.log("1")
         const response = await LinkResolutionService.consumeLink(shortId);
-
+        console.log("RESPONSE DE LINK RESOLUTION", response)
         if (response.success && response.data) {
           // Get the fingerprint BEFORE any state update that triggers the initial
           // fetch. This way, scoringId and huellaData are set in the same React
