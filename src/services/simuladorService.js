@@ -21,7 +21,7 @@ export default class SimuladorService {
   ) {
     try {
       const url = `${LANDING_BACKEND_URL}/api/simulador-prestamos/calcular`;
-
+      const apiKey = LANDING_BACKEND_API_KEY;
       const body = {
         scoringId,
         plazoSeleccionado,
