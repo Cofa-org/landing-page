@@ -4,6 +4,9 @@
   margin: 0px;
   min-width: 100%;
   padding: var(--spacing-xl);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .formTemplate {
@@ -237,10 +240,11 @@
 
 @media (max-width: 480px) {
   .formTemplateContainer {
-    min-height: 760px;
+    min-height: auto;
     width: 100%;
     margin: 0px;
     min-width: 100%;
     padding: var(--spacing-md);
+    justify-content: flex-start;
   }
 }
