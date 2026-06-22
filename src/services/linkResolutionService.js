@@ -7,9 +7,7 @@ export default class LinkResolutionService {
     try {
       const url = `${LRS_URL}/consume?id=${shortId}`;
       const apiKey = LRS_API_KEY;
-      console.log("2")
       const response = await HttpApi(url, null, HTTP_METHOD.POST, apiKey, null);
-      console.log("RESPONSE SERVICE LINK 3", response)
       if (!response.ok) {
         throw new Error(response.message || "Error al consumir el link");
       }
