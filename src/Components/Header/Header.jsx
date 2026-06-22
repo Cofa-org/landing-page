@@ -131,9 +131,11 @@ const Header = () => {
       </nav>
 
       <div className='buttons-container'>
-        <a href='http://wa.me/5491137570853' target='_blank' rel='noopener noreferrer' aria-label="Quiero mi préstamo por WhatsApp">
-          <button className='primary-btn header-primary-btn'>Quiero mi préstamo</button>
-        </a>
+        {pathname !== '/registro-simulador' && (
+          <a href='http://wa.me/5491137570853' target='_blank' rel='noopener noreferrer' aria-label="Quiero mi préstamo por WhatsApp">
+            <button className='primary-btn header-primary-btn'>Quiero mi préstamo</button>
+          </a>
+        )}
         <button className='btn-show-links' onClick={() => handleToggleNavbar(true)} aria-label='Abrir menú de navegación'>
           <FiMenu />
         </button>
