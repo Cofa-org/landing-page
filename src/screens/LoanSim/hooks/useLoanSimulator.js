@@ -49,8 +49,8 @@ export const useLoanSimulator = () => {
       setLoading(true);
       setStep(LOAN_SIM_STEPS.SIMULACION);
       try {
+       
         const response = await LinkResolutionService.consumeLink(shortId);
-
         if (response.success && response.data) {
           // Get the fingerprint BEFORE any state update that triggers the initial
           // fetch. This way, scoringId and huellaData are set in the same React
@@ -106,9 +106,9 @@ export const useLoanSimulator = () => {
           setHuellaData(mapFingerprintToHuellaData(fingerprint));
           setHuellaRequestId(fingerprint?.requestId || null);
         } else {
-          setError(
-            `${response.message} 😕` || "El enlace de acceso es inválido o ha expirado 🤔.",
-          );
+          const errorMessage =
+            response.message || response.error?.message || "El enlace de acceso es inválido o ha expirado";
+          setError(`${errorMessage} 😕`);
         }
       } catch (err) {
         setError(err.message ? `${err.message} 😊` : "Error al verificar el acceso");
@@ -167,7 +167,7 @@ export const useLoanSimulator = () => {
         }
 
         const response = await SimuladorService.calcularPlanes(params, controller.signal);
-
+     
         // Discard response if this request was superseded by a newer one.
         if (controller.signal.aborted) return;
 
@@ -189,8 +189,18 @@ export const useLoanSimulator = () => {
 
           if (existingState) {
             setExistingSimulation(newData?.existingSimulation);
-            setStep(LOAN_SIM_STEPS[existingState]);
-
+            // No auto-navegar al step DISPOSITIVO_RECHAZADO: el estado viejo puede
+            // provenir de una sesión anterior con un device distinto. La validación
+            // actual de huella (en este mismo request a calcularPlanes) es la fuente
+            // de verdad: si el device actual es válido, esta response llegó con
+            // success=true, lo que significa que la validación pasó. Dejamos al
+            // usuario en SIMULACION para que pueda continuar con su device legítimo.
+            // Si el device actual NO es válido, la response habría llegado con
+            // success=false, cause=DEVICE_FINGERPRINT_MISMATCH y la línea 217 ya
+            // lo habría mandado a DISPOSITIVO_RECHAZADO.
+            if (existingState !== LOAN_SIM_STEPS.DISPOSITIVO_RECHAZADO) {
+              setStep(LOAN_SIM_STEPS[existingState]);
+            }
             if (newData?.existingSimulation?.email) {
               setEmail(newData.existingSimulation.email);
             }
@@ -216,7 +226,7 @@ export const useLoanSimulator = () => {
           }
         } else {
           if (response.cause === ERROR_CAUSE.DEVICE_FINGERPRINT_MISMATCH) {
-            setStep(LOAN_SIM_STEPS.DEVICE_MISMATCH);
+            setStep(LOAN_SIM_STEPS.DISPOSITIVO_RECHAZADO);
             return;
           }
           setError(
@@ -405,8 +415,9 @@ export const useLoanSimulator = () => {
         setStep(LOAN_SIM_STEPS.COMPLIANCE);
       } else {
         setError(
-          `${response.message} 🤔` ||
-            "¡Ups! El código que ingresaste no es correcto. Inténtalo de nuevo 😊",
+          response.message
+            ? `${response.message} 🤔`
+            : "¡Ups! El código que ingresaste no es correcto. Inténtalo de nuevo 😊",
         );
       }
     } catch (err) {

@@ -52,6 +52,7 @@ export default class SimuladorService {
 
   static async iniciarSesion({ scoringId, cuit }) {
     try {
+      
       const url = `${LANDING_BACKEND_URL}/api/simulador-prestamos/init`;
       const apiKey = LANDING_BACKEND_API_KEY;
       const body = { scoringId, cuit };
