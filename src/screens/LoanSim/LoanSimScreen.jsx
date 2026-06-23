@@ -165,7 +165,7 @@ const LoanSimScreen = () => {
             simulationData={simulationData}
           />
         )}
-        {step === LOAN_SIM_STEPS.DEVICE_MISMATCH && <DeviceMismatchStep />}
+        {step === LOAN_SIM_STEPS.DISPOSITIVO_RECHAZADO && <DeviceMismatchStep />}
       </Suspense>
     );
   };
@@ -176,7 +176,7 @@ const LoanSimScreen = () => {
       step !== LOAN_SIM_STEPS.SIMULACION &&
       step !== LOAN_SIM_STEPS.COMPLETADO &&
       step !== LOAN_SIM_STEPS.RECHAZADO &&
-      step !== LOAN_SIM_STEPS.DEVICE_MISMATCH
+      step !== LOAN_SIM_STEPS.DISPOSITIVO_RECHAZADO
     )
       return <BackButton onClick={handlePrevStep} />;
     return null;
