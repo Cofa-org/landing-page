@@ -168,24 +168,20 @@ export default class SimuladorService {
     }
   }
 
-  static async obtenerIdPreaprobado({ scoringId, cantidad_cuotas, monto }) {
+  static async aceptarTerminos({ scoringId }) {
     try {
-      const url = `${LANDING_BACKEND_URL}/api/simulador-prestamos/preaprobado`;
+      const url = `${LANDING_BACKEND_URL}/api/simulador-prestamos/aceptar-terminos`;
       const apiKey = LANDING_BACKEND_API_KEY;
-      const body = {
-        scoringId,
-        cantidad_cuotas,
-        monto,
-      };
+      const body = { scoringId };
       const token = await getCookie(COOKIE_SIMULADOR_TOKEN_CONFIG.NAME);
       const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, token);
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Error al obtener ID preaprobado");
+        throw new Error(errorData.message || "Error al aceptar los términos");
       }
       return await response.json();
     } catch (error) {
-      console.error("OBTENER_ID_PREAPROBADO_ERROR:", error);
+      console.error("ACEPTAR_TERMINOS_ERROR:", error);
       throw error;
     }
   }
