@@ -281,11 +281,11 @@ export default class SimuladorService {
     }
   }
 
-  static async solicitarSuscripcionMobbex({ scoringId }) {
+  static async solicitarSuscripcionMobbex({ scoringId, linkId }) {
     try {
       const url = `${LANDING_BACKEND_URL}/api/simulador-prestamos/suscripcion-mobbex`;
       const apiKey = LANDING_BACKEND_API_KEY;
-      const body = { scoringId };
+      const body = { scoringId, linkId };
       const token = await getCookie(COOKIE_SIMULADOR_TOKEN_CONFIG.NAME);
       const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, token);
       if (!response.ok) {

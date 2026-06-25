@@ -17,6 +17,7 @@ import SimuladorService from "../../../services/simuladorService";
 export const useMobbexSubscription = (scoringId, onSubscriptionCompleted) => {
   const [searchParams] = useSearchParams();
   const fromMobbex = searchParams.get("fromMobbex") === "true";
+  const linkId = searchParams.get("id");
 
   const [isConfirming, setIsConfirming] = useState(fromMobbex);
   const [loading, setLoading] = useState(false);
@@ -40,10 +41,15 @@ export const useMobbexSubscription = (scoringId, onSubscriptionCompleted) => {
   }, [fromMobbex, scoringId, onSubscriptionCompleted]);
 
   const handleSuscribirse = useCallback(async () => {
+    if (!linkId) {
+      setError("No se encontró el identificador del link en la URL");
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
-      const response = await SimuladorService.solicitarSuscripcionMobbex({ scoringId });
+      const response = await SimuladorService.solicitarSuscripcionMobbex({ scoringId, linkId });
       const url = response.data?.subscriptionURL;
       if (!url) {
         throw new Error("No se obtuvo la URL de suscripción");
@@ -53,7 +59,7 @@ export const useMobbexSubscription = (scoringId, onSubscriptionCompleted) => {
       setError(err.message || "Error al obtener la URL de suscripción");
       setLoading(false);
     }
-  }, [scoringId]);
+  }, [scoringId, linkId]);
 
   return {
     isConfirming,

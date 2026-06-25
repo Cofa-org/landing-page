@@ -57,13 +57,13 @@ describe("useMobbexSubscription", () => {
     expect(SimuladorService.confirmarSuscripcionMobbex).not.toHaveBeenCalled();
   });
 
-  test("handleSuscribirse llama solicitarSuscripcionMobbex y redirige", async () => {
+  test("handleSuscribirse llama solicitarSuscripcionMobbex con linkId y redirige", async () => {
     SimuladorService.solicitarSuscripcionMobbex.mockResolvedValue({
       success: true,
       data: { subscriptionURL: "https://mobbex.com/p/test" },
     });
     const { result } = renderHook(() => useMobbexSubscription("abc123", vi.fn()), {
-      wrapper: makeWrapper("/simulador"),
+      wrapper: makeWrapper("/simulador?id=eSQKz2X1ds"),
     });
 
     await act(async () => {
@@ -72,6 +72,7 @@ describe("useMobbexSubscription", () => {
 
     expect(SimuladorService.solicitarSuscripcionMobbex).toHaveBeenCalledWith({
       scoringId: "abc123",
+      linkId: "eSQKz2X1ds",
     });
     expect(window.location.href).toBe("https://mobbex.com/p/test");
   });
@@ -79,7 +80,7 @@ describe("useMobbexSubscription", () => {
   test("handleSuscribirse setea error si la API falla", async () => {
     SimuladorService.solicitarSuscripcionMobbex.mockRejectedValue(new Error("Network"));
     const { result } = renderHook(() => useMobbexSubscription("abc123", vi.fn()), {
-      wrapper: makeWrapper("/simulador"),
+      wrapper: makeWrapper("/simulador?id=eSQKz2X1ds"),
     });
 
     await act(async () => {
