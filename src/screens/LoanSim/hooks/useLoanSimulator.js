@@ -500,7 +500,7 @@ export const useLoanSimulator = () => {
           partitioned: true,
         };
         await setCookie(COOKIE_CONFIG.NAME, scoringData.scoringId, COOKIE_CONFIG.EXPIRY_MS);
-        setStep(LOAN_SIM_STEPS.COMPLETADO);
+        setStep(LOAN_SIM_STEPS.MOBBEX_SUBSCRIPTION);
       } else {
         const esErrorCoherencia = aceptarTerminosResponse.message?.includes(
           ERROR_CAUSE.COHERENCIA_FINANCIERA_ERROR,
@@ -531,6 +531,10 @@ export const useLoanSimulator = () => {
       setValidating(false);
     }
   };
+
+  const handleMobbexSubscriptionCompleted = useCallback(() => {
+    setStep(LOAN_SIM_STEPS.COMPLETADO);
+  }, []);
 
   const handleInfoPrestamo = async () => {
     setLoadingModal(true);
@@ -638,6 +642,7 @@ export const useLoanSimulator = () => {
     handleInstallmentChange,
     handleNextStep,
     handlePrevStep,
+    handleMobbexSubscriptionCompleted,
     solicitarOTP,
     verificarOTP,
     guardarCompliance,

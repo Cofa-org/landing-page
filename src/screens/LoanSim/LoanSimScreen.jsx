@@ -12,6 +12,9 @@ const OTPValidation = lazy(() => import("../../Components/OTPValidation/OTPValid
 const ComplianceStep = lazy(() => import("./components/ComplianceStep/ComplianceStep"));
 const CBUValidation = lazy(() => import("./components/CBUValidation/CBUValidation"));
 const SuccessStep = lazy(() => import("./components/SuccessStep/SuccessStep"));
+const MobbexSubscriptionStep = lazy(() =>
+  import("./components/MobbexSubscriptionStep/MobbexSubscriptionStep"),
+);
 const DeviceMismatchStep = lazy(() =>
   import("./components/DeviceMismatchStep/DeviceMismatchStep"),
 );
@@ -44,6 +47,7 @@ const LoanSimScreen = () => {
     validarCBU,
     handleNextStep,
     handlePrevStep,
+    handleMobbexSubscriptionCompleted,
     handleInfoPrestamo,
     guardarCompliance,
     existingCompliance,
@@ -157,6 +161,13 @@ const LoanSimScreen = () => {
             validandoBanco={validandoBanco}
           />
         )}
+        {step === LOAN_SIM_STEPS.MOBBEX_SUBSCRIPTION && (
+          <MobbexSubscriptionStep
+            scoringId={scoringId}
+            onSubscriptionCompleted={handleMobbexSubscriptionCompleted}
+            error={error}
+          />
+        )}
         {step === LOAN_SIM_STEPS.COMPLETADO && (
           <SuccessStep
             handleInfoPrestamo={handleInfoPrestamo}
@@ -176,7 +187,8 @@ const LoanSimScreen = () => {
       step !== LOAN_SIM_STEPS.SIMULACION &&
       step !== LOAN_SIM_STEPS.COMPLETADO &&
       step !== LOAN_SIM_STEPS.RECHAZADO &&
-      step !== LOAN_SIM_STEPS.DISPOSITIVO_RECHAZADO
+      step !== LOAN_SIM_STEPS.DISPOSITIVO_RECHAZADO &&
+      step !== LOAN_SIM_STEPS.MOBBEX_SUBSCRIPTION
     )
       return <BackButton onClick={handlePrevStep} />;
     return null;

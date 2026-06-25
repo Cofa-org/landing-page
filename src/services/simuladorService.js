@@ -280,4 +280,40 @@ export default class SimuladorService {
       throw error;
     }
   }
+
+  static async solicitarSuscripcionMobbex({ scoringId }) {
+    try {
+      const url = `${LANDING_BACKEND_URL}/api/simulador-prestamos/suscripcion-mobbex`;
+      const apiKey = LANDING_BACKEND_API_KEY;
+      const body = { scoringId };
+      const token = await getCookie(COOKIE_SIMULADOR_TOKEN_CONFIG.NAME);
+      const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, token);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Error al solicitar suscripción Mobbex");
+      }
+      return await response.json();
+    } catch (error) {
+      console.error("SOLICITAR_SUSCRIPCION_MOBBEX_ERROR:", error);
+      throw error;
+    }
+  }
+
+  static async confirmarSuscripcionMobbex({ scoringId }) {
+    try {
+      const url = `${LANDING_BACKEND_URL}/api/simulador-prestamos/suscripcion-mobbex/confirmar`;
+      const apiKey = LANDING_BACKEND_API_KEY;
+      const body = { scoringId };
+      const token = await getCookie(COOKIE_SIMULADOR_TOKEN_CONFIG.NAME);
+      const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, token);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Error al confirmar suscripción Mobbex");
+      }
+      return await response.json();
+    } catch (error) {
+      console.error("CONFIRMAR_SUSCRIPCION_MOBBEX_ERROR:", error);
+      throw error;
+    }
+  }
 }
