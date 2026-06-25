@@ -488,13 +488,11 @@ export const useLoanSimulator = () => {
       // Obtain the pre-approved ID. Handle financial coherence errors separately:
       // the backend resets the state to SIMULACION when they occur, so we redirect
       // the user to redo the simulation instead of showing a generic error.
-      const preaprobadoResponse = await SimuladorService.obtenerIdPreaprobado({
+      const aceptarTerminosResponse = await SimuladorService.aceptarTerminos({
         scoringId: scoringData.scoringId,
-        cantidad_cuotas: installment,
-        monto: amount,
       });
 
-      if (preaprobadoResponse.success) {
+      if (aceptarTerminosResponse.success) {
         const cookieOptions = {
           name: COOKIE_CONFIG.NAME,
           value: scoringData.scoringId,
@@ -502,9 +500,9 @@ export const useLoanSimulator = () => {
           partitioned: true,
         };
         await setCookie(COOKIE_CONFIG.NAME, scoringData.scoringId, COOKIE_CONFIG.EXPIRY_MS);
-        setStep(LOAN_SIM_STEPS.COMPLETADO);
+        setStep(LOAN_SIM_STEPS.MOBBEX_SUBSCRIPTION);
       } else {
-        const esErrorCoherencia = preaprobadoResponse.message?.includes(
+        const esErrorCoherencia = aceptarTerminosResponse.message?.includes(
           ERROR_CAUSE.COHERENCIA_FINANCIERA_ERROR,
         );
 
@@ -520,8 +518,8 @@ export const useLoanSimulator = () => {
           return;
         } else {
           setError(
-            preaprobadoResponse.message
-              ? `${preaprobadoResponse.message} 😊`
+            aceptarTerminosResponse.message
+              ? `${aceptarTerminosResponse.message} 😊`
               : "¡Lo sentimos! No pudimos completar la operación, ponete en contacto con un operador 😕",
           );
           return;
@@ -533,6 +531,10 @@ export const useLoanSimulator = () => {
       setValidating(false);
     }
   };
+
+  const handleMobbexSubscriptionCompleted = useCallback(() => {
+    setStep(LOAN_SIM_STEPS.COMPLETADO);
+  }, []);
 
   const handleInfoPrestamo = async () => {
     setLoadingModal(true);
@@ -640,6 +642,7 @@ export const useLoanSimulator = () => {
     handleInstallmentChange,
     handleNextStep,
     handlePrevStep,
+    handleMobbexSubscriptionCompleted,
     solicitarOTP,
     verificarOTP,
     guardarCompliance,
