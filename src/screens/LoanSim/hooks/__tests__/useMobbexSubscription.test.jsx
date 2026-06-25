@@ -41,6 +41,9 @@ describe("useMobbexSubscription", () => {
 
     expect(SimuladorService.confirmarSuscripcionMobbex).toHaveBeenCalledWith({
       scoringId: "abc123",
+      sid: null,
+      uid: null,
+      status: null,
     });
     expect(onCompleted).toHaveBeenCalled();
   });
@@ -89,5 +92,28 @@ describe("useMobbexSubscription", () => {
 
     expect(result.current.error).toBe("Network");
     expect(window.location.href).toBe("");
+  });
+
+  test("con fromMobbex=true y sid/uid/status en URL, llama confirmar con esos params", async () => {
+    SimuladorService.confirmarSuscripcionMobbex.mockResolvedValue({ success: true });
+    const onCompleted = vi.fn();
+
+    renderHook(() => useMobbexSubscription("abc123", onCompleted), {
+      wrapper: makeWrapper(
+        "/simulador?fromMobbex=true&sid=SID123&uid=UID456&status=200",
+      ),
+    });
+
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 0));
+    });
+
+    expect(SimuladorService.confirmarSuscripcionMobbex).toHaveBeenCalledWith({
+      scoringId: "abc123",
+      sid: "SID123",
+      uid: "UID456",
+      status: "200",
+    });
+    expect(onCompleted).toHaveBeenCalled();
   });
 });

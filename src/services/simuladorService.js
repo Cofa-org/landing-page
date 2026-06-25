@@ -299,11 +299,11 @@ export default class SimuladorService {
     }
   }
 
-  static async confirmarSuscripcionMobbex({ scoringId }) {
+  static async confirmarSuscripcionMobbex({ scoringId, sid, uid, status }) {
     try {
       const url = `${LANDING_BACKEND_URL}/api/simulador-prestamos/suscripcion-mobbex/confirmar`;
       const apiKey = LANDING_BACKEND_API_KEY;
-      const body = { scoringId };
+      const body = { scoringId, sid, uid, status };
       const token = await getCookie(COOKIE_SIMULADOR_TOKEN_CONFIG.NAME);
       const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, token);
       if (!response.ok) {

@@ -8,6 +8,7 @@ import SimuladorService from "../../../services/simuladorService";
  * Comportamiento:
  * 1. Si el usuario llega con ?fromMobbex=true (volvió de Mobbex vía returnURL),
  *    auto-llama al endpoint de confirmación y dispara onSubscriptionCompleted.
+ *    Si Mobbex redirige con sid/uid/status, los envía al backend para persistir.
  * 2. Si no, expone handleSuscribirse para que el componente dispare el redirect.
  *
  * @param {string} scoringId
@@ -18,6 +19,9 @@ export const useMobbexSubscription = (scoringId, onSubscriptionCompleted) => {
   const [searchParams] = useSearchParams();
   const fromMobbex = searchParams.get("fromMobbex") === "true";
   const linkId = searchParams.get("id");
+  const mobbexSid = searchParams.get("sid");
+  const mobbexUid = searchParams.get("uid");
+  const mobbexStatus = searchParams.get("status");
 
   const [isConfirming, setIsConfirming] = useState(fromMobbex);
   const [loading, setLoading] = useState(false);
@@ -29,7 +33,12 @@ export const useMobbexSubscription = (scoringId, onSubscriptionCompleted) => {
 
     const confirm = async () => {
       try {
-        await SimuladorService.confirmarSuscripcionMobbex({ scoringId });
+        await SimuladorService.confirmarSuscripcionMobbex({
+          scoringId,
+          sid: mobbexSid,
+          uid: mobbexUid,
+          status: mobbexStatus,
+        });
         onSubscriptionCompleted();
       } catch (err) {
         setError(err.message || "Error al confirmar la suscripción");
@@ -38,7 +47,7 @@ export const useMobbexSubscription = (scoringId, onSubscriptionCompleted) => {
       }
     };
     confirm();
-  }, [fromMobbex, scoringId, onSubscriptionCompleted]);
+  }, [fromMobbex, scoringId, mobbexSid, mobbexUid, mobbexStatus, onSubscriptionCompleted]);
 
   const handleSuscribirse = useCallback(async () => {
     if (!linkId) {
