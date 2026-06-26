@@ -6,7 +6,7 @@ import { COOKIE_LEAD_TOKEN_CONFIG, DNI_AGE_CALIBRATION } from "../../../constant
 import { getFingerprint, mapFingerprintToHuellaData } from "../../../lib/fingerprint.js";
 
 const DNI_REGEX = /^\d{7,8}$/;
-const CELULAR_REGEX = /^549\d{10}$/;
+const CELULAR_REGEX = /^[1-9]\d{9}$/;
 
 const calcularEdad = (fechaNacimiento) => {
   const fecha = new Date(fechaNacimiento);
@@ -119,10 +119,16 @@ export const useLeadRegistration = (turnstileToken) => {
         }
         return "";
       }
-      case "celular":
-        if (formData.celular && !CELULAR_REGEX.test(formData.celular))
-          return "El celular debe ser un número argentino válido (Ej: 5491123456789)";
+      case "celular": {
+        if (!formData.celular) return "";
+        if (formData.celular.startsWith("549"))
+          return "No incluyas el 549 al inicio. Ingresá solo los 10 dígitos (prefijo + número).";
+        if (formData.celular.startsWith("0"))
+          return "No incluyas el 0 inicial. Ingresá los 10 dígitos (prefijo sin 0 + número).";
+        if (!CELULAR_REGEX.test(formData.celular))
+          return "El celular debe tener 10 dígitos (prefijo + número, sin 0 ni 15)";
         return "";
+      }
       case "fechaNacimiento": {
         if (!value) return "La fecha de nacimiento es requerida";
         const fecha = new Date(value);
@@ -141,7 +147,12 @@ export const useLeadRegistration = (turnstileToken) => {
   const handleChange = useCallback(
     (e) => {
       const { name, value } = e.target;
-      const sanitized = name === "dni" ? value.replace(/\D/g, "").slice(0, 8) : value;
+      const sanitized =
+        name === "dni"
+          ? value.replace(/\D/g, "").slice(0, 8)
+          : name === "celular"
+          ? value.replace(/\D/g, "").slice(0, 10)
+          : value;
       setFormData((prev) => ({ ...prev, [name]: sanitized }));
       if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
     },
