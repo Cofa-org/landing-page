@@ -33,12 +33,19 @@ export const useMobbexSubscription = (scoringId, onSubscriptionCompleted) => {
 
     const confirm = async () => {
       try {
-        await SimuladorService.confirmarSuscripcionMobbex({
+        const response = await SimuladorService.confirmarSuscripcionMobbex({
           scoringId,
           sid: mobbexSid,
           uid: mobbexUid,
           status: mobbexStatus,
         });
+        if (!response?.success) {
+          setError(
+            `${response?.message} 😕` ||
+              "¡Lo sentimos! No pudimos confirmar tu suscripción. Intentá nuevamente 😕",
+          );
+          return;
+        }
         onSubscriptionCompleted();
       } catch (err) {
         setError(err.message || "Error al confirmar la suscripción");
@@ -59,6 +66,14 @@ export const useMobbexSubscription = (scoringId, onSubscriptionCompleted) => {
     setError(null);
     try {
       const response = await SimuladorService.solicitarSuscripcionMobbex({ scoringId, linkId });
+      if (!response?.success) {
+        setError(
+          `${response?.message} 😕` ||
+            "¡Lo sentimos! No pudimos iniciar tu suscripción. Intentá nuevamente 😕",
+        );
+        setLoading(false);
+        return;
+      }
       const url = response.data?.subscriptionURL;
       if (!url) {
         throw new Error("No se obtuvo la URL de suscripción");

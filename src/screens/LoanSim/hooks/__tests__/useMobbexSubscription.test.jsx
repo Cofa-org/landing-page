@@ -116,4 +116,40 @@ describe("useMobbexSubscription", () => {
     });
     expect(onCompleted).toHaveBeenCalled();
   });
+
+  test("con fromMobbex=true y success=false: NO llama onCompleted y setea error", async () => {
+    SimuladorService.confirmarSuscripcionMobbex.mockResolvedValue({
+      success: false,
+      message: "No se pudo persistir la firma",
+    });
+    const onCompleted = vi.fn();
+
+    const { result } = renderHook(() => useMobbexSubscription("abc123", onCompleted), {
+      wrapper: makeWrapper("/simulador?fromMobbex=true"),
+    });
+
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 0));
+    });
+
+    expect(onCompleted).not.toHaveBeenCalled();
+    expect(result.current.error).toBe("No se pudo persistir la firma 😕");
+  });
+
+  test("handleSuscribirse con success=false: setea error y NO redirige", async () => {
+    SimuladorService.solicitarSuscripcionMobbex.mockResolvedValue({
+      success: false,
+      message: "El linkId no es válido",
+    });
+    const { result } = renderHook(() => useMobbexSubscription("abc123", vi.fn()), {
+      wrapper: makeWrapper("/simulador?id=eSQKz2X1ds"),
+    });
+
+    await act(async () => {
+      await result.current.handleSuscribirse();
+    });
+
+    expect(result.current.error).toBe("El linkId no es válido 😕");
+    expect(window.location.href).toBe("");
+  });
 });
