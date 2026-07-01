@@ -76,6 +76,7 @@ export const useLoanSimulator = () => {
             await SimuladorService.iniciarSesion({
               scoringId: String(response.data.scoringId),
               cuit: response.data.cuit || null,
+              shortId: shortId || null,
             });
           } catch (initErr) {
             console.error("INICIAR_SESION_SIMULADOR_ERROR:", initErr);
