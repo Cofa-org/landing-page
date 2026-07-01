@@ -26,7 +26,6 @@ const OnboardingFlowScreen = () => {
     navigateToPrev,
     handleLeadSuccess,
     handleRejected,
-    handleAnalysis,
     getLeadId,
     shouldShowBackButton,
     leadData,
@@ -37,13 +36,15 @@ const OnboardingFlowScreen = () => {
 
   const handlePrevStep = navigateToPrev;
 
-  const handleVerificarOTP = useCallback(async (codigo) => {
+  const handleVerificarOTP = useCallback(
+    async (codigo) => {
       const result = await verificarOTP(codigo);
       if (result?.success) {
-        // Pasamos esCliente para que navigateToNext sepa si saltear DNI_UPLOAD.
-        navigateToNext(onboardingStep, { esCliente: leadData?.es_cliente });
+        navigateToNext(onboardingStep);
       }
-  }, [verificarOTP, onboardingStep, leadData]);
+    },
+    [verificarOTP, onboardingStep],
+  );
 
   const renderStep = () => {
     switch (onboardingStep) {
@@ -52,7 +53,6 @@ const OnboardingFlowScreen = () => {
           <LeadRegistrationStep
             onSuccess={handleLeadSuccess}
             onRejected={handleRejected}
-            onAnalysis={handleAnalysis}
             onNext={() => navigateToNext(LOAN_SIM_STEPS.LEAD_REGISTRATION)}
             error={null}
           />
@@ -95,8 +95,6 @@ const OnboardingFlowScreen = () => {
         );
       case LOAN_SIM_STEPS.RECHAZADO:
         return <RejectedStep />;
-      case LOAN_SIM_STEPS.EN_ANALISIS:
-        return <AnalysisStep />;
       default:
         return null;
     }
@@ -106,18 +104,15 @@ const OnboardingFlowScreen = () => {
     <>
       <Header />
       <main id='main-content'>
-        <div className={styles.splitLayout}>
-          <div className={styles.leftColumn}>
-            <HeroLoanSim />
-          </div>
-          <div className={`${styles.homeCalculator_calculatorBox} ${styles.rightColumn}`}>
-            <div className={styles.calculatorContainer}>
+        <HeroLoanSim />
+        <div className={styles.homeCalculator_calculatorBox}>
+          <div className={styles.calculatorContainer}>
             {shouldShowBackButton() && (
               <BackButton
                 onClick={navigateToPrev}
                 style={{
                   width: "100%",
-                  "marginBottom": "1rem",
+                  marginBottom: "1rem",
                 }}
               />
             )}
@@ -131,7 +126,6 @@ const OnboardingFlowScreen = () => {
               {renderStep()}
             </Suspense>
           </div>
-        </div>
         </div>
       </main>
       <Footer />
