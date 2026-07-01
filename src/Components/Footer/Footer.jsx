@@ -3,9 +3,16 @@ import React from "react";
 import { BiRegistered } from "react-icons/bi";
 import { FaWhatsapp } from "react-icons/fa";
 import "./Footer.css";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 /*  */
 const Footer = () => {
+  const { pathname } = useLocation();
+
+  let whatsappUrl = "http://wa.me/5491137570853";
+  if (pathname === '/registro-simulador') {
+    whatsappUrl += "?text=" + encodeURIComponent("Hola!! Necesito ayuda para simular mi préstamo!");
+  }
+
   return (
     <footer>
       <div className='footer-box-left'>
@@ -229,7 +236,7 @@ const Footer = () => {
       </div>
 
       <Link
-        to={"http://wa.me/5491137570853"}
+        to={whatsappUrl}
         className='wsp-contact'
         target='_blank'
         id='btn-whatsapp'
