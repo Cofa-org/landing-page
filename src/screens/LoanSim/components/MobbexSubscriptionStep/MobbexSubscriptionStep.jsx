@@ -13,7 +13,13 @@ const MobbexSubscriptionStep = ({ scoringId, onSubscriptionCompleted, error: ext
   if (isConfirming) {
     return (
       <div className={styles.container}>
-        <h2 className={styles.title}>Confirmando tu suscripción...</h2>
+        <img
+          src='/img/mobbex_confirming.webp'
+          alt='Confirmando suscripción'
+          className={styles.illustration}
+        />
+        <h2 className={styles.title}>Estamos confirmando tu suscripción!</h2>
+        <p className={styles.description}>Aguarda unos segundos por favor...</p>
       </div>
     );
   }
@@ -22,16 +28,11 @@ const MobbexSubscriptionStep = ({ scoringId, onSubscriptionCompleted, error: ext
 
   return (
     <div className={styles.container}>
-      <img
-        src="/img/mobbex_subscription_card.webp"
-        alt="Suscripción Mobbex"
-        className={styles.illustration}
-      />
       <h2 className={styles.title}>Suscribite al débito automático</h2>
       <p className={styles.description}>
-        Para completar la solicitud de tu préstamo, suscribite al débito automático
-        de tus cuotas a través de Mobbex. Serás redirigido a su plataforma para
-        finalizar el proceso de forma segura.
+        Para completar la solicitud de tu préstamo, suscribite al débito automático de tus cuotas a
+        través de Mobbex. Serás redirigido a su plataforma para finalizar el proceso de forma
+        segura.
       </p>
       {displayError && <p className={styles.errorText}>{displayError}</p>}
       <GenericButton
