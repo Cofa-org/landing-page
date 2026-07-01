@@ -18,7 +18,6 @@ const ReciboUploadStep = React.lazy(
   () => import("./components/ReciboUploadStep/ReciboUploadStep.jsx"),
 );
 const WelcomeStep = React.lazy(() => import("./components/WelcomeStep/WelcomeStep.jsx"));
-const AnalysisStep = React.lazy(() => import("./components/AnalysisStep/AnalysisStep.jsx"));
 
 const OnboardingFlowScreen = () => {
   const {
