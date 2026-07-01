@@ -22,6 +22,11 @@ const MobbexSubscriptionStep = ({ scoringId, onSubscriptionCompleted, error: ext
 
   return (
     <div className={styles.container}>
+      <img
+        src="/img/mobbex_subscription_card.webp"
+        alt="Suscripción Mobbex"
+        className={styles.illustration}
+      />
       <h2 className={styles.title}>Suscribite al débito automático</h2>
       <p className={styles.description}>
         Para completar la solicitud de tu préstamo, suscribite al débito automático
