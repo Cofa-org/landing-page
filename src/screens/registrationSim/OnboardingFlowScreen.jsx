@@ -104,27 +104,31 @@ const OnboardingFlowScreen = () => {
     <>
       <Header />
       <main id='main-content'>
-        <HeroLoanSim />
-        <div className={styles.homeCalculator_calculatorBox}>
-          <div className={styles.calculatorContainer}>
-            {shouldShowBackButton() && (
-              <BackButton
-                onClick={navigateToPrev}
-                style={{
-                  width: "100%",
-                  marginBottom: "1rem",
-                }}
-              />
-            )}
-            <Suspense
-              fallback={
-                <div className={styles.loaderContainer}>
-                  <Loader />
-                </div>
-              }
-            >
-              {renderStep()}
-            </Suspense>
+        <div className={styles.splitLayout}>
+          <div className={styles.leftColumn}>
+            <HeroLoanSim />
+          </div>
+          <div className={`${styles.homeCalculator_calculatorBox} ${styles.rightColumn}`}>
+            <div className={styles.calculatorContainer}>
+              {shouldShowBackButton() && (
+                <BackButton
+                  onClick={navigateToPrev}
+                  style={{
+                    width: "100%",
+                    marginBottom: "1rem",
+                  }}
+                />
+              )}
+              <Suspense
+                fallback={
+                  <div className={styles.loaderContainer}>
+                    <Loader />
+                  </div>
+                }
+              >
+                {renderStep()}
+              </Suspense>
+            </div>
           </div>
         </div>
       </main>
