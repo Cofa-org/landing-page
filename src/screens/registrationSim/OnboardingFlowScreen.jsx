@@ -3,7 +3,7 @@ import BackButton from "../../Components/buttons/backbutton/BackButton.jsx";
 import { Footer, Header } from "../../Components/index.js";
 import Loader from "../../Components/Loader/Loader.jsx";
 import { HeroLoanSim } from "../../Sections/index.js";
-import { LOAN_SIM_STEPS, OTP_CONFIG } from "../../constants/LOAN_SIM.js";
+import { LOAN_SIM_STEPS, OTP_CONFIG, ONBOARDING_STATES } from "../../constants/LOAN_SIM.js";
 import { useOnboardingFlow } from "./hooks/useOnboardingFlow.js";
 import { usePhoneOTP } from "./hooks/usePhoneOTP.js";
 import OTPValidation from "../../Components/OTPValidation/OTPValidation.jsx";
@@ -40,11 +40,21 @@ const OnboardingFlowScreen = () => {
 
   const handleVerificarOTP = useCallback(async (codigo) => {
       const result = await verificarOTP(codigo);
-      if (result?.success) {
-        // Pasamos esCliente para que navigateToNext sepa si saltear DNI_UPLOAD.
-        navigateToNext(onboardingStep, { esCliente: leadData?.es_cliente });
+      if (!result?.success) return;
+
+      const nuevoEstado = result.data?.estado_onboarding;
+
+      if (nuevoEstado === ONBOARDING_STATES.EN_ANALISIS) {
+        handleAnalysis({ lead: result.data, token: leadToken });
+      } else if (nuevoEstado === ONBOARDING_STATES.RECHAZADO) {
+        handleRejected();
+      } else {
+        // CELULAR_VALIDADO or DNI_SUBIDO — proceed to DNI_UPLOAD or RECIBO_UPLOAD
+        navigateToNext(onboardingStep, {
+          esCliente: result.data?.es_cliente ?? leadData?.es_cliente,
+        });
       }
-  }, [verificarOTP, onboardingStep, leadData]);
+  }, [verificarOTP, onboardingStep, leadData, leadToken, handleAnalysis, handleRejected, navigateToNext]);
 
   const renderStep = () => {
     switch (onboardingStep) {
