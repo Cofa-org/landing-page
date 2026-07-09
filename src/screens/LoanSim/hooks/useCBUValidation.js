@@ -48,7 +48,14 @@ export const useCBUValidation = (isClient, existingCbu, onValidate) => {
           setCodigoBancoError(null);
         } else {
           setBancoEncontrado(null);
-          // setCodigoBancoError(response.message || "Alguno de los dígitos ingresados no es correcto");
+          // El backend retorna success: false con el mensaje "Alguno de los dígitos
+          // ingresados no es correcto" (o el específico para CVU) cuando el código
+          // no matchea ningún banco registrado. Mostramos ese mensaje con emoji.
+          setCodigoBancoError(
+            response.message
+              ? `${response.message} 😊`
+              : "Alguno de los dígitos ingresados no es correcto",
+          );
         }
       } catch (err) {
         console.error("Error validando código bancario:", err);

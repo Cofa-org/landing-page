@@ -8,7 +8,7 @@ import Turnstile from "../../../../Components/Turnstile/Turnstile.jsx";
 import { TURNSTILE_SITE_KEY } from "../../../../config.js";
 import styles from "./LeadRegistrationStep.module.css";
 
-const LeadRegistrationStep = ({ onSuccess, onRejected, onNext, loading, error: externalError }) => {
+const LeadRegistrationStep = ({ onSuccess, onRejected, onAnalysis, onNext, loading, error: externalError }) => {
   const [successMessage, setSuccessMessage] = useState("");
   const [honeypot, setHoneypot] = useState("");
   const [turnstileToken, setTurnstileToken] = useState("");
@@ -46,7 +46,10 @@ const LeadRegistrationStep = ({ onSuccess, onRejected, onNext, loading, error: e
 
     turnstileRef.current?.reset();
     setTurnstileToken("");
-
+    if (result.analysis && onAnalysis) {
+      onAnalysis(result.data);
+      return;
+    }
     if (result.rejected && onRejected) {
       onRejected();
     }
@@ -140,7 +143,8 @@ const LeadRegistrationStep = ({ onSuccess, onRejected, onNext, loading, error: e
         inputMode='tel'
         value={formData.celular}
         onChange={handleChange}
-        placeholder='Ej: 5491123456789'
+        placeholder='Ej: 1145678901'
+        helperText='Los primeros dígitos son el prefijo de tu zona (sin 0). Total: 10 dígitos.'
         required
         error={errors.celular}
         autoComplete='tel'
@@ -194,6 +198,7 @@ const LeadRegistrationStep = ({ onSuccess, onRejected, onNext, loading, error: e
 LeadRegistrationStep.propTypes = {
   onSuccess: PropTypes.func,
   onRejected: PropTypes.func,
+  onAnalysis: PropTypes.func,
   onNext: PropTypes.func,
   loading: PropTypes.bool,
   error: PropTypes.string,

@@ -33,11 +33,11 @@ export const useReciboUpload = () => {
       if (response.success) {
         return { success: true };
       }
-      const msg = response.message || "Error al subir el recibo";
+      const msg = response.message ? `${response.message} 😊` : "Error al subir el recibo";
       setUploadError(msg);
       return { success: false, error: msg };
     } catch (err) {
-      const msg = err.message || "Error de conexión";
+      const msg = err.message ? `${err.message} 😊` : "Error de conexión";
       setUploadError(msg);
       return { success: false, error: msg };
     } finally {

@@ -14,11 +14,11 @@ export const usePhoneOTP = (getLeadId) => {
       setError(null);
       try {
         const result = await LeadRegistrationService.verificarOTPCelular({ leadId, codigo });
-   
+       
         if (!result.success) {
           setError(
-            response.mensaje ||
-            "¡Ups! El código que ingresaste no es correcto. Inténtalo de nuevo 😊",
+            `${result.message} 😊` ||
+              "¡Ups! El código que ingresaste no es correcto. Inténtalo de nuevo 😊",
           );
           return;
         }
@@ -43,7 +43,7 @@ export const usePhoneOTP = (getLeadId) => {
       try {
         await LeadRegistrationService.solicitarOTPCelular({ leadId, celular: destination });
       } catch (err) {
-        setError(err.message || "Error al reenviar el código");
+        setError(err.message ? `${err.message} 😊` : "Error al reenviar el código");
         throw err;
       } finally {
         setValidating(false);

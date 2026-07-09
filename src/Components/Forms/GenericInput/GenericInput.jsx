@@ -14,6 +14,7 @@ const GenericInput = ({
   onChange,
   placeholder,
   error,
+  helperText,
   required = false,
   ...props
 }) => {
@@ -42,6 +43,9 @@ const GenericInput = ({
           {...props}
         />
       </div>
+      {helperText && !error && (
+        <span className={styles.helperText}>{helperText}</span>
+      )}
       <span className={styles.errorText}>{error && error}</span>
     </div>
   );
@@ -55,6 +59,7 @@ GenericInput.propTypes = {
   onChange: PropTypes.func.isRequired,
   placeholder: PropTypes.string,
   error: PropTypes.string,
+  helperText: PropTypes.string,
   required: PropTypes.bool,
 };
 

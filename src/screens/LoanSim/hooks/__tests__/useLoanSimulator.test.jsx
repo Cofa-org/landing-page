@@ -12,6 +12,7 @@ vi.mock("../../../../services/linkResolutionService.js", () => ({
 vi.mock("../../../../services/simuladorService.js", () => ({
   default: {
     calcularPlanes: vi.fn(),
+    iniciarSesion: vi.fn().mockResolvedValue({ success: true, data: { token: "mock-jwt" } }),
   },
 }));
 

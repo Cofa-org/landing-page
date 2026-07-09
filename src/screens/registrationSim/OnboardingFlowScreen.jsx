@@ -3,7 +3,7 @@ import BackButton from "../../Components/buttons/backbutton/BackButton.jsx";
 import { Footer, Header } from "../../Components/index.js";
 import Loader from "../../Components/Loader/Loader.jsx";
 import { HeroLoanSim } from "../../Sections/index.js";
-import { LOAN_SIM_STEPS, OTP_CONFIG } from "../../constants/LOAN_SIM.js";
+import { LOAN_SIM_STEPS, OTP_CONFIG, ONBOARDING_STATES } from "../../constants/LOAN_SIM.js";
 import { useOnboardingFlow } from "./hooks/useOnboardingFlow.js";
 import { usePhoneOTP } from "./hooks/usePhoneOTP.js";
 import OTPValidation from "../../Components/OTPValidation/OTPValidation.jsx";
@@ -18,6 +18,7 @@ const ReciboUploadStep = React.lazy(
   () => import("./components/ReciboUploadStep/ReciboUploadStep.jsx"),
 );
 const WelcomeStep = React.lazy(() => import("./components/WelcomeStep/WelcomeStep.jsx"));
+const AnalysisStep = React.lazy(() => import("./components/AnalysisStep/AnalysisStep.jsx"));
 
 const OnboardingFlowScreen = () => {
   const {
@@ -26,6 +27,7 @@ const OnboardingFlowScreen = () => {
     navigateToPrev,
     handleLeadSuccess,
     handleRejected,
+    handleAnalysis,
     getLeadId,
     shouldShowBackButton,
     leadData,
@@ -39,12 +41,21 @@ const OnboardingFlowScreen = () => {
   const handleVerificarOTP = useCallback(
     async (codigo) => {
       const result = await verificarOTP(codigo);
-      if (result?.success) {
-        navigateToNext(onboardingStep);
+      if (!result?.success) return;
+
+      const nuevoEstado = result.data?.estado_onboarding;
+
+      if (nuevoEstado === ONBOARDING_STATES.EN_ANALISIS) {
+        handleAnalysis({ lead: result.data, token: leadToken });
+      } else if (nuevoEstado === ONBOARDING_STATES.RECHAZADO) {
+        handleRejected();
+      } else {
+        // CELULAR_VALIDADO or DNI_SUBIDO — proceed to DNI_UPLOAD or RECIBO_UPLOAD
+        navigateToNext(onboardingStep, {
+          esCliente: result.data?.es_cliente ?? leadData?.es_cliente,
+        });
       }
-    },
-    [verificarOTP, onboardingStep],
-  );
+  }, [verificarOTP, onboardingStep, leadData, leadToken, handleAnalysis, handleRejected, navigateToNext]);
 
   const renderStep = () => {
     switch (onboardingStep) {
@@ -53,6 +64,7 @@ const OnboardingFlowScreen = () => {
           <LeadRegistrationStep
             onSuccess={handleLeadSuccess}
             onRejected={handleRejected}
+            onAnalysis={handleAnalysis}
             onNext={() => navigateToNext(LOAN_SIM_STEPS.LEAD_REGISTRATION)}
             error={null}
           />
@@ -95,6 +107,8 @@ const OnboardingFlowScreen = () => {
         );
       case LOAN_SIM_STEPS.RECHAZADO:
         return <RejectedStep />;
+      case LOAN_SIM_STEPS.EN_ANALISIS:
+        return <AnalysisStep />;
       default:
         return null;
     }
