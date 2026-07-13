@@ -34,6 +34,10 @@ const MobbexSubscriptionStep = ({ scoringId, onSubscriptionCompleted, error: ext
         través de Mobbex. Serás redirigido a su plataforma para finalizar el proceso de forma
         segura.
       </p>
+      <p className={styles.note}>
+        Si la suscripción no se completa o falla, comunicate con un operador para finalizar tu
+        préstamo.
+      </p>
       {displayError && <p className={styles.errorText}>{displayError}</p>}
       <GenericButton
         onClick={handleSuscribirse}
