@@ -27,6 +27,15 @@
   margin: 0;
 }
 
+.note {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #718096;
+  max-width: 32rem;
+  margin: 0;
+  font-style: italic;
+}
+
 .button {
   min-width: 16rem;
 }
