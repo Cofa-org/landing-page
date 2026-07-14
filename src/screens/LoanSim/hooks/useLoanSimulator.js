@@ -501,7 +501,14 @@ export const useLoanSimulator = () => {
           partitioned: true,
         };
         await setCookie(COOKIE_CONFIG.NAME, scoringData.scoringId, COOKIE_CONFIG.EXPIRY_MS);
-        setStep(LOAN_SIM_STEPS.MOBBEX_SUBSCRIPTION);
+        // Si el backend skipeó Mobbex (tarjeta de débito vigente del préstamo
+        // anterior), el préstamo ya está creado y la firma ya corrió — ir
+        // directo al paso final en vez de forzar al usuario por la pantalla
+        // de suscripción. El backend envía este flag en `procesarFirmaYCompletar`.
+        const nextStep = aceptarTerminosResponse.skipMobbex
+          ? LOAN_SIM_STEPS.COMPLETADO
+          : LOAN_SIM_STEPS.MOBBEX_SUBSCRIPTION;
+        setStep(nextStep);
       } else {
         const esErrorCoherencia = aceptarTerminosResponse.message?.includes(
           ERROR_CAUSE.COHERENCIA_FINANCIERA_ERROR,
