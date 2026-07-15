@@ -43,20 +43,28 @@ const CameraCapture = ({ open, onCapture, onCancel, tipoFoto }) => {
     if (!videoRef.current) return;
     setPhase("capturing");
     setValidationError("");
-    try {
-      checkResolution(videoRef.current);
-      const blob = await captureFrame(videoRef.current, canvasRef.current);
-      // Validar blur después de tener el blob dibujado en canvas
-      checkBlur(canvasRef.current);
-      const url = URL.createObjectURL(blob);
-      setPreviewBlob(blob);
-      setPreviewUrl(url);
-      setPhase("preview");
-      stopCamera();
-    } catch (err) {
-      setValidationError(err?.message || ERROR_MESSAGE.CAMERA_BLURRY_PHOTO);
+
+    const resolutionCheck = checkResolution(videoRef.current);
+    if (!resolutionCheck.ok) {
+      setValidationError(resolutionCheck.message);
       setPhase("streaming");
+      return;
     }
+
+    const blob = await captureFrame(videoRef.current, canvasRef.current);
+
+    const blurCheck = checkBlur(canvasRef.current);
+    if (!blurCheck.ok) {
+      setValidationError(blurCheck.message);
+      setPhase("streaming");
+      return;
+    }
+
+    const url = URL.createObjectURL(blob);
+    setPreviewBlob(blob);
+    setPreviewUrl(url);
+    setPhase("preview");
+    stopCamera();
   };
 
   const handleConfirm = () => {

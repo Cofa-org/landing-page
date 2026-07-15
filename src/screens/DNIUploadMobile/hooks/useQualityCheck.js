@@ -2,17 +2,34 @@ import { ERROR_CAUSE, ERROR_MESSAGE } from "../../../constants/camera.constants.
 
 const MIN_WIDTH = 640;
 const MIN_HEIGHT = 480;
-const BLUR_THRESHOLD = 500;
+const BLUR_THRESHOLD = 1000;
 
+const BLUR_VALIDATION = {
+  [ERROR_CAUSE.CAMERA_BLURRY_PHOTO]: ERROR_MESSAGE.CAMERA_BLURRY_PHOTO,
+};
+
+const RESOLUTION_VALIDATION = {
+  [ERROR_CAUSE.CAMERA_INSUFFICIENT_RESOLUTION]: ERROR_MESSAGE.CAMERA_INSUFFICIENT_RESOLUTION,
+};
+
+/**
+ * Valida que la resolución del video sea suficiente para capturar el DNI.
+ * @returns {{ ok: true } | { ok: false, cause: string, message: string }}
+ */
 export function checkResolution(videoEl) {
   if (videoEl.videoWidth < MIN_WIDTH || videoEl.videoHeight < MIN_HEIGHT) {
-    throw makeCameraError(
-      ERROR_CAUSE.CAMERA_INSUFFICIENT_RESOLUTION,
-      ERROR_MESSAGE.CAMERA_INSUFFICIENT_RESOLUTION,
-    );
+    return {
+      ok: false,
+      cause: ERROR_CAUSE.CAMERA_INSUFFICIENT_RESOLUTION,
+      message: RESOLUTION_VALIDATION[ERROR_CAUSE.CAMERA_INSUFFICIENT_RESOLUTION],
+    };
   }
+  return { ok: true };
 }
 
+/**
+ * Calcula la varianza del Laplaciano sobre el canvas.
+ */
 export function calculateBlur(canvasEl) {
   const ctx = canvasEl.getContext("2d");
   const { data, width, height } = ctx.getImageData(0, 0, canvasEl.width, canvasEl.height);
@@ -43,23 +60,18 @@ export function calculateBlur(canvasEl) {
   return sum / count;
 }
 
+/**
+ * Valida que la imagen capturada no esté borrosa.
+ * @returns {{ ok: true } | { ok: false, cause: string, message: string }}
+ */
 export function checkBlur(canvasEl) {
   const variance = calculateBlur(canvasEl);
   if (variance < BLUR_THRESHOLD) {
-    throw makeCameraError(
-      ERROR_CAUSE.CAMERA_BLURRY_PHOTO,
-      ERROR_MESSAGE.CAMERA_BLURRY_PHOTO,
-    );
+    return {
+      ok: false,
+      cause: ERROR_CAUSE.CAMERA_BLURRY_PHOTO,
+      message: BLUR_VALIDATION[ERROR_CAUSE.CAMERA_BLURRY_PHOTO],
+    };
   }
-}
-
-/**
- * Construye un Error con `message` user-facing y `cause` interno.
- * Permite que el caller muestre el mensaje correcto sin perder
- * la clasificación programática para tests/analytics.
- */
-function makeCameraError(cause, message) {
-  const error = new Error(message);
-  error.cause = cause;
-  return error;
+  return { ok: true };
 }
