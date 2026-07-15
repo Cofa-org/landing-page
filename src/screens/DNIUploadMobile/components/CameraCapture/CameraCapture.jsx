@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FaCamera, FaCheck, FaTimes } from "react-icons/fa";
 import { useCameraCapture } from "../../hooks/useCameraCapture";
-import { checkResolution, checkBlur } from "../../hooks/useQualityCheck";
-import { ERROR_CAUSE, ERROR_MESSAGE } from "../../../../constants/camera.constants.js";
+import { checkResolution } from "../../hooks/useQualityCheck";
+import { ERROR_MESSAGE } from "../../../../constants/camera.constants.js";
 import styles from "./CameraCapture.module.css";
 
 const CameraCapture = ({ open, onCapture, onCancel, tipoFoto }) => {
@@ -52,14 +52,6 @@ const CameraCapture = ({ open, onCapture, onCancel, tipoFoto }) => {
     }
 
     const blob = await captureFrame(videoRef.current, canvasRef.current);
-
-    const blurCheck = checkBlur(canvasRef.current);
-    if (!blurCheck.ok) {
-      setValidationError(blurCheck.message);
-      setPhase("streaming");
-      return;
-    }
-
     const url = URL.createObjectURL(blob);
     setPreviewBlob(blob);
     setPreviewUrl(url);
