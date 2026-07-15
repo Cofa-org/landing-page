@@ -2,11 +2,14 @@ import { ERROR_CAUSE, ERROR_MESSAGE } from "../../../constants/camera.constants.
 
 const MIN_WIDTH = 640;
 const MIN_HEIGHT = 480;
-const BLUR_THRESHOLD = 100;
+const BLUR_THRESHOLD = 500;
 
 export function checkResolution(videoEl) {
   if (videoEl.videoWidth < MIN_WIDTH || videoEl.videoHeight < MIN_HEIGHT) {
-    throw new Error(ERROR_CAUSE.CAMERA_INSUFFICIENT_RESOLUTION);
+    throw makeCameraError(
+      ERROR_CAUSE.CAMERA_INSUFFICIENT_RESOLUTION,
+      ERROR_MESSAGE.CAMERA_INSUFFICIENT_RESOLUTION,
+    );
   }
 }
 
@@ -43,6 +46,20 @@ export function calculateBlur(canvasEl) {
 export function checkBlur(canvasEl) {
   const variance = calculateBlur(canvasEl);
   if (variance < BLUR_THRESHOLD) {
-    throw new Error(ERROR_CAUSE.CAMERA_BLURRY_PHOTO);
+    throw makeCameraError(
+      ERROR_CAUSE.CAMERA_BLURRY_PHOTO,
+      ERROR_MESSAGE.CAMERA_BLURRY_PHOTO,
+    );
   }
+}
+
+/**
+ * Construye un Error con `message` user-facing y `cause` interno.
+ * Permite que el caller muestre el mensaje correcto sin perder
+ * la clasificación programática para tests/analytics.
+ */
+function makeCameraError(cause, message) {
+  const error = new Error(message);
+  error.cause = cause;
+  return error;
 }
