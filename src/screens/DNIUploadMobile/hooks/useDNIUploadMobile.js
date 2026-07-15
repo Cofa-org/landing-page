@@ -10,11 +10,16 @@ export const useDNIUploadMobile = (leadId, token) => {
   const [uploadError, setUploadError] = useState("");
   const [uploadSuccess, setUploadSuccess] = useState(false);
 
-  const handleFileChange = useCallback((e, setFile, setPreview) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    setFile(file);
-    setPreview(URL.createObjectURL(file));
+  const handleCapture = useCallback((blob, setFile, setPreview) => {
+    if (!blob) return;
+    setFile(blob);
+    if (setPreview) {
+      // Limpiar preview anterior si existe
+      setPreview((prev) => {
+        if (prev) URL.revokeObjectURL(prev);
+        return URL.createObjectURL(blob);
+      });
+    }
     setUploadError("");
   }, []);
 
@@ -58,7 +63,7 @@ export const useDNIUploadMobile = (leadId, token) => {
     uploadError,
     uploadSuccess,
     isFormValid,
-    handleFileChange,
+    handleCapture,
     submitDNI,
     setDniFront,
     setDniBack,

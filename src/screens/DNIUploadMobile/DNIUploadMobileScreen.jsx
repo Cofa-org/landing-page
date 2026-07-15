@@ -1,7 +1,8 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { FaCamera, FaCheck, FaArrowLeft } from "react-icons/fa";
+import { FaCheck, FaArrowLeft, FaCamera } from "react-icons/fa";
 import { useDNIUploadMobile } from "./hooks/useDNIUploadMobile";
+import CameraCapture from "./components/CameraCapture/CameraCapture";
 import styles from "./DNIUploadMobile.module.css";
 
 const DNIUploadMobileScreen = () => {
@@ -10,6 +11,8 @@ const DNIUploadMobileScreen = () => {
 
   const leadId = searchParams.get("leadId");
   const token = searchParams.get("token");
+
+  const [captureOpen, setCaptureOpen] = useState(null); // "frente" | "dorso" | null
 
   useEffect(() => {
     if (!leadId || !token) {
@@ -24,7 +27,7 @@ const DNIUploadMobileScreen = () => {
     uploadError,
     uploadSuccess,
     isFormValid,
-    handleFileChange,
+    handleCapture,
     submitDNI,
     setDniFront,
     setDniBack,
@@ -88,17 +91,14 @@ const DNIUploadMobileScreen = () => {
                 </button>
               </div>
             ) : (
-              <label className={styles.uploadArea}>
+              <button
+                type="button"
+                className={styles.uploadArea}
+                onClick={() => setCaptureOpen("frente")}
+              >
                 <FaCamera className={styles.cameraIcon} />
-                <span>Tomá foto del frente</span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  capture="environment"
-                  onChange={(e) => handleFileChange(e, setDniFront, setPreviewFront)}
-                  className={styles.fileInput}
-                />
-              </label>
+                <span>Sacar foto del frente</span>
+              </button>
             )}
           </div>
 
@@ -117,17 +117,14 @@ const DNIUploadMobileScreen = () => {
                 </button>
               </div>
             ) : (
-              <label className={styles.uploadArea}>
+              <button
+                type="button"
+                className={styles.uploadArea}
+                onClick={() => setCaptureOpen("dorso")}
+              >
                 <FaCamera className={styles.cameraIcon} />
-                <span>Tomá foto del dorso</span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  capture="environment"
-                  onChange={(e) => handleFileChange(e, setDniBack, setPreviewBack)}
-                  className={styles.fileInput}
-                />
-              </label>
+                <span>Sacar foto del dorso</span>
+              </button>
             )}
           </div>
         </div>
@@ -144,6 +141,20 @@ const DNIUploadMobileScreen = () => {
           {isUploading ? "Subiendo..." : "Subir fotos"}
         </button>
       </form>
+
+      <CameraCapture
+        open={captureOpen !== null}
+        tipoFoto={captureOpen || "frente"}
+        onCapture={(blob) => {
+          if (captureOpen === "frente") {
+            handleCapture(blob, setDniFront, setPreviewFront);
+          } else if (captureOpen === "dorso") {
+            handleCapture(blob, setDniBack, setPreviewBack);
+          }
+          setCaptureOpen(null);
+        }}
+        onCancel={() => setCaptureOpen(null)}
+      />
     </div>
   );
 };
