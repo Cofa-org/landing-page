@@ -14,6 +14,16 @@ const CameraCapture = ({ open, onCapture, onCancel, tipoFoto }) => {
   const [validationError, setValidationError] = useState("");
   const [previewUrl, setPreviewUrl] = useState("");
 
+  // Resetear estado cuando el modal se abre (evita mostrar preview de la captura anterior)
+  useEffect(() => {
+    if (!open) return;
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setPreviewBlob(null);
+    setPreviewUrl("");
+    setValidationError("");
+    setPhase("idle");
+  }, [open]);
+
   useEffect(() => {
     return () => {
       stopCamera();
