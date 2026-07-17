@@ -1,5 +1,6 @@
 .container {
   display: flex;
+  gap: 1rem;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -33,6 +34,7 @@
 
 .buttonContainer {
   display: flex;
+  flex-direction: column;
   gap: 10px;
   margin-top: 10px;
   width: 100%;

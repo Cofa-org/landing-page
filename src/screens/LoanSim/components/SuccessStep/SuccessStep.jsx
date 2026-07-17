@@ -30,8 +30,8 @@ const SuccessStep = ({ handleInfoPrestamo, loanInfo, loadingModal, simulationDat
       <MdCheckCircleOutline className={styles.icon} />
       <h2 className={styles.title}>¡Solicitud Exitosa!</h2>
       <p className={styles.description}>
-        Hemos validado tus datos correctamente y el prestamo ha sido generado. La transferencia esta
-        en curso.
+        Hemos validado tus datos correctamente y el préstamo ha sido generado. 
+        Revisa tu email para verificar que recibiste el contrato.
       </p>
       <div className={styles.buttonContainer}>
         <button
