@@ -47,13 +47,14 @@ const MobbexSubscriptionStep = ({ scoringId, onSubscriptionCompleted, error: ext
       >
         Suscribirme en Mobbex
       </GenericButton>
-      <button
-        className='primary-btn'
+      <GenericButton
+        type='button'
+        variant='secondary'
         onClick={() => (window.location.href = "http://wa.me/5491137570853")}
         style={{ flex: 1, marginTop: "1rem" }}
       >
         Comunicarse con un asesor
-      </button>
+      </GenericButton>
     </div>
   );
 };

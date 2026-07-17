@@ -1,6 +1,7 @@
 import React, { useEffect, useState, lazy, Suspense } from "react";
 import styles from "./SuccessStep.module.css";
 import { MdCheckCircleOutline } from "react-icons/md";
+import GenericButton from "../../../../Components/buttons/GenericButton/GenericButton.jsx";
 import { COOKIE_CONFIG, UI_CONFIG } from "../../../../constants/LOAN_SIM.js";
 import { getCookie } from "../../../../lib/utils.js";
 
@@ -42,13 +43,14 @@ const SuccessStep = ({ handleInfoPrestamo, loanInfo, loadingModal, simulationDat
         >
           {loadingModal ? "Cargando..." : "Info prestamo"}
         </button>
-        <button
-          className='primary-btn'
+        <GenericButton
+          type='button'
+          variant='secondary'
           onClick={() => (window.location.href = "http://wa.me/5491137570853")}
           style={{ flex: 1 }}
         >
-          Comunicarse con asesor
-        </button>
+          Comunicarse con un asesor
+        </GenericButton>
       </div>
       {showInfoModal && (
         <Suspense fallback={<div>Cargando detalle...</div>}>

@@ -88,13 +88,14 @@ const CBUValidation = ({ onValidate, loading, error, onBack, isClient, existingC
           {error && (
             <>
               <span className={styles.errorText}>{error}</span>
-              <button
-                className='primary-btn'
+              <GenericButton
+                type='button'
+                variant='secondary'
                 onClick={() => (window.location.href = "http://wa.me/5491137570853")}
                 style={{ flex: 1 }}
               >
                 Comunicarse con un asesor
-              </button>
+              </GenericButton>
             </>
           )}
         </div>

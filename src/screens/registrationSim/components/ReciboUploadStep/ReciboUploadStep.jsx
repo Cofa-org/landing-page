@@ -38,35 +38,45 @@ const ReciboUploadStep = ({ leadId, onSuccess, onAnalysisAfterRecibo, loading, e
 
   return (
     <GenericForm
-      title="Subí tu recibo de sueldo"
-      description="Necesitamos una foto clara de tu recibo de sueldo para verificar tu capacidad de pago."
+      title='Subí tu recibo de sueldo'
+      description='Necesitamos una foto clara de tu recibo de sueldo para verificar tu capacidad de pago.'
       onSubmit={handleSubmit}
       className={styles.formTemplateContainer}
       children_className={styles.formTemplate}
     >
-
       <div className={styles.uploadAreaWrapper}>
         {preview ? (
           <div className={styles.preview}>
             {isImage ? (
-              <img src={preview} alt="Recibo de sueldo" />
+              <img
+                src={preview}
+                alt='Recibo de sueldo'
+              />
             ) : (
               <div className={styles.pdfIcon}>
                 <FaFilePdf />
                 <span>PDF seleccionado</span>
               </div>
             )}
-            <span className={styles.checkIcon}><FaCheck /></span>
-            <button type="button" className={styles.retakeBtn} onClick={clearFile}>Cambiar</button>
+            <span className={styles.checkIcon}>
+              <FaCheck />
+            </span>
+            <button
+              type='button'
+              className={styles.retakeBtn}
+              onClick={clearFile}
+            >
+              Cambiar
+            </button>
           </div>
         ) : (
           <label className={styles.uploadArea}>
             <FaCamera className={styles.cameraIcon} />
             <span>Tocar para subir</span>
             <input
-              type="file"
-              accept="image/*,application/pdf"
-              capture="environment"
+              type='file'
+              accept='image/*,application/pdf'
+              capture='environment'
               onChange={handleFileChange}
               className={styles.fileInput}
             />
@@ -74,16 +84,25 @@ const ReciboUploadStep = ({ leadId, onSuccess, onAnalysisAfterRecibo, loading, e
         )}
       </div>
 
-      {displayError && (
-        <p className={styles.error}>{displayError}</p>
-      )}
+      {displayError && <p className={styles.error}>{displayError}</p>}
 
       <GenericButton
-        type="submit"
+        type='submit'
         loading={isLoading}
         disabled={!isFormValid || isLoading}
       >
         Continuar
+      </GenericButton>
+
+      <GenericButton
+        type='button'
+        variant='secondary'
+        onClick={() =>
+          (window.location.href =
+            "http://wa.me/5491137570853?text=Hola!!%20Necesito%20ayuda%20para%20subir%20mi%20recibo%20de%20sueldo!")
+        }
+      >
+        Comunicarse con un asesor
       </GenericButton>
     </GenericForm>
   );
