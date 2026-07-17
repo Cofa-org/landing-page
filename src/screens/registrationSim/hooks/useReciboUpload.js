@@ -31,7 +31,9 @@ export const useReciboUpload = () => {
     try {
       const response = await LeadRegistrationService.subirRecibo({ leadId }, reciboFile);
       if (response.success) {
-        return { success: true };
+        // Propagar la fila final del lead para que ReciboUploadStep pueda inspeccionar
+        // estado_onboarding y enrutar a EN_ANALISIS si el back transicionó allí.
+        return { success: true, data: response.data };
       }
       const msg = response.message ? `${response.message} 😊` : "Error al subir el recibo";
       setUploadError(msg);

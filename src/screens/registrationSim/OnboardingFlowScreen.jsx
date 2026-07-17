@@ -28,6 +28,7 @@ const OnboardingFlowScreen = () => {
     handleLeadSuccess,
     handleRejected,
     handleAnalysis,
+    goToAnalysis,
     getLeadId,
     shouldShowBackButton,
     leadData,
@@ -45,17 +46,19 @@ const OnboardingFlowScreen = () => {
 
       const nuevoEstado = result.data?.estado_onboarding;
 
-      if (nuevoEstado === ONBOARDING_STATES.EN_ANALISIS) {
-        handleAnalysis({ lead: result.data, token: leadToken });
-      } else if (nuevoEstado === ONBOARDING_STATES.RECHAZADO) {
+      if (nuevoEstado === ONBOARDING_STATES.RECHAZADO) {
         handleRejected();
       } else {
-        // CELULAR_VALIDADO or DNI_SUBIDO — proceed to DNI_UPLOAD or RECIBO_UPLOAD
+        // CELULAR_VALIDADO or DNI_SUBIDO — proceed to DNI_UPLOAD or RECIBO_UPLOAD.
+        // Los leads que requieren análisis llegan aquí también; la transición a EN_ANALISIS
+        // se hace al subir el recibo (subirRecibo en el back).
         navigateToNext(onboardingStep, {
           esCliente: result.data?.es_cliente ?? leadData?.es_cliente,
         });
       }
-  }, [verificarOTP, onboardingStep, leadData, leadToken, handleAnalysis, handleRejected, navigateToNext]);
+    },
+    [verificarOTP, onboardingStep, leadData, handleRejected, navigateToNext],
+  );
 
   const renderStep = () => {
     switch (onboardingStep) {
@@ -83,6 +86,7 @@ const OnboardingFlowScreen = () => {
           <ReciboUploadStep
             leadId={getLeadId()}
             onSuccess={() => navigateToNext(LOAN_SIM_STEPS.RECIBO_UPLOAD)}
+            onAnalysisAfterRecibo={goToAnalysis}
             error={null}
           />
         );

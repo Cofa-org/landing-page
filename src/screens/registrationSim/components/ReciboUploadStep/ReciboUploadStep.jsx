@@ -4,9 +4,10 @@ import { FaCamera, FaCheck, FaFilePdf } from "react-icons/fa";
 import GenericButton from "../../../../Components/buttons/GenericButton/GenericButton.jsx";
 import GenericForm from "../../../../Components/Forms/GenericForm/GenericForm.jsx";
 import { useReciboUpload } from "../../hooks/useReciboUpload.js";
+import { ONBOARDING_STATES } from "../../../../constants/LOAN_SIM.js";
 import styles from "./ReciboUploadStep.module.css";
 
-const ReciboUploadStep = ({ leadId, onSuccess, loading, error: externalError }) => {
+const ReciboUploadStep = ({ leadId, onSuccess, onAnalysisAfterRecibo, loading, error: externalError }) => {
   const {
     preview,
     isUploading,
@@ -24,8 +25,14 @@ const ReciboUploadStep = ({ leadId, onSuccess, loading, error: externalError }) 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const result = await subirRecibo(leadId);
-    if (result.success && onSuccess) {
-      onSuccess();
+    if (result.success) {
+      // Si el back transicionó el lead a EN_ANALISIS (porque requiere análisis),
+      // navegamos a la pantalla de análisis. Si no, flujo normal.
+      if (result.data?.estado_onboarding === ONBOARDING_STATES.EN_ANALISIS) {
+        if (onAnalysisAfterRecibo) onAnalysisAfterRecibo(result.data);
+      } else if (onSuccess) {
+        onSuccess();
+      }
     }
   };
 

@@ -203,6 +203,10 @@ export const useOnboardingFlow = () => {
     setOnboardingStep(LOAN_SIM_STEPS.EN_ANALISIS);
   }, []);
 
+  const goToAnalysis = useCallback(() => {
+    setOnboardingStep(LOAN_SIM_STEPS.EN_ANALISIS);
+  }, []);
+
   const resetOnboarding = useCallback(() => {
     setLeadData(null);
     setLeadToken(null);
@@ -240,6 +244,7 @@ export const useOnboardingFlow = () => {
     handleLeadSuccess,
     handleRejected,
     handleAnalysis,
+    goToAnalysis,
 
     // Utilidad
     getLeadId,
