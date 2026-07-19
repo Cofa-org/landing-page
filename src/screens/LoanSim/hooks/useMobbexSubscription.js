@@ -46,7 +46,12 @@ export const useMobbexSubscription = (scoringId, onSubscriptionCompleted) => {
           );
           return;
         }
-        onSubscriptionCompleted();
+        // Catch defensivo: si onSubscriptionCompleted rompe su contrato
+        // never-throw, no queremos una unhandled rejection que deje al usuario
+        // stuck en MOBBEX_SUBSCRIPTION. Loggeamos y seguimos.
+        onSubscriptionCompleted()?.catch?.((err) =>
+          console.error("MOBBEX_COMPLETION_CALLBACK_ERROR:", err),
+        );
       } catch (err) {
         setError(err.message || "Error al confirmar la suscripción");
       } finally {
