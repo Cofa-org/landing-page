@@ -76,7 +76,7 @@ const ReciboUploadStep = ({ leadId, onSuccess, onAnalysisAfterRecibo, loading, e
             <input
               type='file'
               accept='image/*,application/pdf'
-              capture='environment'
+              // capture='environment'
               onChange={handleFileChange}
               className={styles.fileInput}
             />
