@@ -27,6 +27,18 @@
   margin: 0;
 }
 
+.infoText {
+  color: #2b6cb0;
+  background-color: #ebf8ff;
+  border: 1px solid #bee3f8;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  max-width: 32rem;
+  margin: 0;
+  padding: 0.75rem 1rem;
+}
+
 .note {
   font-size: 0.875rem;
   line-height: 1.5;

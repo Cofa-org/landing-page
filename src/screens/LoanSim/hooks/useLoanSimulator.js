@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
-import { getCookie, roundToFiveHundreds, setCookie } from "../../../lib/utils.js";
+import { getCookie, roundToFiveHundreds, setCookieWithDuration } from "../../../lib/utils.js";
 import { useDebounce } from "../../../hooks/useDebounce";
 import SimuladorService from "../../../services/simuladorService";
-import { COOKIE_CONFIG, COOKIE_SIMULADOR_TOKEN_CONFIG, LOAN_SIM_STEPS } from "../../../constants/LOAN_SIM.js";
+import { COOKIE_CONFIG, COOKIE_LOAN_INFO_CONFIG, COOKIE_SIMULADOR_TOKEN_CONFIG, LOAN_SIM_STEPS } from "../../../constants/LOAN_SIM.js";
 import LinkResolutionService from "../../../services/linkResolutionService.js";
 import { ERROR_CAUSE } from "../../../constants/error";
 import { getFingerprint, mapFingerprintToHuellaData } from "../../../lib/fingerprint.js";
@@ -494,13 +494,9 @@ export const useLoanSimulator = () => {
       });
 
       if (aceptarTerminosResponse.success) {
-        const cookieOptions = {
-          name: COOKIE_CONFIG.NAME,
-          value: scoringData.scoringId,
-          expires: COOKIE_CONFIG.EXPIRY_MS,
-          partitioned: true,
-        };
-        await setCookie(COOKIE_CONFIG.NAME, scoringData.scoringId, COOKIE_CONFIG.EXPIRY_MS);
+        // Cachear cookies al cierre real (no antes — skipMobbex o Mobbex
+        // confirmed). Ver `persistLoanToCookies` para el contrato never-throw.
+        await persistLoanToCookies(scoringData.scoringId);
         // Si el backend skipeó Mobbex (tarjeta de débito vigente del préstamo
         // anterior), el préstamo ya está creado y la firma ya corrió — ir
         // directo al paso final en vez de forzar al usuario por la pantalla
@@ -540,37 +536,94 @@ export const useLoanSimulator = () => {
     }
   };
 
-  const handleMobbexSubscriptionCompleted = useCallback(() => {
-    setStep(LOAN_SIM_STEPS.COMPLETADO);
+  // Ref para que handleMobbexSubscriptionCompleted tenga identidad estable
+  // y no re-dispare el effect de useMobbexSubscription cuando
+  // scoringData.scoringId cambie (eso causaría un confirm() duplicado).
+  const scoringIdRef = useRef(scoringData.scoringId);
+  useEffect(() => {
+    scoringIdRef.current = scoringData.scoringId;
+  }, [scoringData.scoringId]);
+
+  // Helper: persiste las cookies del préstamo finalizado.
+  // Contrato "never throws":
+  //   - Si el setCookie de scoringId falla, swalloweamos (otros sistemas
+  //     pueden depender de esa cookie, pero el flujo del simulador no).
+  //   - Si el fetch o el setCookie de loanInfo fallan, swalloweamos: el
+  //     botón de SuccessStep quedará deshabilitado (regla de negocio: sin
+  //     loanInfo cookie no hay acceso). El usuario debe contactar a soporte.
+  // Se recrea cada render (no es useCallback) — sus callers también lo son.
+  const persistLoanToCookies = async (scoringId) => {
+    if (!scoringId) return;
+    // Cookie scoringId: legacy — se setea para no romper sistemas externos
+    // que la busquen. No se usa en el nuevo flujo del simulador.
+    try {
+      await setCookieWithDuration(
+        COOKIE_CONFIG.NAME,
+        scoringId,
+        COOKIE_CONFIG.EXPIRY_MS,
+      );
+    } catch (err) {
+      console.error("SCORING_ID_COOKIE_ERROR:", err);
+    }
+    // Cookie loanInfo: regla de negocio. Combina scoringId + data para
+    // servir como gate (su existencia = acceso) y como data source. 2h de
+    // expiración = ventana de acceso. Sin backend fallback — si esta
+    // cookie no se setea (fetch falló), el usuario no tiene acceso.
+    try {
+      const response = await SimuladorService.obtenerInfoPrestamo(scoringId);
+      if (response?.success && response.data) {
+        const combined = { scoringId, ...response.data };
+        setLoanInfo(response.data);
+        await setCookieWithDuration(
+          COOKIE_LOAN_INFO_CONFIG.NAME,
+          JSON.stringify(combined),
+          COOKIE_LOAN_INFO_CONFIG.EXPIRY_MS,
+        );
+      }
+    } catch (err) {
+      console.warn("LOAN_INFO_CACHE_ERROR:", err);
+    }
+  };
+
+  const handleMobbexSubscriptionCompleted = useCallback(async () => {
+    try {
+      await persistLoanToCookies(scoringIdRef.current);
+    } catch (err) {
+      console.error("PERSIST_LOAN_COOKIES_ERROR:", err);
+    } finally {
+      // setStep SIEMPRE corre, incluso si persistLoanToCookies throw
+      // (no debería, pero el finally es defensa contra bugs futuros).
+      // Sin finally, un throw dejaría al usuario stuck en MOBBEX_SUBSCRIPTION.
+      setStep(LOAN_SIM_STEPS.COMPLETADO);
+    }
+    // deps vacías: scoringId se lee vía ref para mantener identidad estable
   }, []);
 
   const handleInfoPrestamo = async () => {
     setLoadingModal(true);
     try {
-      const scoringId = await getCookie(COOKIE_CONFIG.NAME);
-      if (!scoringId) {
-        setError("No se encontró el scoringId. Inténtalo de nuevo.");
-        return false;
+      // Regla de negocio: la única fuente de verdad para "puede ver la info"
+      // es la cookie loanInfo (2h desde que se creó el préstamo). La cookie
+      // NO es un cache — es el indicador de acceso. Por eso:
+      //   - Sin backend fallback (no se concede acceso fuera de la ventana).
+      //   - Sin React state fallback para scoringId (no se concede acceso
+      //     después de las 2h en la misma sesión).
+      // Si la cookie está ausente / corrupta / no es objeto → return false.
+      try {
+        const raw = await getCookie(COOKIE_LOAN_INFO_CONFIG.NAME);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === "object") {
+            // Extraer scoringId si está presente; el resto es la data del préstamo.
+            // El modal no necesita scoringId, sólo los campos de display.
+            const { scoringId: _scoringId, ...loanData } = parsed;
+            setLoanInfo(loanData);
+            return true;
+          }
+        }
+      } catch (parseErr) {
+        console.warn("LOAN_INFO_COOKIE_READ_ERROR:", parseErr);
       }
-      const response = await SimuladorService.obtenerInfoPrestamo(scoringId);
-      if (response.success) {
-        setLoanInfo(response.data);
-        return true;
-      } else {
-        setError(
-          response.message
-            ? `${response.message} 😊`
-            : "Error al obtener la información del préstamo.",
-        );
-        return false;
-      }
-    } catch (error) {
-      console.error("Error obteniendo info del préstamo:", error);
-      setError(
-        error.message
-          ? `${error.message} 😊`
-          : "Error al obtener la información del préstamo.",
-      );
       return false;
     } finally {
       setLoadingModal(false);

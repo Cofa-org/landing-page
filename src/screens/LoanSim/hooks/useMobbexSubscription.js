@@ -1,6 +1,9 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import SimuladorService from "../../../services/simuladorService";
+
+const MOBBEX_RETRY_MESSAGE =
+  "Lo sentimos, necesitamos que repitas la suscripción para poder confirmarla. Volvé a intentarlo para continuar.";
 
 /**
  * Maneja la lógica del paso de suscripción a Mobbex.
@@ -13,7 +16,7 @@ import SimuladorService from "../../../services/simuladorService";
  *
  * @param {string} scoringId
  * @param {Function} onSubscriptionCompleted - callback para navegar a COMPLETADO
- * @returns {{ isConfirming: boolean, loading: boolean, error: string|null, handleSuscribirse: Function }}
+ * @returns {{ isConfirming: boolean, loading: boolean, error: string|null, message: string|null, handleSuscribirse: Function }}
  */
 export const useMobbexSubscription = (scoringId, onSubscriptionCompleted) => {
   const [searchParams] = useSearchParams();
@@ -26,6 +29,17 @@ export const useMobbexSubscription = (scoringId, onSubscriptionCompleted) => {
   const [isConfirming, setIsConfirming] = useState(fromMobbex);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [message, setMessage] = useState(null);
+
+  // Mantener el callback en una ref para que el efecto de auto-confirmación
+  // no se re-ejecute si el padre lo recrea en cada render (vi.fn() inline,
+  // funciones no memoizadas, etc.). Sin esto, un cambio de referencia del
+  // callback re-dispararía el ciclo confirmacion -> setMessage y arruinaría
+  // el clear del aviso informativo en handleSuscribirse.
+  const onSubscriptionCompletedRef = useRef(onSubscriptionCompleted);
+  useEffect(() => {
+    onSubscriptionCompletedRef.current = onSubscriptionCompleted;
+  });
 
   // Auto-confirmar al volver de Mobbex
   useEffect(() => {
@@ -40,21 +54,40 @@ export const useMobbexSubscription = (scoringId, onSubscriptionCompleted) => {
           status: mobbexStatus,
         });
         if (!response?.success) {
-          setError(
-            `${response?.message} 😕` ||
-              "¡Lo sentimos! No pudimos confirmar tu suscripción. Intentá nuevamente 😕",
-          );
+          if (mobbexStatus === "410") {
+            setError(null);
+            setMessage(response?.message || MOBBEX_RETRY_MESSAGE);
+          } else {
+            setMessage(null);
+            setError(
+              `${response?.message} 😕` ||
+                "¡Lo sentimos! No pudimos confirmar tu suscripción. Intentá nuevamente 😕",
+            );
+          }
           return;
         }
-        onSubscriptionCompleted();
+        // Catch defensivo: si onSubscriptionCompleted rompe su contrato
+        // never-throw, no queremos una unhandled rejection que deje al usuario
+        // stuck en MOBBEX_SUBSCRIPTION. Loggeamos y seguimos.
+        setError(null);
+        setMessage(null);
+        onSubscriptionCompletedRef.current()?.catch?.((err) =>
+          console.error("MOBBEX_COMPLETION_CALLBACK_ERROR:", err),
+        );
       } catch (err) {
-        setError(err.message || "Error al confirmar la suscripción");
+        if (mobbexStatus === "410") {
+          setError(null);
+          setMessage(err.message || MOBBEX_RETRY_MESSAGE);
+        } else {
+          setMessage(null);
+          setError(err.message || "Error al confirmar la suscripción");
+        }
       } finally {
         setIsConfirming(false);
       }
     };
     confirm();
-  }, [fromMobbex, scoringId, mobbexSid, mobbexUid, mobbexStatus, onSubscriptionCompleted]);
+  }, [fromMobbex, scoringId, mobbexSid, mobbexUid, mobbexStatus]);
 
   const handleSuscribirse = useCallback(async () => {
     if (!linkId) {
@@ -64,6 +97,7 @@ export const useMobbexSubscription = (scoringId, onSubscriptionCompleted) => {
     }
     setLoading(true);
     setError(null);
+    setMessage(null);
     try {
       const response = await SimuladorService.solicitarSuscripcionMobbex({ scoringId, linkId });
       if (!response?.success) {
@@ -89,6 +123,7 @@ export const useMobbexSubscription = (scoringId, onSubscriptionCompleted) => {
     isConfirming,
     loading,
     error,
+    message,
     handleSuscribirse,
   };
 };

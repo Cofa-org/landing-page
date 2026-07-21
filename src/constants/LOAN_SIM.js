@@ -40,7 +40,19 @@ export const UI_CONFIG = {
 
 export const COOKIE_CONFIG = {
   NAME: "scoringId",
-  EXPIRY_MS: Date.now() + 2 * 60 * 60 * 1000, // 2 hours
+  // Duración relativa en ms (no timestamp absoluto). El call-site suma
+  // Date.now() al pasarlo a setCookieWithDuration para evitar que el módulo
+  // "congele" el expiry al importarse (bug histórico: Date.now() se evaluaba
+  // una sola vez al cargar el módulo).
+  EXPIRY_MS: 2 * 60 * 60 * 1000, // 2 hours in ms
+};
+
+export const COOKIE_LOAN_INFO_CONFIG = {
+  NAME: "loanInfo",
+  // Cache del response de obtenerInfoPrestamo: la info del préstamo es
+  // inmutable una vez creado el préstamo, así que cachearla evita el
+  // round-trip al backend en cada click de "Info prestamo".
+  EXPIRY_MS: 2 * 60 * 60 * 1000, // 2 hours in ms
 };
 
 export const COOKIE_LEAD_TOKEN_CONFIG = {

@@ -59,6 +59,19 @@ export async function setCookie(name, value, expires) {
   document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expiresStr}; path=/`;
 }
 
+/**
+ * Helper para evitar que el call-site olvide sumar Date.now() a una duración.
+ * Pasa directamente la duración (en ms) a setCookie; el wrapper hace el
+ * `Date.now() + durationMs` por vos. Sin esto, olvidar Date.now() causa que
+ * la cookie expire en 1970 (porque new Date(durationEnMs) lo interpreta como
+ * un timestamp absoluto en 1970).
+ *
+ * Uso: `await setCookieWithDuration(name, value, COOKIE_CONFIG.EXPIRY_MS)`
+ */
+export async function setCookieWithDuration(name, value, durationMs) {
+  return setCookie(name, value, Date.now() + durationMs);
+}
+
 export async function deleteCookie(name) {
   if (hasCookieStore) {
     await window.cookieStore.delete(name);
