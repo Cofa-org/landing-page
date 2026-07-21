@@ -5,7 +5,7 @@ import { useMobbexSubscription } from "../../hooks/useMobbexSubscription";
 import styles from "./MobbexSubscriptionStep.module.css";
 
 const MobbexSubscriptionStep = ({ scoringId, onSubscriptionCompleted, error: externalError }) => {
-  const { isConfirming, loading, error, handleSuscribirse } = useMobbexSubscription(
+  const { isConfirming, loading, error, message, handleSuscribirse } = useMobbexSubscription(
     scoringId,
     onSubscriptionCompleted,
   );
@@ -39,6 +39,7 @@ const MobbexSubscriptionStep = ({ scoringId, onSubscriptionCompleted, error: ext
         préstamo.
       </p>
       {displayError && <p className={styles.errorText}>{displayError}</p>}
+      {message && <p className={styles.infoText}>{message}</p>}
       <GenericButton
         onClick={handleSuscribirse}
         loading={loading}

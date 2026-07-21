@@ -152,4 +152,96 @@ describe("useMobbexSubscription", () => {
     expect(result.current.error).toBe("El linkId no es válido 😕");
     expect(window.location.href).toBe("");
   });
+
+  test("primer 410 expone un aviso informativo y no un error", async () => {
+    SimuladorService.confirmarSuscripcionMobbex.mockResolvedValue({
+      success: false,
+      status: 410,
+      message:
+        "Lo sentimos, necesitamos que repitas la suscripción para poder confirmarla. Volvé a intentarlo para continuar.",
+    });
+    const onCompleted = vi.fn();
+
+    const { result } = renderHook(() => useMobbexSubscription("abc123", onCompleted), {
+      wrapper: makeWrapper("/simulador?fromMobbex=true&status=410"),
+    });
+
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+
+    expect(result.current.message).toBe(
+      "Lo sentimos, necesitamos que repitas la suscripción para poder confirmarla. Volvé a intentarlo para continuar.",
+    );
+    expect(result.current.error).toBeNull();
+    expect(onCompleted).not.toHaveBeenCalled();
+  });
+
+  test("primer 410 rechazado por HttpApi expone un aviso informativo y no un error", async () => {
+    SimuladorService.confirmarSuscripcionMobbex.mockRejectedValue(
+      new Error(
+        "Lo sentimos, necesitamos que repitas la suscripción para poder confirmarla. Volvé a intentarlo para continuar.",
+      ),
+    );
+    const onCompleted = vi.fn();
+
+    const { result } = renderHook(() => useMobbexSubscription("abc123", onCompleted), {
+      wrapper: makeWrapper("/simulador?fromMobbex=true&status=410"),
+    });
+
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+
+    expect(result.current.message).toBe(
+      "Lo sentimos, necesitamos que repitas la suscripción para poder confirmarla. Volvé a intentarlo para continuar.",
+    );
+    expect(result.current.error).toBeNull();
+    expect(onCompleted).not.toHaveBeenCalled();
+  });
+
+  test("un segundo 410 aceptado por backend dispara onCompleted", async () => {
+    SimuladorService.confirmarSuscripcionMobbex.mockResolvedValue({ success: true });
+    const onCompleted = vi.fn();
+
+    const { result } = renderHook(() => useMobbexSubscription("abc123", onCompleted), {
+      wrapper: makeWrapper("/simulador?fromMobbex=true&sid=SID2&uid=UID2&status=410"),
+    });
+
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+
+    expect(onCompleted).toHaveBeenCalledTimes(1);
+    expect(result.current.message).toBeNull();
+    expect(result.current.error).toBeNull();
+  });
+
+  test("handleSuscribirse limpia el aviso informativo antes de iniciar otro intento", async () => {
+    SimuladorService.confirmarSuscripcionMobbex.mockResolvedValue({
+      success: false,
+      status: 410,
+      message: "Lo sentimos, necesitamos que repitas la suscripción para poder confirmarla. Volvé a intentarlo para continuar.",
+    });
+    SimuladorService.solicitarSuscripcionMobbex.mockResolvedValue({
+      success: true,
+      data: { subscriptionURL: "https://mobbex.com/p/retry" },
+    });
+
+    const { result } = renderHook(() => useMobbexSubscription("abc123", vi.fn()), {
+      wrapper: makeWrapper("/simulador?id=eSQKz2X1ds&fromMobbex=true&status=410"),
+    });
+
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    expect(result.current.message).not.toBeNull();
+
+    await act(async () => {
+      await result.current.handleSuscribirse();
+    });
+
+    expect(result.current.message).toBeNull();
+    expect(window.location.href).toBe("https://mobbex.com/p/retry");
+  });
 });
