@@ -3,11 +3,16 @@
   width: 100%;
   margin: 0px;
   min-width: 100%;
-  padding: var(--spacing-xl);
+  padding: var(--spacing-lg);
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
   position: relative;
+  max-width: 450px;
+  margin: 0 auto;
+  background: var(--color-background);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow);
 }
 
 .formTemplate {
@@ -154,17 +159,21 @@
 .cardsList {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 2rem;
   width: 100%;
 }
 
 .card {
   border: 1.5px solid #d0d0d0;
   border-radius: 8px;
-  padding: 1rem;
+  padding: 2rem 1rem;
   background: #ffffff;
   cursor: pointer;
-  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s, transform 0.15s;
+  transition:
+    border-color 0.15s,
+    background 0.15s,
+    box-shadow 0.15s,
+    transform 0.15s;
   text-align: left;
   font-family: inherit;
   font-size: 1rem;
