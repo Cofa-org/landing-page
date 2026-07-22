@@ -221,10 +221,12 @@ export const useLeadRegistration = (turnstileToken) => {
         if (response?.requiresIdentitySelection === true) {
           return {
             success: true,
-            requiresIdentitySelection: true,
-            identities: response.identities,
-            dni: formData.dni.trim(),
-            celular: formData.celular,
+            data: {
+              requiresIdentitySelection: true,
+              identities: response.identities,
+              dni: formData.dni.trim(),
+              celular: formData.celular,
+            },
           };
         }
 

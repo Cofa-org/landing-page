@@ -187,12 +187,12 @@ export const useOnboardingFlow = () => {
   }, [onboardingStep, getLeadId, leadData]);
 
   const handleLeadSuccess = useCallback((data) => {
-    if (data?.requiresIdentitySelection) {
-      setPendingIdentities(data.identities);
+    if (data?.data?.requiresIdentitySelection) {
+      setPendingIdentities(data.data.identities);
       // Guardamos dni/celular de la sesión actual para poder re-llamar
       // a crearLead con selectedCuit.
-      setPendingDni(data?.dni ?? null);
-      setPendingCelular(data?.celular ?? null);
+      setPendingDni(data.data?.dni ?? null);
+      setPendingCelular(data.data?.celular ?? null);
       setOnboardingStep(LOAN_SIM_STEPS.IDENTITY_SELECTION);
       return;
     }
