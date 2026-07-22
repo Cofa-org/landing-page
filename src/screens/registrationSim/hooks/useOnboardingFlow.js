@@ -56,6 +56,9 @@ export const useOnboardingFlow = () => {
   const [leadToken, setLeadToken] = useState(null);
   const [onboardingStep, setOnboardingStep] = useState(LOAN_SIM_STEPS.LEAD_REGISTRATION);
   const [restoringOnboarding, setRestoringOnboarding] = useState(false);
+  const [pendingIdentities, setPendingIdentities] = useState(null);
+  const [pendingDni, setPendingDni] = useState(null);
+  const [pendingCelular, setPendingCelular] = useState(null);
 
   const getLeadId = useCallback(() => {
     if (leadData?.leadId) return leadData.leadId;
@@ -184,7 +187,15 @@ export const useOnboardingFlow = () => {
   }, [onboardingStep, getLeadId, leadData]);
 
   const handleLeadSuccess = useCallback((data) => {
-
+    if (data?.requiresIdentitySelection) {
+      setPendingIdentities(data.identities);
+      // Guardamos dni/celular de la sesión actual para poder re-llamar
+      // a crearLead con selectedCuit.
+      setPendingDni(data?.dni ?? null);
+      setPendingCelular(data?.celular ?? null);
+      setOnboardingStep(LOAN_SIM_STEPS.IDENTITY_SELECTION);
+      return;
+    }
     setLeadData(data.lead);
     setLeadToken(data.token);
     // Siempre navegar a PHONE_VALIDATION después de crearLead exitoso
@@ -202,6 +213,44 @@ export const useOnboardingFlow = () => {
     if (data?.token) setLeadToken(data.token);
     setOnboardingStep(LOAN_SIM_STEPS.EN_ANALISIS);
   }, []);
+
+  const handleIdentitySelected = useCallback(
+    async (selectedCuit) => {
+      // Re-llamar a crearLead con el CUIT seleccionado para generar el lead con
+      // un scoring fresco basado en la identidad elegida.
+      // El DNI y celular los tenemos guardados en pendingDni/pendingCelular
+      // desde la primera llamada (que devolvió requiresIdentitySelection).
+      // Turnstile ya se validó en la primera llamada; el controller salta
+      // la verificación cuando selectedCuit está presente (ver Task 12 del plan).
+      const turnstileTokenPlaceholder = "reenrollment-placeholder";
+
+      const response = await LeadRegistrationService.crearLead({
+        dni: pendingDni,
+        turnstileToken: turnstileTokenPlaceholder,
+        huella_dispositivo: null,
+        request_id: null,
+        celular: pendingCelular,
+        selectedCuit,
+      });
+
+      if (response.success && response.data) {
+        setPendingIdentities(null);
+        setPendingDni(null);
+        setPendingCelular(null);
+        await setCookie(
+          COOKIE_LEAD_TOKEN_CONFIG.NAME,
+          response.data.token,
+          COOKIE_LEAD_TOKEN_CONFIG.EXPIRY_MS,
+        );
+        setLeadData(response.data.lead);
+        setLeadToken(response.data.token);
+        setOnboardingStep(LOAN_SIM_STEPS.PHONE_VALIDATION);
+        return { success: true };
+      }
+      return { success: false, error: response.message || "No pudimos procesar tu selección" };
+    },
+    [pendingDni, pendingCelular],
+  );
 
   const goToAnalysis = useCallback(() => {
     setOnboardingStep(LOAN_SIM_STEPS.EN_ANALISIS);
@@ -234,6 +283,7 @@ export const useOnboardingFlow = () => {
     leadToken,
     onboardingStep,
     restoringOnboarding,
+    pendingIdentities,
 
     // Navegación
     navigateToNext,
@@ -245,6 +295,7 @@ export const useOnboardingFlow = () => {
     handleRejected,
     handleAnalysis,
     goToAnalysis,
+    handleIdentitySelected,
 
     // Utilidad
     getLeadId,
