@@ -1,4 +1,4 @@
-import React, { Suspense, memo, useCallback } from "react";
+import React, { Suspense, memo, useCallback, useState } from "react";
 import BackButton from "../../Components/buttons/backbutton/BackButton.jsx";
 import { Footer, Header } from "../../Components/index.js";
 import Loader from "../../Components/Loader/Loader.jsx";
@@ -19,6 +19,9 @@ const ReciboUploadStep = React.lazy(
 );
 const WelcomeStep = React.lazy(() => import("./components/WelcomeStep/WelcomeStep.jsx"));
 const AnalysisStep = React.lazy(() => import("./components/AnalysisStep/AnalysisStep.jsx"));
+const IdentitySelectionStep = React.lazy(
+  () => import("./components/IdentitySelectionStep/IdentitySelectionStep.jsx"),
+);
 
 const OnboardingFlowScreen = () => {
   const {
@@ -29,6 +32,8 @@ const OnboardingFlowScreen = () => {
     handleRejected,
     handleAnalysis,
     goToAnalysis,
+    handleIdentitySelected,
+    pendingIdentities,
     getLeadId,
     shouldShowBackButton,
     leadData,
@@ -38,6 +43,29 @@ const OnboardingFlowScreen = () => {
   const { verificarOTP, reenviarOTP, validating, error } = usePhoneOTP(getLeadId);
 
   const handlePrevStep = navigateToPrev;
+
+  const [identitySelectionError, setIdentitySelectionError] = useState(null);
+  const [identitySelectionLoading, setIdentitySelectionLoading] = useState(false);
+
+  const handleIdentitySelect = useCallback(
+    async (cuit) => {
+      setIdentitySelectionError(null);
+      setIdentitySelectionLoading(true);
+      try {
+        const result = await handleIdentitySelected(cuit);
+        if (!result?.success) {
+          setIdentitySelectionError(
+            result?.error || "No pudimos procesar tu selección. Volvé a intentarlo.",
+          );
+        }
+      } catch (err) {
+        setIdentitySelectionError(err.message || "No pudimos procesar tu selección. Volvé a intentarlo.");
+      } finally {
+        setIdentitySelectionLoading(false);
+      }
+    },
+    [handleIdentitySelected],
+  );
 
   const handleVerificarOTP = useCallback(
     async (codigo) => {
@@ -113,6 +141,16 @@ const OnboardingFlowScreen = () => {
         return <RejectedStep />;
       case LOAN_SIM_STEPS.EN_ANALISIS:
         return <AnalysisStep />;
+      case LOAN_SIM_STEPS.IDENTITY_SELECTION:
+        return (
+          <IdentitySelectionStep
+            identities={pendingIdentities || []}
+            onSelect={handleIdentitySelect}
+            onBack={navigateToPrev}
+            loading={identitySelectionLoading}
+            error={identitySelectionError}
+          />
+        );
       default:
         return null;
     }
