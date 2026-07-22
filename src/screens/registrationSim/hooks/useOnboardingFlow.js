@@ -31,6 +31,7 @@ const getNextStepAfterPhoneValidation = (esCliente) =>
 const PREV_STEP_MAP = {
   [LOAN_SIM_STEPS.PHONE_VALIDATION]: LOAN_SIM_STEPS.LEAD_REGISTRATION,
   [LOAN_SIM_STEPS.DNI_UPLOAD]: LOAN_SIM_STEPS.LEAD_REGISTRATION,
+  [LOAN_SIM_STEPS.IDENTITY_SELECTION]: LOAN_SIM_STEPS.LEAD_REGISTRATION,
   // RECIBO_UPLOAD → se decide dinámicamente en navigateToPrev según es_cliente.
   [LOAN_SIM_STEPS.WELCOME]: LOAN_SIM_STEPS.RECIBO_UPLOAD,
 };
@@ -183,9 +184,16 @@ export const useOnboardingFlow = () => {
       } catch (err) {
         console.error("Error al sincronizar estado de onboarding:", err);
       }
+      // Limpiar pending de identidad cuando salimos del step IDENTITY_SELECTION
+      // (no afecta el flujo normal donde se navega desde otros steps).
+      if (onboardingStep === LOAN_SIM_STEPS.IDENTITY_SELECTION) {
+        setPendingIdentities(null);
+        setPendingDni(null);
+        setPendingCelular(null);
+      }
       setOnboardingStep(prev);
     }
-  }, [onboardingStep, getLeadId, leadData]);
+  }, [onboardingStep, getLeadId, leadData, setPendingIdentities, setPendingDni, setPendingCelular]);
 
   const handleLeadSuccess = useCallback((data) => {
 
