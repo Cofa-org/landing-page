@@ -196,7 +196,7 @@ const LoanSimScreen = () => {
 
   if (error && !simulationData && step === LOAN_SIM_STEPS.SIMULACION) {
     return (
-      <div className={styles.homeCalculator_calculatorBox}>
+      <div className={styles.errorScreenBox}>
         <div className={styles.calculatorContainer}>
           <h2 className={styles.title}>Simulador de Préstamo</h2>
           <div className={styles.errorContainer}>
@@ -230,13 +230,17 @@ const LoanSimScreen = () => {
     <>
       <Header />
       <main id='main-content'>
-        <HeroLoanSim />
-        <div className={styles.homeCalculator_calculatorBox}>
-          <div
-            className={`${styles.calculatorContainer} ${loading || validating ? styles.loadingOverlay : ""}`}
-          >
-            {renderBackButton()}
-            {renderStep()}
+        <div className={styles.splitLayout}>
+          <div className={styles.leftColumn}>
+            <HeroLoanSim />
+          </div>
+          <div className={`${styles.homeCalculator_calculatorBox} ${styles.rightColumn}`}>
+            <div
+              className={`${styles.calculatorContainer} ${loading || validating ? styles.loadingOverlay : ""}`}
+            >
+              {renderBackButton()}
+              {renderStep()}
+            </div>
           </div>
         </div>
       </main>
