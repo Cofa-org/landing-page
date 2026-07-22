@@ -1,5 +1,6 @@
 import React, { memo, useEffect, useState } from "react";
 import PropTypes from "prop-types";
+import GenericButton from "../../../../Components/buttons/GenericButton/GenericButton.jsx";
 import { SECURITY_SLIDES } from "../../hooks/useLeadRegistration.js";
 import styles from "./IdentitySelectionStep.module.css";
 
@@ -83,16 +84,17 @@ const IdentitySelectionStep = ({ identities, onSelect, loading, error }) => {
             </p>
             <div className={styles.cardsList}>
               {identities.map((identity) => (
-                <button
+                <GenericButton
                   key={identity.cuit}
                   type="button"
+                  variant="outline"
                   className={styles.card}
                   onClick={() => handleClick(identity.cuit)}
                   disabled={isSubmitting}
                 >
                   <div>{identity.nombreCompleto}</div>
                   <div className={styles.cardCuit}>CUIT {formatCuit(identity.cuit)}</div>
-                </button>
+                </GenericButton>
               ))}
             </div>
             {error && <p className={styles.error}>{error} 😊</p>}
