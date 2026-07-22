@@ -214,6 +214,20 @@ export const useLeadRegistration = (turnstileToken) => {
           signal,
         );
 
+        // SUP-9: el DNI tiene múltiples identidades en el padrón. Devolvemos
+        // el flag para que el caller (useOnboardingFlow) navegue al step de selección.
+        // Devolvemos dni y celular para que el caller pueda guardarlos como
+        // "pendingDni"/"pendingCelular" y re-llamar con selectedCuit luego.
+        if (response?.requiresIdentitySelection === true) {
+          return {
+            success: true,
+            requiresIdentitySelection: true,
+            identities: response.identities,
+            dni: formData.dni.trim(),
+            celular: formData.celular,
+          };
+        }
+
         if (response.success && response.data) {
           await setCookie(
             COOKIE_LEAD_TOKEN_CONFIG.NAME,
