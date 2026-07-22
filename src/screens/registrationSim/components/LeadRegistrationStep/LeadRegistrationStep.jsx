@@ -36,14 +36,14 @@ const LeadRegistrationStep = ({ onSuccess, onRejected, onAnalysis, onNext, loadi
     setSuccessMessage("");
 
     const result = await crearLead(turnstileToken);
-
+    
     if (result.success && onSuccess) {
       setSuccessMessage("¡Datos enviados correctamente!");
       onSuccess(result.data);
       // No llamar onNext() cuando el back pide selección de identidad:
       // handleLeadSuccess ya navega a LOAN_SIM_STEPS.IDENTITY_SELECTION
       // (en useOnboardingFlow) y onNext() sobreescribiría a PHONE_VALIDATION.
-      if (onNext && !result.data?.data?.requiresIdentitySelection) {
+      if (onNext && !result.data?.requiresIdentitySelection) {
         onNext();
       }
       return;

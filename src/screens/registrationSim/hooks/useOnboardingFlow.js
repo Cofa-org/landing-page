@@ -187,17 +187,19 @@ export const useOnboardingFlow = () => {
   }, [onboardingStep, getLeadId, leadData]);
 
   const handleLeadSuccess = useCallback((data) => {
-    if (data?.data?.requiresIdentitySelection) {
-      setPendingIdentities(data.data.identities);
+
+    if (data?.requiresIdentitySelection) {
+      setPendingIdentities(data.identities);
       // Guardamos dni/celular de la sesión actual para poder re-llamar
       // a crearLead con selectedCuit.
-      setPendingDni(data.data?.dni ?? null);
-      setPendingCelular(data.data?.celular ?? null);
+      setPendingDni(data.dni ?? null);
+      setPendingCelular(data.celular ?? null);
       setOnboardingStep(LOAN_SIM_STEPS.IDENTITY_SELECTION);
       return;
     }
     setLeadData(data.lead);
     setLeadToken(data.token);
+
     // Siempre navegar a PHONE_VALIDATION después de crearLead exitoso
     setOnboardingStep(LOAN_SIM_STEPS.PHONE_VALIDATION);
   }, []);
@@ -244,6 +246,7 @@ export const useOnboardingFlow = () => {
         );
         setLeadData(response.data.lead);
         setLeadToken(response.data.token);
+        
         setOnboardingStep(LOAN_SIM_STEPS.PHONE_VALIDATION);
         return { success: true };
       }

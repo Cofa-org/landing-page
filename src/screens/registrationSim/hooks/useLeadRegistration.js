@@ -218,6 +218,7 @@ export const useLeadRegistration = (turnstileToken) => {
         // el flag para que el caller (useOnboardingFlow) navegue al step de selección.
         // Devolvemos dni y celular para que el caller pueda guardarlos como
         // "pendingDni"/"pendingCelular" y re-llamar con selectedCuit luego.
+       
         if (response?.requiresIdentitySelection === true) {
           return {
             success: true,
