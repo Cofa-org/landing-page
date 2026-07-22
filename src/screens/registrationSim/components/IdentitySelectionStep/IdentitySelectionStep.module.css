@@ -1,0 +1,71 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  color: #555;
+  margin: 0 0 0.5rem 0;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.card {
+  border: 1.5px solid #d0d0d0;
+  border-radius: 8px;
+  padding: 1rem;
+  background: #ffffff;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  text-align: left;
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+.card:hover:not(:disabled) {
+  border-color: #2563eb;
+  background: #f5f9ff;
+}
+
+.card:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.cardCuit {
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 0.25rem;
+  letter-spacing: 0.5px;
+}
+
+.error {
+  color: #d32f2f;
+  font-size: 0.9rem;
+  text-align: center;
+  margin: 0;
+}
+
+.backButton {
+  background: none;
+  border: none;
+  color: #2563eb;
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 0.5rem 0;
+  align-self: flex-start;
+}
