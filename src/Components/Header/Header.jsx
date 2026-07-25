@@ -131,7 +131,7 @@ const Header = () => {
       </nav>
 
       <div className='buttons-container'>
-        {pathname === '/registro-simulador' ? (
+        {pathname === '/registro-simulador' || pathname === '/simulador' ? (
           <a 
             href='http://wa.me/5491137570853?text=Hola!!%20Necesito%20ayuda%20para%20simular%20mi%20pr%C3%A9stamo!' 
             target='_blank' 

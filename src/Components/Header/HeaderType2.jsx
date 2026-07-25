@@ -47,7 +47,7 @@ const HeaderType2 = () => {
             <Link to={'/#preguntas-frecuentes'} onClick={handleCloseNabvar}>Preguntas Frecuentes</Link>
             <Link to={'/#contacto'} onClick={handleCloseNabvar}>Contacto</Link>
           </nav>
-          {pathname === '/registro-simulador' ? (
+          {pathname === '/registro-simulador' || pathname === '/simulador' ? (
             <a href='http://wa.me/5491137570853?text=Hola!!%20Necesito%20ayuda%20para%20simular%20mi%20pr%C3%A9stamo!' target="_blank" rel="noopener noreferrer" aria-label='Solicitar ayuda por WhatsApp'>
               <button className='primary-btn mobible-nav-secondary-btn' id='btn-header-type-2-prestamo' >Solicitar ayuda</button>
             </a>
