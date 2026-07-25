@@ -34,7 +34,7 @@ function SocialNetworks() {
         <BsLinkedin />
       </Link>
       <Link
-        to={"http://wa.me/5491137570853"}
+        to={"http://wa.me/5491137570853?text=Hola!%20Necesito%20ayuda!"}
         target='_blank'
         aria-label='WhatsApp COFA'
       >

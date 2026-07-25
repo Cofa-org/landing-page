@@ -11,6 +11,8 @@ const Footer = () => {
   let whatsappUrl = "http://wa.me/5491137570853";
   if (pathname === '/registro-simulador') {
     whatsappUrl += "?text=" + encodeURIComponent("Hola!! Necesito ayuda para simular mi préstamo!");
+  } else {
+    whatsappUrl += "?text=" + encodeURIComponent("Hola! Necesito ayuda!");
   }
 
   return (

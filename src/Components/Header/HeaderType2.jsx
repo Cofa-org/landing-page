@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import './HeaderType2.css'
 
 import {IoMdArrowBack} from 'react-icons/io'
 import {FiMenu} from 'react-icons/fi'
 const HeaderType2 = () => {
+  const { pathname } = useLocation();
 
   const [isOpen, setIsOpen] = useState(false)
   const [first, setFirst] = useState(true)
@@ -46,9 +47,15 @@ const HeaderType2 = () => {
             <Link to={'/#preguntas-frecuentes'} onClick={handleCloseNabvar}>Preguntas Frecuentes</Link>
             <Link to={'/#contacto'} onClick={handleCloseNabvar}>Contacto</Link>
           </nav>
-          <a href='http://wa.me/5491137570853' target="_blank" rel="noopener noreferrer">
-            <button className='primary-btn mobible-nav-secondary-btn' id='btn-header-type-2-prestamo' >Quiero mi Préstamo</button>
-          </a>
+          {pathname === '/registro-simulador' ? (
+            <a href='http://wa.me/5491137570853?text=Hola!!%20Necesito%20ayuda%20para%20simular%20mi%20pr%C3%A9stamo!' target="_blank" rel="noopener noreferrer" aria-label='Solicitar ayuda por WhatsApp'>
+              <button className='primary-btn mobible-nav-secondary-btn' id='btn-header-type-2-prestamo' >Solicitar ayuda</button>
+            </a>
+          ) : (
+            <Link to='/registro-simulador' aria-label='Quiero mi préstamo'>
+              <button className='primary-btn mobible-nav-secondary-btn' id='btn-header-type-2-prestamo' >Quiero mi Préstamo</button>
+            </Link>
+          )}
           
         </div>
         {
