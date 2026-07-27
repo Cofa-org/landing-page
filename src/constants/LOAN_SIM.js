@@ -113,7 +113,7 @@ export const PEP_TIPO = Object.freeze({
  *   al usuario siempre se muestran con el rango estricto 18-60.
  */
 export const DNI_AGE_CALIBRATION = {
-  baseDniMillions: 13,
+  baseDniMillions: 16,
   baseAge: 60,
   yearsPerMillion: 1.2,
   calibrationYear: 2026,
