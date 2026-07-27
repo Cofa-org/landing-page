@@ -131,19 +131,24 @@ const Header = () => {
       </nav>
 
       <div className='buttons-container'>
-        <a 
-          href={pathname === '/registro-simulador' 
-            ? 'http://wa.me/5491137570853?text=Hola!!%20Necesito%20ayuda%20para%20simular%20mi%20pr%C3%A9stamo!' 
-            : 'http://wa.me/5491137570853'
-          } 
-          target='_blank' 
-          rel='noopener noreferrer' 
-          aria-label={pathname === '/registro-simulador' ? "Solicitar ayuda por WhatsApp" : "Quiero mi préstamo por WhatsApp"}
-        >
-          <button className='primary-btn header-primary-btn'>
-            {pathname === '/registro-simulador' ? "Solicitar ayuda" : "Quiero mi préstamo"}
-          </button>
-        </a>
+        {pathname === '/registro-simulador' || pathname === '/simulador' ? (
+          <a 
+            href='http://wa.me/5491137570853?text=Hola!!%20Necesito%20ayuda%20para%20simular%20mi%20pr%C3%A9stamo!' 
+            target='_blank' 
+            rel='noopener noreferrer' 
+            aria-label='Solicitar ayuda por WhatsApp'
+          >
+            <button className='primary-btn header-primary-btn'>
+              Solicitar ayuda
+            </button>
+          </a>
+        ) : (
+          <Link to='/registro-simulador' aria-label='Quiero mi préstamo'>
+            <button className='primary-btn header-primary-btn'>
+              Quiero mi préstamo
+            </button>
+          </Link>
+        )}
         <button className='btn-show-links' onClick={() => handleToggleNavbar(true)} aria-label='Abrir menú de navegación'>
           <FiMenu />
         </button>
