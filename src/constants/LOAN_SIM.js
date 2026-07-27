@@ -117,5 +117,5 @@ export const DNI_AGE_CALIBRATION = {
   baseAge: 60,
   yearsPerMillion: 1.2,
   calibrationYear: 2026,
-  tolerance: { min: 16, max: 63 },
+  tolerance: { min: 18, max: 63 },
 };
