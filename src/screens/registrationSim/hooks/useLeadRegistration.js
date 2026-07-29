@@ -71,7 +71,12 @@ export const SECURITY_SLIDES = [
 ];
 
 export const useLeadRegistration = (turnstileToken) => {
-  const [formData, setFormData] = useState({ dni: "", celular: "", fechaNacimiento: "" });
+  const [formData, setFormData] = useState({
+    dni: "",
+    celular: "",
+    fechaNacimiento: "",
+    term_y_cond: false,
+  });
   const [errors, setErrors] = useState({ dni: "", celular: "", fechaNacimiento: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
@@ -159,6 +164,10 @@ export const useLeadRegistration = (turnstileToken) => {
     [errors],
   );
 
+  const handleTerminosChange = useCallback((event) => {
+    setFormData((prev) => ({ ...prev, term_y_cond: event.target.checked }));
+  }, []);
+
   const validateForm = useCallback(() => {
     const newErrors = {
       dni: validateField("dni", formData.dni),
@@ -206,6 +215,7 @@ export const useLeadRegistration = (turnstileToken) => {
             huella_dispositivo: huellaData,
             request_id: requestId,
             celular: formData.celular,
+            term_y_cond: formData.term_y_cond,
             ...(showFechaNacimiento &&
               formData.fechaNacimiento && {
                 fecha_nacimiento: formData.fechaNacimiento,
@@ -285,7 +295,8 @@ export const useLeadRegistration = (turnstileToken) => {
     !errors.dni &&
     !errors.celular &&
     (!showFechaNacimiento || (formData.fechaNacimiento && !errors.fechaNacimiento)) &&
-    turnstileToken !== "";
+    turnstileToken !== "" &&
+    formData.term_y_cond === true;
 
   return {
     formData,
@@ -294,6 +305,7 @@ export const useLeadRegistration = (turnstileToken) => {
     submitError,
     isFormValid,
     handleChange,
+    handleTerminosChange,
     crearLead,
     currentSlide,
     setCurrentSlide,
