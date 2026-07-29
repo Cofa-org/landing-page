@@ -38,7 +38,7 @@ const OTPValidation = ({
 
   const description =
     destinationType === OTP_CONFIG.DESTINATION_TYPE.PHONE
-      ? `Ingresá el código de ${otpLength} dígitos que enviamos al ${destination}`
+      ? `Te enviaremos un código de ${otpLength} dígitos por SMS al ${destination}. Ingresalo abajo para verificar tu celular.`
       : `Ingresá el código de ${otpLength} dígitos que enviamos a ${destination}`;
 
   return (
