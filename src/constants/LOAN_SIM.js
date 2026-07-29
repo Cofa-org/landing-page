@@ -119,3 +119,13 @@ export const DNI_AGE_CALIBRATION = {
   calibrationYear: 2026,
   tolerance: { min: 18, max: 63 },
 };
+
+export const SITUACION_LABORAL_OPTIONS = Object.freeze([
+  { value: "RELACION_DEPENDENCIA", label: "Relación de dependencia" },
+  { value: "MONOTRIBUTISTA",       label: "Monotributista" },
+  { value: "JUBILADO_PENSIONADO",  label: "Jubilado - Pensionado" },
+  { value: "ESTUDIANTE",           label: "Estudiante" },
+  { value: "AUTONOMO",             label: "Autónomo" },
+  { value: "DESOCUPADO",           label: "Desocupado" },
+  { value: "EN_NEGRO",             label: "En negro" },
+]);

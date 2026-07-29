@@ -61,6 +61,7 @@ export const useOnboardingFlow = () => {
   const [pendingIdentities, setPendingIdentities] = useState(null);
   const [pendingDni, setPendingDni] = useState(null);
   const [pendingCelular, setPendingCelular] = useState(null);
+  const [pendingSituacionLaboral, setPendingSituacionLaboral] = useState(null);
 
   const getLeadId = useCallback(() => {
     if (leadData?.leadId) return leadData.leadId;
@@ -190,10 +191,11 @@ export const useOnboardingFlow = () => {
         setPendingIdentities(null);
         setPendingDni(null);
         setPendingCelular(null);
+        setPendingSituacionLaboral(null);
       }
       setOnboardingStep(prev);
     }
-  }, [onboardingStep, getLeadId, leadData, setPendingIdentities, setPendingDni, setPendingCelular]);
+  }, [onboardingStep, getLeadId, leadData, setPendingIdentities, setPendingDni, setPendingCelular, setPendingSituacionLaboral]);
 
   const handleLeadSuccess = useCallback((data) => {
 
@@ -203,6 +205,7 @@ export const useOnboardingFlow = () => {
       // a crearLead con selectedCuit.
       setPendingDni(data.dni ?? null);
       setPendingCelular(data.celular ?? null);
+      setPendingSituacionLaboral(data.situacionLaboral ?? null);
       setOnboardingStep(LOAN_SIM_STEPS.IDENTITY_SELECTION);
       return;
     }
@@ -242,12 +245,15 @@ export const useOnboardingFlow = () => {
         request_id: null,
         celular: pendingCelular,
         selectedCuit,
+        term_y_cond: true,
+        situacion_laboral: pendingSituacionLaboral,
       });
 
       if (response.success && response.data) {
         setPendingIdentities(null);
         setPendingDni(null);
         setPendingCelular(null);
+        setPendingSituacionLaboral(null);
         await setCookie(
           COOKIE_LEAD_TOKEN_CONFIG.NAME,
           response.data.token,
@@ -261,7 +267,7 @@ export const useOnboardingFlow = () => {
       }
       return { success: false, error: response.message || "No pudimos procesar tu selección" };
     },
-    [pendingDni, pendingCelular],
+    [pendingDni, pendingCelular, pendingSituacionLaboral],
   );
 
   const goToAnalysis = useCallback(() => {

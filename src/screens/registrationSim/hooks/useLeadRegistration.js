@@ -2,11 +2,11 @@ import { useState, useCallback, useEffect } from "react";
 import LeadRegistrationService from "../../../services/leadRegistrationService";
 import { ERROR_CAUSE, ERROR_MESSAGE } from "../../../constants/error";
 import { setCookie } from "../../../lib/utils";
-import { COOKIE_LEAD_TOKEN_CONFIG, DNI_AGE_CALIBRATION } from "../../../constants/LOAN_SIM";
+import { COOKIE_LEAD_TOKEN_CONFIG, DNI_AGE_CALIBRATION, SITUACION_LABORAL_OPTIONS } from "../../../constants/LOAN_SIM.js";
 import { getFingerprint, mapFingerprintToHuellaData } from "../../../lib/fingerprint.js";
 
 const DNI_REGEX = /^\d{7,8}$/;
-const CELULAR_REGEX = /^[1-9]\d{9}$/;
+const CELULAR_REGEX = /^\d{10}$/;
 
 const calcularEdad = (fechaNacimiento) => {
   const fecha = new Date(fechaNacimiento);
@@ -75,9 +75,15 @@ export const useLeadRegistration = (turnstileToken) => {
     dni: "",
     celular: "",
     fechaNacimiento: "",
+    situacionLaboral: "",
     term_y_cond: false,
   });
-  const [errors, setErrors] = useState({ dni: "", celular: "", fechaNacimiento: "" });
+  const [errors, setErrors] = useState({
+    dni: "",
+    celular: "",
+    fechaNacimiento: "",
+    situacionLaboral: "",
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -126,12 +132,8 @@ export const useLeadRegistration = (turnstileToken) => {
       }
       case "celular": {
         if (!formData.celular) return "";
-        if (formData.celular.startsWith("549"))
-          return "No incluyas el 549 al inicio. Ingresá solo los 10 dígitos (prefijo + número).";
-        if (formData.celular.startsWith("0"))
-          return "No incluyas el 0 inicial. Ingresá los 10 dígitos (prefijo sin 0 + número).";
         if (!CELULAR_REGEX.test(formData.celular))
-          return "El celular debe tener 10 dígitos (prefijo + número, sin 0 ni 15)";
+          return "Ingresá los 10 dígitos de tu celular";
         return "";
       }
       case "fechaNacimiento": {
@@ -142,6 +144,12 @@ export const useLeadRegistration = (turnstileToken) => {
         const edad = calcularEdad(value);
         if (edad < 18) return "Debés tener al menos 18 años";
         if (edad > 60) return "Debés tener 60 años o menos";
+        return "";
+      }
+      case "situacionLaboral": {
+        if (!trimmed) return "Seleccioná tu situación laboral";
+        if (!SITUACION_LABORAL_OPTIONS.some((o) => o.value === trimmed))
+          return "Seleccioná una opción válida";
         return "";
       }
       default:
@@ -172,13 +180,14 @@ export const useLeadRegistration = (turnstileToken) => {
     const newErrors = {
       dni: validateField("dni", formData.dni),
       celular: validateField("celular", formData.celular),
+      situacionLaboral: validateField("situacionLaboral", formData.situacionLaboral),
     };
     if (Number(formData.dni) >= 90000000) {
       newErrors.fechaNacimiento = validateField("fechaNacimiento", formData.fechaNacimiento);
     }
     setErrors(newErrors);
     return {
-      isValid: !newErrors.dni && !newErrors.fechaNacimiento,
+      isValid: !newErrors.dni && !newErrors.celular && !newErrors.fechaNacimiento && !newErrors.situacionLaboral,
       errors: newErrors,
     };
   }, [formData, validateField]);
@@ -215,6 +224,7 @@ export const useLeadRegistration = (turnstileToken) => {
             huella_dispositivo: huellaData,
             request_id: requestId,
             celular: formData.celular,
+            situacion_laboral: formData.situacionLaboral,
             term_y_cond: formData.term_y_cond,
             ...(showFechaNacimiento &&
               formData.fechaNacimiento && {
@@ -237,6 +247,7 @@ export const useLeadRegistration = (turnstileToken) => {
               identities: response.identities,
               dni: formData.dni.trim(),
               celular: formData.celular,
+              situacionLaboral: formData.situacionLaboral,
             },
           };
         }
@@ -271,6 +282,9 @@ export const useLeadRegistration = (turnstileToken) => {
         if (response.cause === ERROR_CAUSE.EDAD_INVALIDA) {
           return { success: false, rejected: true };
         }
+        if (response.cause === ERROR_CAUSE.SITUACION_LABORAL_NO_ELEGIBLE) {
+          return { success: false, rejected: true };
+        }
         setSubmitError(
           response.message ? `${response.message} 😊` : "Error al registrar. Intentá nuevamente.",
         );
@@ -295,6 +309,7 @@ export const useLeadRegistration = (turnstileToken) => {
     !errors.dni &&
     !errors.celular &&
     (!showFechaNacimiento || (formData.fechaNacimiento && !errors.fechaNacimiento)) &&
+    formData.situacionLaboral !== "" &&
     turnstileToken !== "" &&
     formData.term_y_cond === true;
 

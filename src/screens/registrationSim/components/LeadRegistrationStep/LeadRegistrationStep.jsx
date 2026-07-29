@@ -2,7 +2,9 @@ import React, { memo, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import GenericForm from "../../../../Components/Forms/GenericForm/GenericForm.jsx";
 import GenericInput from "../../../../Components/Forms/GenericInput/GenericInput.jsx";
+import GenericSelect from "../../../../Components/Forms/GenericInput/GenericSelect.jsx";
 import GenericButton from "../../../../Components/buttons/GenericButton/GenericButton.jsx";
+import { SITUACION_LABORAL_OPTIONS } from "../../../../constants/LOAN_SIM.js";
 import { useLeadRegistration, SECURITY_SLIDES } from "../../hooks/useLeadRegistration.js";
 import Turnstile from "../../../../Components/Turnstile/Turnstile.jsx";
 import { TURNSTILE_SITE_KEY } from "../../../../config.js";
@@ -179,6 +181,15 @@ const LeadRegistrationStep = ({ onSuccess, onRejected, onAnalysis, onNext, loadi
           height: "1px",
           overflow: "hidden",
         }}
+      />
+      <GenericSelect
+        label='Situación laboral'
+        name='situacionLaboral'
+        value={formData.situacionLaboral}
+        onChange={handleChange}
+        options={SITUACION_LABORAL_OPTIONS}
+        required
+        error={errors.situacionLaboral}
       />
       <div className={styles.terminosContainer}>
         <label className={styles.terminosLabel}>

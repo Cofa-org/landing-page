@@ -1,0 +1,72 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-color);
+  margin-left: 4px;
+}
+
+.selectWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.select {
+  width: 100%;
+  padding: 12px 40px 12px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  outline: none;
+  background-color: var(--color-background);
+  color: var(--text-color);
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%228%22%20viewBox%3D%220%200%2012%208%22%3E%3Cpath%20fill%3D%22%23777%22%20d%3D%22M6%208L0%200h12z%22%2F%3E%3C%2Fsvg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 12px 8px;
+  cursor: pointer;
+}
+
+.select:focus {
+  border-color: var(--primary-color);
+  background-color: #fff;
+  box-shadow: 0 0 0 4px var(--primary-color-10);
+}
+
+.selectError {
+  border-color: #ff4d4f;
+}
+
+.selectError:focus {
+  border-color: #ff4d4f;
+  box-shadow: 0 0 0 4px rgba(255, 77, 79, 0.1);
+}
+
+.selectPlaceholder {
+  color: #999;
+}
+
+.helperText {
+  font-size: 0.75rem;
+  color: #777777;
+  margin-top: 4px;
+  display: block;
+}
+
+.errorText {
+  font-size: 0.8rem;
+  color: #ff4d4f;
+  margin-top: 4px;
+  margin-left: 4px;
+}
