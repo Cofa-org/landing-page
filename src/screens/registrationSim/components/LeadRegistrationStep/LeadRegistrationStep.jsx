@@ -20,6 +20,7 @@ const LeadRegistrationStep = ({ onSuccess, onRejected, onAnalysis, onNext, loadi
     submitError,
     isFormValid,
     handleChange,
+    handleTerminosChange,
     crearLead,
     currentSlide,
     setCurrentSlide,
@@ -179,6 +180,21 @@ const LeadRegistrationStep = ({ onSuccess, onRejected, onAnalysis, onNext, loadi
           overflow: "hidden",
         }}
       />
+      <div className={styles.terminosContainer}>
+        <label className={styles.terminosLabel}>
+          <input
+            type='checkbox'
+            checked={formData.term_y_cond}
+            onChange={handleTerminosChange}
+            required
+            aria-required='true'
+            aria-label='Aceptar términos y condiciones'
+          />
+          <span>
+            Acepto los <a href='/terminos-y-condiciones' target='_blank' rel='noopener noreferrer'>términos y condiciones</a>
+          </span>
+        </label>
+      </div>
       <GenericButton
         type='submit'
         loading={isLoading}

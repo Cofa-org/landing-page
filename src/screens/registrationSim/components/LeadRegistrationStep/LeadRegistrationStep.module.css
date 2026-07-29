@@ -248,3 +248,25 @@
     justify-content: flex-start;
   }
 }
+
+.terminosContainer {
+  margin: 1rem 0;
+  display: flex;
+  align-items: flex-start;
+}
+
+.terminosLabel {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.terminosLabel input[type="checkbox"] {
+  margin-top: 0.2rem;
+  cursor: pointer;
+  min-width: 1.1rem;
+  min-height: 1.1rem;
+}
