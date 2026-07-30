@@ -3,6 +3,7 @@ import { LOAN_SIM_STEPS, ONBOARDING_STATES } from "../../../constants/LOAN_SIM.j
 import { getCookie, setCookie } from "../../../lib/utils.js";
 import { COOKIE_LEAD_TOKEN_CONFIG } from "../../../constants/LOAN_SIM.js";
 import { getDecodedToken } from "../../../lib/token.js";
+import { ERROR_CAUSE } from "../../../constants/error.js";
 import LeadRegistrationService from "../../../services/leadRegistrationService.js";
 
 const ONBOARDING_STEPS = {
@@ -261,13 +262,37 @@ export const useOnboardingFlow = () => {
         );
         setLeadData(response.data.lead);
         setLeadToken(response.data.token);
-        
+
         setOnboardingStep(LOAN_SIM_STEPS.PHONE_VALIDATION);
         return { success: true };
       }
-      return { success: false, error: response.message || "No pudimos procesar tu selección" };
+
+      // El back siempre devuelve HTTP 200 (incluso en errores — el status real
+      // viene en el body). Detectamos el rechazo por causa:
+      //   - SITUACION_LABORAL_NO_ELEGIBLE → el gate sigue rechazando con la
+      //     identidad seleccionada (ej: si selectedCuit matcheó un fallecido
+      //     o si la sit. laboral no es elegible).
+      //   - FALLECIDO → la identidad seleccionada es de un fallecido.
+      //   - EDAD_INVALIDA / SCORING_RECHAZADO → también son rechazos.
+      // En cualquier caso de rechazo, navega al RejectedStep. Si NO es un
+      // rechazo conocido, devolvemos el error para que OnboardingFlowScreen
+      // lo muestre en el slot de error del IdentitySelectionStep.
+      if (
+        response.cause === ERROR_CAUSE.SITUACION_LABORAL_NO_ELEGIBLE ||
+        response.cause === ERROR_CAUSE.FALLECIDO ||
+        response.cause === ERROR_CAUSE.EDAD_INVALIDA ||
+        response.cause === ERROR_CAUSE.SCORING_RECHAZADO
+      ) {
+        handleRejected();
+        return { success: false, rejected: true };
+      }
+
+      return {
+        success: false,
+        error: response.message || "No pudimos procesar tu selección",
+      };
     },
-    [pendingDni, pendingCelular, pendingSituacionLaboral],
+    [pendingDni, pendingCelular, pendingSituacionLaboral, handleRejected],
   );
 
   const goToAnalysis = useCallback(() => {

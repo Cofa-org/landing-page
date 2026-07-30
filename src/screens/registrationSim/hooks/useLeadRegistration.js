@@ -285,6 +285,11 @@ export const useLeadRegistration = (turnstileToken) => {
         if (response.cause === ERROR_CAUSE.SITUACION_LABORAL_NO_ELEGIBLE) {
           return { success: false, rejected: true };
         }
+        // FALLECIDO: el back también devuelve esta cause para DNIs de personas
+        // fallecidas. El usuario debe ir al RejectedStep igual.
+        if (response.cause === ERROR_CAUSE.FALLECIDO) {
+          return { success: false, rejected: true };
+        }
         setSubmitError(
           response.message ? `${response.message} 😊` : "Error al registrar. Intentá nuevamente.",
         );
@@ -292,7 +297,6 @@ export const useLeadRegistration = (turnstileToken) => {
       } catch (err) {
         console.error("LEAD_REGISTRATION_ERROR:", err);
         if (err.name === "AbortError") return { success: false, aborted: true };
-        // Detección unificada por causa: EDAD_INVALIDA → rechazo.
         const msg = err.message ? `${err.message} 😊` : "Error de conexión. Intentá nuevamente.";
         setSubmitError(msg);
         return { success: false, error: msg };
