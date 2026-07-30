@@ -40,6 +40,7 @@ const LoanSimScreen = () => {
     bancoEncontrado,
     codigoBancoError,
     validandoBanco,
+    initialSimulationResolved,
     handleAmountChange,
     handleInstallmentChange,
     solicitarOTP,
@@ -55,8 +56,15 @@ const LoanSimScreen = () => {
     setStep,
   } = useLoanSimulator();
 
-  // Bloquear render hasta que scoringId esté disponible (evita cascading renders)
-  const isInitializing = !scoringId && step === LOAN_SIM_STEPS.SIMULACION;
+  // Bloquear render hasta que la primera respuesta de calcularPlanes sea
+  // procesada. Antes se usaba `!scoringId && step === SIMULACION`, lo que
+  // permitía que el step SIMULACION quedara visible (con los sliders de
+  // capital/cuota) durante la ventana entre setScoringData y la respuesta
+  // con existingSimulation.estado real del servidor — bug observable
+  // cuando el usuario recarga en cualquier step (OTP, COMPLIANCE, CBU,
+  // MOBBEX, COMPLETADO) o vuelve de Mobbex. El nuevo flag se setea en el
+  // finally de fetchSimulation, así que cubre éxito y error.
+  const isInitializing = !initialSimulationResolved;
 
   useEffect(() => {
     if (step === LOAN_SIM_STEPS.COMPLIANCE) {

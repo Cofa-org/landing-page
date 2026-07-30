@@ -28,6 +28,15 @@ export const useLoanSimulator = () => {
   const [bancoEncontrado, setBancoEncontrado] = useState(null);
   const [codigoBancoError, setCodigoBancoError] = useState(null);
   const [validandoBanco, setValidandoBanco] = useState(false);
+  // Flag que permanece false hasta que la primera llamada a fetchSimulation
+  // (post-consumeLink) resuelve. Mientras está false, LoanSimScreen mantiene
+  // el loading screen aunque scoringId ya esté seteado — evita que el usuario
+  // vea el step SIMULACION (sliders) durante la ventana entre
+  // setScoringData y la respuesta con existingSimulation.estado real del
+  // servidor (ej: volver de Mobbex → MOBBEX_SUBSCRIPTION). Se setea en el
+  // finally de fetchSimulation (no en el try) para que tanto éxito como
+  // error liberen el loading.
+  const [initialSimulationResolved, setInitialSimulationResolved] = useState(false);
   // Huella del dispositivo (cacheada al iniciar el flujo del simulador)
   const [huellaData, setHuellaData] = useState(null);
   const [huellaRequestId, setHuellaRequestId] = useState(null);
@@ -247,6 +256,13 @@ export const useLoanSimulator = () => {
         // Only clear the loading state if this request is still the active one.
         if (!controller.signal.aborted) {
           setLoading(false);
+          // Libera el loading inicial de LoanSimScreen. Se ejecuta en finally
+          // (no try) para que tanto éxito como error liberen el flag — un
+          // backend 500 en la primera llamada no debe dejar al usuario en
+          // loading eterno. El check !controller.signal.aborted cubre el caso
+          // de la primera llamada abortada por una segunda (el flag se setea
+          // en el finally de la segunda).
+          setInitialSimulationResolved(true);
         }
       }
     },
@@ -699,6 +715,7 @@ export const useLoanSimulator = () => {
     codigoBancoError,
     setCodigoBancoError,
     validandoBanco,
+    initialSimulationResolved,
     handleAmountChange,
     handleInstallmentChange,
     handleNextStep,

@@ -153,6 +153,76 @@ describe("useLoanSimulator — initial link paste", () => {
     // Liberamos la primera llamada
     resolveFirst(calcularPlanesResponse);
   });
+
+  it("mantiene initialSimulationResolved=false mientras fetchSimulation está en vuelo (no permite que step=SIMULACION quede visible al recargar)", async () => {
+    // Regression guard: el bug era que al recargar con existingSimulation.estado
+    // distinto de SIMULACION (MOBBEX_SUBSCRIPTION, COMPLETADO, OTP_VALIDATION,
+    // etc.), el usuario veía el step SIMULACION (sliders) durante la ventana
+    // entre setScoringData y la resolución de calcularPlanes. El fix expone
+    // un flag initialSimulationResolved que permanece false hasta que la
+    // primera respuesta de calcularPlanes es procesada.
+    // Reset explícito del mock: vi.clearAllMocks() en beforeEach limpia
+    // calls/instances/results pero NO la cola de mockImplementationOnce /
+    // mockResolvedValueOnce. El test "aborts any in-flight duplicate" deja
+    // una respuesta encolada que consumiría nuestra primera llamada.
+    SimuladorService.calcularPlanes.mockReset();
+    let resolveCalcular;
+    const calcularResponseConEstadoMobbex = {
+      success: true,
+      data: {
+        capital_maximo_a_ofrecer: 100000,
+        planes_disponibles: [{ plazo: 12, valorCuota: 1000, tasaOp: 0.85 }],
+        existingSimulation: {
+          id: 1,
+          scoringId: SCORING_ID,
+          estado: LOAN_SIM_STEPS.MOBBEX_SUBSCRIPTION,
+          email: "test@example.com",
+        },
+      },
+    };
+    SimuladorService.calcularPlanes.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          resolveCalcular = resolve;
+        }),
+    );
+
+    const { result } = renderUseLoanSimulator(SHORT_ID);
+
+    // 1) consumeLink resuelve → setScoringData → effect dispara fetchSimulation
+    //    → fetchSimulation llama calcularPlanes pero la promesa está pending.
+    await waitFor(() => expect(result.current.scoringId).toBe(SCORING_ID));
+    await waitFor(() => expect(SimuladorService.calcularPlanes).toHaveBeenCalledTimes(1));
+
+    // 2) En esta ventana: scoringId ya está seteado, step es SIMULACION
+    //    (default post setStep en initVerification), pero el state real del
+    //    servidor todavía no se conoce. El flag debe ser false para mantener
+    //    el loading screen.
+    expect(result.current.initialSimulationResolved).toBe(false);
+
+    // 3) Liberamos la promesa → fetchSimulation resuelve → setStep(MOBBEX_SUBSCRIPTION).
+    resolveCalcular(calcularResponseConEstadoMobbex);
+    await waitFor(() => expect(result.current.step).toBe(LOAN_SIM_STEPS.MOBBEX_SUBSCRIPTION));
+
+    // 4) Después de procesar la respuesta inicial, el flag pasa a true.
+    expect(result.current.initialSimulationResolved).toBe(true);
+  });
+
+  it("initialSimulationResolved se vuelve true incluso si calcularPlanes falla en la primera llamada (no queda loading eterno)", async () => {
+    // Edge case: si la primera respuesta de calcularPlanes es un error, el
+    // loading screen debe ceder para mostrar el error al usuario (no quedar
+    // colgado para siempre). Mismo reset defensivo que el test anterior.
+    SimuladorService.calcularPlanes.mockReset();
+    SimuladorService.calcularPlanes.mockRejectedValueOnce(new Error("network"));
+
+    const { result } = renderUseLoanSimulator(SHORT_ID);
+
+    await waitFor(() => expect(result.current.scoringId).toBe(SCORING_ID));
+    // Esperar a que la promise rechazada sea procesada por el hook.
+    await new Promise((r) => setTimeout(r, 50));
+
+    expect(result.current.initialSimulationResolved).toBe(true);
+  });
 });
 
 describe("useLoanSimulator — persistLoanToCookies / handleInfoPrestamo", () => {
