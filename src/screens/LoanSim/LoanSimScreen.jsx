@@ -2,7 +2,12 @@ import { useEffect, lazy, Suspense } from "react";
 import BackButton from "../../Components/buttons/backbutton/BackButton.jsx";
 import { Footer, Header } from "../../Components/index.js";
 import Loader from "../../Components/Loader/Loader.jsx";
-import { COMPLIANCE_STEPS, LOAN_SIM_STEPS, OTP_CONFIG } from "../../constants/LOAN_SIM.js";
+import {
+  COMPLIANCE_STEPS,
+  LOAN_SIM_STEPS,
+  OTP_CONFIG,
+  REJECTION_CONFIG,
+} from "../../constants/LOAN_SIM.js";
 import { HeroLoanSim } from "../../Sections/index.js";
 
 // Lazy load de los pasos del simulador
@@ -15,8 +20,8 @@ const SuccessStep = lazy(() => import("./components/SuccessStep/SuccessStep"));
 const MobbexSubscriptionStep = lazy(() =>
   import("./components/MobbexSubscriptionStep/MobbexSubscriptionStep"),
 );
-const DeviceMismatchStep = lazy(() =>
-  import("./components/DeviceMismatchStep/DeviceMismatchStep"),
+const RejectedStep = lazy(() =>
+  import("./components/RejectedStep/RejectedStep"),
 );
 import { useLoanSimulator } from "./hooks/useLoanSimulator";
 import { useComplianceForm } from "./hooks/useComplianceForm";
@@ -41,6 +46,7 @@ const LoanSimScreen = () => {
     codigoBancoError,
     validandoBanco,
     initialSimulationResolved,
+    rejectionReason,
     handleAmountChange,
     handleInstallmentChange,
     solicitarOTP,
@@ -184,7 +190,16 @@ const LoanSimScreen = () => {
             simulationData={simulationData}
           />
         )}
-        {step === LOAN_SIM_STEPS.DISPOSITIVO_RECHAZADO && <DeviceMismatchStep />}
+        {step === LOAN_SIM_STEPS.RECHAZADO && (
+          <RejectedStep
+            rejection={
+              rejectionReason === "PHONE_NOT_VALIDATED"
+                ? REJECTION_CONFIG.PHONE_NOT_VALIDATED
+                : REJECTION_CONFIG.DEVICE_MISMATCH
+            }
+          />
+        )}
+        {step === LOAN_SIM_STEPS.DISPOSITIVO_RECHAZADO && <RejectedStep />}
       </Suspense>
     );
   };

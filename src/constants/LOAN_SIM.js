@@ -129,3 +129,30 @@ export const SITUACION_LABORAL_OPTIONS = Object.freeze([
   { value: "DESOCUPADO",           label: "Desocupado" },
   { value: "EN_NEGRO",             label: "En negro" },
 ]);
+
+export const REJECTION_CONFIG = {
+  DEVICE_MISMATCH: {
+    cause: "DEVICE_MISMATCH",
+    title: "Dispositivo diferente detectado",
+    description:
+      "Detectamos que estás intentando acceder desde un dispositivo diferente al que usaste para registrarte. Por favor, póngase en contacto con un operador para continuar con tu solicitud.",
+    illustration: null, // RejectedStep renderiza MdWarning de react-icons cuando illustration es null; no usa imagen.
+    primaryAction: {
+      label: "Volver al inicio",
+      href: "https://www.cofa.com.ar/",
+      target: "_self",
+    },
+  },
+  PHONE_NOT_VALIDATED: {
+    cause: "PHONE_NOT_VALIDATED",
+    title: "En este momento no podemos avanzar con tu simulación.",
+    description:
+      "Necesitamos validar tu celular para poder continuar. Por favor, contactate con un asesor y te ayudamos.",
+    illustration: "/img/rejected_empathy.webp",
+    primaryAction: {
+      label: "Comunicarme con un asesor",
+      href: "https://wa.me/5491137570853?text=Hola!!%20Necesito%20ayuda%20para%20simular%20mi%20préstamo!",
+      target: "_blank",
+    },
+  },
+};

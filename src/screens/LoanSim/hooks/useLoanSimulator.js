@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
-import { getCookie, roundToFiveHundreds, setCookieWithDuration } from "../../../lib/utils.js";
+import { deleteCookie, getCookie, roundToFiveHundreds, setCookieWithDuration } from "../../../lib/utils.js";
 import { useDebounce } from "../../../hooks/useDebounce";
 import SimuladorService from "../../../services/simuladorService";
 import { COOKIE_CONFIG, COOKIE_LOAN_INFO_CONFIG, COOKIE_SIMULADOR_TOKEN_CONFIG, LOAN_SIM_STEPS } from "../../../constants/LOAN_SIM.js";
@@ -47,6 +47,14 @@ export const useLoanSimulator = () => {
   // initial/debounced effects can call it without depending on its identity
   // (which would otherwise re-fire the effects when huellaData changes).
   const fetchSimulationRef = useRef(null);
+  // Causa de rechazo del simulador. Se setea a "PHONE_NOT_VALIDATED" cuando
+  // /init responde success=false con cause=PHONE_NOT_VALIDATED (el back
+  // rechazó el celular del lead → simulador debe mostrar pantalla de asesor).
+  // LoanSimScreen lee este estado (no response.cause) porque el back siempre
+  // responde HTTP 200, así que la inspección debe ocurrir DESPUÉS del await,
+  // no en el catch — patrón de useOnboardingFlow/useLeadRegistration, ver
+  // memory simulator-response-cause-detection-2026-07-31.
+  const [rejectionReason, setRejectionReason] = useState(null);
   const shortId = searchParams.get("id");
 
   useEffect(() => {
@@ -81,19 +89,44 @@ export const useLoanSimulator = () => {
           // calcularPlanes al detectar scoringId correría antes de que el
           // cookie del token esté escrita → 401 en la primera llamada.
           // Espejo del patrón de useLeadRegistration: tras crearLead, setCookie(COOKIE_LEAD_TOKEN_CONFIG).
-          try {
-            await SimuladorService.iniciarSesion({
-              scoringId: String(response.data.scoringId),
-              cuit: response.data.cuit || null,
-              shortId: shortId || null,
-            });
-          } catch (initErr) {
-            console.error("INICIAR_SESION_SIMULADOR_ERROR:", initErr);
+          // Después de Task 4, iniciarSesion SIEMPRE retorna jsonResponse
+          // (no tira en success=false porque el back responde HTTP 200).
+          // Inspeccionar success/cause DESPUÉS del await (no en el catch)
+          // — patrón de useOnboardingFlow/useLeadRegistration, per memory
+          // simulator-response-cause-detection-2026-07-31.
+          const initResponse = await SimuladorService.iniciarSesion({
+            scoringId: String(response.data.scoringId),
+            cuit: response.data.cuit || null,
+            shortId: shortId || null,
+          });
+
+          if (
+            initResponse &&
+            initResponse.success === false &&
+            initResponse.cause === "PHONE_NOT_VALIDATED"
+          ) {
+            // Limpiar cookie simuladorToken por las dudas (caso sesión cruzada).
+            try {
+              await deleteCookie(COOKIE_SIMULADOR_TOKEN_CONFIG.NAME);
+            } catch (delCookieErr) {
+              console.warn("DELETE_COOKIE_FAILED:", delCookieErr);
+            }
+            setRejectionReason("PHONE_NOT_VALIDATED");
+            setStep(LOAN_SIM_STEPS.RECHAZADO);
+            // initialSimulationResolved se setea en el finally de abajo.
+            setInitialSimulationResolved(true);
+            return;
+          }
+
+          if (!initResponse || initResponse.success !== true) {
+            // Cualquier otro cause de /init → error genérico (no es
+            // PHONE_NOT_VALIDATED, así que no mostramos la pantalla de asesor).
             setError(
-              initErr.message
-                ? `${initErr.message} 😊`
+              initResponse?.message
+                ? `${initResponse.message} 😊`
                 : "No se pudo iniciar la sesión del simulador. Por favor, intenta nuevamente.",
             );
+            setInitialSimulationResolved(true);
             return;
           }
 
@@ -716,6 +749,8 @@ export const useLoanSimulator = () => {
     setCodigoBancoError,
     validandoBanco,
     initialSimulationResolved,
+    rejectionReason,
+    setRejectionReason,
     handleAmountChange,
     handleInstallmentChange,
     handleNextStep,

@@ -64,12 +64,20 @@ export default class SimuladorService {
       }
 
       const jsonResponse = await response.json();
-      // Guardar token en cookie para que las 11 llamadas siguientes lo lean.
-      await setCookie(
-        COOKIE_SIMULADOR_TOKEN_CONFIG.NAME,
-        jsonResponse.data.token,
-        COOKIE_SIMULADOR_TOKEN_CONFIG.EXPIRY_MS,
-      );
+
+      // Solo persistir el cookie si la respuesta es success=true y trae token.
+      // Cuando el back rechaza con cause=PHONE_NOT_VALIDATED (HTTP 200 +
+      // body { success: false, data: null }), el caller va a inspeccionar
+      // jsonResponse.cause y mostrar la pantalla de rechazo — no debe
+      // haber un cookie con valor undefined persistido.
+      if (jsonResponse.success && jsonResponse.data?.token) {
+        await setCookie(
+          COOKIE_SIMULADOR_TOKEN_CONFIG.NAME,
+          jsonResponse.data.token,
+          COOKIE_SIMULADOR_TOKEN_CONFIG.EXPIRY_MS,
+        );
+      }
+
       return jsonResponse;
     } catch (error) {
       console.error("INICIAR_SESION_SIMULADOR_ERROR:", error);

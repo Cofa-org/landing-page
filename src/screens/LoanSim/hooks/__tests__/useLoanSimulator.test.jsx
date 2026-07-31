@@ -31,6 +31,7 @@ vi.mock("../../../../lib/utils.js", () => ({
   getCookie: vi.fn(),
   setCookie: vi.fn().mockResolvedValue(undefined),
   setCookieWithDuration: vi.fn().mockResolvedValue(undefined),
+  deleteCookie: vi.fn().mockResolvedValue(undefined),
   roundToFiveHundreds: (x) => Math.round(x / 500) * 500,
 }));
 
@@ -42,7 +43,7 @@ vi.mock("../../../../lib/utils.js", () => ({
 import LinkResolutionService from "../../../../services/linkResolutionService.js";
 import SimuladorService from "../../../../services/simuladorService.js";
 import { getFingerprint, mapFingerprintToHuellaData } from "../../../../lib/fingerprint.js";
-import { getCookie, setCookie, setCookieWithDuration } from "../../../../lib/utils.js";
+import { getCookie, setCookie, setCookieWithDuration, deleteCookie } from "../../../../lib/utils.js";
 import { LOAN_SIM_STEPS } from "../../../../constants/LOAN_SIM.js";
 import { useLoanSimulator } from "../useLoanSimulator";
 
@@ -453,5 +454,75 @@ describe("useLoanSimulator — persistLoanToCookies / handleInfoPrestamo", () =>
       unmount();
       lastUnmount = null;
     }
+  });
+});
+
+describe("useLoanSimulator - phone-not-validated gate", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    LinkResolutionService.consumeLink.mockResolvedValue({
+      success: true,
+      data: { scoringId: SCORING_ID, cuit: "20123456789", nombreCompleto: "Test" },
+    });
+    getFingerprint.mockResolvedValue({ requestId: "req-1" });
+    mapFingerprintToHuellaData.mockReturnValue({ visitorId: "fp-1" });
+  });
+
+  it("setea step=RECHAZADO y rejectionReason='PHONE_NOT_VALIDATED' cuando /init responde con cause=PHONE_NOT_VALIDATED", async () => {
+    SimuladorService.iniciarSesion.mockResolvedValue({
+      success: false,
+      cause: "PHONE_NOT_VALIDATED",
+      message: "...",
+    });
+
+    const { result } = renderHook(() => useLoanSimulator(), {
+      wrapper: ({ children }) => <MemoryRouter initialEntries={[`/simulador?id=${SHORT_ID}`]}>{children}</MemoryRouter>,
+    });
+
+    await waitFor(() => {
+      expect(result.current.rejectionReason).toBe("PHONE_NOT_VALIDATED");
+    });
+
+    expect(result.current.step).toBe(LOAN_SIM_STEPS.RECHAZADO);
+    expect(deleteCookie).toHaveBeenCalledWith("simuladorToken");
+  });
+
+  it("NO setea RECHAZADO cuando /init responde success=true (camino normal)", async () => {
+    SimuladorService.iniciarSesion.mockResolvedValue({
+      success: true,
+      data: { token: "mock-jwt" },
+    });
+    SimuladorService.calcularPlanes.mockResolvedValue({ success: true, data: {} });
+
+    const { result } = renderHook(() => useLoanSimulator(), {
+      wrapper: ({ children }) => <MemoryRouter initialEntries={[`/simulador?id=${SHORT_ID}`]}>{children}</MemoryRouter>,
+    });
+
+    await waitFor(() => {
+      expect(result.current.initialSimulationResolved).toBe(true);
+    });
+
+    expect(result.current.step).not.toBe(LOAN_SIM_STEPS.RECHAZADO);
+    expect(result.current.rejectionReason).toBeNull();
+    expect(deleteCookie).not.toHaveBeenCalled();
+  });
+
+  it("cae al error genérico (no RECHAZADO) cuando /init responde con cause distinto de PHONE_NOT_VALIDATED", async () => {
+    SimuladorService.iniciarSesion.mockResolvedValue({
+      success: false,
+      cause: "OTRO_CAUSE",
+      message: "otro error",
+    });
+
+    const { result } = renderHook(() => useLoanSimulator(), {
+      wrapper: ({ children }) => <MemoryRouter initialEntries={[`/simulador?id=${SHORT_ID}`]}>{children}</MemoryRouter>,
+    });
+
+    await waitFor(() => {
+      expect(result.current.initialSimulationResolved).toBe(true);
+    });
+
+    expect(result.current.step).not.toBe(LOAN_SIM_STEPS.RECHAZADO);
+    expect(result.current.rejectionReason).toBeNull();
   });
 });
