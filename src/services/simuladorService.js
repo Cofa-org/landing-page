@@ -1,6 +1,7 @@
 import { LANDING_BACKEND_URL, LANDING_BACKEND_API_KEY } from "../config";
 import { HTTP_METHOD } from "../constants/HTTP_METHODS.js";
 import { HttpApi } from "../lib/http.js";
+import { parseErrorResponse } from "../lib/http-error.js";
 import { getCookie, setCookie } from "../lib/utils";
 import { COOKIE_SIMULADOR_TOKEN_CONFIG } from "../constants/LOAN_SIM.js";
 
@@ -38,7 +39,7 @@ export default class SimuladorService {
       const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, token, signal);
 
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = await parseErrorResponse(response);
         throw new Error(errorData.message || "Error al calcular planes");
       }
 
@@ -59,7 +60,7 @@ export default class SimuladorService {
       const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, null);
 
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = await parseErrorResponse(response);
         throw new Error(errorData.message || "Error al iniciar sesión del simulador");
       }
 
@@ -93,7 +94,7 @@ export default class SimuladorService {
       const token = await getCookie(COOKIE_SIMULADOR_TOKEN_CONFIG.NAME);
       const response = await HttpApi(URL, body, HTTP_METHOD.POST, apiKey, token);
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = await parseErrorResponse(response);
         throw new Error(errorData.message || "Error al guardar plan");
       }
       return await response.json();
@@ -116,7 +117,7 @@ export default class SimuladorService {
       const token = await getCookie(COOKIE_SIMULADOR_TOKEN_CONFIG.NAME);
       const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, token);
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = await parseErrorResponse(response);
         throw new Error(errorData.message || "Error al solicitar OTP");
       }
       const jsonResponse = await response.json();
@@ -142,7 +143,7 @@ export default class SimuladorService {
       const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, token);
 
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = await parseErrorResponse(response);
         throw new Error(errorData.message || "Error al verificar OTP");
       }
       return await response.json();
@@ -165,7 +166,7 @@ export default class SimuladorService {
       const token = await getCookie(COOKIE_SIMULADOR_TOKEN_CONFIG.NAME);
       const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, token);
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = await parseErrorResponse(response);
         throw new Error(errorData.message || "Error al validar CBU");
       }
       return await response.json();
@@ -183,7 +184,7 @@ export default class SimuladorService {
       const token = await getCookie(COOKIE_SIMULADOR_TOKEN_CONFIG.NAME);
       const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, token);
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = await parseErrorResponse(response);
         throw new Error(errorData.message || "Error al aceptar los términos");
       }
       return await response.json();
@@ -201,7 +202,7 @@ export default class SimuladorService {
       const response = await HttpApi(url, null, HTTP_METHOD.GET, apiKey, token);
 
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = await parseErrorResponse(response);
         throw new Error(errorData.message || "Error al obtener info del préstamo");
       }
 
@@ -219,7 +220,7 @@ export default class SimuladorService {
       const token = await getCookie(COOKIE_SIMULADOR_TOKEN_CONFIG.NAME);
       const response = await HttpApi(url, payload, HTTP_METHOD.POST, apiKey, token);
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = await parseErrorResponse(response);
         throw new Error(errorData.message || "Error al guardar información de compliance");
       }
       return await response.json();
@@ -236,7 +237,7 @@ export default class SimuladorService {
       const token = await getCookie(COOKIE_SIMULADOR_TOKEN_CONFIG.NAME);
       const response = await HttpApi(url, null, HTTP_METHOD.GET, apiKey, token);
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = await parseErrorResponse(response);
         throw new Error(errorData.message || "Error al verificar compliance existente");
       }
       return await response.json();
@@ -257,7 +258,7 @@ export default class SimuladorService {
       const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, token);
 
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = await parseErrorResponse(response);
         throw new Error(errorData.message || "Error al validar código de banco");
       }
 
@@ -277,7 +278,7 @@ export default class SimuladorService {
       const response = await HttpApi(url, body, HTTP_METHOD.PUT, apiKey, token);
 
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = await parseErrorResponse(response);
         throw new Error(errorData.message || "Error al actualizar el estado de la simulación");
       }
 
@@ -296,7 +297,7 @@ export default class SimuladorService {
       const token = await getCookie(COOKIE_SIMULADOR_TOKEN_CONFIG.NAME);
       const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, token);
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = await parseErrorResponse(response);
         throw new Error(errorData.message || "Error al solicitar suscripción Mobbex");
       }
       return await response.json();
@@ -314,7 +315,7 @@ export default class SimuladorService {
       const token = await getCookie(COOKIE_SIMULADOR_TOKEN_CONFIG.NAME);
       const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, token);
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = await parseErrorResponse(response);
         throw new Error(errorData.message || "Error al confirmar suscripción Mobbex");
       }
       return await response.json();
