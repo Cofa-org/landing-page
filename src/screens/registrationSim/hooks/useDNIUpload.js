@@ -1,5 +1,8 @@
 import { useState, useCallback } from "react";
 import LeadRegistrationService from "../../../services/leadRegistrationService";
+import { getFriendlyErrorMessage } from "../../../lib/network-error";
+
+const SUBIR_DNI_RETRY_CONFIG = { retries: 1, backoffMs: 1500 };
 
 export const useDNIUpload = () => {
   const [dniFront, setDniFront] = useState(null);
@@ -35,7 +38,9 @@ export const useDNIUpload = () => {
     try {
       const response = await LeadRegistrationService.subirDni(
         { leadId },
-        { dniFront, dniBack }
+        { dniFront, dniBack },
+        null,
+        SUBIR_DNI_RETRY_CONFIG,
       );
       if (response.success) {
         return { success: true };
@@ -44,7 +49,7 @@ export const useDNIUpload = () => {
       setUploadError(msg);
       return { success: false, error: msg };
     } catch (err) {
-      const msg = err.message ? `${err.message} 😊` : "Error de conexión";
+      const msg = `${getFriendlyErrorMessage(err)} 😊`;
       setUploadError(msg);
       return { success: false, error: msg };
     } finally {

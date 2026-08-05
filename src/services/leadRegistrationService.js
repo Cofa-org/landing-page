@@ -46,7 +46,7 @@ export default class LeadRegistrationService {
     }
   }
 
-  static async subirDni({ leadId }, { dniFront, dniBack }, signal = null) {
+  static async subirDni({ leadId }, { dniFront, dniBack }, signal = null, retryConfig = null) {
     try {
       const url = `${LANDING_BACKEND_URL}/api/lead-registration/subir-dni/${leadId}`;
       const token = await getCookie(COOKIE_LEAD_TOKEN_CONFIG.NAME);
@@ -60,6 +60,7 @@ export default class LeadRegistrationService {
         LANDING_BACKEND_API_KEY,
         token,
         signal,
+        retryConfig,
       );
 
       const data = await response.json();
@@ -73,7 +74,7 @@ export default class LeadRegistrationService {
     }
   }
 
-  static async subirDniMobile({ leadId }, { dniFront, dniBack }, tokenOverride, signal = null) {
+  static async subirDniMobile({ leadId }, { dniFront, dniBack }, tokenOverride, signal = null, retryConfig = null) {
     try {
       const url = `${LANDING_BACKEND_URL}/api/lead-registration/subir-dni/${leadId}`;
       const formData = new FormData();
@@ -86,6 +87,7 @@ export default class LeadRegistrationService {
         LANDING_BACKEND_API_KEY,
         tokenOverride,
         signal,
+        retryConfig,
       );
 
       const data = await response.json();
@@ -99,7 +101,7 @@ export default class LeadRegistrationService {
     }
   }
 
-  static async subirRecibo({ leadId }, file, signal = null) {
+  static async subirRecibo({ leadId }, file, signal = null, retryConfig = null) {
     try {
       const url = `${LANDING_BACKEND_URL}/api/lead-registration/subir-recibo/${leadId}`;
       const token = await getCookie(COOKIE_LEAD_TOKEN_CONFIG.NAME);
@@ -112,6 +114,7 @@ export default class LeadRegistrationService {
         LANDING_BACKEND_API_KEY,
         token,
         signal,
+        retryConfig,
       );
 
       const data = await response.json();

@@ -1,5 +1,8 @@
 import { useState, useCallback } from "react";
 import LeadRegistrationService from "./../../../services/leadRegistrationService.js";
+import { getFriendlyErrorMessage } from "../../../lib/network-error.js";
+
+const SUBIR_DNI_MOBILE_RETRY_CONFIG = { retries: 1, backoffMs: 1500 };
 
 export const useDNIUploadMobile = (leadId, token) => {
   const [dniFront, setDniFront] = useState(null);
@@ -37,6 +40,8 @@ export const useDNIUploadMobile = (leadId, token) => {
         { leadId },
         { dniFront, dniBack },
         token,
+        null,
+        SUBIR_DNI_MOBILE_RETRY_CONFIG,
       );
       if (response.success) {
         setUploadSuccess(true);
@@ -45,7 +50,7 @@ export const useDNIUploadMobile = (leadId, token) => {
       setUploadError(response.message || "Error al subir las fotos");
       return { success: false };
     } catch (err) {
-      setUploadError(err.message || "Error de conexión");
+      setUploadError(getFriendlyErrorMessage(err));
       return { success: false };
     } finally {
       setIsUploading(false);
