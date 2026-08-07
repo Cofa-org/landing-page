@@ -52,6 +52,7 @@ describe("useLeadRegistration - validación de celular", () => {
     });
 
     expect(r).toEqual({ success: false, validationFailed: true });
+    expect(result.current.errors.celular).toBe("Ingresá los 10 dígitos de tu celular");
     expect(LeadRegistrationService.crearLead).not.toHaveBeenCalled();
   });
 
@@ -71,6 +72,7 @@ describe("useLeadRegistration - validación de celular", () => {
     });
 
     expect(r).toEqual({ success: false, validationFailed: true });
+    expect(result.current.errors.celular).toBe("Ingresá los 10 dígitos de tu celular");
     expect(LeadRegistrationService.crearLead).not.toHaveBeenCalled();
   });
 
@@ -87,6 +89,7 @@ describe("useLeadRegistration - validación de celular", () => {
     });
 
     expect(r).toEqual({ success: false, validationFailed: true });
+    expect(result.current.errors.celular).toBe("El celular es requerido");
     expect(LeadRegistrationService.crearLead).not.toHaveBeenCalled();
   });
 
@@ -108,6 +111,7 @@ describe("useLeadRegistration - validación de celular", () => {
     });
 
     expect(LeadRegistrationService.crearLead).toHaveBeenCalledTimes(1);
+    expect(result.current.errors.celular).toBe("");
     const payload = LeadRegistrationService.crearLead.mock.calls[0][0];
     expect(payload.celular).toBe("1145678901");
   });
