@@ -131,9 +131,10 @@ export const useLeadRegistration = (turnstileToken) => {
         return "";
       }
       case "celular": {
-        if (!formData.celular) return "";
-        if (!CELULAR_REGEX.test(formData.celular))
+        if (!value) return "El celular es requerido";
+        if (!CELULAR_REGEX.test(value)) {
           return "Ingresá los 10 dígitos de tu celular";
+        }
         return "";
       }
       case "fechaNacimiento": {
@@ -310,6 +311,7 @@ export const useLeadRegistration = (turnstileToken) => {
   const showFechaNacimiento = Number(formData.dni) >= 90000000;
   const isFormValid =
     formData.dni.trim() !== "" &&
+    formData.celular !== "" &&
     !errors.dni &&
     !errors.celular &&
     (!showFechaNacimiento || (formData.fechaNacimiento && !errors.fechaNacimiento)) &&
