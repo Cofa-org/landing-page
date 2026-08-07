@@ -135,7 +135,7 @@ export const REJECTION_CONFIG = {
     cause: "DEVICE_MISMATCH",
     title: "Dispositivo diferente detectado",
     description:
-      "Detectamos que estás intentando acceder desde un dispositivo diferente al que usaste para registrarte. Por favor, póngase en contacto con un operador para continuar con tu solicitud.",
+      "Detectamos que estás intentando acceder desde un dispositivo diferente al que usaste para registrarte. Por favor, ponete en contacto con un operador para continuar con tu solicitud.",
     illustration: null, // RejectedStep renderiza MdWarning de react-icons cuando illustration es null; no usa imagen.
     primaryAction: {
       label: "Volver al inicio",
