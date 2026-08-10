@@ -1,4 +1,5 @@
 import { useEffect, lazy, Suspense } from "react";
+import GenericButton from "../../Components/buttons/GenericButton/GenericButton.jsx";
 import BackButton from "../../Components/buttons/backbutton/BackButton.jsx";
 import { Footer, Header } from "../../Components/index.js";
 import Loader from "../../Components/Loader/Loader.jsx";
@@ -225,6 +226,14 @@ const LoanSimScreen = () => {
           <div className={styles.errorContainer}>
             <p className={styles.errorMsg}>{error}</p>
             <p className={styles.errorSubtext}>Por favor, ponte en contacto con un operador.</p>
+            <GenericButton
+              type='button'
+              variant='primary'
+              onClick={() => (window.location.href = "http://wa.me/5491137570853?text=Hola!!%20Necesito%20ayuda%20para%20simular%20mi%20pr%C3%A9stamo!")}
+              style={{ marginTop: "1rem" }}
+            >
+              Comunicarse con un asesor
+            </GenericButton>
           </div>
         </div>
       </div>
@@ -244,14 +253,16 @@ const LoanSimScreen = () => {
             </div>
           </div>
         </div>
-        <Footer />
+        <Footer hideWhatsAppBtn={true} />
       </>
     );
   }
 
+  const isFirstOrLastStep = step === LOAN_SIM_STEPS.SIMULACION || step === LOAN_SIM_STEPS.COMPLETADO;
+
   return (
     <>
-      <Header hideHelpButton={step === LOAN_SIM_STEPS.SIMULACION} />
+      <Header hideHelpButton={isFirstOrLastStep} />
       <main id='main-content'>
         <div className={styles.splitLayout}>
           <div className={styles.leftColumn}>
@@ -267,7 +278,7 @@ const LoanSimScreen = () => {
           </div>
         </div>
       </main>
-      <Footer />
+      <Footer hideWhatsAppBtn={isFirstOrLastStep} />
     </>
   );
 };

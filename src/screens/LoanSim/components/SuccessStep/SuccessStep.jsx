@@ -51,23 +51,25 @@ const SuccessStep = ({ handleInfoPrestamo, loanInfo, loadingModal, simulationDat
         tiempo, comunicate con un asesor.
       </p>
       <div className={styles.buttonContainer}>
-        <button
-          className={`primary-btn ${loadingModal || !hasAccess ? styles.disabled : ""}`}
-          onClick={onInfoPrestamo}
-          disabled={loadingModal || !hasAccess}
-          style={{ flex: 1 }}
-          aria-label='Info prestamo'
-        >
-          {loadingModal ? "Cargando..." : "Info prestamo"}
-        </button>
         <GenericButton
+          type='button'
+          variant='primary'
+          onClick={onInfoPrestamo}
+          disabled={!hasAccess}
+          loading={loadingModal}
+          style={{ flex: 1 }}
+          aria-label='Informacion prestamo'
+        >
+          INFORMACIÓN PRÉSTAMO
+        </GenericButton>
+        {/* <GenericButton
           type='button'
           variant='secondary'
           onClick={() => (window.location.href = "http://wa.me/5491137570853")}
           style={{ flex: 1 }}
         >
           Comunicarse con un asesor
-        </GenericButton>
+        </GenericButton> */}
       </div>
       {showInfoModal && (
         <Suspense fallback={<div>Cargando detalle...</div>}>

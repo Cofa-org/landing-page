@@ -5,7 +5,7 @@ import { FaWhatsapp } from "react-icons/fa";
 import "./Footer.css";
 import { Link, useLocation } from "react-router-dom";
 /*  */
-const Footer = () => {
+const Footer = ({ hideWhatsAppBtn = false }) => {
   const { pathname } = useLocation();
 
   let whatsappUrl = "http://wa.me/5491137570853";
@@ -236,16 +236,17 @@ const Footer = () => {
         </p>
         <p> CUIT 33-71133479-9</p>
       </div>
-
-      <Link
-        to={whatsappUrl}
-        className='wsp-contact'
-        target='_blank'
-        id='btn-whatsapp'
-        aria-label='whatsapp'
-      >
-        <FaWhatsapp />
-      </Link>
+      {!hideWhatsAppBtn && (
+        <Link
+          to={whatsappUrl}
+          className='wsp-contact'
+          target='_blank'
+          id='btn-whatsapp'
+          aria-label='whatsapp'
+        >
+          <FaWhatsapp />
+        </Link>
+      )}
     </footer>
   );
 };

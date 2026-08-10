@@ -19,13 +19,13 @@ const WelcomeStep = ({ leadId, onBack }) => {
       />
       <div className={styles.content}>
         <h1 className={styles.title}>Bienvenido a Cofa!</h1>
-        <p className={styles.subtitle}>Tu registro fue completado exitosamente.</p>
-        <GenericButton
+        <p className={styles.subtitle}>Tu registro fue completado exitosamente. Nuestro equipo ya ha sido notificado. A la brevedad uno de nuestros operadores se pondrá en contacto a tu celular para terminar.</p>
+        {/* <GenericButton
           onClick={() => handleWelcomeComplete(leadId)}
           disabled={onboardingCompletado}
         >
           Quiero mi préstamo
-        </GenericButton>
+        </GenericButton> */}
       </div>
     </div>
   );
