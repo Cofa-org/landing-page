@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { getFingerprint, mapFingerprintToHuellaData } from "../../../lib/fingerprint.js";
 import LeadRegistrationService from "../../../services/leadRegistrationService.js";
 
 export const usePhoneOTP = (getLeadId) => {
@@ -13,8 +14,26 @@ export const usePhoneOTP = (getLeadId) => {
       setValidating(true);
       setError(null);
       try {
-        const result = await LeadRegistrationService.verificarOTPCelular({ leadId, codigo });
-       
+        // Capturar fingerprint ANTES de validar OTP. Si el cliente llega a
+        // este step, ya pasó los gates de crearLead (FALLECIDO, OTROS).
+        // Si el OTP es incorrecto, el fingerprint queda orphaned en DB
+        // (no se vincula al lead), pero no se registra ningún device.
+        let fingerprint = null;
+        try {
+          fingerprint = await getFingerprint({ leadId });
+        } catch (err) {
+          console.warn("Fingerprint could not be obtained:", err);
+        }
+        const huellaData = mapFingerprintToHuellaData(fingerprint);
+        const requestId = fingerprint?.requestId || null;
+
+        const result = await LeadRegistrationService.verificarOTPCelular({
+          leadId,
+          codigo,
+          huella_dispositivo: huellaData,
+          requestId,
+        });
+
         if (!result.success) {
           setError(
             `${result.message} 😊` ||

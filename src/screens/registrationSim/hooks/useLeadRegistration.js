@@ -3,7 +3,6 @@ import LeadRegistrationService from "../../../services/leadRegistrationService";
 import { ERROR_CAUSE, ERROR_MESSAGE } from "../../../constants/error";
 import { setCookie } from "../../../lib/utils";
 import { COOKIE_LEAD_TOKEN_CONFIG, DNI_AGE_CALIBRATION, SITUACION_LABORAL_OPTIONS } from "../../../constants/LOAN_SIM.js";
-import { getFingerprint, mapFingerprintToHuellaData } from "../../../lib/fingerprint.js";
 
 const DNI_REGEX = /^\d{7,8}$/;
 const CELULAR_REGEX = /^\d{10}$/;
@@ -206,24 +205,12 @@ export const useLeadRegistration = (turnstileToken) => {
       setIsSubmitting(true);
       setSubmitError("");
 
-      // Obtener fingerprint y mapear a huellaData
-      let fingerprint = null;
-      try {
-        fingerprint = await getFingerprint({ dni: formData.dni.trim() });
-      } catch (err) {
-        console.warn("Fingerprint could not be obtained:", err);
-      }
-      const huellaData = mapFingerprintToHuellaData(fingerprint);
-      const requestId = fingerprint?.requestId || null;
-
       try {
         const showFechaNacimiento = Number(formData.dni) >= 90000000;
         const response = await LeadRegistrationService.crearLead(
           {
             dni: formData.dni.trim(),
             turnstileToken,
-            huella_dispositivo: huellaData,
-            request_id: requestId,
             celular: formData.celular,
             situacion_laboral: formData.situacionLaboral,
             term_y_cond: formData.term_y_cond,
