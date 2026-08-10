@@ -58,7 +58,7 @@ const NavLinks = ({ pageType, selectedLink, onLinkClick }) => {
   );
 };
 
-const Header = () => {
+const Header = ({ hideHelpButton = false }) => {
   const { pathname } = useLocation();
   const { scrolled } = useScrollContext();
   const [isOpen, setIsOpen] = useState(false);
@@ -132,16 +132,18 @@ const Header = () => {
 
       <div className='buttons-container'>
         {pathname === '/registro-simulador' || pathname === '/simulador' ? (
-          <a 
-            href='http://wa.me/5491137570853?text=Hola!!%20Necesito%20ayuda%20para%20simular%20mi%20pr%C3%A9stamo!' 
-            target='_blank' 
-            rel='noopener noreferrer' 
-            aria-label='Solicitar ayuda por WhatsApp'
-          >
-            <button className='primary-btn header-primary-btn'>
-              Solicitar ayuda
-            </button>
-          </a>
+          !hideHelpButton && (
+            <a 
+              href='http://wa.me/5491137570853?text=Hola!!%20Necesito%20ayuda%20para%20simular%20mi%20pr%C3%A9stamo!' 
+              target='_blank' 
+              rel='noopener noreferrer' 
+              aria-label='Solicitar ayuda por WhatsApp'
+            >
+              <button className='primary-btn header-primary-btn'>
+                Solicitar ayuda
+              </button>
+            </a>
+          )
         ) : (
           <Link to='/registro-simulador' aria-label='Quiero mi préstamo'>
             <button className='primary-btn header-primary-btn'>

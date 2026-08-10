@@ -235,7 +235,7 @@ const LoanSimScreen = () => {
   if (isInitializing) {
     return (
       <>
-        <Header />
+        <Header hideHelpButton={true} />
         <div className={styles.homeCalculator_calculatorBox}>
           <div className={styles.calculatorContainer}>
             <div className={styles.loaderContainer}>
@@ -251,7 +251,7 @@ const LoanSimScreen = () => {
 
   return (
     <>
-      <Header />
+      <Header hideHelpButton={step === LOAN_SIM_STEPS.SIMULACION} />
       <main id='main-content'>
         <div className={styles.splitLayout}>
           <div className={styles.leftColumn}>

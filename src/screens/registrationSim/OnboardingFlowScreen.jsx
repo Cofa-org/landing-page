@@ -158,7 +158,7 @@ const OnboardingFlowScreen = () => {
 
   return (
     <>
-      <Header />
+      <Header hideHelpButton={onboardingStep === LOAN_SIM_STEPS.LEAD_REGISTRATION} />
       <main id='main-content'>
         <div className={styles.splitLayout}>
           <div className={styles.leftColumn}>
