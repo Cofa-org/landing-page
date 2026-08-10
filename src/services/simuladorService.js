@@ -221,7 +221,7 @@ export default class SimuladorService {
       const response = await HttpApi(url, payload, HTTP_METHOD.POST, apiKey, token);
       if (!response.ok) {
         const errorData = await parseErrorResponse(response);
-        throw new Error(errorData.message || "Error al guardar información de compliance");
+        throw new Error(errorData.message || "Error al guardar información de compliance. Intentá de nuevo");
       }
       return await response.json();
     } catch (error) {
@@ -298,7 +298,7 @@ export default class SimuladorService {
       const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, token);
       if (!response.ok) {
         const errorData = await parseErrorResponse(response);
-        throw new Error(errorData.message || "Error al solicitar suscripción Mobbex");
+        throw new Error(errorData.message || "Error al solicitar suscripción de pago");
       }
       return await response.json();
     } catch (error) {

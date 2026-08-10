@@ -500,7 +500,7 @@ export const useLoanSimulator = () => {
         setError(
           response.message
             ? `${response.message} 😊`
-            : "Error al guardar información de compliance",
+            : "Error al guardar información de compliance. Intentá de nuevo",
         );
       }
     } catch (err) {

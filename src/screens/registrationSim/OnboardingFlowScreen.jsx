@@ -156,9 +156,11 @@ const OnboardingFlowScreen = () => {
     }
   };
 
+  const isFirstOrLastStep = onboardingStep === LOAN_SIM_STEPS.LEAD_REGISTRATION || onboardingStep === LOAN_SIM_STEPS.WELCOME;
+
   return (
     <>
-      <Header />
+      <Header hideHelpButton={isFirstOrLastStep} />
       <main id='main-content'>
         <div className={styles.splitLayout}>
           <div className={styles.leftColumn}>
@@ -188,7 +190,7 @@ const OnboardingFlowScreen = () => {
           </div>
         </div>
       </main>
-      <Footer />
+      <Footer hideWhatsAppBtn={isFirstOrLastStep} />
     </>
   );
 };
