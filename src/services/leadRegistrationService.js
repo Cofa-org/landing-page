@@ -7,7 +7,7 @@ import { COOKIE_LEAD_TOKEN_CONFIG } from "../constants/LOAN_SIM.js";
 export default class LeadRegistrationService {
 
   static async crearLead(
-    { dni, turnstileToken, huella_dispositivo, request_id, celular, selectedCuit, term_y_cond, situacion_laboral, fecha_nacimiento },
+    { dni, turnstileToken, celular, selectedCuit, term_y_cond, situacion_laboral, fecha_nacimiento },
     signal = null,
   ) {
     try {
@@ -15,8 +15,6 @@ export default class LeadRegistrationService {
       const body = {
         dni,
         turnstileToken,
-        huella_dispositivo,
-        request_id,
         celular,
         selectedCuit,
         term_y_cond,
@@ -248,11 +246,11 @@ export default class LeadRegistrationService {
     }
   }
 
-  static async verificarOTPCelular({ leadId, codigo }, signal = null) {
+  static async verificarOTPCelular({ leadId, codigo, huella_dispositivo, requestId }, signal = null) {
     try {
       const url = `${LANDING_BACKEND_URL}/api/lead-registration/verificar-otp-celular`;
       const token = await getCookie(COOKIE_LEAD_TOKEN_CONFIG.NAME);
-      const body = { codigo };
+      const body = { codigo, huella_dispositivo, request_id: requestId };
       const response = await HttpApi(
         url,
         body,
