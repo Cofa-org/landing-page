@@ -250,7 +250,7 @@ export default class LeadRegistrationService {
     try {
       const url = `${LANDING_BACKEND_URL}/api/lead-registration/verificar-otp-celular`;
       const token = await getCookie(COOKIE_LEAD_TOKEN_CONFIG.NAME);
-      const body = { codigo, huella_dispositivo, requestId };
+      const body = { codigo, huella_dispositivo, request_id: requestId };
       const response = await HttpApi(
         url,
         body,
