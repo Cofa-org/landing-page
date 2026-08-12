@@ -59,7 +59,9 @@ const OnboardingFlowScreen = () => {
           );
         }
       } catch (err) {
-        setIdentitySelectionError(err.message || "No pudimos procesar tu selección. Volvé a intentarlo.");
+        setIdentitySelectionError(
+          err.message || "No pudimos procesar tu selección. Volvé a intentarlo.",
+        );
       } finally {
         setIdentitySelectionLoading(false);
       }
@@ -140,7 +142,7 @@ const OnboardingFlowScreen = () => {
       case LOAN_SIM_STEPS.RECHAZADO:
         return <RejectedStep />;
       case LOAN_SIM_STEPS.EN_ANALISIS:
-        return <AnalysisStep />;
+        return <AnalysisStep onBack={navigateToPrev} />;
       case LOAN_SIM_STEPS.IDENTITY_SELECTION:
         return (
           <IdentitySelectionStep
@@ -156,7 +158,9 @@ const OnboardingFlowScreen = () => {
     }
   };
 
-  const isFirstOrLastStep = onboardingStep === LOAN_SIM_STEPS.LEAD_REGISTRATION || onboardingStep === LOAN_SIM_STEPS.WELCOME;
+  const isFirstOrLastStep =
+    onboardingStep === LOAN_SIM_STEPS.LEAD_REGISTRATION ||
+    onboardingStep === LOAN_SIM_STEPS.WELCOME;
 
   return (
     <>
