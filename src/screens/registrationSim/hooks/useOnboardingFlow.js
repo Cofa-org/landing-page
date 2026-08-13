@@ -65,6 +65,8 @@ export const useOnboardingFlow = () => {
   const [pendingDni, setPendingDni] = useState(null);
   const [pendingCelular, setPendingCelular] = useState(null);
   const [pendingSituacionLaboral, setPendingSituacionLaboral] = useState(null);
+  const [rejectedFechaExpiracionBloqueo, setRejectedFechaExpiracionBloqueo] =
+    useState(null);
 
   const getLeadId = useCallback(() => {
     if (leadData?.leadId) return leadData.leadId;
@@ -219,9 +221,10 @@ export const useOnboardingFlow = () => {
     setOnboardingStep(LOAN_SIM_STEPS.PHONE_VALIDATION);
   }, []);
 
-  const handleRejected = useCallback(() => {
+  const handleRejected = useCallback((fechaExpiracionBloqueo = null) => {
     setLeadData(null);
     setLeadToken(null);
+    setRejectedFechaExpiracionBloqueo(fechaExpiracionBloqueo);
     setOnboardingStep(LOAN_SIM_STEPS.RECHAZADO);
   }, []);
 
@@ -283,9 +286,10 @@ export const useOnboardingFlow = () => {
         response.cause === ERROR_CAUSE.SITUACION_LABORAL_NO_ELEGIBLE ||
         response.cause === ERROR_CAUSE.FALLECIDO ||
         response.cause === ERROR_CAUSE.EDAD_INVALIDA ||
-        response.cause === ERROR_CAUSE.SCORING_RECHAZADO
+        response.cause === ERROR_CAUSE.SCORING_RECHAZADO ||
+        response.cause === ERROR_CAUSE.LEAD_REGISTRATION_RECHAZADO_RECIENTE
       ) {
-        handleRejected();
+        handleRejected(response.data?.fecha_expiracion_bloqueo ?? null);
         return { success: false, rejected: true };
       }
 
@@ -329,6 +333,7 @@ export const useOnboardingFlow = () => {
     onboardingStep,
     restoringOnboarding,
     pendingIdentities,
+    rejectedFechaExpiracionBloqueo,
 
     // Navegación
     navigateToNext,

@@ -116,3 +116,63 @@ describe("useLeadRegistration - validación de celular", () => {
     expect(payload.celular).toBe("1145678901");
   });
 });
+
+describe("useLeadRegistration - rechazo reciente por estado_gestion", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("retorna { success: false, rejected: true, fechaExpiracionBloqueo } cuando el back responde con cause LEAD_REGISTRATION_RECHAZADO_RECIENTE", async () => {
+    const fechaIso = "2026-09-25T10:00:00.000Z";
+    LeadRegistrationService.crearLead.mockResolvedValue({
+      success: false,
+      status: 400,
+      message: "Tu última solicitud fue rechazada...",
+      cause: "LEAD_REGISTRATION_RECHAZADO_RECIENTE",
+      data: { fecha_expiracion_bloqueo: fechaIso },
+    });
+
+    const { result } = renderHook(() => useLeadRegistration("turnstile-token"));
+    fillValidExtras(result);
+    act(() => {
+      result.current.handleChange(changeEvent("celular", "1145678901"));
+    });
+
+    let r;
+    await act(async () => {
+      r = await result.current.crearLead("turnstile-token");
+    });
+
+    expect(r).toEqual({
+      success: false,
+      rejected: true,
+      fechaExpiracionBloqueo: fechaIso,
+    });
+  });
+
+  it("retorna fechaExpiracionBloqueo: null si la respuesta no trae data", async () => {
+    LeadRegistrationService.crearLead.mockResolvedValue({
+      success: false,
+      status: 400,
+      cause: "LEAD_REGISTRATION_RECHAZADO_RECIENTE",
+      message: "...",
+    });
+
+    const { result } = renderHook(() => useLeadRegistration("turnstile-token"));
+    fillValidExtras(result);
+    act(() => {
+      result.current.handleChange(changeEvent("celular", "1145678901"));
+    });
+
+    let r;
+    await act(async () => {
+      r = await result.current.crearLead("turnstile-token");
+    });
+
+    expect(r).toEqual({
+      success: false,
+      rejected: true,
+      fechaExpiracionBloqueo: null,
+    });
+  });
+});

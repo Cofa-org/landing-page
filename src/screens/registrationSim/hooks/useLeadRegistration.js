@@ -278,6 +278,15 @@ export const useLeadRegistration = (turnstileToken) => {
         if (response.cause === ERROR_CAUSE.FALLECIDO) {
           return { success: false, rejected: true };
         }
+        // El operador de backoffice rechazó el lead del DNI dentro de los últimos 45
+        // días. El back siempre responde HTTP 200 con `cause` y `data.fecha_expiracion_bloqueo`.
+        if (response.cause === ERROR_CAUSE.LEAD_REGISTRATION_RECHAZADO_RECIENTE) {
+          return {
+            success: false,
+            rejected: true,
+            fechaExpiracionBloqueo: response.data?.fecha_expiracion_bloqueo ?? null,
+          };
+        }
         setSubmitError(
           response.message ? `${response.message} 😊` : "Error al registrar. Intentá nuevamente.",
         );

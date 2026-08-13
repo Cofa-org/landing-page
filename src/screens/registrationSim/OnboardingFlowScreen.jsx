@@ -34,6 +34,7 @@ const OnboardingFlowScreen = () => {
     goToAnalysis,
     handleIdentitySelected,
     pendingIdentities,
+    rejectedFechaExpiracionBloqueo,
     getLeadId,
     shouldShowBackButton,
     leadData,
@@ -140,7 +141,9 @@ const OnboardingFlowScreen = () => {
           />
         );
       case LOAN_SIM_STEPS.RECHAZADO:
-        return <RejectedStep />;
+        return (
+          <RejectedStep fechaExpiracionBloqueo={rejectedFechaExpiracionBloqueo} />
+        );
       case LOAN_SIM_STEPS.EN_ANALISIS:
         return <AnalysisStep onBack={navigateToPrev} />;
       case LOAN_SIM_STEPS.IDENTITY_SELECTION:
