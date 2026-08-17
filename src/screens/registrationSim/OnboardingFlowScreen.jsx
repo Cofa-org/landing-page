@@ -6,6 +6,7 @@ import { HeroLoanSim } from "../../Sections/index.js";
 import { LOAN_SIM_STEPS, OTP_CONFIG, ONBOARDING_STATES } from "../../constants/LOAN_SIM.js";
 import { useOnboardingFlow } from "./hooks/useOnboardingFlow.js";
 import { usePhoneOTP } from "./hooks/usePhoneOTP.js";
+import { usePhonePicker } from "./hooks/usePhonePicker.js";
 import OTPValidation from "../../Components/OTPValidation/OTPValidation.jsx";
 import styles from "./OnboardingFlow.module.css";
 import RejectedStep from "./components/RejectedStep/RejectedStep.jsx";
@@ -22,6 +23,9 @@ const AnalysisStep = React.lazy(() => import("./components/AnalysisStep/Analysis
 const IdentitySelectionStep = React.lazy(
   () => import("./components/IdentitySelectionStep/IdentitySelectionStep.jsx"),
 );
+const PhonePickerStep = React.lazy(
+  () => import("./components/PhonePickerStep/PhonePickerStep.jsx"),
+);
 
 const OnboardingFlowScreen = () => {
   const {
@@ -33,7 +37,10 @@ const OnboardingFlowScreen = () => {
     handleAnalysis,
     goToAnalysis,
     handleIdentitySelected,
+    handlePickerTriggered,
+    handlePickerPick: submitPickerPick,
     pendingIdentities,
+    pickerContext,
     rejectedFechaExpiracionBloqueo,
     getLeadId,
     shouldShowBackButton,
@@ -42,6 +49,7 @@ const OnboardingFlowScreen = () => {
   } = useOnboardingFlow();
 
   const { verificarOTP, reenviarOTP, validating, error } = usePhoneOTP(getLeadId);
+  const { submitPick, submitting: pickerLoading, error: pickerError } = usePhonePicker();
 
   const handlePrevStep = navigateToPrev;
 
@@ -73,6 +81,18 @@ const OnboardingFlowScreen = () => {
   const handleVerificarOTP = useCallback(
     async (codigo) => {
       const result = await verificarOTP(codigo);
+
+      // Phone picker trigger: el back devolvió el shape `requiresPhonePicker`
+      // en lugar de `success: true`. Persistimos el contexto (options + target)
+      // y navegamos al step PHONE_PICKER. La presentación queda en PhonePickerStep.
+      if (result?.requiresPhonePicker) {
+        handlePickerTriggered({
+          options: result.options ?? [],
+          target: result.target ?? null,
+        });
+        return;
+      }
+
       if (!result?.success) return;
 
       const nuevoEstado = result.data?.estado_onboarding;
@@ -88,7 +108,14 @@ const OnboardingFlowScreen = () => {
         });
       }
     },
-    [verificarOTP, onboardingStep, leadData, handleRejected, navigateToNext],
+    [verificarOTP, onboardingStep, leadData, handleRejected, navigateToNext, handlePickerTriggered],
+  );
+
+  const handlePickerPick = useCallback(
+    async (opcionElegida) => {
+      await submitPickerPick(submitPick, opcionElegida);
+    },
+    [submitPickerPick, submitPick],
   );
 
   const renderStep = () => {
@@ -154,6 +181,15 @@ const OnboardingFlowScreen = () => {
             onBack={navigateToPrev}
             loading={identitySelectionLoading}
             error={identitySelectionError}
+          />
+        );
+      case LOAN_SIM_STEPS.PHONE_PICKER:
+        return (
+          <PhonePickerStep
+            options={pickerContext?.options ?? []}
+            onPick={handlePickerPick}
+            loading={pickerLoading}
+            error={pickerError}
           />
         );
       default:

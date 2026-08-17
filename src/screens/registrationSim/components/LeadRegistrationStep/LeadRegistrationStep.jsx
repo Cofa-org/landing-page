@@ -39,7 +39,7 @@ const LeadRegistrationStep = ({ onSuccess, onRejected, onAnalysis, onNext, loadi
     setSuccessMessage("");
 
     const result = await crearLead(turnstileToken);
-    
+
     if (result.success && onSuccess) {
       setSuccessMessage("¡Datos enviados correctamente!");
       onSuccess(result.data);
@@ -228,12 +228,14 @@ const LeadRegistrationStep = ({ onSuccess, onRejected, onAnalysis, onNext, loadi
 };
 
 LeadRegistrationStep.propTypes = {
-  onSuccess: PropTypes.func,
-  onRejected: PropTypes.func,
-  onAnalysis: PropTypes.func,
-  onNext: PropTypes.func,
+  onSuccess: PropTypes.func.isRequired,
+  onRejected: PropTypes.func.isRequired,
+  onAnalysis: PropTypes.func.isRequired,
+  onNext: PropTypes.func.isRequired,
   loading: PropTypes.bool,
   error: PropTypes.string,
 };
+
+LeadRegistrationStep.displayName = "LeadRegistrationStep";
 
 export default memo(LeadRegistrationStep);

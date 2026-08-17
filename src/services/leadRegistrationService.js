@@ -269,4 +269,31 @@ export default class LeadRegistrationService {
       throw error;
     }
   }
+
+  static async phonePickerPick({ opcionElegida }, signal = null) {
+    try {
+      const url = `${LANDING_BACKEND_URL}/api/lead-registration/phone-picker-pick`;
+      const token = await getCookie(COOKIE_LEAD_TOKEN_CONFIG.NAME);
+      const body = { opcionElegida };
+      const response = await HttpApi(
+        url,
+        body,
+        HTTP_METHOD.POST,
+        LANDING_BACKEND_API_KEY,
+        token,
+        signal,
+      );
+
+      const data = await response.json();
+      if (!response.ok) {
+        const err = new Error(data.message || "Error al validar teléfono");
+        if (data.cause) err.cause = data.cause;
+        throw err;
+      }
+      return data;
+    } catch (error) {
+      console.error("PHONE_PICKER_PICK_SERVICE_ERROR:", error);
+      throw error;
+    }
+  }
 }

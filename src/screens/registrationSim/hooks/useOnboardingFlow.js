@@ -36,6 +36,7 @@ const PREV_STEP_MAP = {
   // RECIBO_UPLOAD → se decide dinámicamente en navigateToPrev según es_cliente.
   [LOAN_SIM_STEPS.WELCOME]: LOAN_SIM_STEPS.RECIBO_UPLOAD,
   [LOAN_SIM_STEPS.EN_ANALISIS]: LOAN_SIM_STEPS.RECIBO_UPLOAD,
+  [LOAN_SIM_STEPS.PHONE_PICKER]: LOAN_SIM_STEPS.PHONE_VALIDATION,
 };
 
 /**
@@ -54,6 +55,7 @@ const BACK_BUTTON_STEPS = [
   LOAN_SIM_STEPS.RECIBO_UPLOAD,
   LOAN_SIM_STEPS.WELCOME,
   LOAN_SIM_STEPS.EN_ANALISIS,
+  LOAN_SIM_STEPS.PHONE_PICKER,
 ];
 
 export const useOnboardingFlow = () => {
@@ -67,6 +69,7 @@ export const useOnboardingFlow = () => {
   const [pendingSituacionLaboral, setPendingSituacionLaboral] = useState(null);
   const [rejectedFechaExpiracionBloqueo, setRejectedFechaExpiracionBloqueo] =
     useState(null);
+  const [pickerContext, setPickerContext] = useState(null);
 
   const getLeadId = useCallback(() => {
     if (leadData?.leadId) return leadData.leadId;
@@ -122,6 +125,8 @@ export const useOnboardingFlow = () => {
             targetStep = LOAN_SIM_STEPS.RECHAZADO;
           } else if (estadoOnboarding === ONBOARDING_STATES.EN_ANALISIS) {
             targetStep = LOAN_SIM_STEPS.EN_ANALISIS;
+          } else if (estadoOnboarding === ONBOARDING_STATES.PHONE_PICKER) {
+            targetStep = LOAN_SIM_STEPS.PHONE_PICKER;
           }
           // Solo actualizar leadData si no tiene informacion completa (sin celular)
           if (leadData?.celular) {
@@ -311,6 +316,57 @@ export const useOnboardingFlow = () => {
     setOnboardingStep(LOAN_SIM_STEPS.LEAD_REGISTRATION);
   }, []);
 
+  /**
+   * Limpia el contexto del picker (options+target) y vuelve al step de
+   * validación de celular. Se usa cuando el usuario pulsa "Volver" desde
+   * PhonePickerStep.
+   */
+  const handlePickerResolved = useCallback(() => {
+    setPickerContext(null);
+    setOnboardingStep(LOAN_SIM_STEPS.PHONE_VALIDATION);
+  }, []);
+
+  /**
+   * Orquesta el submit del picker y la navegación forward.
+   * El caller pasa `submitPick` (de usePhonePicker) para mantener la lógica
+   * de presentación fuera de este hook (per convention `manual-validation-tags`).
+   *  - Success (data es_cliente true|false): navega a RECIBO_UPLOAD | DNI_UPLOAD.
+   *  - Failure o already-attempted: no navega; el caller (PhonePickerStep)
+   *    mantiene el mensaje de error en pantalla vía el `error` state del hook
+   *    de presentación.
+   */
+  const handlePickerPick = useCallback(
+    async (submitPick, opcionElegida) => {
+      const result = await submitPick(opcionElegida);
+      if (!result?.success) {
+        return result;
+      }
+   
+      const decision = result.data?.decision;
+      if (decision?.estado === "RECHAZADO") {
+        setPickerContext(null);
+        handleRejected(decision.motivoRechazo ?? null);
+        return result;
+      }
+      const esCliente = result.data?.es_cliente ?? leadData?.es_cliente;
+      const next = getNextStepAfterPhoneValidation(esCliente);
+      setPickerContext(null);
+      setOnboardingStep(next);
+      return result;
+    },
+    [leadData, handleRejected],
+  );
+
+  /**
+   * Persiste el contexto del picker y navega al step PHONE_PICKER.
+   * Lo llama OnboardingFlowScreen cuando el back devuelve el shape
+   * `requiresPhonePicker` desde verificarOTPCelular.
+   */
+  const handlePickerTriggered = useCallback(({ options, target }) => {
+    setPickerContext({ options: options ?? [], target: target ?? null });
+    setOnboardingStep(LOAN_SIM_STEPS.PHONE_PICKER);
+  }, []);
+
   const getScoringId = useCallback(() => {
     if (leadData?.id_scoring) {
       return String(leadData.id_scoring);
@@ -334,6 +390,8 @@ export const useOnboardingFlow = () => {
     restoringOnboarding,
     pendingIdentities,
     rejectedFechaExpiracionBloqueo,
+    pickerContext,
+    setPickerContext,
 
     // Navegación
     navigateToNext,
@@ -346,6 +404,9 @@ export const useOnboardingFlow = () => {
     handleAnalysis,
     goToAnalysis,
     handleIdentitySelected,
+    handlePickerResolved,
+    handlePickerTriggered,
+    handlePickerPick,
 
     // Utilidad
     getLeadId,

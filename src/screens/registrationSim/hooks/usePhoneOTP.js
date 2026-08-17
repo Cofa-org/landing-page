@@ -34,6 +34,14 @@ export const usePhoneOTP = (getLeadId) => {
           requestId,
         });
 
+        // Phone picker trigger (knowledge-based auth fallback): el back indica
+        // que el OTP no aplica y devuelve opciones para que el usuario confirme
+        // cuál es su celular. Se surface sin tocar `error` para que el caller
+        // (OnboardingFlowScreen) navegue a PHONE_PICKER.
+        if (result?.requiresPhonePicker) {
+          return result;
+        }
+
         if (!result.success) {
           setError(
             `${result.message} 😊` ||
