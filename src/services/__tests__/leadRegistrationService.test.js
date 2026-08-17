@@ -16,7 +16,6 @@ describe("LeadRegistrationService.phonePickerPick", () => {
           success: true,
           data: {
             estado: "VALIDADO",
-            esCorrecta: true,
             decision: { estado: "DNI_SUBIDO" },
           },
         }),

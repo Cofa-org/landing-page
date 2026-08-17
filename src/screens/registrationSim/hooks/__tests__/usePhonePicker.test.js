@@ -23,10 +23,10 @@ describe("usePhonePicker", () => {
     expect(result.current.error).toBeNull();
   });
 
-  it("submitPick happy path: success={true, data:{estado,esCorrecta,decision}}", async () => {
+  it("submitPick happy path: success={true, data:{estado,decision}}", async () => {
     LeadRegistrationService.phonePickerPick.mockResolvedValue({
       success: true,
-      data: { estado: "VALIDADO", esCorrecta: true, decision: { estado: "DNI_SUBIDO" } },
+      data: { estado: "VALIDADO", decision: { estado: "DNI_SUBIDO" } },
     });
     const { result } = renderHook(() => usePhonePicker());
 

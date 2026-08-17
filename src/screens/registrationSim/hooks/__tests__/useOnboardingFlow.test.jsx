@@ -134,9 +134,8 @@ describe("useOnboardingFlow — phone picker routing", () => {
 
   // 2026-08-14 picker-rules-fix follow-up: cuando el back devuelve decision.estado === 'RECHAZADO'
   // (picker elige mal en cualquiera de las 3 reglas), el hook debe enrutar al RejectedStep.
-  // El back retorna { success: true, data: { estado: 'NO_VALIDADO', esCorrecta: false,
-  // decision: { estado: 'RECHAZADO', ... } } } — el handler no debe seguir la rama
-  // "navega forward" que sólo lee `es_cliente` para decidir destino.
+  // El back retorna { success: true, data: { estado: 'NO_VALIDADO', decision: { estado: 'RECHAZADO', ... } } }
+  // — el handler no debe seguir la rama "navega forward" que sólo lee `es_cliente` para decidir destino.
   it("handlePickerPick: picker elige mal → navega a RECHAZADO step (decision.estado === RECHAZADO)", async () => {
     const { result } = renderHook(() => useOnboardingFlow());
 
@@ -151,7 +150,6 @@ describe("useOnboardingFlow — phone picker routing", () => {
       success: true,
       data: {
         estado: "NO_VALIDADO",
-        esCorrecta: false,
         decision: {
           estado: "RECHAZADO",
           emitirAnalisis: false,
