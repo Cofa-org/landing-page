@@ -152,7 +152,7 @@ const LeadRegistrationStep = ({ onSuccess, onRejected, onAnalysis, onNext, loadi
         value={formData.celular}
         onChange={handleChange}
         placeholder='Ej: 1145678901'
-        helperText='Los primeros dígitos son el prefijo de tu zona (sin 0). Total: 10 dígitos.'
+        helperText='Ingresa tu número sin +549 ni 0 (1145678901). Total: 10 dígitos.'
         required
         error={errors.celular}
         autoComplete='tel'
