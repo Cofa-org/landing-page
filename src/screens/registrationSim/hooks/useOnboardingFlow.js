@@ -127,6 +127,9 @@ export const useOnboardingFlow = () => {
             targetStep = LOAN_SIM_STEPS.EN_ANALISIS;
           } else if (estadoOnboarding === ONBOARDING_STATES.PHONE_PICKER) {
             targetStep = LOAN_SIM_STEPS.PHONE_PICKER;
+            if (response.data.pickerContext) {
+              setPickerContext(response.data.pickerContext);
+            }
           }
           // Solo actualizar leadData si no tiene informacion completa (sin celular)
           if (leadData?.celular) {
@@ -327,10 +330,22 @@ export const useOnboardingFlow = () => {
   }, []);
 
   /**
+   * Persiste el contexto del picker y navega al step PHONE_PICKER.
+   * Lo llama OnboardingFlowScreen cuando el back devuelve el shape
+   * `requiresPhonePicker` desde verificarOTPCelular, y también
+   * `handlePickerPick` cuando el back expone un retry con nuevas opciones.
+   */
+  const handlePickerTriggered = useCallback(({ options, target }) => {
+    setPickerContext({ options: options ?? [], target: target ?? null });
+    setOnboardingStep(LOAN_SIM_STEPS.PHONE_PICKER);
+  }, []);
+
+  /**
    * Orquesta el submit del picker y la navegación forward.
    * El caller pasa `submitPick` (de usePhonePicker) para mantener la lógica
    * de presentación fuera de este hook (per convention `manual-validation-tags`).
    *  - Success (data es_cliente true|false): navega a RECIBO_UPLOAD | DNI_UPLOAD.
+   *  - 2nd-attempt (retryAvailable=true): re-dispara el picker con nuevas opciones.
    *  - Failure o already-attempted: no navega; el caller (PhonePickerStep)
    *    mantiene el mensaje de error en pantalla vía el `error` state del hook
    *    de presentación.
@@ -341,8 +356,23 @@ export const useOnboardingFlow = () => {
       if (!result?.success) {
         return result;
       }
-   
+
       const decision = result.data?.decision;
+
+      // 2nd-attempt: el back devolvió retryAvailable=true y mantiene al usuario
+      // en el picker con un set de opciones/target actualizado. Re-disparamos
+      // el picker en lugar de avanzar.
+      if (
+        decision?.estado === LOAN_SIM_STEPS.PHONE_PICKER &&
+        result.data?.retryAvailable === true
+      ) {
+        handlePickerTriggered({
+          options: result.data.nextOptions ?? [],
+          target: result.data.nextTarget ?? null,
+        });
+        return result;
+      }
+
       if (decision?.estado === "RECHAZADO") {
         setPickerContext(null);
         handleRejected(decision.motivoRechazo ?? null);
@@ -354,18 +384,8 @@ export const useOnboardingFlow = () => {
       setOnboardingStep(next);
       return result;
     },
-    [leadData, handleRejected],
+    [leadData, handleRejected, handlePickerTriggered],
   );
-
-  /**
-   * Persiste el contexto del picker y navega al step PHONE_PICKER.
-   * Lo llama OnboardingFlowScreen cuando el back devuelve el shape
-   * `requiresPhonePicker` desde verificarOTPCelular.
-   */
-  const handlePickerTriggered = useCallback(({ options, target }) => {
-    setPickerContext({ options: options ?? [], target: target ?? null });
-    setOnboardingStep(LOAN_SIM_STEPS.PHONE_PICKER);
-  }, []);
 
   const getScoringId = useCallback(() => {
     if (leadData?.id_scoring) {

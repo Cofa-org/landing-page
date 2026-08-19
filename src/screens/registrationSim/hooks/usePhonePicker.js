@@ -17,8 +17,12 @@ const ROUTABLE_CAUSES = new Set([
  * Per `manual-validation-tags-2026-08-06` convention: all business logic here,
  * component (PhonePickerStep) is pure presentational.
  *
- * Behavior contract:
+ * Behavior contract (updated 2026-08-19 for 2nd attempt feature):
  *  - Happy path: returns the service result untouched (caller routes forward).
+ *  - Retry available (data.retryAvailable=true AND data.decision.estado=PHONE_PICKER,
+ *    with data.nextOptions / data.nextTarget / data.attemptNumber=2 / data.attemptsLeft=0):
+ *    returns the result untouched. Caller (handlePickerPick in useOnboardingFlow)
+ *    re-triggers the picker with the new options/target.
  *  - PHONE_PICKER_ALREADY_ATTEMPTED: returns the result AND surfaces a
  *    user-facing error message via `error` state (no rethrow — caller stays
  *    on the picker step).
