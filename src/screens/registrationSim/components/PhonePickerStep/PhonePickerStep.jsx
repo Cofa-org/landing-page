@@ -3,13 +3,15 @@ import PropTypes from "prop-types";
 import styles from "./PhonePickerStep.module.css";
 
 /**
- * Formatea un número de 10 dígitos en formato legible argentino: "11 4444-5555".
- * Devuelve el string original si no tiene exactamente 10 dígitos (defensa
- * silenciosa para no romper el render si el back manda un length distinto).
+ * Devuelve el número tal cual lo manda el back (10 dígitos, sin
+ * separadores). El back ahora garantiza que el primer dígito sea 0-3
+ * (rangos válidos de celulares argentinos), por lo que no necesitamos
+ * agregar separadores. Devuelve el string original si no tiene exactamente
+ * 10 dígitos (defensa silenciosa).
  */
 const formatPhone = (digits) => {
   if (typeof digits !== "string" || digits.length !== 10) return digits;
-  return `${digits.slice(0, 2)} ${digits.slice(2, 6)}-${digits.slice(6)}`;
+  return digits;
 };
 
 const EXPECTED_OPTIONS_LENGTH = 4;

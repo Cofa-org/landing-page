@@ -46,17 +46,7 @@ const PREV_STEP_MAP = {
  * @returns {string} LOAN_SIM_STEPS.PHONE_VALIDATION | LOAN_SIM_STEPS.DNI_UPLOAD
  */
 const getPrevStepFromReciboUpload = (esCliente) =>
-  esCliente === true ? LOAN_SIM_STEPS.PHONE_VALIDATION : LOAN_SIM_STEPS.DNI_UPLOAD;
-
-const BACK_BUTTON_STEPS = [
-  LOAN_SIM_STEPS.IDENTITY_SELECTION,
-  LOAN_SIM_STEPS.PHONE_VALIDATION,
-  // LOAN_SIM_STEPS.DNI_UPLOAD,
-  LOAN_SIM_STEPS.RECIBO_UPLOAD,
-  LOAN_SIM_STEPS.WELCOME,
-  LOAN_SIM_STEPS.EN_ANALISIS,
-  // LOAN_SIM_STEPS.PHONE_PICKER,
-];
+  esCliente === true ? null : LOAN_SIM_STEPS.DNI_UPLOAD;
 
 export const useOnboardingFlow = () => {
   const [leadData, setLeadData] = useState(null);
@@ -67,8 +57,7 @@ export const useOnboardingFlow = () => {
   const [pendingDni, setPendingDni] = useState(null);
   const [pendingCelular, setPendingCelular] = useState(null);
   const [pendingSituacionLaboral, setPendingSituacionLaboral] = useState(null);
-  const [rejectedFechaExpiracionBloqueo, setRejectedFechaExpiracionBloqueo] =
-    useState(null);
+  const [rejectedFechaExpiracionBloqueo, setRejectedFechaExpiracionBloqueo] = useState(null);
   const [pickerContext, setPickerContext] = useState(null);
 
   const getLeadId = useCallback(() => {
@@ -79,12 +68,13 @@ export const useOnboardingFlow = () => {
     }
     return null;
   }, [leadData, leadToken]);
+
   useEffect(() => {
     const restoreOnboardingState = async () => {
       setRestoringOnboarding(true);
       try {
         const leadTokenValue = await getCookie(COOKIE_LEAD_TOKEN_CONFIG.NAME);
-      
+
         if (!leadTokenValue) {
           setOnboardingStep(LOAN_SIM_STEPS.LEAD_REGISTRATION);
           setRestoringOnboarding(false);
@@ -105,10 +95,10 @@ export const useOnboardingFlow = () => {
         }
 
         const response = await LeadRegistrationService.obtenerEstadoOnboarding(leadId);
-  
+
         if (response.success && response.data) {
           const estadoOnboarding = response.data.estado_onboarding;
-         
+
           // Map onboarding state to loan sim step
           let targetStep = LOAN_SIM_STEPS.LEAD_REGISTRATION;
           if (estadoOnboarding === ONBOARDING_STATES.CELULAR_VALIDADO) {
@@ -117,7 +107,8 @@ export const useOnboardingFlow = () => {
             targetStep = LOAN_SIM_STEPS.PHONE_VALIDATION;
           } else if (estadoOnboarding === ONBOARDING_STATES.DNI_SUBIDO) {
             targetStep = LOAN_SIM_STEPS.RECIBO_UPLOAD;
-          } else if (estadoOnboarding === ONBOARDING_STATES.RECIBO_SUBIDO || 
+          } else if (
+            estadoOnboarding === ONBOARDING_STATES.RECIBO_SUBIDO ||
             estadoOnboarding === ONBOARDING_STATES.ONBOARDING_COMPLETO
           ) {
             targetStep = LOAN_SIM_STEPS.WELCOME;
@@ -127,9 +118,6 @@ export const useOnboardingFlow = () => {
             targetStep = LOAN_SIM_STEPS.EN_ANALISIS;
           } else if (estadoOnboarding === ONBOARDING_STATES.PHONE_PICKER) {
             targetStep = LOAN_SIM_STEPS.PHONE_PICKER;
-            if (response.data.pickerContext) {
-              setPickerContext(response.data.pickerContext);
-            }
           }
           // Solo actualizar leadData si no tiene informacion completa (sin celular)
           if (leadData?.celular) {
@@ -155,6 +143,16 @@ export const useOnboardingFlow = () => {
     };
     restoreOnboardingState();
   }, []);
+
+  const BACK_BUTTON_STEPS = [
+    LOAN_SIM_STEPS.IDENTITY_SELECTION,
+    LOAN_SIM_STEPS.PHONE_VALIDATION,
+    // LOAN_SIM_STEPS.DNI_UPLOAD,
+    ...(!leadData?.es_cliente ? [LOAN_SIM_STEPS.RECIBO_UPLOAD] : []),
+    LOAN_SIM_STEPS.WELCOME,
+    LOAN_SIM_STEPS.EN_ANALISIS,
+    // LOAN_SIM_STEPS.PHONE_PICKER,
+  ];
 
   const navigateToNext = useCallback((currentStep, extras = {}) => {
     let next;
@@ -208,10 +206,17 @@ export const useOnboardingFlow = () => {
       }
       setOnboardingStep(prev);
     }
-  }, [onboardingStep, getLeadId, leadData, setPendingIdentities, setPendingDni, setPendingCelular, setPendingSituacionLaboral]);
+  }, [
+    onboardingStep,
+    getLeadId,
+    leadData,
+    setPendingIdentities,
+    setPendingDni,
+    setPendingCelular,
+    setPendingSituacionLaboral,
+  ]);
 
   const handleLeadSuccess = useCallback((data) => {
-
     if (data?.requiresIdentitySelection) {
       setPendingIdentities(data.identities);
       // Guardamos dni/celular de la sesión actual para poder re-llamar

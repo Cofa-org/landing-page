@@ -169,7 +169,7 @@ const OnboardingFlowScreen = () => {
         );
       case LOAN_SIM_STEPS.RECHAZADO:
         return (
-          <RejectedStep fechaExpiracionBloqueo={rejectedFechaExpiracionBloqueo} />
+          <RejectedStep />
         );
       case LOAN_SIM_STEPS.EN_ANALISIS:
         return <AnalysisStep onBack={navigateToPrev} />;
