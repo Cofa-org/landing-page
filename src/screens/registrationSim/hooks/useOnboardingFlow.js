@@ -118,6 +118,23 @@ export const useOnboardingFlow = () => {
             targetStep = LOAN_SIM_STEPS.EN_ANALISIS;
           } else if (estadoOnboarding === ONBOARDING_STATES.PHONE_PICKER) {
             targetStep = LOAN_SIM_STEPS.PHONE_PICKER;
+            // PATCH 2026-08-20 (fix bug scoring-sync + restore): cuando el operador
+            // ejecuta scoring manual desde el backoffice y el celular del lead no
+            // matchea los teléfonos declarados, scoring-sync (`Scoring_Backend`)
+            // persiste la fila `webapp_sim_leads_validacion_telefonica` con
+            // `origen='SCORING'` + UPDATE `estado_onboarding='PHONE_PICKER'`.
+            // El cliente, al recargar la página (token aún activo), cae en este
+            // branch del restore. Sin este fix, `pickerContext` quedaba en null
+            // y `PhonePickerStep` retornaba `null` ("pantalla vacía") porque
+            // `options.length !== 4`. El back ya devuelve `pickerContext` con
+            // `options` + `target` cuando scoring dispara el picker (ver
+            // `obtenerEstadoOnboarding` líneas 1058-1101); el restore solo
+            // necesitaba propagarlo al state. Tests en
+            // `__tests__/useOnboardingFlow.test.js` cubren el caso (1 RED, 2
+            // pre-existentes que cubren null y missing).
+            if (response.data.pickerContext) {
+              setPickerContext(response.data.pickerContext);
+            }
           }
           // Solo actualizar leadData si no tiene informacion completa (sin celular)
           if (leadData?.celular) {
@@ -339,9 +356,21 @@ export const useOnboardingFlow = () => {
    * Lo llama OnboardingFlowScreen cuando el back devuelve el shape
    * `requiresPhonePicker` desde verificarOTPCelular, y también
    * `handlePickerPick` cuando el back expone un retry con nuevas opciones.
+   *
+   * PATCH 2026-08-20 (whole-branch review #2): preserva `origenTrigger` del
+   * contexto previo cuando el caller no lo provee. Sin esto, el retry de un
+   * picker disparado por scoring-sync (origenTrigger='scoring') cae al path
+   * OTP normal en el segundo pick y dirige al usuario a DNI_UPLOAD /
+   * RECIBO_UPLOAD — el WRONG final screen para scoring-sync. Usar el form
+   * setter (`setPickerContext((prev) => …)`) garantiza leer el state actual
+   * aunque React haya batcheado updates pendientes.
    */
   const handlePickerTriggered = useCallback(({ options, target }) => {
-    setPickerContext({ options: options ?? [], target: target ?? null });
+    setPickerContext((prev) => ({
+      options: options ?? [],
+      target: target ?? null,
+      origenTrigger: prev?.origenTrigger ?? "otp",
+    }));
     setOnboardingStep(LOAN_SIM_STEPS.PHONE_PICKER);
   }, []);
 
@@ -383,13 +412,30 @@ export const useOnboardingFlow = () => {
         handleRejected(decision.motivoRechazo ?? null);
         return result;
       }
+
+      // Scoring-sync post-pick: cuando el operador ejecutó scoring manual desde
+      // el backoffice y el cliente ya pasó por DNI_UPLOAD/RECIBO_UPLOAD, el
+      // picker llega con origenTrigger='scoring'. Un pick correcto va directo a
+      // la pantalla final según emitirAnalisis (no al flujo intermedio).
+      if (
+        pickerContext?.origenTrigger === "scoring" &&
+        decision?.estado !== LOAN_SIM_STEPS.PHONE_PICKER
+      ) {
+        const finalStep = decision?.emitirAnalisis
+          ? LOAN_SIM_STEPS.EN_ANALISIS
+          : LOAN_SIM_STEPS.WELCOME;
+        setPickerContext(null);
+        setOnboardingStep(finalStep);
+        return result;
+      }
+
       const esCliente = result.data?.es_cliente ?? leadData?.es_cliente;
       const next = getNextStepAfterPhoneValidation(esCliente);
       setPickerContext(null);
       setOnboardingStep(next);
       return result;
     },
-    [leadData, handleRejected, handlePickerTriggered],
+    [leadData, pickerContext, handleRejected, handlePickerTriggered],
   );
 
   const getScoringId = useCallback(() => {
