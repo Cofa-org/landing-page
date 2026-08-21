@@ -99,12 +99,22 @@ export default class LeadRegistrationService {
     }
   }
 
-  static async subirRecibo({ leadId }, file, signal = null, retryConfig = null) {
+  static async subirRecibos({ leadId }, filesByOrden, signal = null, retryConfig = null) {
     try {
-      const url = `${LANDING_BACKEND_URL}/api/lead-registration/subir-recibo/${leadId}`;
+      const url = `${LANDING_BACKEND_URL}/api/lead-registration/subir-recibos/${leadId}`;
       const token = await getCookie(COOKIE_LEAD_TOKEN_CONFIG.NAME);
       const formData = new FormData();
-      formData.append("file", file);
+      const ordenes = [];
+      for (const orden of Object.keys(filesByOrden).sort((a, b) => Number(a) - Number(b))) {
+        const file = filesByOrden[orden];
+        if (!file) continue;
+        formData.append("files", file);
+        formData.append("orden", String(orden));
+        ordenes.push(orden);
+      }
+      if (ordenes.length === 0) {
+        throw new Error("Al menos un recibo es requerido");
+      }
       const response = await HttpApi(
         url,
         formData,
@@ -114,16 +124,65 @@ export default class LeadRegistrationService {
         signal,
         retryConfig,
       );
-
       const data = await response.json();
       if (!response.ok) {
-        throw new Error(data.message || "Error al subir el recibo");
+        const err = new Error(data.message || "Error al subir los recibos");
+        if (data.cause) err.cause = data.cause;
+        throw err;
       }
       return data;
     } catch (error) {
-      console.error("SUBIR_RECIBO_SERVICE_ERROR:", error);
+      console.error("SUBIR_RECIBOS_SERVICE_ERROR:", error);
       throw error;
     }
+  }
+
+  static async getRecibosPendientes(leadId, signal = null) {
+    try {
+      const url = `${LANDING_BACKEND_URL}/api/lead-registration/${leadId}/recibos-pendientes`;
+      const token = await getCookie(COOKIE_LEAD_TOKEN_CONFIG.NAME);
+      const response = await HttpApi(
+        url,
+        null,
+        HTTP_METHOD.GET,
+        LANDING_BACKEND_API_KEY,
+        token,
+        signal,
+      );
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Error al obtener los recibos pendientes");
+      }
+      return data.data || [];
+    } catch (error) {
+      console.error("GET_RECIBOS_PENDIENTES_ERROR:", error);
+      throw error;
+    }
+  }
+
+  static async eliminarRecibo(reciboId, signal = null) {
+    try {
+      const url = `${LANDING_BACKEND_URL}/api/lead-registration/subir-recibos/${reciboId}`;
+      const token = await getCookie(COOKIE_LEAD_TOKEN_CONFIG.NAME);
+      const response = await HttpApi(
+        url,
+        null,
+        HTTP_METHOD.DELETE,
+        LANDING_BACKEND_API_KEY,
+        token,
+        signal,
+      );
+      const data = await response.json();
+      if (!response.ok) {
+        const err = new Error(data.message || "Error al eliminar el recibo");
+        if (data.cause) err.cause = data.cause;
+        throw err;
+      }
+      return data;
+    } catch (error) {
+      console.error("ELIMINAR_RECIBO_SERVICE_ERROR:", error);
+      throw error;
+      }
   }
 
   static async obtenerEstadoOnboarding(leadId, signal = null) {

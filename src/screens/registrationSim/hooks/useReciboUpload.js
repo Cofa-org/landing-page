@@ -2,71 +2,239 @@ import { useState, useCallback } from "react";
 import LeadRegistrationService from "../../../services/leadRegistrationService";
 import { getFriendlyErrorMessage } from "../../../lib/network-error";
 
-const SUBIR_RECIBO_RETRY_CONFIG = { retries: 1, backoffMs: 1500 };
+const SLOT_COUNT = 3;
+const SUBIR_RECIBOS_RETRY_CONFIG = { retries: 1, backoffMs: 1500 };
 
+const initialSlots = () => Array(SLOT_COUNT).fill(null);
+
+const isValidOrden = (orden) =>
+  Number.isInteger(orden) && orden >= 1 && orden <= SLOT_COUNT;
+
+const toSlotIndex = (orden) => orden - 1;
+
+/**
+ * Hook que gestiona hasta 3 recibos de sueldo en slots numerados 1..3.
+ *
+ * Contrato:
+ *  - `slots` es un array de longitud 3; cada entry es `null` o un objeto
+ *    `{ file, preview, reciboId, status, error, mime?, size?, hydrated? }`
+ *    con `status ∈ 'idle' | 'uploading' | 'uploaded' | 'error'`.
+ *  - `addFileToSlot(orden, file)` puebla el slot asignado por `orden` (1-indexed).
+ *  - `clearSlot(orden)` elimina el slot; si está uploaded, llama primero
+ *    `eliminarRecibo` para no dejar huérfanos en el back.
+ *  - `uploadAll(leadId)` postea solo los slots `idle` en una sola llamada
+ *    batch al nuevo endpoint `subirRecibos` y mapea la respuesta por `orden`.
+ *  - `setSlotHydrated(orden, { reciboId, url, mime, size })` reconstruye un
+ *    slot `uploaded` a partir de un recibo que el back ya tiene persistido
+ *    (camino del rehydration al volver a la pantalla).
+ *
+ * `clearSlot` siempre llama `eliminarRecibo` antes de limpiar localmente
+ * cuando `slot.reciboId` está seteado — sea por upload del usuario o por
+ * rehydration desde el back. Esto evita huérfanos en Storage/DB sin importar
+ * el origen del slot.
+ */
 export const useReciboUpload = () => {
-  const [reciboFile, setReciboFile] = useState(null);
-  const [preview, setPreview] = useState(null);
-  const [isUploading, setIsUploading] = useState(false);
+  const [slots, setSlots] = useState(initialSlots);
   const [uploadError, setUploadError] = useState("");
 
-  const handleFileChange = useCallback((e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    setReciboFile(file);
-    setPreview(URL.createObjectURL(file));
-    setUploadError("");
+  const applySlotUpdate = useCallback((orden, mutator) => {
+    if (!isValidOrden(orden)) return;
+    const index = toSlotIndex(orden);
+    setSlots((prev) => {
+      const next = prev.slice();
+      next[index] = mutator(prev[index]);
+      return next;
+    });
   }, []);
 
-  const clearFile = useCallback(() => {
-    setReciboFile(null);
-    setPreview(null);
-    setUploadError("");
-  }, []);
+  const addFileToSlot = useCallback(
+    (orden, file) => {
+      if (!file) return;
+      applySlotUpdate(orden, () => ({
+        file,
+        preview: URL.createObjectURL(file),
+        reciboId: undefined,
+        status: "idle",
+      }));
+      setUploadError("");
+    },
+    [applySlotUpdate],
+  );
 
-  const subirRecibo = useCallback(async (leadId) => {
-    if (!reciboFile) return { success: false, error: "El recibo de sueldo es requerido" };
-    if (!leadId) return { success: false, error: "Lead no encontrado" };
+  const clearSlot = useCallback(
+    async (orden) => {
+      if (!isValidOrden(orden)) return;
+      const index = toSlotIndex(orden);
+      const slot = slots[index];
+      if (!slot) return;
 
-    setIsUploading(true);
-    setUploadError("");
-
-    try {
-      const response = await LeadRegistrationService.subirRecibo(
-        { leadId },
-        reciboFile,
-        null,
-        SUBIR_RECIBO_RETRY_CONFIG,
-      );
-      if (response.success) {
-        // Propagar la fila final del lead para que ReciboUploadStep pueda inspeccionar
-        // estado_onboarding y enrutar a EN_ANALISIS si el back transicionó allí.
-        return { success: true, data: response.data };
+      const previewToRevoke = slot.preview;
+      if (previewToRevoke && previewToRevoke.startsWith("blob:")) {
+        try {
+          URL.revokeObjectURL(previewToRevoke);
+        } catch (_e) {
+          // best-effort cleanup; nunca fallamos el clear por un revoke
+        }
       }
-      const msg = response.message ? `${response.message} 😊` : "Error al subir el recibo";
-      setUploadError(msg);
-      return { success: false, error: msg };
-    } catch (err) {
-      const msg = `${getFriendlyErrorMessage(err)} 😊`;
-      setUploadError(msg);
-      return { success: false, error: msg };
-    } finally {
-      setIsUploading(false);
-    }
-  }, [reciboFile]);
 
-  const isFormValid = !!reciboFile;
-  const isImage = reciboFile ? reciboFile.type.startsWith("image/") : false;
+      const reciboIdToDelete = slot.reciboId;
+      setSlots((prev) => {
+        const next = prev.slice();
+        next[index] = null;
+        return next;
+      });
+
+      if (reciboIdToDelete) {
+        try {
+          await LeadRegistrationService.eliminarRecibo(reciboIdToDelete);
+        } catch (err) {
+          // No bloqueamos el clear local; el back puede limpiarse idempotentemente.
+          // El error se descarta a propósito para no confundir al usuario: el slot
+          // ya quedó vacío en la UI.
+          console.error("ELIMINAR_RECIBO_FROM_HOOK_ERROR:", err);
+        }
+      }
+    },
+    [slots],
+  );
+
+  const setSlotHydrated = useCallback(
+    (orden, { reciboId, url, mime, size }) => {
+      if (!isValidOrden(orden)) return;
+      const index = toSlotIndex(orden);
+      // Whole-branch fix C-2 (2026-08-21): si el usuario ya seleccionó un file en
+      // este slot mientras el rehydration estaba en flight, NO pisar el slot
+      // con datos del back — el file local representa la intención más
+      // reciente del usuario. Si no hay file local, recién ahí aplicamos la
+      // hidratación desde el back.
+      setSlots((prev) => {
+        const next = prev.slice();
+        const current = next[index];
+        if (current && current.file) {
+          return next;
+        }
+        next[index] = {
+          file: null,
+          preview: url,
+          reciboId,
+          status: "uploaded",
+          mime,
+          size,
+          hydrated: true,
+        };
+        return next;
+      });
+    },
+    [],
+  );
+
+  const uploadAll = useCallback(
+    async (leadId) => {
+      if (!leadId) {
+        return { success: false, error: "Lead no encontrado" };
+      }
+
+      // Snapshot de los slots idle al momento de disparar.
+      const idleSlots = slots
+        .map((slot, index) => ({ slot, orden: index + 1 }))
+        .filter(({ slot }) => slot && slot.status === "idle" && slot.file);
+
+      if (idleSlots.length === 0) {
+        return { success: false, error: "Subí al menos un recibo" };
+      }
+
+      const filesByOrden = idleSlots.reduce((acc, { slot, orden }) => {
+        acc[orden] = slot.file;
+        return acc;
+      }, {});
+      const uploadingOrdens = idleSlots.map(({ orden }) => orden);
+
+      // Marcar todos los idle como 'uploading' en un solo setState.
+      setSlots((prev) => {
+        const next = prev.slice();
+        for (const orden of uploadingOrdens) {
+          const idx = toSlotIndex(orden);
+          next[idx] = { ...next[idx], status: "uploading" };
+        }
+        return next;
+      });
+      setUploadError("");
+
+      try {
+        const response = await LeadRegistrationService.subirRecibos(
+          { leadId },
+          filesByOrden,
+          null,
+          SUBIR_RECIBOS_RETRY_CONFIG,
+        );
+
+        if (response?.success) {
+          const recibos = response?.data?.recibos || [];
+          setSlots((prev) => {
+            const next = prev.slice();
+            for (const recibo of recibos) {
+              if (!isValidOrden(recibo.orden)) continue;
+              const idx = toSlotIndex(recibo.orden);
+              const existing = next[idx];
+              next[idx] = {
+                ...(existing || {}),
+                reciboId: recibo.id,
+                status: "uploaded",
+                error: undefined,
+              };
+            }
+            return next;
+          });
+          return { success: true, data: response.data };
+        }
+
+        const msg = response?.message
+          ? `${response.message} 😊`
+          : "Error al subir los recibos";
+        setUploadError(msg);
+        setSlots((prev) => {
+          const next = prev.slice();
+          for (const orden of uploadingOrdens) {
+            const idx = toSlotIndex(orden);
+            const existing = next[idx];
+            if (existing) {
+              next[idx] = { ...existing, status: "error", error: msg };
+            }
+          }
+          return next;
+        });
+        return { success: false, error: msg };
+      } catch (err) {
+        const msg = `${getFriendlyErrorMessage(err)} 😊`;
+        setUploadError(msg);
+        setSlots((prev) => {
+          const next = prev.slice();
+          for (const orden of uploadingOrdens) {
+            const idx = toSlotIndex(orden);
+            const existing = next[idx];
+            if (existing) {
+              next[idx] = { ...existing, status: "error", error: msg };
+            }
+          }
+          return next;
+        });
+        return { success: false, error: msg };
+      }
+    },
+    [slots],
+  );
+
+  const isUploading = slots.some((s) => s?.status === "uploading");
+  const isFormValid = slots.some((s) => s?.status === "uploaded");
 
   return {
-    reciboFile,
-    preview,
+    slots,
     isUploading,
     uploadError,
     isFormValid,
-    isImage,
-    handleFileChange,
-    clearFile,
-    subirRecibo,
+    addFileToSlot,
+    clearSlot,
+    uploadAll,
+    setSlotHydrated,
   };
 };

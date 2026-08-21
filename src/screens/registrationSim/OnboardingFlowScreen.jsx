@@ -102,7 +102,7 @@ const OnboardingFlowScreen = () => {
       } else {
         // CELULAR_VALIDADO or DNI_SUBIDO — proceed to DNI_UPLOAD or RECIBO_UPLOAD.
         // Los leads que requieren análisis llegan aquí también; la transición a EN_ANALISIS
-        // se hace al subir el recibo (subirRecibo en el back).
+        // se hace al subir el recibo (subirRecibos en el back).
         navigateToNext(onboardingStep, {
           esCliente: result.data?.es_cliente ?? leadData?.es_cliente,
         });

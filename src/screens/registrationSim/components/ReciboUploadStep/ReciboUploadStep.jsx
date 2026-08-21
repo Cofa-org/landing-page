@@ -1,34 +1,82 @@
-import React, { memo } from "react";
+import React, { memo, useEffect } from "react";
 import PropTypes from "prop-types";
-import { FaCamera, FaCheck, FaFilePdf } from "react-icons/fa";
 import GenericButton from "../../../../Components/buttons/GenericButton/GenericButton.jsx";
 import GenericForm from "../../../../Components/Forms/GenericForm/GenericForm.jsx";
 import { useReciboUpload } from "../../hooks/useReciboUpload.js";
+import LeadRegistrationService from "../../../../services/leadRegistrationService.js";
 import { ONBOARDING_STATES } from "../../../../constants/LOAN_SIM.js";
+import ReciboSlotTile from "./ReciboSlotTile.jsx";
 import styles from "./ReciboUploadStep.module.css";
 
-const ReciboUploadStep = ({ leadId, onSuccess, onAnalysisAfterRecibo, loading, error: externalError }) => {
+const MAX_SLOTS = 3;
+
+/**
+ * ReciboUploadStep — pantalla multi-recibo (hasta 3).
+ *
+ * Cambios vs versión anterior:
+ *  - Rinde hasta 3 `ReciboSlotTile` (cada uno expone su "+ Agregar Recibo N").
+ *  - Al montar, si tenemos `leadId`, consulta `getRecibosPendientes` y
+ *    rehidrata los slots llamando `setSlotHydrated` por cada recibo
+ *    persistido en el back. Esto permite volver a esta pantalla sin
+ *    perder los recibos ya subidos.
+ *  - Refactored to batch upload via `uploadAll`.
+ *  - Mantiene el routing post-submit: si el back transiciona al lead a
+ *    `EN_ANALISIS`, navega a la pantalla de análisis; si no, flujo normal.
+ */
+const ReciboUploadStep = ({
+  leadId,
+  onSuccess,
+  onAnalysisAfterRecibo,
+  loading,
+  error: externalError,
+}) => {
   const {
-    preview,
+    slots,
     isUploading,
     uploadError,
     isFormValid,
-    isImage,
-    handleFileChange,
-    clearFile,
-    subirRecibo,
+    addFileToSlot,
+    clearSlot,
+    uploadAll,
+    setSlotHydrated,
   } = useReciboUpload();
+
+  // Rehydrate from server on mount.
+  useEffect(() => {
+    if (!leadId) return undefined;
+    let cancelled = false;
+    (async () => {
+      try {
+        const existentes = await LeadRegistrationService.getRecibosPendientes(leadId);
+        if (cancelled) return;
+        for (const r of existentes) {
+          setSlotHydrated(r.orden, {
+            reciboId: r.recibo_id,
+            url: r.url,
+            mime: r.mime,
+            size: r.size,
+          });
+        }
+      } catch (e) {
+        // Rehydration es best-effort: si falla, el usuario puede volver a
+        // subir. Solo logueamos para no romper la UX con un toast de error.
+        console.warn("RECIBOS_REHYDRATE_FAILED:", e);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [leadId, setSlotHydrated]);
 
   const isLoading = loading || isUploading;
   const displayError = uploadError || externalError;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const result = await subirRecibo(leadId);
+    const result = await uploadAll(leadId);
     if (result.success) {
-      // Si el back transicionó el lead a EN_ANALISIS (porque requiere análisis),
-      // navegamos a la pantalla de análisis. Si no, flujo normal.
-      if (result.data?.estado_onboarding === ONBOARDING_STATES.EN_ANALISIS) {
+      const estado = result.data?.estado_onboarding;
+      if (estado === ONBOARDING_STATES.EN_ANALISIS) {
         if (onAnalysisAfterRecibo) onAnalysisAfterRecibo(result.data);
       } else if (onSuccess) {
         onSuccess();
@@ -36,52 +84,27 @@ const ReciboUploadStep = ({ leadId, onSuccess, onAnalysisAfterRecibo, loading, e
     }
   };
 
+  const visibleSlots = slots.slice(0, MAX_SLOTS);
+
   return (
     <GenericForm
       title='Subí tu recibo de sueldo'
-      description='Necesitamos una foto clara de tu recibo de sueldo para verificar tu capacidad de pago.'
+      description='Necesitamos al menos un recibo para verificar tu capacidad de pago. Si cobrás por quincena o tenés varios comprobantes, podés subir hasta 3.'
       onSubmit={handleSubmit}
       className={styles.formTemplateContainer}
       children_className={styles.formTemplate}
     >
       <div className={styles.uploadAreaWrapper}>
-        {preview ? (
-          <div className={styles.preview}>
-            {isImage ? (
-              <img
-                src={preview}
-                alt='Recibo de sueldo'
-              />
-            ) : (
-              <div className={styles.pdfIcon}>
-                <FaFilePdf />
-                <span>PDF seleccionado</span>
-              </div>
-            )}
-            <span className={styles.checkIcon}>
-              <FaCheck />
-            </span>
-            <button
-              type='button'
-              className={styles.retakeBtn}
-              onClick={clearFile}
-            >
-              Cambiar
-            </button>
-          </div>
-        ) : (
-          <label className={styles.uploadArea}>
-            <FaCamera className={styles.cameraIcon} />
-            <span>Tocar para subir</span>
-            <input
-              type='file'
-              accept='image/*,application/pdf'
-              // capture='environment'
-              onChange={handleFileChange}
-              className={styles.fileInput}
-            />
-          </label>
-        )}
+        {visibleSlots.map((slot, idx) => (
+          <ReciboSlotTile
+            key={idx}
+            orden={idx + 1}
+            slot={slot}
+            onAddFile={addFileToSlot}
+            onClear={clearSlot}
+            maxSlots={MAX_SLOTS}
+          />
+        ))}
       </div>
 
       {displayError && <p className={styles.error}>{displayError}</p>}
@@ -111,6 +134,7 @@ const ReciboUploadStep = ({ leadId, onSuccess, onAnalysisAfterRecibo, loading, e
 ReciboUploadStep.propTypes = {
   leadId: PropTypes.number,
   onSuccess: PropTypes.func,
+  onAnalysisAfterRecibo: PropTypes.func,
   loading: PropTypes.bool,
   error: PropTypes.string,
 };
