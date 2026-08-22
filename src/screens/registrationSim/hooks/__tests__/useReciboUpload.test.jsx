@@ -99,7 +99,7 @@ describe("useReciboUpload", () => {
     it("isFormValid remains true after uploadAll succeeds (uploaded slot)", async () => {
       LeadRegistrationService.subirRecibos.mockResolvedValue({
         success: true,
-        data: { recibos: [{ id: 7, orden: 1 }] },
+        data: { recibos: [{ recibo_id: 7, orden: 1 }] },
       });
       const { result } = renderHook(() => useReciboUpload());
       act(() => {
@@ -122,8 +122,8 @@ describe("useReciboUpload", () => {
         success: true,
         data: {
           recibos: [
-            { id: 101, orden: 1 },
-            { id: 102, orden: 2 },
+            { recibo_id: 101, orden: 1 },
+            { recibo_id: 102, orden: 2 },
           ],
         },
       });
@@ -159,7 +159,7 @@ describe("useReciboUpload", () => {
     it("omite slots no-idle (null o uploaded) y deja sus valores intactos", async () => {
       LeadRegistrationService.subirRecibos.mockResolvedValue({
         success: true,
-        data: { recibos: [{ id: 200, orden: 2 }] },
+        data: { recibos: [{ recibo_id: 200, orden: 2 }] },
       });
       const { result } = renderHook(() => useReciboUpload());
       // slot 0 ya uploaded, slot 1 idle, slot 2 null
@@ -184,7 +184,7 @@ describe("useReciboUpload", () => {
     it("mientras hay uploading, isFormValid=true (file sigue presente; el gating durante upload lo hace isLoading)", async () => {
       let resolveUpload;
       LeadRegistrationService.subirRecibos.mockImplementation(
-        () => new Promise((res) => { resolveUpload = () => res({ success: true, data: { recibos: [{ id: 1, orden: 1 }] } }); }),
+        () => new Promise((res) => { resolveUpload = () => res({ success: true, data: { recibos: [{ recibo_id: 1, orden: 1 }] } }); }),
       );
       const { result } = renderHook(() => useReciboUpload());
       act(() => {

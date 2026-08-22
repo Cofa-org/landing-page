@@ -171,7 +171,7 @@ export const useReciboUpload = () => {
               const existing = next[idx];
               next[idx] = {
                 ...(existing || {}),
-                reciboId: recibo.id,
+                reciboId: recibo.recibo_id,
                 status: "uploaded",
                 error: undefined,
               };
