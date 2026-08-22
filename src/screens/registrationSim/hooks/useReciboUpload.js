@@ -20,18 +20,20 @@ const toSlotIndex = (orden) => orden - 1;
  *    `{ file, preview, reciboId, status, error, mime?, size?, hydrated? }`
  *    con `status ∈ 'idle' | 'uploading' | 'uploaded' | 'error'`.
  *  - `addFileToSlot(orden, file)` puebla el slot asignado por `orden` (1-indexed).
- *  - `clearSlot(orden)` elimina el slot; si está uploaded, llama primero
- *    `eliminarRecibo` para no dejar huérfanos en el back.
+ *  - `clearSlot(orden)` limpia el estado local del slot. Quitar works
+ *    pre-upload only — local state cleanup. Post-upload deletion is the
+ *    operator's job via backoffice direct-DB, NOT via HTTP.
  *  - `uploadAll(leadId)` postea solo los slots `idle` en una sola llamada
  *    batch al nuevo endpoint `subirRecibos` y mapea la respuesta por `orden`.
  *  - `setSlotHydrated(orden, { reciboId, url, mime, size })` reconstruye un
  *    slot `uploaded` a partir de un recibo que el back ya tiene persistido
  *    (camino del rehydration al volver a la pantalla).
  *
- * `clearSlot` siempre llama `eliminarRecibo` antes de limpiar localmente
- * cuando `slot.reciboId` está seteado — sea por upload del usuario o por
- * rehydration desde el back. Esto evita huérfanos en Storage/DB sin importar
- * el origen del slot.
+ * `clearSlot` es 100% local: revoca el `blob:` URL del preview y vacía el
+ * slot en el state. NO llama al back — el DELETE endpoint fue removido en
+ * 2026-08-21 porque el post-upload ya es compromiso del operador (backoffice
+ * direct-DB per Plan B). Los slots `uploaded` también se pueden "quitar" de
+ * la UI, pero el archivo sigue en Storage/DB hasta que el operador lo borre.
  */
 export const useReciboUpload = () => {
   const [slots, setSlots] = useState(initialSlots);
@@ -77,23 +79,14 @@ export const useReciboUpload = () => {
         }
       }
 
-      const reciboIdToDelete = slot.reciboId;
+      // 100% local cleanup. NO hay llamada al back: el DELETE endpoint fue
+      // removido en 2026-08-21 — post-upload, el operador borra vía backoffice
+      // direct-DB (per Plan B).
       setSlots((prev) => {
         const next = prev.slice();
         next[index] = null;
         return next;
       });
-
-      if (reciboIdToDelete) {
-        try {
-          await LeadRegistrationService.eliminarRecibo(reciboIdToDelete);
-        } catch (err) {
-          // No bloqueamos el clear local; el back puede limpiarse idempotentemente.
-          // El error se descarta a propósito para no confundir al usuario: el slot
-          // ya quedó vacío en la UI.
-          console.error("ELIMINAR_RECIBO_FROM_HOOK_ERROR:", err);
-        }
-      }
     },
     [slots],
   );
@@ -223,9 +216,15 @@ export const useReciboUpload = () => {
     },
     [slots],
   );
+  
 
   const isUploading = slots.some((s) => s?.status === "uploading");
-  const isFormValid = slots.some((s) => s?.status === "uploaded");
+  // El botón Continuar se habilita en cuanto hay al menos un file seleccionado
+  // (independiente del status). El gating durante el upload lo hace `isLoading`
+  // en el componente (`disabled={!isFormValid || isLoading}`). Esto rompe el
+  // deadlock donde `status === 'uploaded'` solo era alcanzable clickeando
+  // Continuar, que estaba disabled hasta entonces.
+  const isFormValid = slots.some((s) => s?.file);
 
   return {
     slots,

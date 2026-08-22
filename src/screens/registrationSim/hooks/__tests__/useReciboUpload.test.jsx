@@ -80,6 +80,42 @@ describe("useReciboUpload", () => {
     });
   });
 
+  describe("isFormValid semantics (multi-recibo isFormValid fix)", () => {
+    it("isFormValid becomes true after addFileToSlot (idle slot)", () => {
+      const { result } = renderHook(() => useReciboUpload());
+      expect(result.current.isFormValid).toBe(false);
+      act(() => {
+        result.current.addFileToSlot(1, makeFile());
+      });
+      // Tras pickear un file (aún no uploaded), el botón Continuar debe
+      // estar habilitado para disparar la subida. Esto rompe el deadlock
+      // donde isFormValid requería status='uploaded' (sólo alcanzable
+      // clickeando Continuar, que estaba disabled).
+      expect(result.current.isFormValid).toBe(true);
+      expect(result.current.slots[0]?.status).toBe("idle");
+      expect(result.current.slots[0]?.file).toBeInstanceOf(File);
+    });
+
+    it("isFormValid remains true after uploadAll succeeds (uploaded slot)", async () => {
+      LeadRegistrationService.subirRecibos.mockResolvedValue({
+        success: true,
+        data: { recibos: [{ id: 7, orden: 1 }] },
+      });
+      const { result } = renderHook(() => useReciboUpload());
+      act(() => {
+        result.current.addFileToSlot(1, makeFile());
+      });
+      await act(async () => {
+        await result.current.uploadAll(99);
+      });
+      // Tras upload exitoso: file sigue presente, status='uploaded'.
+      // isFormValid debe seguir true (no se deshabilita por el cambio de status).
+      expect(result.current.isFormValid).toBe(true);
+      expect(result.current.slots[0]?.status).toBe("uploaded");
+      expect(result.current.slots[0]?.file).toBeInstanceOf(File);
+    });
+  });
+
   describe("uploadAll", () => {
     it("happy path: postea solo slots idle y mapea respuesta por orden", async () => {
       LeadRegistrationService.subirRecibos.mockResolvedValue({
@@ -145,7 +181,7 @@ describe("useReciboUpload", () => {
       expect(result.current.slots[2]).toBeNull();
     });
 
-    it("mientras hay uploading, isFormValid=true solo si hay algún uploaded", async () => {
+    it("mientras hay uploading, isFormValid=true (file sigue presente; el gating durante upload lo hace isLoading)", async () => {
       let resolveUpload;
       LeadRegistrationService.subirRecibos.mockImplementation(
         () => new Promise((res) => { resolveUpload = () => res({ success: true, data: { recibos: [{ id: 1, orden: 1 }] } }); }),
@@ -162,7 +198,12 @@ describe("useReciboUpload", () => {
       });
 
       expect(result.current.isUploading).toBe(true);
-      expect(result.current.isFormValid).toBe(false);
+      // Multi-recibo isFormValid fix (2026-08-21): isFormValid se basa en
+      // `s?.file` (no en `status === 'uploaded'`), por lo que durante el
+      // upload el slot ya tiene file y isFormValid = true. El botón Continuar
+      // se mantiene deshabilitado vía `isLoading` en el componente
+      // (`disabled={!isFormValid || isLoading}`).
+      expect(result.current.isFormValid).toBe(true);
 
       await act(async () => {
         resolveUpload();
@@ -257,7 +298,22 @@ describe("useReciboUpload", () => {
   });
 
   describe("clearSlot", () => {
-    it("si el slot está uploaded: llama eliminarRecibo con su reciboId", async () => {
+    it("clearSlot of idle slot does NOT call any service", async () => {
+      const { result } = renderHook(() => useReciboUpload());
+      act(() => {
+        result.current.addFileToSlot(1, makeFile());
+      });
+
+      await act(async () => {
+        await result.current.clearSlot(1);
+      });
+
+      expect(LeadRegistrationService.eliminarRecibo).not.toHaveBeenCalled();
+      expect(LeadRegistrationService.subirRecibos).not.toHaveBeenCalled();
+      expect(result.current.slots[0]).toBeNull();
+    });
+
+    it("clearSlot of uploaded slot does NOT call any service (local-only after pivot)", async () => {
       LeadRegistrationService.eliminarRecibo.mockResolvedValue({ success: true });
       const { result } = renderHook(() => useReciboUpload());
       act(() => {
@@ -269,22 +325,10 @@ describe("useReciboUpload", () => {
         await result.current.clearSlot(2);
       });
 
-      expect(LeadRegistrationService.eliminarRecibo).toHaveBeenCalledWith(555);
-      expect(result.current.slots[1]).toBeNull();
-    });
-
-    it("si el slot está idle (no uploaded): NO llama eliminarRecibo", async () => {
-      const { result } = renderHook(() => useReciboUpload());
-      act(() => {
-        result.current.addFileToSlot(1, makeFile());
-      });
-
-      await act(async () => {
-        await result.current.clearSlot(1);
-      });
-
+      // 2026-08-21 pivot: clearSlot es 100% local. NO llama al back.
+      // Post-upload deletion la hace el operador vía backoffice direct-DB.
       expect(LeadRegistrationService.eliminarRecibo).not.toHaveBeenCalled();
-      expect(result.current.slots[0]).toBeNull();
+      expect(result.current.slots[1]).toBeNull();
     });
 
     it("si el slot es null: no llama eliminarRecibo y queda null", async () => {
@@ -336,7 +380,13 @@ describe("useReciboUpload", () => {
         size: 4096,
         hydrated: true,
       });
-      expect(result.current.isFormValid).toBe(true);
+      // Multi-recibo isFormValid fix (2026-08-21): un slot hidratado desde
+      // el back tiene `file: null` (no hay file local), por lo que
+      // `s?.file` es falsy e isFormValid = false. El botón Continuar queda
+      // deshabilitado, lo cual es consistente con que el usuario no
+      // seleccionó ningún file local en esta sesión y uploadAll rechazaría
+      // la subida con "Subí al menos un recibo".
+      expect(result.current.isFormValid).toBe(false);
     });
 
     it("setSlotHydrated fuera de rango es no-op", () => {

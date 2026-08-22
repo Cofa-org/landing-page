@@ -160,31 +160,6 @@ export default class LeadRegistrationService {
     }
   }
 
-  static async eliminarRecibo(reciboId, signal = null) {
-    try {
-      const url = `${LANDING_BACKEND_URL}/api/lead-registration/subir-recibos/${reciboId}`;
-      const token = await getCookie(COOKIE_LEAD_TOKEN_CONFIG.NAME);
-      const response = await HttpApi(
-        url,
-        null,
-        HTTP_METHOD.DELETE,
-        LANDING_BACKEND_API_KEY,
-        token,
-        signal,
-      );
-      const data = await response.json();
-      if (!response.ok) {
-        const err = new Error(data.message || "Error al eliminar el recibo");
-        if (data.cause) err.cause = data.cause;
-        throw err;
-      }
-      return data;
-    } catch (error) {
-      console.error("ELIMINAR_RECIBO_SERVICE_ERROR:", error);
-      throw error;
-      }
-  }
-
   static async obtenerEstadoOnboarding(leadId, signal = null) {
     try {
       const url = `${LANDING_BACKEND_URL}/api/lead-registration/${leadId}/estado`;

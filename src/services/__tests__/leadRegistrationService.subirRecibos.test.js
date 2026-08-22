@@ -67,19 +67,3 @@ describe("LeadRegistrationService.getRecibosPendientes", () => {
     expect(data).toEqual([{ orden: 1 }]);
   });
 });
-
-describe("LeadRegistrationService.eliminarRecibo", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    getCookie.mockResolvedValue("tok");
-  });
-
-  it("returns success true on 200", async () => {
-    HttpApi.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ success: true }),
-    });
-    const result = await LeadRegistrationService.eliminarRecibo("uuid-abc");
-    expect(result).toEqual({ success: true });
-  });
-});
