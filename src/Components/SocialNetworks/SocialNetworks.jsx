@@ -1,4 +1,4 @@
-import { BsFacebook, BsInstagram, BsLinkedin, BsTiktok, BsWhatsapp } from "react-icons/bs";
+import { BsFacebook, BsInstagram, BsLinkedin, BsTiktok } from "react-icons/bs";
 import { Link } from "react-router-dom";
 import "./SocialNetworks.css";
 
@@ -32,13 +32,6 @@ function SocialNetworks() {
         aria-label='LinkedIn COFA'
       >
         <BsLinkedin />
-      </Link>
-      <Link
-        to={"http://wa.me/5491137570853?text=Hola!%20Necesito%20ayuda!"}
-        target='_blank'
-        aria-label='WhatsApp COFA'
-      >
-        <BsWhatsapp />
       </Link>
     </div>
   );

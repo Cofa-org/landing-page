@@ -133,16 +133,13 @@ const Header = ({ hideHelpButton = false }) => {
       <div className='buttons-container'>
         {pathname === '/registro-simulador' || pathname === '/simulador' ? (
           !hideHelpButton && (
-            <a 
-              href='http://wa.me/5491137570853?text=Hola!!%20Necesito%20ayuda%20para%20simular%20mi%20pr%C3%A9stamo!' 
-              target='_blank' 
-              rel='noopener noreferrer' 
-              aria-label='Solicitar ayuda por WhatsApp'
+            <button 
+              className='primary-btn header-primary-btn'
+              onClick={() => window.callbell && window.callbell('open')}
+              aria-label='Solicitar ayuda'
             >
-              <button className='primary-btn header-primary-btn'>
-                Solicitar ayuda
-              </button>
-            </a>
+              Solicitar ayuda
+            </button>
           )
         ) : (
           <Link to='/registro-simulador' aria-label='Quiero mi préstamo'>

@@ -1,4 +1,4 @@
-import React, { Suspense, memo, useCallback, useState } from "react";
+import React, { Suspense, memo, useCallback, useState, useEffect } from "react";
 import BackButton from "../../Components/buttons/backbutton/BackButton.jsx";
 import { Footer, Header } from "../../Components/index.js";
 import Loader from "../../Components/Loader/Loader.jsx";
@@ -201,6 +201,19 @@ const OnboardingFlowScreen = () => {
     onboardingStep === LOAN_SIM_STEPS.LEAD_REGISTRATION ||
     onboardingStep === LOAN_SIM_STEPS.WELCOME;
 
+  useEffect(() => {
+    if (window.callbell) {
+      if (isFirstOrLastStep) {
+        window.callbell('hide');
+      } else {
+        window.callbell('show');
+      }
+    }
+    return () => {
+      if (window.callbell) window.callbell('show');
+    };
+  }, [isFirstOrLastStep]);
+
   return (
     <>
       <Header hideHelpButton={isFirstOrLastStep} />
@@ -233,7 +246,7 @@ const OnboardingFlowScreen = () => {
           </div>
         </div>
       </main>
-      <Footer hideWhatsAppBtn={isFirstOrLastStep} />
+      <Footer />
     </>
   );
 };

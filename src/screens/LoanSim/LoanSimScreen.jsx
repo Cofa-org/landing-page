@@ -73,6 +73,22 @@ const LoanSimScreen = () => {
   // finally de fetchSimulation, así que cubre éxito y error.
   const isInitializing = !initialSimulationResolved;
 
+  const isFirstOrLastStep = step === LOAN_SIM_STEPS.SIMULACION || step === LOAN_SIM_STEPS.COMPLETADO;
+  const shouldHideCallbell = isInitializing || isFirstOrLastStep;
+
+  useEffect(() => {
+    if (window.callbell) {
+      if (shouldHideCallbell) {
+        window.callbell('hide');
+      } else {
+        window.callbell('show');
+      }
+    }
+    return () => {
+      if (window.callbell) window.callbell('show');
+    };
+  }, [shouldHideCallbell]);
+
   useEffect(() => {
     if (step === LOAN_SIM_STEPS.COMPLIANCE) {
       verificarComplianceExistente();
@@ -253,12 +269,11 @@ const LoanSimScreen = () => {
             </div>
           </div>
         </div>
-        <Footer hideWhatsAppBtn={true} />
+        <Footer />
       </>
     );
   }
 
-  const isFirstOrLastStep = step === LOAN_SIM_STEPS.SIMULACION || step === LOAN_SIM_STEPS.COMPLETADO;
 
   return (
     <>
@@ -278,7 +293,7 @@ const LoanSimScreen = () => {
           </div>
         </div>
       </main>
-      <Footer hideWhatsAppBtn={isFirstOrLastStep} />
+      <Footer />
     </>
   );
 };

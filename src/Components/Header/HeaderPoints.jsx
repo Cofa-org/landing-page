@@ -111,9 +111,7 @@ const HeaderPoints = () => {
             {/* <Link to={'/asistencias'}>
               <button className='secondary-btn' id='btn-points-assist'>Quiero mi Asistencia</button>
             </Link> */}
-            <a href='http://wa.me/5491137570853' target="_blank" rel="noopener noreferrer">
-              <button className='primary-btn' id='btn-loan-points'>Quiero mi Préstamo</button>
-            </a>
+            <button className='primary-btn' id='btn-loan-points' onClick={() => window.callbell && window.callbell('open')}>Quiero mi Préstamo</button>
             <button className='btn-show-links' onClick={openNavbar}><FiMenu/></button>
         </div>
         <div className={isOpen ? 'mobible-navbar-points open-points' : (first ?  'mobible-navbar' : 'mobible-navbar not-first-points')}>
@@ -138,9 +136,7 @@ const HeaderPoints = () => {
               Contacto
             </a>
           </nav>
-          <a href='http://wa.me/5491137570853' target="_blank" rel="noopener noreferrer">
-            <button className='primary-btn mobible-nav-secondary-btn' >Quiero mi Préstamo</button>
-          </a>
+          <button className='primary-btn mobible-nav-secondary-btn' onClick={() => window.callbell && window.callbell('open')}>Quiero mi Préstamo</button>
           {/* <Link to={'/asistencias'} className='secondary-btn mobible-nav-secondary-btn'>
             Quiero mi Asistencia
           </Link> */}

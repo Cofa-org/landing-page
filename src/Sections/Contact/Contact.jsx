@@ -25,9 +25,8 @@ const Contact = () => {
         <span>
           <BsTelephone />
           <a
-            href='http://wa.me/5491137570853?text=Hola!%20Necesito%20ayuda!'
-            target='_blank'
-            rel='noopener noreferrer'
+            style={{cursor: 'pointer'}}
+            onClick={() => window.callbell && window.callbell('open')}
           >
             <span>1137570853</span>
           </a>
