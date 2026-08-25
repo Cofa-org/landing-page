@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { openCallbellWidget } from '../../utils/callbellHelpers';
 import './Header.css';
 import { FiMenu } from 'react-icons/fi';
 import { IoMdArrowBack } from 'react-icons/io';
@@ -82,7 +83,7 @@ const HeaderAssist = () => {
           </a>
         </nav>
         <div className='buttons-container buttons-container-points'>
-          <button className='secondary-btn' id='btn-points-assist' onClick={() => window.callbell && window.callbell('open')}>Quiero mi Asistencia</button>
+          <button className='secondary-btn' id='btn-points-assist' onClick={openCallbellWidget}>Quiero mi Asistencia</button>
 
           <button className='btn-show-links' onClick={openNavbar}><FiMenu /></button>
         </div>
@@ -129,7 +130,7 @@ const HeaderAssist = () => {
             </a>
           </nav>
 
-          <button className='secondary-btn mobible-nav-secondary-btn' onClick={() => window.callbell && window.callbell('open')}>
+          <button className='secondary-btn mobible-nav-secondary-btn' onClick={openCallbellWidget}>
             Quiero mi Asistencia
           </button>
         </div>

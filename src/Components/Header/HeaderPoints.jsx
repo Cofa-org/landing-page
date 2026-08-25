@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { openCallbellWidget } from '../../utils/callbellHelpers';
 import './Header.css'
 import {FiMenu} from 'react-icons/fi'
 import {IoMdArrowBack} from 'react-icons/io'
@@ -111,7 +112,7 @@ const HeaderPoints = () => {
             {/* <Link to={'/asistencias'}>
               <button className='secondary-btn' id='btn-points-assist'>Quiero mi Asistencia</button>
             </Link> */}
-            <button className='primary-btn' id='btn-loan-points' onClick={() => window.callbell && window.callbell('open')}>Quiero mi Préstamo</button>
+            <button className='primary-btn' id='btn-loan-points' onClick={openCallbellWidget}>Quiero mi Préstamo</button>
             <button className='btn-show-links' onClick={openNavbar}><FiMenu/></button>
         </div>
         <div className={isOpen ? 'mobible-navbar-points open-points' : (first ?  'mobible-navbar' : 'mobible-navbar not-first-points')}>
@@ -136,7 +137,7 @@ const HeaderPoints = () => {
               Contacto
             </a>
           </nav>
-          <button className='primary-btn mobible-nav-secondary-btn' onClick={() => window.callbell && window.callbell('open')}>Quiero mi Préstamo</button>
+          <button className='primary-btn mobible-nav-secondary-btn' onClick={openCallbellWidget}>Quiero mi Préstamo</button>
           {/* <Link to={'/asistencias'} className='secondary-btn mobible-nav-secondary-btn'>
             Quiero mi Asistencia
           </Link> */}

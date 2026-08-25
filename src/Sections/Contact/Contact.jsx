@@ -1,4 +1,5 @@
 import React from "react";
+import { openCallbellWidget } from "../../utils/callbellHelpers";
 import "./Contact.css";
 import { AiOutlineClockCircle } from "react-icons/ai";
 import {
@@ -26,7 +27,7 @@ const Contact = () => {
           <BsTelephone />
           <a
             style={{cursor: 'pointer'}}
-            onClick={() => window.callbell && window.callbell('open')}
+            onClick={openCallbellWidget}
           >
             <span>1137570853</span>
           </a>

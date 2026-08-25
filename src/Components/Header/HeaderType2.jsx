@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { openCallbellWidget } from '../../utils/callbellHelpers';
 import { Link, useLocation } from 'react-router-dom'
 import './HeaderType2.css'
 
@@ -48,7 +49,7 @@ const HeaderType2 = () => {
             <Link to={'/#contacto'} onClick={handleCloseNabvar}>Contacto</Link>
           </nav>
           {pathname === '/registro-simulador' || pathname === '/simulador' ? (
-            <button className='primary-btn mobible-nav-secondary-btn' id='btn-header-type-2-prestamo' onClick={() => window.callbell && window.callbell('open')} aria-label='Solicitar ayuda'>Solicitar ayuda</button>
+            <button className='primary-btn mobible-nav-secondary-btn' id='btn-header-type-2-prestamo' onClick={openCallbellWidget} aria-label='Solicitar ayuda'>Solicitar ayuda</button>
           ) : (
             <Link to='/registro-simulador' aria-label='Quiero mi préstamo'>
               <button className='primary-btn mobible-nav-secondary-btn' id='btn-header-type-2-prestamo' >Quiero mi Préstamo</button>

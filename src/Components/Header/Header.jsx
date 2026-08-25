@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
+import { openCallbellWidget } from "../../utils/callbellHelpers";
 import { Link, useLocation } from "react-router-dom";
 import { FiMenu } from "react-icons/fi";
 import { IoMdArrowBack } from "react-icons/io";
@@ -135,7 +136,7 @@ const Header = ({ hideHelpButton = false }) => {
           !hideHelpButton && (
             <button 
               className='primary-btn header-primary-btn'
-              onClick={() => window.callbell && window.callbell('open')}
+              onClick={openCallbellWidget}
               aria-label='Solicitar ayuda'
             >
               Solicitar ayuda

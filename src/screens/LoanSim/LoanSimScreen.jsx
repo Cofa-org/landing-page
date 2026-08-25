@@ -1,4 +1,5 @@
 import { useEffect, lazy, Suspense } from "react";
+import { toggleCallbellWidget } from "../../utils/callbellHelpers";
 import GenericButton from "../../Components/buttons/GenericButton/GenericButton.jsx";
 import BackButton from "../../Components/buttons/backbutton/BackButton.jsx";
 import { Footer, Header } from "../../Components/index.js";
@@ -77,15 +78,14 @@ const LoanSimScreen = () => {
   const shouldHideCallbell = isInitializing || isFirstOrLastStep;
 
   useEffect(() => {
-    if (window.callbell) {
-      if (shouldHideCallbell) {
-        window.callbell('hide');
-      } else {
-        window.callbell('show');
-      }
+    if (shouldHideCallbell) {
+      toggleCallbellWidget(false);
+    } else {
+      toggleCallbellWidget(true);
     }
+    
     return () => {
-      if (window.callbell) window.callbell('show');
+      toggleCallbellWidget(true);
     };
   }, [shouldHideCallbell]);
 

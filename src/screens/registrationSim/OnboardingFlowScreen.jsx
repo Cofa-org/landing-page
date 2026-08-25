@@ -1,4 +1,5 @@
 import React, { Suspense, memo, useCallback, useState, useEffect } from "react";
+import { toggleCallbellWidget } from "../../utils/callbellHelpers";
 import BackButton from "../../Components/buttons/backbutton/BackButton.jsx";
 import { Footer, Header } from "../../Components/index.js";
 import Loader from "../../Components/Loader/Loader.jsx";
@@ -202,15 +203,14 @@ const OnboardingFlowScreen = () => {
     onboardingStep === LOAN_SIM_STEPS.WELCOME;
 
   useEffect(() => {
-    if (window.callbell) {
-      if (isFirstOrLastStep) {
-        window.callbell('hide');
-      } else {
-        window.callbell('show');
-      }
+    if (isFirstOrLastStep) {
+      toggleCallbellWidget(false);
+    } else {
+      toggleCallbellWidget(true);
     }
+    
     return () => {
-      if (window.callbell) window.callbell('show');
+      toggleCallbellWidget(true);
     };
   }, [isFirstOrLastStep]);
 
