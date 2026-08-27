@@ -1,5 +1,5 @@
 import React from "react";
-import { openCallbellWidget } from "../../utils/callbellHelpers";
+import { openCallbellWebchat } from "../../utils/callbellHelpers";
 import "./Hero.css";
 import { infoList } from "../../data/info";
 import { AnimatedTitle, Carrusel } from "../../Components";
@@ -27,7 +27,7 @@ const Hero = () => {
             <button
               className='primary-btn btn-loan-main'
               id='btn-hero-prestamo'
-              onClick={openCallbellWidget}
+              onClick={openCallbellWebchat}
               aria-label='Solicitar ayuda'
             >
               SOLICITAR AYUDA

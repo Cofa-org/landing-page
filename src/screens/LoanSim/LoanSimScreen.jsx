@@ -1,5 +1,5 @@
 import { useEffect, lazy, Suspense } from "react";
-import { toggleCallbellWidget } from "../../utils/callbellHelpers";
+import { toggleCallbellWebchat } from "../../utils/callbellHelpers";
 import GenericButton from "../../Components/buttons/GenericButton/GenericButton.jsx";
 import BackButton from "../../Components/buttons/backbutton/BackButton.jsx";
 import { Footer, Header } from "../../Components/index.js";
@@ -74,18 +74,18 @@ const LoanSimScreen = () => {
   // finally de fetchSimulation, así que cubre éxito y error.
   const isInitializing = !initialSimulationResolved;
 
-  const isFirstOrLastStep = step === LOAN_SIM_STEPS.SIMULACION || step === LOAN_SIM_STEPS.COMPLETADO;
+  const isFirstOrLastStep = step === LOAN_SIM_STEPS.SIMULACION || step === LOAN_SIM_STEPS.COMPLETADO || step === LOAN_SIM_STEPS.RECHAZADO || step === LOAN_SIM_STEPS.DISPOSITIVO_RECHAZADO;
   const shouldHideCallbell = isInitializing || isFirstOrLastStep;
 
   useEffect(() => {
     if (shouldHideCallbell) {
-      toggleCallbellWidget(false);
+      toggleCallbellWebchat(false);
     } else {
-      toggleCallbellWidget(true);
+      toggleCallbellWebchat(true);
     }
     
     return () => {
-      toggleCallbellWidget(true);
+      toggleCallbellWebchat(true);
     };
   }, [shouldHideCallbell]);
 
@@ -245,7 +245,7 @@ const LoanSimScreen = () => {
             <GenericButton
               type='button'
               variant='primary'
-              onClick={() => (window.location.href = "http://wa.me/5491137570853?text=Hola!!%20Necesito%20ayuda%20para%20simular%20mi%20pr%C3%A9stamo!")}
+              onClick={() => window.open("https://wa.me/5491137570853?text=Hola!!%20Necesito%20ayuda%20para%20simular%20mi%20pr%C3%A9stamo!", "_blank", "noopener,noreferrer")}
               style={{ marginTop: "1rem" }}
             >
               Comunicarse con un asesor
@@ -260,7 +260,10 @@ const LoanSimScreen = () => {
   if (isInitializing) {
     return (
       <>
-        <Header hideHelpButton={true} />
+        <Header 
+          hideHelpButton={true} 
+          helpButtonPreset="Hola!! Necesito ayuda para simular mi préstamo!" 
+        />
         <div className={styles.homeCalculator_calculatorBox}>
           <div className={styles.calculatorContainer}>
             <div className={styles.loaderContainer}>
@@ -277,7 +280,10 @@ const LoanSimScreen = () => {
 
   return (
     <>
-      <Header hideHelpButton={isFirstOrLastStep} />
+      <Header 
+        hideHelpButton={isFirstOrLastStep} 
+        helpButtonPreset="Hola!! Necesito ayuda para simular mi préstamo!" 
+      />
       <main id='main-content'>
         <div className={styles.splitLayout}>
           <div className={styles.leftColumn}>

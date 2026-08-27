@@ -18,9 +18,9 @@ const RejectedStep = ({ fechaExpiracionBloqueo = null }) => {
         alt="Ilustración de rechazo"
         className={styles.illustration}
       />
-      <h2 className={styles.title}>En este momento no podemos ofrecerte una solución.</h2>
+      <h2 className={styles.title}>En este momento no tenés una oferta de préstamo disponible.</h2>
       <p className={styles.description}>
-        Pero seguiremos buscando alternativas para apoyarte en tu camino hacia el éxito financiero.
+        Podés volver a intentarlo más adelante.
       </p>
       {fechaTexto && (
         <p className={styles.description} role="status">

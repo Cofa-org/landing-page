@@ -51,7 +51,7 @@ const MobbexSubscriptionStep = ({ scoringId, onSubscriptionCompleted, error: ext
       <GenericButton
         type='button'
         variant='secondary'
-        onClick={() => (window.location.href = "http://wa.me/5491137570853")}
+        onClick={() => window.open("https://wa.me/5491137570853", "_blank", "noopener,noreferrer")}
         style={{ flex: 1, marginTop: "1rem" }}
       >
         Comunicarse con un asesor

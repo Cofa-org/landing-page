@@ -90,3 +90,8 @@ input:-internal-autofill-selected {
 .primary-btn > a {
   color: var(--white-text-color);
 }
+
+/* Ocultamiento global forzado para Callbell Livechat */
+body.hide-callbell #callbell-livechat-host {
+  display: none !important;
+}

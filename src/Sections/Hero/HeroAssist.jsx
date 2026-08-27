@@ -1,5 +1,5 @@
 import React from 'react'
-import { openCallbellWidget } from '../../utils/callbellHelpers';
+import { openCallbellWebchat } from '../../utils/callbellHelpers';
 import {GoArrowDown, GoArrowRight} from 'react-icons/go'
 import { OurServicesList } from '../../Components'
 import { Link } from 'react-router-dom'
@@ -18,7 +18,7 @@ const HeroAssist = () => {
                     <p>Tu red de seguridad en situaciones imprevistas. Ya sea que necesites atención médica de emergencia, asistencia en el hogar o ayuda para encontrar un médico, COFA Asistencias está acá para ayudarte.</p>
                 </div>
                 <div className='hero-buttons'>
-                    <button className='primary-btn' onClick={openCallbellWidget}>Pedir Asistencias <GoArrowRight /></button> 
+                    <button className='primary-btn' onClick={openCallbellWebchat}>Pedir Asistencias <GoArrowRight /></button> 
                     <Link to={'/asistencias/#multiasistencia'} className='primary-btn btn-score-points'>
                         Saber Más <GoArrowDown /> 
                     </Link>

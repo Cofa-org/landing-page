@@ -4,27 +4,26 @@
  * estas funciones manipulan el DOM directamente.
  */
 
-// Alterna la visibilidad del div host del widget para ocultarlo/mostrarlo
-export const toggleCallbellWidget = (isVisible) => {
-  const widgetHost = document.getElementById('callbell-livechat-host');
-  if (widgetHost) {
-    widgetHost.style.display = isVisible ? 'block' : 'none';
+// Alterna la visibilidad agregando o quitando una clase en el body
+export const toggleCallbellWebchat = (isVisible) => {
+  if (isVisible) {
+    document.body.classList.remove('hide-callbell');
+  } else {
+    document.body.classList.add('hide-callbell');
   }
 };
 
 // Intenta simular un clic en el botón de apertura del chat nativo
-export const openCallbellWidget = () => {
+export const openCallbellWebchat = () => {
   const widgetHost = document.getElementById('callbell-livechat-host');
   if (widgetHost) {
     // Callbell inyecta un iframe o botones dentro del div host
     // Buscamos cualquier elemento clickeable dentro del contenedor principal
-    // (A veces el botón se esconde tras un Shadow DOM, en ese caso la redirección a WA será la alternativa)
     try {
       const launcherBtn = widgetHost.querySelector('[role="button"]') || widgetHost.querySelector('button');
       if (launcherBtn) {
         launcherBtn.click();
       } else {
-        // Fallback si no encontramos el botón
         console.warn('Callbell Livechat launcher button not found.');
       }
     } catch (e) {

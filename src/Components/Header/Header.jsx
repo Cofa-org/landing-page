@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
-import { openCallbellWidget } from "../../utils/callbellHelpers";
+import { openCallbellWebchat } from "../../utils/callbellHelpers";
 import { Link, useLocation } from "react-router-dom";
 import { FiMenu } from "react-icons/fi";
 import { IoMdArrowBack } from "react-icons/io";
@@ -59,7 +59,7 @@ const NavLinks = ({ pageType, selectedLink, onLinkClick }) => {
   );
 };
 
-const Header = ({ hideHelpButton = false }) => {
+const Header = ({ hideHelpButton = false, helpButtonPreset }) => {
   const { pathname } = useLocation();
   const { scrolled } = useScrollContext();
   const [isOpen, setIsOpen] = useState(false);
@@ -136,7 +136,13 @@ const Header = ({ hideHelpButton = false }) => {
           !hideHelpButton && (
             <button 
               className='primary-btn header-primary-btn'
-              onClick={openCallbellWidget}
+              onClick={() => {
+                if (helpButtonPreset) {
+                  window.open(`https://wa.me/5491137570853?text=${encodeURIComponent(helpButtonPreset)}`, '_blank', 'noopener,noreferrer');
+                } else {
+                  openCallbellWebchat();
+                }
+              }}
               aria-label='Solicitar ayuda'
             >
               Solicitar ayuda

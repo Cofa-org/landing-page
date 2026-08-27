@@ -121,8 +121,7 @@ const ReciboUploadStep = ({
         type='button'
         variant='secondary'
         onClick={() =>
-          (window.location.href =
-            "http://wa.me/5491137570853?text=Hola!!%20Necesito%20ayuda%20para%20subir%20mi%20recibo%20de%20sueldo!")
+          window.open("https://wa.me/5491137570853?text=Hola!!%20Necesito%20ayuda%20para%20subir%20mi%20recibo%20de%20sueldo!", "_blank", "noopener,noreferrer")
         }
       >
         Comunicarse con un asesor
