@@ -66,16 +66,21 @@ export async function HttpApi(url, body, method, apiKey, token, signal = null, r
   const backoffMs = retryConfig?.backoffMs ?? 0;
   const isFormData = body instanceof FormData;
 
-  const buildOptions = () => ({
-    headers: {
-      ...(apiKey && { "x-api-key": apiKey }),
-      ...(token && { Authorization: `Bearer ${token}` }),
-      ...(!isFormData && { "Content-Type": "application/json" }),
-    },
-    method,
-    ...(body && { body: isFormData ? body : JSON.stringify(body) }),
-    ...(signal && { signal }),
-  });
+  const buildOptions = () => {
+    // Intentamos recuperar el ID de sesión de Callbell si fue generado
+    const cbSessionId = typeof window !== "undefined" ? localStorage.getItem("callbell_session_id") : null;
+    return {
+      headers: {
+        ...(apiKey && { "x-api-key": apiKey }),
+        ...(token && { Authorization: `Bearer ${token}` }),
+        ...(!isFormData && { "Content-Type": "application/json" }),
+        ...(cbSessionId && { "x-callbell-session-id": cbSessionId }),
+      },
+      method,
+      ...(body && { body: isFormData ? body : JSON.stringify(body) }),
+      ...(signal && { signal }),
+    };
+  };
 
   // Sólo wrappeamos TypeError en NetworkError cuando el caller optó por
   // retry. Sin retryConfig, propagamos el TypeError crudo para no

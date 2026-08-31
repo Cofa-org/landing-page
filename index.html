@@ -108,11 +108,18 @@
     <!-- End Google Tag Manager -->
     <!-- Start of Async Callbell Code -->
     <script>
+      let cbSessionId = localStorage.getItem('callbell_session_id');
+      if (!cbSessionId) {
+        cbSessionId = crypto.randomUUID();
+        localStorage.setItem('callbell_session_id', cbSessionId);
+      }
+      
       if (!window.callbellSettings) {
         window.callbellSettings = {}
       }
       window.callbellSettings["uuid"] = "2f43b31d-1abb-47fd-b02d-cc0e693f2997";
       window.callbellSettings["script_token"] = "oqE9mr9WVofs3RXCbsAPz3Cs";
+      window.callbellSettings["extra_params"] = { identifier: cbSessionId };
     </script>
     <script>
       (function(){var w=window;var d=document;var l=function(){var s=d.createElement('script');s.type='text/javascript';s.async=true;s.src='https://dash.callbell.eu/include/livechat/'+window.callbellSettings.script_token+'/'+window.callbellSettings.uuid+'.js';var x=d.getElementsByTagName('script')[0];x.parentNode.insertBefore(s,x);};if(w.attachEvent){w.attachEvent('onload',l);}else{w.addEventListener('load',l,false);}})();
