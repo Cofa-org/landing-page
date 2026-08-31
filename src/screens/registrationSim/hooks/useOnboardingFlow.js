@@ -136,18 +136,23 @@ export const useOnboardingFlow = () => {
               setPickerContext(response.data.pickerContext);
             }
           }
-          // Solo actualizar leadData si no tiene informacion completa (sin celular)
-          if (leadData?.celular) {
-            setLeadData(response.data);
-          }
-          // Mergear es_cliente para que navigateToPrev pueda decidir correctamente
-          // cuando el usuario refresca en RECIBO_UPLOAD.
-          if (response.data.es_cliente !== undefined) {
-            setLeadData((prev) => ({
-              ...(prev || {}),
+          // Patch 2026-08-31 (OTP resend fix): la condición original
+          // `if (leadData?.celular)` estaba invertida — sólo sobrescribía
+          // `leadData` cuando YA tenía celular, dejando `leadData.celular`
+          // undefined en el primer restore tras reload. Resultado:
+          // `OTPValidation.destination` era undefined y
+          // `usePhoneOTP.reenviarOTP` retornaba silencioso (timer sin
+          // reenvío). Reemplazamos por un merge explícito de los campos
+          // que el front necesita persistir entre sesiones.
+          setLeadData((prev) => ({
+            ...(prev || {}),
+            ...(response.data.celular !== undefined && {
+              celular: response.data.celular,
+            }),
+            ...(response.data.es_cliente !== undefined && {
               es_cliente: response.data.es_cliente,
-            }));
-          }
+            }),
+          }));
           setLeadToken(leadTokenValue);
           setOnboardingStep(targetStep);
         }
@@ -246,6 +251,21 @@ export const useOnboardingFlow = () => {
     }
     setLeadData(data.lead);
     setLeadToken(data.token);
+    // Patch 2026-08-31 (OTP resend fix): el path identity-selection
+    // (handleIdentitySelected, ~L293) sí persiste `token` en cookie, pero
+    // el happy path (este bloque) sólo lo guardaba en `leadToken` (state).
+    // El servicio `solicitarOTPCelular` lee el JWT de la cookie para
+    // mandarlo como `Authorization: Bearer ...` (ver leadRegistrationService
+    // línea ~261). Sin la cookie, el back responde 401 "Token no
+    // proporcionado" y `usePhoneOTP.reenviarOTP` muestra ese mensaje
+    // mientras el cooldown arranca sin disparar nada. Persistir acá.
+    if (data?.token) {
+      setCookie(
+        COOKIE_LEAD_TOKEN_CONFIG.NAME,
+        data.token,
+        COOKIE_LEAD_TOKEN_CONFIG.EXPIRY_MS,
+      );
+    }
 
     // Siempre navegar a PHONE_VALIDATION después de crearLead exitoso
     setOnboardingStep(LOAN_SIM_STEPS.PHONE_VALIDATION);

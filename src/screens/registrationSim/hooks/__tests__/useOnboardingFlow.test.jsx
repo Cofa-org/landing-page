@@ -19,6 +19,7 @@ vi.mock("../../../../lib/token.js", () => ({
   getDecodedToken: vi.fn().mockReturnValue(null),
 }));
 
+import { setCookie } from "../../../../lib/utils.js";
 import { useOnboardingFlow } from "../useOnboardingFlow.js";
 
 describe("useOnboardingFlow — phone picker routing", () => {
@@ -182,5 +183,59 @@ describe("useOnboardingFlow — phone picker routing", () => {
     // mediante el array de steps que sí podemos setear — al ser derivada,
     // la prueba queda como contrato de pertenencia:
     expect(["PHONE_VALIDATION", "DNI_UPLOAD", "RECIBO_UPLOAD", "WELCOME", "EN_ANALISIS", "IDENTITY_SELECTION", "PHONE_PICKER"]).toContain("PHONE_PICKER");
+  });
+});
+
+describe("useOnboardingFlow — handleLeadSuccess persiste token en cookie", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("happy path (no identity-selection): setea cookie leadToken para que solicitarOTPCelular pueda mandar Authorization Bearer", () => {
+    // Patch 2026-08-31 (OTP resend fix): `solicitarOTPCelular` lee el JWT
+    // de la cookie `leadToken` (leadRegistrationService.solicitarOTPCelular
+    // hace `getCookie(COOKIE_LEAD_TOKEN_CONFIG.NAME)` y lo manda como
+    // Authorization header). Si la cookie no está seteada, el back responde
+    // 401 "Token no proporcionado" — exactamente lo que el usuario veía.
+    // Antes: `handleLeadSuccess` sólo guardaba en `leadToken` (state).
+    const { result } = renderHook(() => useOnboardingFlow());
+
+    act(() => {
+      result.current.handleLeadSuccess({
+        lead: {
+          id: 30,
+          celular: "1145678901",
+          es_cliente: false,
+        },
+        token: "jwt-mock-token-abc",
+      });
+    });
+
+    expect(setCookie).toHaveBeenCalledWith(
+      "leadToken",
+      "jwt-mock-token-abc",
+      expect.any(Number),
+    );
+    expect(result.current.onboardingStep).toBe("PHONE_VALIDATION");
+  });
+
+  it("identity-selection path: NO setea cookie acá (lo hace handleIdentitySelected después de la 2da llamada a crearLead)", () => {
+    // Defense-in-depth: si alguien refactorea `handleLeadSuccess` y agrega
+    // un `setCookie` no-op cuando `requiresIdentitySelection`, este test
+    // rompe y obliga a decidir dónde vive la persistencia.
+    const { result } = renderHook(() => useOnboardingFlow());
+
+    act(() => {
+      result.current.handleLeadSuccess({
+        requiresIdentitySelection: true,
+        identities: [{ cuit: "20123456789", nombre_completo: "Juan" }],
+        dni: "12345678",
+        celular: "1145678901",
+        situacionLaboral: "RELACION_DEPENDENCIA",
+      });
+    });
+
+    expect(setCookie).not.toHaveBeenCalled();
+    expect(result.current.onboardingStep).toBe("IDENTITY_SELECTION");
   });
 });

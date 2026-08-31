@@ -64,7 +64,24 @@ export const usePhoneOTP = (getLeadId) => {
   const reenviarOTP = useCallback(
     async (destination) => {
       const leadId = getLeadId();
-      if (!leadId || !destination) return;
+      // Patch 2026-08-31 (OTP resend fix): defense-in-depth. Antes un
+      // `return` silencioso cuando faltaba `leadId` o `destination` permitía
+      // que `handleResendClick` (useOTPValidation.js) arrancara el cooldown
+      // de 120s sin disparar la API al back. Surface el problema al caller
+      // para que NO setee el timer y para que el hook de presentación
+      // muestre el error en pantalla.
+      if (!leadId) {
+        const error = new Error("Sesión inválida: no se encontró el leadId");
+        setError(`${error.message} 😊`);
+        throw error;
+      }
+      if (!destination) {
+        const error = new Error(
+          "Falta el número de celular para reenviar el código",
+        );
+        setError(`${error.message} 😊`);
+        throw error;
+      }
       setValidating(true);
       setError(null);
       try {
