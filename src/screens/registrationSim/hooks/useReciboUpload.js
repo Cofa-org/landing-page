@@ -92,7 +92,7 @@ export const useReciboUpload = () => {
   );
 
   const setSlotHydrated = useCallback(
-    (orden, { reciboId, url, mime, size }) => {
+    (orden, { reciboId, url, mime, size, filename }) => {
       if (!isValidOrden(orden)) return;
       const index = toSlotIndex(orden);
       // Whole-branch fix C-2 (2026-08-21): si el usuario ya seleccionó un file en
@@ -113,6 +113,7 @@ export const useReciboUpload = () => {
           status: "uploaded",
           mime,
           size,
+          filename,
           hydrated: true,
         };
         return next;

@@ -1,4 +1,4 @@
-import React, { memo, useEffect } from "react";
+import React, { memo, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import GenericButton from "../../../../Components/buttons/GenericButton/GenericButton.jsx";
 import GenericForm from "../../../../Components/Forms/GenericForm/GenericForm.jsx";
@@ -9,6 +9,18 @@ import ReciboSlotTile from "./ReciboSlotTile.jsx";
 import styles from "./ReciboUploadStep.module.css";
 
 const MAX_SLOTS = 3;
+
+/**
+ * Extrae el filename original del `storage_path` de un recibo persistido.
+ * Shape esperado: `lead-123/PENDIENTE/RECIBO/recibo.jpg` → `"recibo.jpg"`.
+ * Si `storage_path` es null/undefined/vacío, retorna `null` para que el slot
+ * se hidrate igual pero sin nombre visible (backward compat con filas legacy).
+ */
+const extractFilenameFromStoragePath = (storagePath) => {
+  if (!storagePath || typeof storagePath !== "string") return null;
+  const segments = storagePath.split("/").filter(Boolean);
+  return segments.length > 0 ? segments[segments.length - 1] : null;
+};
 
 /**
  * ReciboUploadStep — pantalla multi-recibo (hasta 3).
@@ -41,13 +53,28 @@ const ReciboUploadStep = ({
     setSlotHydrated,
   } = useReciboUpload();
 
+  // `hydrating` cubre la ventana de RTT de `getRecibosPendientes` para
+  // evitar el flash de 3 slots vacíos antes de que el back responda
+  // (Task 6). Initializa desde `Boolean(leadId)` para que el primer paint
+  // refleje inmediatamente el caso "sin RTT" cuando no hay leadId: muestra
+  // los 3 placeholders, no skeletons. Cuando `leadId` existe, el default
+  // `true` hace que el primer paint muestre skeletons mientras llega
+  // `getRecibosPendientes`; el effect de rehydration baja `hydrating` a
+  // `false` en su `finally`.
+  // (I2 — whole-branch review 2026-08-31)
+  const [hydrating, setHydrating] = useState(Boolean(leadId));
+
   // Rehydrate from server on mount.
   useEffect(() => {
-    if (!leadId) return undefined;
+    if (!leadId) {
+      setHydrating(false);
+      return undefined;
+    }
     let cancelled = false;
     (async () => {
       try {
         const existentes = await LeadRegistrationService.getRecibosPendientes(leadId);
+        console.log("RECIBOS_REHYDRATE", existentes);
         if (cancelled) return;
         for (const r of existentes) {
           setSlotHydrated(r.orden, {
@@ -55,12 +82,15 @@ const ReciboUploadStep = ({
             url: r.url,
             mime: r.mime,
             size: r.size,
+            filename: extractFilenameFromStoragePath(r.storage_path),
           });
         }
       } catch (e) {
         // Rehydration es best-effort: si falla, el usuario puede volver a
         // subir. Solo logueamos para no romper la UX con un toast de error.
         console.warn("RECIBOS_REHYDRATE_FAILED:", e);
+      } finally {
+        if (!cancelled) setHydrating(false);
       }
     })();
     return () => {
@@ -83,9 +113,9 @@ const ReciboUploadStep = ({
       }
     }
   };
-
+console.log(slots)
   const visibleSlots = slots.slice(0, MAX_SLOTS);
-
+console.log(visibleSlots)
   return (
     <GenericForm
       title='Subí tu recibo de sueldo'
@@ -95,16 +125,25 @@ const ReciboUploadStep = ({
       children_className={styles.formTemplate}
     >
       <div className={styles.uploadAreaWrapper}>
-        {visibleSlots.map((slot, idx) => (
-          <ReciboSlotTile
-            key={idx}
-            orden={idx + 1}
-            slot={slot}
-            onAddFile={addFileToSlot}
-            onClear={clearSlot}
-            maxSlots={MAX_SLOTS}
-          />
-        ))}
+        {hydrating
+          ? Array.from({ length: MAX_SLOTS }, (_, idx) => (
+              <div
+                key={idx}
+                data-testid='hydration-skeleton'
+                className={styles.skeletonSlot}
+                aria-hidden='true'
+              />
+            ))
+          : visibleSlots.map((slot, idx) => (
+              <ReciboSlotTile
+                key={idx}
+                orden={idx + 1}
+                slot={slot}
+                onAddFile={addFileToSlot}
+                onClear={clearSlot}
+                maxSlots={MAX_SLOTS}
+              />
+            ))}
       </div>
 
       {displayError && <p className={styles.error}>{displayError}</p>}

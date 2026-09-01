@@ -316,6 +316,39 @@
   color: #333;
 }
 
+/* Skeleton placeholder (Task 6): mientras `getRecibosPendientes` está
+   en flight, mostramos 3 tiles animados para evitar el flash de slots
+   vacíos. Mismo footprint visual que `.slotTile` pero sin input ni
+   interactividad. */
+.skeletonSlot {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 16px;
+  width: 100%;
+  max-width: 360px;
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 0%,
+    #f8f8f8 50%,
+    #f0f0f0 100%
+  );
+  background-size: 200% 100%;
+  min-height: 200px;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
 @media (max-width: 480px) {
   .formTemplateContainer {
     min-height: 760px;

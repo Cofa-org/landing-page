@@ -35,16 +35,23 @@ describe("ReciboUploadStep", () => {
   });
 
   describe("renderizado inicial", () => {
-    it("renderiza 3 slots por defecto", () => {
+    it("renderiza 3 slots por defecto", async () => {
       const { container } = render(<ReciboUploadStep leadId={1} />);
-      // Cada slot expone su input file (vacío al inicio). 3 slots → 3 inputs.
-      expect(countFileInputs(container)).toBe(3);
+      // Task 6: durante el RTT de rehydration el componente muestra
+      // skeletons, no slots. Tras resolver `getRecibosPendientes` (mock
+      // `beforeEach` con `[]`), los 3 placeholders aparecen.
+      await waitFor(() => {
+        expect(countFileInputs(container)).toBe(3);
+      });
     });
 
-    it("muestra '+ Subir Recibo N' en cada placeholder, con N = número de slot", () => {
+    it("muestra '+ Subir Recibo N' en cada placeholder, con N = número de slot", async () => {
       render(<ReciboUploadStep leadId={1} />);
-      // El label de cada placeholder refleja SU slot (orden), no el próximo.
-      expect(screen.getByText(/\+ Subir Recibo 1/i)).toBeInTheDocument();
+      // Task 6: esperar la salida del estado `hydrating` antes de
+      // inspeccionar los labels de los placeholders.
+      await waitFor(() => {
+        expect(screen.getByText(/\+ Subir Recibo 1/i)).toBeInTheDocument();
+      });
       expect(screen.getByText(/\+ Subir Recibo 2/i)).toBeInTheDocument();
       expect(screen.getByText(/\+ Subir Recibo 3/i)).toBeInTheDocument();
       // No debe quedar ningún label de la convención vieja.
@@ -59,6 +66,11 @@ describe("ReciboUploadStep", () => {
       });
 
       render(<ReciboUploadStep leadId={7} />);
+
+      // Task 6: esperar fin de hydration antes de tocar inputs.
+      await waitFor(() => {
+        expect(screen.getByTestId("slot-1-input")).toBeInTheDocument();
+      });
 
       // Slot 1 (data-testid="slot-1-input") → fire change.
       const slot1Input = screen.getByTestId("slot-1-input");
@@ -78,11 +90,13 @@ describe("ReciboUploadStep", () => {
       expect(screen.queryByText(/\+ Agregar Recibo 3/i)).not.toBeInTheDocument();
     });
 
-    it("nunca renderiza un 4to slot (max 3)", () => {
+    it("nunca renderiza un 4to slot (max 3)", async () => {
       const { container } = render(<ReciboUploadStep leadId={7} />);
 
-      // Estado inicial: 3 placeholders con 3 file inputs.
-      expect(countFileInputs(container)).toBe(3);
+      // Task 6: esperar fin de hydration antes de contar inputs.
+      await waitFor(() => {
+        expect(countFileInputs(container)).toBe(3);
+      });
 
       // Llenamos los 3 slots con archivos. El componente usa
       // `slots.slice(0, MAX_SLOTS)` con MAX_SLOTS=3 → no debe aparecer
@@ -108,16 +122,135 @@ describe("ReciboUploadStep", () => {
       expect(screen.queryByText(/\+ Agregar Recibo 4/i)).not.toBeInTheDocument();
     });
 
-    it("el botón Continuar está disabled cuando no hay slot uploaded", () => {
+    it("el botón Continuar está disabled cuando no hay slot uploaded", async () => {
       render(<ReciboUploadStep leadId={1} />);
+      // Task 6: esperar fin de hydration; el botón existe siempre, pero
+      // esta aserción debe correr cuando el form está listo.
+      await waitFor(() => {
+        expect(
+          screen.getByRole("button", { name: /continuar/i }),
+        ).toBeInTheDocument();
+      });
       const submitBtn = screen.getByRole("button", { name: /continuar/i });
       expect(submitBtn).toBeDisabled();
     });
   });
 
+  describe("Hydration skeleton (Task 6: hydrating state during RTT)", () => {
+    it("shows skeleton placeholders (no file inputs visible) while getRecibosPendientes is in-flight", () => {
+      // Never-resolving promise keeps the rehydration RTT open so the
+      // component stays in its `hydrating` initial state.
+      LeadRegistrationService.getRecibosPendientes.mockReturnValue(
+        new Promise(() => {}),
+      );
+
+      const { container } = render(<ReciboUploadStep leadId={1} />);
+
+      // No file inputs are rendered while hydrating — placeholders are
+      // suppressed in favor of skeleton tiles (data-testid="hydration-skeleton").
+      expect(countFileInputs(container)).toBe(0);
+      const skeletons = container.querySelectorAll(
+        '[data-testid="hydration-skeleton"]',
+      );
+      expect(skeletons.length).toBe(3);
+    });
+
+    it("replaces skeletons with real slots after getRecibosPendientes resolves", async () => {
+      // Resolves with an empty list so the 3 placeholder slots appear.
+      LeadRegistrationService.getRecibosPendientes.mockResolvedValue([]);
+
+      const { container } = render(<ReciboUploadStep leadId={1} />);
+
+      // After awaiting the resolution, the 3 slot inputs appear and the
+      // skeletons are gone.
+      await waitFor(() => {
+        expect(countFileInputs(container)).toBe(3);
+      });
+      expect(
+        container.querySelectorAll('[data-testid="hydration-skeleton"]').length,
+      ).toBe(0);
+    });
+
+    it("renders empty slots (NOT skeletons) on first render when leadId is null", () => {
+      // I2 (whole-branch review 2026-08-31): when `leadId` is null/undefined,
+      // the useEffect early-returns without firing getRecibosPendientes, but
+      // `useState(true)` causes a one-frame flash of skeleton tiles before
+      // the effect runs. The fix initializes `hydrating` from
+      // `Boolean(leadId)` so the first render reflects the no-RTT case
+      // immediately (empty slots, not skeletons).
+      //
+      // No getRecibosPendientes mock is needed: the effect early-returns
+      // before calling the service. The `beforeEach` mock is harmless.
+      const { container } = render(<ReciboUploadStep leadId={null} />);
+
+      // Skeletons must NOT render on first paint.
+      expect(
+        container.querySelectorAll('[data-testid="hydration-skeleton"]').length,
+      ).toBe(0);
+      // The 3 slot inputs (placeholders) must render on first paint.
+      expect(countFileInputs(container)).toBe(3);
+    });
+  });
+
+  describe("Rehydration (Task 4: derive filename from storage_path)", () => {
+    it("derives filename from storage_path's last segment and shows it in the hydrated tile", async () => {
+      // storage_path shape (from simulador_prestamos_recibo): the last
+      // segment after "/" is the original filename. El rehydration debe
+      // extraerlo y dejarlo visible en el fileMeta del tile.
+      LeadRegistrationService.getRecibosPendientes.mockResolvedValue([
+        {
+          recibo_id: "uuid-recibo-1",
+          orden: 1,
+          url: "blob:recibos/lead-123/PENDIENTE/RECIBO/recibo.jpg",
+          mime: "image/jpeg",
+          size: 12345,
+          storage_path: "lead-123/PENDIENTE/RECIBO/recibo.jpg",
+        },
+      ]);
+
+      render(<ReciboUploadStep leadId={123} />);
+
+      // Tras rehydration, el slot 1 deja de ser placeholder y se vuelve
+      // tile uploaded. El filename derivado del storage_path debe estar
+      // visible en el fileMeta del header.
+      await waitFor(() => {
+        expect(screen.getByText(/recibo\.jpg/)).toBeInTheDocument();
+      });
+    });
+
+    it("still hydrates the slot even when storage_path is missing (filename null)", async () => {
+      // Backward compat: si una fila legacy no tiene storage_path, el slot
+      // se hidrata igual (sin nombre). El placeholder desaparece → tile
+      // uploaded renderiza, sin fileMeta visible.
+      LeadRegistrationService.getRecibosPendientes.mockResolvedValue([
+        {
+          recibo_id: "uuid-legacy",
+          orden: 1,
+          url: "blob:recibos/legacy.jpg",
+          mime: "image/jpeg",
+          size: 4096,
+          // storage_path ausente
+        },
+      ]);
+
+      render(<ReciboUploadStep leadId={456} />);
+
+      // Slot 1 debe hidratar (placeholder "Subir Recibo 1" desaparece).
+      await waitFor(() => {
+        expect(screen.queryByTestId("slot-1-input")).not.toBeInTheDocument();
+      });
+      // El tile muestra el status "Subido" sin nombre (porque filename es null).
+      expect(screen.getByText(/subido/i)).toBeInTheDocument();
+    });
+  });
+
   describe("Quitar visibility (pre-upload pivot 2026-08-21)", () => {
-    it("shows Quitar when slot has idle status (before upload)", () => {
+    it("shows Quitar when slot has idle status (before upload)", async () => {
       render(<ReciboUploadStep leadId={1} />);
+      // Task 6: esperar fin de hydration antes de tocar inputs.
+      await waitFor(() => {
+        expect(screen.getByTestId("slot-1-input")).toBeInTheDocument();
+      });
       // Slot 1 (data-testid="slot-1-input") → fire change. Slot pasa a idle.
       fireEvent.change(screen.getByTestId("slot-1-input"), {
         target: { files: [makeFile("a.jpg")] },
@@ -128,8 +261,12 @@ describe("ReciboUploadStep", () => {
       expect(screen.getByTestId("slot-1-quitar")).toBeInTheDocument();
     });
 
-    it("shows Cambiar archivo button when slot has idle status (pre-upload)", () => {
+    it("shows Cambiar archivo button when slot has idle status (pre-upload)", async () => {
       render(<ReciboUploadStep leadId={1} />);
+      // Task 6: esperar fin de hydration antes de tocar inputs.
+      await waitFor(() => {
+        expect(screen.getByTestId("slot-1-input")).toBeInTheDocument();
+      });
       fireEvent.change(screen.getByTestId("slot-1-input"), {
         target: { files: [makeFile("a.jpg")] },
       });
@@ -137,8 +274,12 @@ describe("ReciboUploadStep", () => {
       expect(screen.getByTestId("slot-1-retake")).toBeInTheDocument();
     });
 
-    it("calls onClear when Quitar is clicked (pre-upload)", () => {
+    it("calls onClear when Quitar is clicked (pre-upload)", async () => {
       render(<ReciboUploadStep leadId={1} />);
+      // Task 6: esperar fin de hydration antes de tocar inputs.
+      await waitFor(() => {
+        expect(screen.getByTestId("slot-1-input")).toBeInTheDocument();
+      });
       fireEvent.change(screen.getByTestId("slot-1-input"), {
         target: { files: [makeFile("a.jpg")] },
       });
@@ -154,6 +295,10 @@ describe("ReciboUploadStep", () => {
         data: { recibos: [{ id: 100, orden: 1 }] },
       });
       render(<ReciboUploadStep leadId={7} />);
+      // Task 6: esperar fin de hydration antes de tocar inputs.
+      await waitFor(() => {
+        expect(screen.getByTestId("slot-1-input")).toBeInTheDocument();
+      });
       fireEvent.change(screen.getByTestId("slot-1-input"), {
         target: { files: [makeFile("a.jpg")] },
       });
@@ -209,7 +354,7 @@ describe("ReciboUploadStep", () => {
       expect(block).toMatch(/\.formTemplateContainer[\s\S]*?padding:\s*var\(--spacing-sm\)/);
     });
 
-    it("renderiza el slot dentro del formulario sin overflow markers a 360px", () => {
+    it("renderiza el slot dentro del formulario sin overflow markers a 360px", async () => {
       // Mock narrow viewport. jsdom doesn't apply CSS, so we only assert
       // structural integrity: the slot wrapper exists, has its data-state
       // attribute and is contained inside the form element.
@@ -222,6 +367,10 @@ describe("ReciboUploadStep", () => {
         const { container } = render(<ReciboUploadStep leadId={1} />);
         const form = container.querySelector("form");
         expect(form).not.toBeNull();
+        // Task 6: esperar fin de hydration antes de contar placeholders.
+        await waitFor(() => {
+          expect(form.querySelectorAll('input[type="file"]').length).toBe(3);
+        });
         // SlotTile wrappers sit inside the form (no horizontal-scroll-bearing
         // divs injected by the component).
         const slotTile = form.querySelector('[class*="slotTile"]');

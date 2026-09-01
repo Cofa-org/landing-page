@@ -70,7 +70,7 @@ const ReciboSlotTile = ({ orden, slot, onAddFile, onClear }) => {
     );
   }
 
-  const isImage = slot.file?.type?.startsWith("image/");
+  const isImage = (slot.file?.type ?? slot.mime)?.startsWith("image/");
   const showActions = slot.status !== "uploaded";
   return (
     <div className={styles.slotTile} data-state={slot.status}>
@@ -88,9 +88,10 @@ const ReciboSlotTile = ({ orden, slot, onAddFile, onClear }) => {
       <div className={styles.slotHeader}>
         <div className={styles.slotHeaderInfo}>
           <strong>Recibo {orden}</strong>
-          {slot.file?.name && (
+          {(slot.file?.name || slot.filename) && (
             <span className={styles.fileMeta}>
-              {slot.file.name} · {formatBytes(slot.file.size)}
+              {slot.file?.name || slot.filename} ·{" "}
+              {formatBytes(slot.file?.size || slot.size)}
             </span>
           )}
         </div>

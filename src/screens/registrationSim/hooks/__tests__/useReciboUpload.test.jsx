@@ -487,6 +487,55 @@ describe("useReciboUpload", () => {
         hydrated: true,
       });
     });
+
+    it("setSlotHydrated stores filename in slot entry when provided", () => {
+      const { result } = renderHook(() => useReciboUpload());
+      act(() => {
+        result.current.setSlotHydrated(2, {
+          reciboId: "uuid-filename",
+          url: "blob:recibos/filename",
+          mime: "image/jpeg",
+          size: 2048,
+          filename: "recibo-original.jpg",
+        });
+      });
+
+      expect(result.current.slots[1]).toEqual({
+        file: null,
+        preview: "blob:recibos/filename",
+        reciboId: "uuid-filename",
+        status: "uploaded",
+        mime: "image/jpeg",
+        size: 2048,
+        filename: "recibo-original.jpg",
+        hydrated: true,
+      });
+    });
+
+    it("setSlotHydrated with no filename still works (backward compat)", () => {
+      const { result } = renderHook(() => useReciboUpload());
+      act(() => {
+        result.current.setSlotHydrated(1, {
+          reciboId: "uuid-no-filename",
+          url: "blob:recibos/legacy",
+          mime: "application/pdf",
+          size: 512,
+        });
+      });
+
+      // Backward compat: callers que no pasan filename NO deben romper.
+      // El slot se hidrata normalmente y filename queda undefined.
+      expect(result.current.slots[0]).toMatchObject({
+        file: null,
+        preview: "blob:recibos/legacy",
+        reciboId: "uuid-no-filename",
+        status: "uploaded",
+        mime: "application/pdf",
+        size: 512,
+        hydrated: true,
+      });
+      expect(result.current.slots[0]?.filename).toBeUndefined();
+    });
   });
 
   describe("rehydration end-to-end", () => {
