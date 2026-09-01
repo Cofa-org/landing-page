@@ -210,6 +210,7 @@ export const useOnboardingFlow = () => {
 
         // Solo sincronizar si hay un estado previo que actualizar
         if (leadId && estadoBackendPrev) {
+          console.log("estadoBackendPrev", estadoBackendPrev);
           await LeadRegistrationService.actualizarEstadoOnboarding({
             leadId,
             estado: estadoBackendPrev,

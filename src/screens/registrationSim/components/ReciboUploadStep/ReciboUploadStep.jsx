@@ -74,7 +74,7 @@ const ReciboUploadStep = ({
     (async () => {
       try {
         const existentes = await LeadRegistrationService.getRecibosPendientes(leadId);
-        console.log("RECIBOS_REHYDRATE", existentes);
+        
         if (cancelled) return;
         for (const r of existentes) {
           setSlotHydrated(r.orden, {
@@ -113,9 +113,9 @@ const ReciboUploadStep = ({
       }
     }
   };
-console.log(slots)
+
   const visibleSlots = slots.slice(0, MAX_SLOTS);
-console.log(visibleSlots)
+
   return (
     <GenericForm
       title='Subí tu recibo de sueldo'
