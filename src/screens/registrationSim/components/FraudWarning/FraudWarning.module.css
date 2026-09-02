@@ -1,0 +1,72 @@
+.warningContainer {
+  background-color: #fff9e6; /* Amarillo claro */
+  border: 1px solid #ffcc00;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.warningIcon {
+  color: #ff9900;
+  font-size: 24px;
+}
+
+.warningTitle {
+  font-weight: 600;
+  font-size: 16px;
+  color: #333333;
+}
+
+.warningText {
+  font-size: 14px;
+  color: #555555;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+.checkboxInput {
+  margin-top: 3px;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #0056b3; /* Usando el azul del tema si aplica, o dejar por defecto */
+}
+
+.checkboxText {
+  font-size: 14px;
+  color: #333333;
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .warningContainer {
+    padding: 12px;
+  }
+  
+  .warningTitle {
+    font-size: 15px;
+  }
+  
+  .warningText, .checkboxText {
+    font-size: 13px;
+  }
+}

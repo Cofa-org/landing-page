@@ -76,6 +76,7 @@ export const useLeadRegistration = (turnstileToken) => {
     fechaNacimiento: "",
     situacionLaboral: "",
     term_y_cond: false,
+    prevencion_fraudes: false,
   });
   const [errors, setErrors] = useState({
     dni: "",
@@ -172,8 +173,12 @@ export const useLeadRegistration = (turnstileToken) => {
     [errors],
   );
 
-  const handleTerminosChange = useCallback((event) => {
-    setFormData((prev) => ({ ...prev, term_y_cond: event.target.checked }));
+  const handleTerminosChange = useCallback((e) => {
+    const { name, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: checked,
+    }));
   }, []);
 
   const validateForm = useCallback(() => {
@@ -214,6 +219,7 @@ export const useLeadRegistration = (turnstileToken) => {
             celular: formData.celular,
             situacion_laboral: formData.situacionLaboral,
             term_y_cond: formData.term_y_cond,
+            prevencion_fraudes: formData.prevencion_fraudes,
             ...(showFechaNacimiento &&
               formData.fechaNacimiento && {
                 fecha_nacimiento: formData.fechaNacimiento,
@@ -313,7 +319,8 @@ export const useLeadRegistration = (turnstileToken) => {
     (!showFechaNacimiento || (formData.fechaNacimiento && !errors.fechaNacimiento)) &&
     formData.situacionLaboral !== "" &&
     turnstileToken !== "" &&
-    formData.term_y_cond === true;
+    formData.term_y_cond === true &&
+    formData.prevencion_fraudes === true;
 
   return {
     formData,
