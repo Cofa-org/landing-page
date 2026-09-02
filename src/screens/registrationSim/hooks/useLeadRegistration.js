@@ -1,40 +1,15 @@
 import { useState, useCallback, useEffect } from "react";
 import LeadRegistrationService from "../../../services/leadRegistrationService";
-import { ERROR_CAUSE, ERROR_MESSAGE } from "../../../constants/error";
+import { ERROR_CAUSE } from "../../../constants/error";
 import { setCookie } from "../../../lib/utils";
-import { COOKIE_LEAD_TOKEN_CONFIG, DNI_AGE_CALIBRATION, SITUACION_LABORAL_OPTIONS } from "../../../constants/LOAN_SIM.js";
+import { COOKIE_LEAD_TOKEN_CONFIG, SITUACION_LABORAL_OPTIONS } from "../../../constants/LOAN_SIM.js";
 
 const DNI_REGEX = /^\d{7,8}$/;
 const CELULAR_REGEX = /^\d{10}$/;
 
-const calcularEdad = (fechaNacimiento) => {
-  const fecha = new Date(fechaNacimiento);
-  const hoy = new Date();
-  let edad = hoy.getFullYear() - fecha.getFullYear();
-  const mes = hoy.getMonth() - fecha.getMonth();
-  if (mes < 0 || (mes === 0 && hoy.getDate() < fecha.getDate())) edad--;
-  return edad;
-};
-
-/**
- * Calcula la edad estimada a partir del DNI argentino.
- * Retorna null para DNIs extranjeros (>= 90M) o DNIs no numéricos.
- * La fórmula se ajusta automáticamente con el año actual.
- */
-const calcularEdadDesdeDNI = (dni) => {
-  const dniNumber = Number(dni);
-  if (!dniNumber || dniNumber >= 90000000) return null;
-
-  const currentYear = new Date().getFullYear();
-  const yearsSinceCalibration = currentYear - DNI_AGE_CALIBRATION.calibrationYear;
-  const dniInMillions = dniNumber / 1_000_000;
-
-  return (
-    DNI_AGE_CALIBRATION.baseAge +
-    yearsSinceCalibration +
-    (DNI_AGE_CALIBRATION.baseDniMillions - dniInMillions) * DNI_AGE_CALIBRATION.yearsPerMillion
-  );
-};
+// Age validation moved to backend (pre-scoring gate in `crearLead`, 2026-09-02).
+// Regla asimétrica: < 18 siempre rechaza; > 60 rechaza solo si NO es cliente COFA.
+// El back persiste el rechazo con motivo_rechazo=EDAD_INVALIDA para visibilidad en backoffice.
 
 export const SECURITY_SLIDES = [
   {
@@ -113,20 +88,6 @@ export const useLeadRegistration = (turnstileToken) => {
       case "dni": {
         if (!trimmed) return "El DNI es requerido";
         if (!DNI_REGEX.test(trimmed)) return "El DNI debe tener 7 u 8 dígitos";
-        // Validar edad estimada solo para DNIs argentinos (< 90M).
-        // Los DNIs extranjeros ya piden fechaNacimiento explícita.
-        const dniNumber = Number(trimmed);
-        if (dniNumber < 90000000) {
-          const edadEstimada = calcularEdadDesdeDNI(trimmed);
-          if (edadEstimada !== null) {
-            if (edadEstimada < DNI_AGE_CALIBRATION.tolerance.min) {
-              return ERROR_MESSAGE.EDAD_INVALIDA;
-            }
-            if (edadEstimada > DNI_AGE_CALIBRATION.tolerance.max) {
-              return ERROR_MESSAGE.EDAD_INVALIDA;
-            }
-          }
-        }
         return "";
       }
       case "celular": {
@@ -141,9 +102,6 @@ export const useLeadRegistration = (turnstileToken) => {
         const fecha = new Date(value);
         if (isNaN(fecha.getTime())) return "Fecha inválida";
         if (fecha > new Date()) return "La fecha no puede ser futura";
-        const edad = calcularEdad(value);
-        if (edad < 18) return "Debés tener al menos 18 años";
-        if (edad > 60) return "Debés tener 60 años o menos";
         return "";
       }
       case "situacionLaboral": {
@@ -196,10 +154,9 @@ export const useLeadRegistration = (turnstileToken) => {
     async (turnstileToken, signal = null) => {
       const validation = validateForm();
       if (!validation.isValid) {
-        // Si la validación local detectó un error de edad, redirigir a rechazo.
-        if (validation.errors.dni === ERROR_MESSAGE.EDAD_INVALIDA) {
-          return { success: false, rejected: true };
-        }
+        // Age validation moved to backend (2026-09-02). El back siempre
+        // responde HTTP 200 con cause=EDAD_INVALIDA; el handler de abajo
+        // lo enruta a RejectedStep via onRejected().
         return { success: false, validationFailed: true };
       }
       setIsSubmitting(true);

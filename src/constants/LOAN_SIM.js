@@ -96,31 +96,9 @@ export const PEP_TIPO = Object.freeze({
   INDIRECTO: "INDIRECTO",
 });
 
-
-/**
- * Calibración DNI argentino → edad estimada.
- *
- * Fórmula: edad = baseAge + (añoActual - calibrationYear)
- *                 + (baseDniMillions - dni/1_000_000) × yearsPerMillion
- *
- * - 13M de DNI → 60 años en calibrationYear.
- * - 1 millón de DNI ≈ yearsPerMillion años de diferencia.
- * - El componente `(añoActual - calibrationYear)` ajusta la edad
- *   automáticamente con el paso del tiempo.
- * - Si la correlación demográfica del DNI cambiara, ajustar los
- *   valores `baseDniMillions`, `baseAge` o `yearsPerMillion`.
- *
- * - `tolerance` es el rango interno donde NO se muestra error
- *   (margen de tolerancia para imprecisión del DNI). Los mensajes
- *   al usuario siempre se muestran con el rango estricto 18-60.
- */
-export const DNI_AGE_CALIBRATION = {
-  baseDniMillions: 16,
-  baseAge: 60,
-  yearsPerMillion: 1.2,
-  calibrationYear: 2026,
-  tolerance: { min: 18, max: 63 },
-};
+// DNI_AGE_CALIBRATION removido 2026-09-02: la validación de edad se movió al
+// backend (gate pre-scoring en crearLead). El front ya no necesita esta
+// constante ni las funciones calcularEdad/calcularEdadDesdeDNI.
 
 export const SITUACION_LABORAL_OPTIONS = Object.freeze([
   { value: "RELACION_DEPENDENCIA", label: "Relación de dependencia" },
