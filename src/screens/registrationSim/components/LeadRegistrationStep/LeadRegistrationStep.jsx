@@ -8,11 +8,18 @@ import { SITUACION_LABORAL_OPTIONS } from "../../../../constants/LOAN_SIM.js";
 import { useLeadRegistration, SECURITY_SLIDES } from "../../hooks/useLeadRegistration.js";
 import Turnstile from "../../../../Components/Turnstile/Turnstile.jsx";
 import { TURNSTILE_SITE_KEY } from "../../../../config.js";
-import FraudWarning from "../FraudWarning/FraudWarning.jsx";
-import CanalesOficialesWarning from "../FraudWarning/CanalesOficialesWarning.jsx";
+import { FraudWarning } from "../../../../Components/index.js";
+import { CanalesOficialesWarning } from "../../../../Components/index.js";
 import styles from "./LeadRegistrationStep.module.css";
 
-const LeadRegistrationStep = ({ onSuccess, onRejected, onAnalysis, onNext, loading, error: externalError }) => {
+const LeadRegistrationStep = ({
+  onSuccess,
+  onRejected,
+  onAnalysis,
+  onNext,
+  loading,
+  error: externalError,
+}) => {
   const [successMessage, setSuccessMessage] = useState("");
   const [honeypot, setHoneypot] = useState("");
   const [turnstileToken, setTurnstileToken] = useState("");
@@ -123,9 +130,13 @@ const LeadRegistrationStep = ({ onSuccess, onRejected, onAnalysis, onNext, loadi
           </div>
         </div>
       )}
-      
+
       <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "16px" }}>
-        <FraudWarning checked={false} onChange={() => {}} showCheckbox={false} />
+        <FraudWarning
+          checked={false}
+          onChange={() => {}}
+          showCheckbox={false}
+        />
         <CanalesOficialesWarning />
       </div>
 
@@ -211,7 +222,14 @@ const LeadRegistrationStep = ({ onSuccess, onRejected, onAnalysis, onNext, loadi
             aria-label='Aceptar términos y condiciones'
           />
           <span>
-            Acepto los <a href='/terminos-y-condiciones' target='_blank' rel='noopener noreferrer'>términos y condiciones</a>
+            Acepto los{" "}
+            <a
+              href='/terminos-y-condiciones'
+              target='_blank'
+              rel='noopener noreferrer'
+            >
+              términos y condiciones
+            </a>
           </span>
         </label>
         <label className={styles.terminosLabel}>
@@ -225,7 +243,8 @@ const LeadRegistrationStep = ({ onSuccess, onRejected, onAnalysis, onNext, loadi
             aria-label='Aceptar prevención de fraudes'
           />
           <span>
-            Entiendo esta advertencia, declaro que soy el beneficiario final del préstamo solicitado y que la solicitud la estoy realizando para mi propio beneficio.
+            Entiendo esta advertencia, declaro que soy el beneficiario final del préstamo solicitado
+            y que la solicitud la estoy realizando para mi propio beneficio.
           </span>
         </label>
       </div>

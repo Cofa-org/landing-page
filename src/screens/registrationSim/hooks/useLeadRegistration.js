@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import LeadRegistrationService from "../../../services/leadRegistrationService";
-import { ERROR_CAUSE } from "../../../constants/error";
+import { ERROR_CAUSE, ERROR_MESSAGE } from "../../../constants/error";
 import { setCookie } from "../../../lib/utils";
 import { COOKIE_LEAD_TOKEN_CONFIG, SITUACION_LABORAL_OPTIONS } from "../../../constants/LOAN_SIM.js";
 

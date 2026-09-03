@@ -9,8 +9,10 @@ import {
 } from "react-icons/md";
 import styles from "../../LoanSimScreen.module.css";
 import { useSimulationStep } from "../../hooks/useSimulationStep";
-import FraudWarning from "../../../registrationSim/components/FraudWarning/FraudWarning.jsx";
+
 import { roundToFiveHundreds } from "../../../../lib/utils.js";
+import { FraudWarning } from "../../../../Components/index.js";
+
 
 const SimulationStep = ({
   amount,
