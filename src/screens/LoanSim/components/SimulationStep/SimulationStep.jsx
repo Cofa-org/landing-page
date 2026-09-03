@@ -9,6 +9,7 @@ import {
 } from "react-icons/md";
 import styles from "../../LoanSimScreen.module.css";
 import { useSimulationStep } from "../../hooks/useSimulationStep";
+import FraudWarning from "../../../registrationSim/components/FraudWarning/FraudWarning.jsx";
 import { roundToFiveHundreds } from "../../../../lib/utils.js";
 
 const SimulationStep = ({
@@ -39,6 +40,8 @@ const SimulationStep = ({
     maxPlazo,
     secondMaxPlazo,
   } = useSimulationStep({ simulationData, installment });
+
+  const [prevencionFraudes, setPrevencionFraudes] = React.useState(false);
 
   return (
     <div className={styles.calculatorMainBox}>
@@ -129,10 +132,18 @@ const SimulationStep = ({
         </div>
       </div>
 
+      <div style={{ marginTop: "24px" }}>
+        <FraudWarning 
+          checked={prevencionFraudes} 
+          onChange={setPrevencionFraudes}
+        />
+      </div>
+
       <button
         className={styles["primary-btn"]}
-        style={{ marginTop: "48px" }}
-        onClick={onNextStep}
+        style={{ marginTop: "24px" }}
+        onClick={() => onNextStep(prevencionFraudes)}
+        disabled={!prevencionFraudes}
       >
         ¡Pedilo ahora!
         <MdArrowForward color='#fff' />

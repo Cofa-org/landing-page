@@ -333,7 +333,7 @@ export const useLoanSimulator = () => {
     setInstallment(newInstallment);
   };
 
-  const handleNextStep = async () => {
+  const handleNextStep = async (prevencionFraudes = false) => {
     if (step === LOAN_SIM_STEPS.SIMULACION) {
       setLoading(true);
       try {
@@ -366,6 +366,7 @@ export const useLoanSimulator = () => {
           cuit: scoringData.cuit,
           capitalSeleccionado: amount,
           plazoSeleccionado: installment,
+          prevencion_fraudes: prevencionFraudes,
           plan: {
             estado: existingSimulation?.email_validado
               ? LOAN_SIM_STEPS.COMPLIANCE // PEP/SO before CBU
