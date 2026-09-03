@@ -124,7 +124,7 @@ const LeadRegistrationStep = ({ onSuccess, onRejected, onAnalysis, onNext, loadi
         </div>
       )}
       
-      <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "16px" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "4px", marginBottom: "8px" }}>
         <FraudWarning checked={false} onChange={() => {}} showCheckbox={false} />
         <CanalesOficialesWarning />
       </div>
