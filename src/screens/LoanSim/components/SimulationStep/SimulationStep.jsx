@@ -145,9 +145,16 @@ const SimulationStep = ({
         onClick={() => onNextStep(prevencionFraudes)}
         disabled={!prevencionFraudes}
       >
-        ¡Pedilo ahora!
+        Solicitar préstamo con COFA
         <MdArrowForward color='#fff' />
       </button>
+
+      <div style={{ marginTop: "16px", textAlign: "center", display: "flex", justifyContent: "center", alignItems: "center", gap: "6px" }}>
+        <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 24 24" style={{ color: "#555" }} height="16" width="16" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"></path></svg>
+        <span style={{ fontSize: "12px", color: "#555" }}>
+          Tu información está protegida. Leé nuestros <a href="/terminos-y-condiciones" target="_blank" rel="noopener noreferrer" style={{ color: "#555", textDecoration: "underline" }}>Términos y Condiciones</a> y <a href="/politica-de-privacidad" target="_blank" rel="noopener noreferrer" style={{ color: "#555", textDecoration: "underline" }}>Política de Privacidad</a>.
+        </span>
+      </div>
 
       <div className={styles.footerRow}>
         <div className={styles.infoContainer}>

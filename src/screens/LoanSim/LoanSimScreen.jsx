@@ -266,7 +266,7 @@ const LoanSimScreen = () => {
       <main id='main-content'>
         <div className={styles.splitLayout}>
           <div className={styles.leftColumn}>
-            <HeroLoanSim />
+            <HeroLoanSim showCanalesOficiales={true} />
           </div>
           <div className={`${styles.homeCalculator_calculatorBox} ${styles.rightColumn}`}>
             <div
