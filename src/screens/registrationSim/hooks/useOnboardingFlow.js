@@ -303,6 +303,15 @@ export const useOnboardingFlow = () => {
         celular: pendingCelular,
         selectedCuit,
         term_y_cond: true,
+        // BUGFIX 2026-09-04: el back exige `prevencion_fraudes === true`
+        // (validarPrevencionFraudesAceptada en strategies.js). El usuario ya
+        // aceptó el checkbox en el primer crearLead (useLeadRegistration
+        // requiere formData.prevencion_fraudes === true para habilitar el
+        // submit), pero la segunda llamada a crearLead (con selectedCuit,
+        // cuando AFIP devuelve múltiples identidades) lo omitía y el back
+        // respondía 400 PREVENCION_FRAUDES_REQUERIDA. Mismo patrón que
+        // term_y_cond arriba — el consentimiento ya fue dado en el form.
+        prevencion_fraudes: true,
         situacion_laboral: pendingSituacionLaboral,
       });
 
