@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import styles from "./HeroLoanSim.module.css";
 import { IoIosCheckmarkCircleOutline } from "react-icons/io";
-import CanalesOficialesWarning from "../../screens/registrationSim/components/FraudWarning/CanalesOficialesWarning.jsx";
+import { CanalesOficialesWarning } from ".././../Components/index.js";
 
 /**
  * Hero component specifically designed for the Loan Simulator screen.
@@ -15,20 +15,30 @@ const HeroLoanSim = ({
   trustItems = ["Mínimos Requisitos", "100% Digital", "En el día", "Seguro y Confiable"],
   showCanalesOficiales = false,
 }) => {
-  const containerStyle = showCanalesOficiales 
-    ? { height: "100%", justifyContent: "space-between" } 
+  const containerStyle = showCanalesOficiales
+    ? { height: "100%", justifyContent: "space-between" }
     : {};
-    
+
   const imageContainerStyle = showCanalesOficiales
-    ? { display: "flex", flexDirection: "column", gap: "24px", alignItems: "center", flexGrow: 1, marginTop: "16px" }
+    ? {
+        display: "flex",
+        flexDirection: "column",
+        gap: "24px",
+        alignItems: "center",
+        flexGrow: 1,
+        marginTop: "16px",
+      }
     : { display: "flex", flexDirection: "column", gap: "24px", alignItems: "center" };
-    
+
   const imageStyle = showCanalesOficiales
     ? { marginTop: "auto", marginBottom: "auto", maxHeight: "250px", transform: "scale(1.4)" }
     : {};
 
   return (
-    <section className={styles.heroContainer} style={containerStyle}>
+    <section
+      className={styles.heroContainer}
+      style={containerStyle}
+    >
       <div className={styles.heroContent}>
         <h1>
           {title} <br />
@@ -49,7 +59,10 @@ const HeroLoanSim = ({
         </div>
       </div>
 
-      <div className={styles.heroImageContainer} style={imageContainerStyle}>
+      <div
+        className={styles.heroImageContainer}
+        style={imageContainerStyle}
+      >
         <img
           src='/img/hero-loan-sim-esp-600.webp'
           srcSet='/img/hero-loan-sim-esp-300.webp 300w, /img/hero-loan-sim-esp-600.webp 600w'
@@ -62,11 +75,11 @@ const HeroLoanSim = ({
           fetchPriority='high'
           style={imageStyle}
         />
-        
+
         {showCanalesOficiales && (
           <div style={{ width: "100%", maxWidth: "420px" }}>
-            <CanalesOficialesWarning 
-              footerText="Ante cualquier duda o inconveniente, comunicate siempre por nuestros canales oficiales." 
+            <CanalesOficialesWarning
+              footerText='Ante cualquier duda o inconveniente, comunicate siempre por nuestros canales oficiales.'
               horizontal={true}
             />
           </div>
