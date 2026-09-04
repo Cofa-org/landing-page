@@ -18,18 +18,18 @@
 }
 
 .leftColumn {
-  flex: 1;
+  flex: 4;
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
 .rightColumn {
-  flex: 1;
+  flex: 6;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: var(--spacing-xl) 5vh;
+  padding: 0 5vh;
 }
 
 @media (max-width: 992px) {

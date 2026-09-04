@@ -12,6 +12,8 @@ import AssistSlider from "./AssistSlider/AssistSlider";
 import { WorkWithUsForm } from "./Forms/WorkWithUsForm";
 import Carrusel from "./Carrusel/Carrusel";
 import FrecuentQuestion from "./FrecuentQuestion/FrecuentQuestion";
+import FraudWarning from "./FraudWarning/FraudWarning";
+import CanalesOficialesWarning from "./FraudWarning/CanalesOficialesWarning";
 
 export {
     Header,
@@ -27,6 +29,8 @@ export {
     AssistSlider,
     WorkWithUsForm,
     Carrusel,
-    FrecuentQuestion
+    FrecuentQuestion,
+    FraudWarning,
+    CanalesOficialesWarning
 }
 export { default as ImageCarousel } from "./ImageCarousel/ImageCarousel";

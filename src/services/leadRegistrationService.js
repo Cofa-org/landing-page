@@ -7,7 +7,7 @@ import { COOKIE_LEAD_TOKEN_CONFIG } from "../constants/LOAN_SIM.js";
 export default class LeadRegistrationService {
 
   static async crearLead(
-    { dni, turnstileToken, celular, selectedCuit, term_y_cond, situacion_laboral, fecha_nacimiento },
+    { dni, turnstileToken, celular, selectedCuit, term_y_cond, situacion_laboral, fecha_nacimiento, prevencion_fraudes },
     signal = null,
   ) {
     try {
@@ -19,6 +19,7 @@ export default class LeadRegistrationService {
         selectedCuit,
         term_y_cond,
         situacion_laboral,
+        prevencion_fraudes,
         fecha_nacimiento,
       };
       const response = await HttpApi(

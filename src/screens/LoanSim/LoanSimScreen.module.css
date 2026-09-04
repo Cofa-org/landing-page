@@ -9,7 +9,7 @@
 .splitLayout {
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: stretch;
   justify-content: center;
   max-width: 1400px;
   margin: 0 auto;
@@ -18,18 +18,18 @@
 }
 
 .leftColumn {
-  flex: 1;
+  flex: 4;
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
 .rightColumn {
-  flex: 1;
+  flex: 6;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: var(--spacing-xl) 5vh;
+  padding: 0 5vh;
 }
 
 @media (max-width: 992px) {
@@ -395,6 +395,21 @@
 
 .primary-btn:active {
   transform: translateY(-2px) scale(0.98);
+}
+
+.primary-btn:disabled {
+  background: #adb5bd;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.primary-btn:disabled::after {
+  display: none;
+}
+
+.primary-btn:disabled svg {
+  transform: none;
 }
 
 .primary-btn svg {

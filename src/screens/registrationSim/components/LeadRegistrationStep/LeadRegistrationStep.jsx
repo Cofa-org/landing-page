@@ -8,9 +8,18 @@ import { SITUACION_LABORAL_OPTIONS } from "../../../../constants/LOAN_SIM.js";
 import { useLeadRegistration, SECURITY_SLIDES } from "../../hooks/useLeadRegistration.js";
 import Turnstile from "../../../../Components/Turnstile/Turnstile.jsx";
 import { TURNSTILE_SITE_KEY } from "../../../../config.js";
+import { FraudWarning } from "../../../../Components/index.js";
+import { CanalesOficialesWarning } from "../../../../Components/index.js";
 import styles from "./LeadRegistrationStep.module.css";
 
-const LeadRegistrationStep = ({ onSuccess, onRejected, onAnalysis, onNext, loading, error: externalError }) => {
+const LeadRegistrationStep = ({
+  onSuccess,
+  onRejected,
+  onAnalysis,
+  onNext,
+  loading,
+  error: externalError,
+}) => {
   const [successMessage, setSuccessMessage] = useState("");
   const [honeypot, setHoneypot] = useState("");
   const [turnstileToken, setTurnstileToken] = useState("");
@@ -121,6 +130,16 @@ const LeadRegistrationStep = ({ onSuccess, onRejected, onAnalysis, onNext, loadi
           </div>
         </div>
       )}
+
+      <div style={{ display: "flex", flexDirection: "column", gap: "4px", marginBottom: "8px" }}>
+        <FraudWarning
+          checked={false}
+          onChange={() => {}}
+          showCheckbox={false}
+        />
+        <CanalesOficialesWarning />
+      </div>
+
       <GenericInput
         label='DNI'
         name='dni'
@@ -195,6 +214,7 @@ const LeadRegistrationStep = ({ onSuccess, onRejected, onAnalysis, onNext, loadi
         <label className={styles.terminosLabel}>
           <input
             type='checkbox'
+            name='term_y_cond'
             checked={formData.term_y_cond}
             onChange={handleTerminosChange}
             required
@@ -202,7 +222,29 @@ const LeadRegistrationStep = ({ onSuccess, onRejected, onAnalysis, onNext, loadi
             aria-label='Aceptar términos y condiciones'
           />
           <span>
-            Acepto los <a href='/terminos-y-condiciones' target='_blank' rel='noopener noreferrer'>términos y condiciones</a>
+            Acepto los{" "}
+            <a
+              href='/terminos-y-condiciones'
+              target='_blank'
+              rel='noopener noreferrer'
+            >
+              términos y condiciones
+            </a>
+          </span>
+        </label>
+        <label className={styles.terminosLabel}>
+          <input
+            type='checkbox'
+            name='prevencion_fraudes'
+            checked={formData.prevencion_fraudes}
+            onChange={handleTerminosChange}
+            required
+            aria-required='true'
+            aria-label='Aceptar prevención de fraudes'
+          />
+          <span>
+            Entiendo esta advertencia, declaro que soy el beneficiario final del préstamo solicitado
+            y que la solicitud la estoy realizando para mi propio beneficio.
           </span>
         </label>
       </div>
@@ -211,7 +253,7 @@ const LeadRegistrationStep = ({ onSuccess, onRejected, onAnalysis, onNext, loadi
         loading={isLoading}
         disabled={!isFormValid || !turnstileToken || isLoading}
       >
-        Enviar
+        Continuar con mi solicitud en COFA
       </GenericButton>
       {displayError && (
         <p style={{ color: "#d32f2f", fontSize: "14px", textAlign: "center", marginTop: "8px" }}>
