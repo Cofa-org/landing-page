@@ -2,12 +2,12 @@
   background-color: #fff9e6; /* Amarillo claro */
   border: 1px solid #ffcc00;
   border-radius: 8px;
-  padding: 16px;
-  margin-top: 8px;
-  margin-bottom: 8px;
+  padding: 12px;
+  margin-top: 4px;
+  margin-bottom: 4px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 
 .warningHeader {
