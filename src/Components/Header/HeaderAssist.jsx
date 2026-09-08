@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { openCallbellWebchat } from '../../utils/callbellHelpers';
 import './Header.css';
 import { FiMenu } from 'react-icons/fi';
 import { IoMdArrowBack } from 'react-icons/io';
@@ -82,9 +83,7 @@ const HeaderAssist = () => {
           </a>
         </nav>
         <div className='buttons-container buttons-container-points'>
-          <Link to={'http://wa.me/5491137570853'} target='_blank' rel="noopener noreferrer">
-            <button className='secondary-btn' id='btn-points-assist'>Quiero mi Asistencia</button>
-          </Link>
+          <button className='secondary-btn' id='btn-points-assist' onClick={openCallbellWebchat}>Quiero mi Asistencia</button>
 
           <button className='btn-show-links' onClick={openNavbar}><FiMenu /></button>
         </div>
@@ -131,9 +130,9 @@ const HeaderAssist = () => {
             </a>
           </nav>
 
-          <Link to={'http://wa.me/5491137570853'} target='_blank' className='secondary-btn mobible-nav-secondary-btn'>
+          <button className='secondary-btn mobible-nav-secondary-btn' onClick={openCallbellWebchat}>
             Quiero mi Asistencia
-          </Link>
+          </button>
         </div>
         {isOpen && <div className='background-layer-points' onClick={handleCloseNabvar}></div>}
       </header>

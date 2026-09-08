@@ -7,6 +7,7 @@ import LeadRegistrationService from "../../../../services/leadRegistrationServic
 import { ONBOARDING_STATES } from "../../../../constants/LOAN_SIM.js";
 import ReciboSlotTile from "./ReciboSlotTile.jsx";
 import styles from "./ReciboUploadStep.module.css";
+import { openCallbellWebchat } from "../../../../utils/callbellHelpers.js";
 
 const MAX_SLOTS = 3;
 
@@ -159,10 +160,7 @@ const ReciboUploadStep = ({
       <GenericButton
         type='button'
         variant='secondary'
-        onClick={() =>
-          (window.location.href =
-            "http://wa.me/5491137570853?text=Hola!!%20Necesito%20ayuda%20para%20subir%20mi%20recibo%20de%20sueldo!")
-        }
+        onClick={openCallbellWebchat}
       >
         Comunicarse con un asesor
       </GenericButton>

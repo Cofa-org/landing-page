@@ -1,4 +1,5 @@
 import { useEffect, lazy, Suspense } from "react";
+import { toggleCallbellWebchat } from "../../utils/callbellHelpers";
 import GenericButton from "../../Components/buttons/GenericButton/GenericButton.jsx";
 import BackButton from "../../Components/buttons/backbutton/BackButton.jsx";
 import { Footer, Header } from "../../Components/index.js";
@@ -72,6 +73,21 @@ const LoanSimScreen = () => {
   // MOBBEX, COMPLETADO) o vuelve de Mobbex. El nuevo flag se setea en el
   // finally de fetchSimulation, así que cubre éxito y error.
   const isInitializing = !initialSimulationResolved;
+
+  const isFirstOrLastStep = step === LOAN_SIM_STEPS.SIMULACION || step === LOAN_SIM_STEPS.COMPLETADO || step === LOAN_SIM_STEPS.RECHAZADO || step === LOAN_SIM_STEPS.DISPOSITIVO_RECHAZADO;
+  const shouldHideCallbell = isInitializing || isFirstOrLastStep;
+
+  useEffect(() => {
+    if (shouldHideCallbell) {
+      toggleCallbellWebchat(false);
+    } else {
+      toggleCallbellWebchat(true);
+    }
+    
+    return () => {
+      toggleCallbellWebchat(true);
+    };
+  }, [shouldHideCallbell]);
 
   useEffect(() => {
     if (step === LOAN_SIM_STEPS.COMPLIANCE) {
@@ -229,7 +245,7 @@ const LoanSimScreen = () => {
             <GenericButton
               type='button'
               variant='primary'
-              onClick={() => (window.location.href = "http://wa.me/5491137570853?text=Hola!!%20Necesito%20ayuda%20para%20simular%20mi%20pr%C3%A9stamo!")}
+              onClick={() => window.open("https://wa.me/5491137570853?text=Hola!!%20Necesito%20ayuda%20para%20simular%20mi%20pr%C3%A9stamo!", "_blank", "noopener,noreferrer")}
               style={{ marginTop: "1rem" }}
             >
               Comunicarse con un asesor
@@ -244,7 +260,10 @@ const LoanSimScreen = () => {
   if (isInitializing) {
     return (
       <>
-        <Header hideHelpButton={true} />
+        <Header 
+          hideHelpButton={true} 
+          helpButtonPreset="Hola!! Necesito ayuda para simular mi préstamo!" 
+        />
         <div className={styles.homeCalculator_calculatorBox}>
           <div className={styles.calculatorContainer}>
             <div className={styles.loaderContainer}>
@@ -253,16 +272,18 @@ const LoanSimScreen = () => {
             </div>
           </div>
         </div>
-        <Footer hideWhatsAppBtn={true} />
+        <Footer />
       </>
     );
   }
 
-  const isFirstOrLastStep = step === LOAN_SIM_STEPS.SIMULACION || step === LOAN_SIM_STEPS.COMPLETADO;
 
   return (
     <>
-      <Header hideHelpButton={isFirstOrLastStep} />
+      <Header 
+        hideHelpButton={isFirstOrLastStep} 
+        helpButtonPreset="Hola!! Necesito ayuda para simular mi préstamo!" 
+      />
       <main id='main-content'>
         <div className={styles.splitLayout}>
           <div className={styles.leftColumn}>
@@ -278,7 +299,7 @@ const LoanSimScreen = () => {
           </div>
         </div>
       </main>
-      <Footer hideWhatsAppBtn={isFirstOrLastStep} />
+      <Footer />
     </>
   );
 };
