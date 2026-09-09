@@ -1,16 +1,20 @@
 import React, { Suspense, memo, useCallback, useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { toggleCallbellWebchat } from "../../utils/callbellHelpers";
 import BackButton from "../../Components/buttons/backbutton/BackButton.jsx";
 import { Footer, Header } from "../../Components/index.js";
 import Loader from "../../Components/Loader/Loader.jsx";
 import { HeroLoanSim } from "../../Sections/index.js";
-import { LOAN_SIM_STEPS, OTP_CONFIG, ONBOARDING_STATES } from "../../constants/LOAN_SIM.js";
+import { LOAN_SIM_STEPS, OTP_CONFIG, ONBOARDING_STATES, COOKIE_LEAD_TOKEN_CONFIG } from "../../constants/LOAN_SIM.js";
 import { useOnboardingFlow } from "./hooks/useOnboardingFlow.js";
 import { usePhoneOTP } from "./hooks/usePhoneOTP.js";
 import { usePhonePicker } from "./hooks/usePhonePicker.js";
 import OTPValidation from "../../Components/OTPValidation/OTPValidation.jsx";
 import styles from "./OnboardingFlow.module.css";
 import RejectedStep from "./components/RejectedStep/RejectedStep.jsx";
+import LinkResolutionService from "../../services/linkResolutionService.js";
+import LeadRegistrationService from "../../services/leadRegistrationService.js";
+import { setCookie } from "../../lib/utils.js";
 
 const LeadRegistrationStep = React.lazy(
   () => import("./components/LeadRegistrationStep/LeadRegistrationStep.jsx"),
@@ -47,6 +51,9 @@ const OnboardingFlowScreen = () => {
     shouldShowBackButton,
     leadData,
     leadToken,
+    setLeadData,
+    setLeadToken,
+    setOnboardingStep,
   } = useOnboardingFlow();
 
   const { verificarOTP, reenviarOTP, validating, error } = usePhoneOTP(getLeadId);
@@ -56,6 +63,68 @@ const OnboardingFlowScreen = () => {
 
   const [identitySelectionError, setIdentitySelectionError] = useState(null);
   const [identitySelectionLoading, setIdentitySelectionLoading] = useState(false);
+
+  // Resume branch (spec "Recibo resubida operador" 2026-09-07):
+  // El operador genera un shortId que el cliente abre como
+  // `/?resume=<shortId>`. Consumimos el link, iniciamos la sesión,
+  // sembramos el cookie + state de onboarding y saltamos directo a
+  // RECIBO_UPLOAD (saltando PHONE_VALIDATION / DNI_UPLOAD).
+  const [searchParams] = useSearchParams();
+  const resumeShortId = searchParams.get("id");
+  const [resumeMaxSlots, setResumeMaxSlots] = useState(3);
+  const [resumeError, setResumeError] = useState(null);
+  const [resumeLoading, setResumeLoading] = useState(false);
+
+  useEffect(() => {
+    if (!resumeShortId) return undefined;
+    let cancelled = false;
+    setResumeLoading(true);
+    setResumeError(null);
+    (async () => {
+      try {
+        const consumed = await LinkResolutionService.consumeLink(resumeShortId);
+        
+        if (cancelled) return;
+        if (!consumed?.success || !consumed.data?.leadId) {
+          setResumeError("El enlace es inválido o ha expirado");
+          return;
+        }
+        const init = await LeadRegistrationService.iniciarSesionResume({
+          leadId: consumed.data.leadId,
+          shortId: resumeShortId,
+        });
+        
+        if (cancelled) return;
+        if (!init?.success) {
+          setResumeError(init?.message || "No pudimos iniciar la sesión");
+          return;
+        }
+        await setCookie(
+          COOKIE_LEAD_TOKEN_CONFIG.NAME,
+          init.data.leadToken,
+          COOKIE_LEAD_TOKEN_CONFIG.EXPIRY_MS,
+        );
+        if (cancelled) return;
+        setLeadData({
+          leadId: init.data.leadId,
+          es_cliente: init.data.es_cliente,
+          celular: init.data.celular,
+        });
+        setLeadToken(init.data.leadToken);
+        setResumeMaxSlots(init.data.maxSlots ?? 3);
+        setOnboardingStep(LOAN_SIM_STEPS.RECIBO_UPLOAD);
+      } catch (e) {
+        if (cancelled) return;
+        console.error("RESUME_INIT_ERROR:", e);
+        setResumeError("No pudimos procesar el enlace");
+      } finally {
+        if (!cancelled) setResumeLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [resumeShortId, setLeadData, setLeadToken, setOnboardingStep]);
 
   const handleIdentitySelect = useCallback(
     async (cuit) => {
@@ -144,9 +213,10 @@ const OnboardingFlowScreen = () => {
         return (
           <ReciboUploadStep
             leadId={getLeadId()}
+            maxSlots={resumeMaxSlots}
             onSuccess={() => navigateToNext(LOAN_SIM_STEPS.RECIBO_UPLOAD)}
             onAnalysisAfterRecibo={goToAnalysis}
-            error={null}
+            error={resumeError}
           />
         );
       case LOAN_SIM_STEPS.PHONE_VALIDATION:

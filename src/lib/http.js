@@ -94,6 +94,7 @@ export async function HttpApi(url, body, method, apiKey, token, signal = null, r
     if (signal?.aborted) {
       throw new DOMException("Aborted", "AbortError");
     }
+    
     try {
       return await fetch(url, buildOptions());
     } catch (err) {

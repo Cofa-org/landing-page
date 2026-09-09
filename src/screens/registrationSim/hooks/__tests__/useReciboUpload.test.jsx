@@ -538,6 +538,94 @@ describe("useReciboUpload", () => {
     });
   });
 
+  describe("maxSlots parameterization (recibo-resubida-operador 2026-09-07)", () => {
+    it("default (sin prop) → 3 slots", () => {
+      const { result } = renderHook(() => useReciboUpload());
+      expect(result.current.slots).toHaveLength(3);
+      expect(result.current.slots).toEqual([null, null, null]);
+    });
+
+    it("maxSlots=6 → 6 slots inicializados a null", () => {
+      const { result } = renderHook(() => useReciboUpload({ maxSlots: 6 }));
+      expect(result.current.slots).toHaveLength(6);
+      expect(result.current.slots).toEqual([null, null, null, null, null, null]);
+    });
+
+    it("maxSlots=6 → permite agregar archivo en slot 5 (orden 5)", () => {
+      const { result } = renderHook(() => useReciboUpload({ maxSlots: 6 }));
+      const file = makeFile("x.pdf");
+      // mutate file extension so makeFile generates pdf-ish; type set to keep
+      // happy with how the hook tracks (no specific MIME validation).
+      Object.defineProperty(file, "type", { value: "application/pdf" });
+      act(() => {
+        result.current.addFileToSlot(5, file);
+      });
+      expect(result.current.slots[4]).toBeDefined();
+      expect(result.current.slots[4]?.file).toBe(file);
+      expect(result.current.slots[4]?.status).toBe("idle");
+    });
+
+    it("maxSlots=3 (default) → rechaza slot 5 (fuera de rango)", () => {
+      const { result } = renderHook(() => useReciboUpload());
+      const file = makeFile("x.pdf");
+      Object.defineProperty(file, "type", { value: "application/pdf" });
+      act(() => {
+        result.current.addFileToSlot(5, file);
+      });
+      // Con default maxSlots=3, el array sigue siendo length 3. El slot 5
+      // (index 4) ni siquiera existe — verificamos que NO se extendió el
+      // array y que los 3 slots siguen vacíos.
+      expect(result.current.slots).toHaveLength(3);
+      expect(result.current.slots).toEqual([null, null, null]);
+    });
+
+    it("isFormValid con maxSlots=6 → true si hay al menos un file en cualquier slot 1..6", () => {
+      const { result } = renderHook(() => useReciboUpload({ maxSlots: 6 }));
+      const file = makeFile("x.pdf");
+      Object.defineProperty(file, "type", { value: "application/pdf" });
+      act(() => {
+        result.current.addFileToSlot(5, file);
+      });
+      expect(result.current.isFormValid).toBe(true);
+    });
+
+    it("setSlotHydrated con maxSlots=6 → hidrata slot 6 correctamente", () => {
+      const { result } = renderHook(() => useReciboUpload({ maxSlots: 6 }));
+      act(() => {
+        result.current.setSlotHydrated(6, {
+          reciboId: "uuid-6",
+          url: "blob:recibos/6",
+          mime: "image/jpeg",
+          size: 256,
+        });
+      });
+      expect(result.current.slots[5]).toMatchObject({
+        preview: "blob:recibos/6",
+        reciboId: "uuid-6",
+        status: "uploaded",
+        hydrated: true,
+      });
+    });
+
+    it("clearSlot con maxSlots=6 → limpia slot 6 correctamente", async () => {
+      const { result } = renderHook(() => useReciboUpload({ maxSlots: 6 }));
+      act(() => {
+        result.current.setSlotHydrated(6, {
+          reciboId: "uuid-6",
+          url: "blob:recibos/6",
+          mime: "image/jpeg",
+          size: 256,
+        });
+      });
+      expect(result.current.slots[5]).not.toBeNull();
+
+      await act(async () => {
+        await result.current.clearSlot(6);
+      });
+      expect(result.current.slots[5]).toBeNull();
+    });
+  });
+
   describe("rehydration end-to-end", () => {
     /**
      * Harness simula el flujo de ReciboUploadStep (Task 11):

@@ -331,4 +331,46 @@ export default class LeadRegistrationService {
       throw error;
     }
   }
+
+  /**
+   * Inicia la sesión de un lead desde un enlace de resubida.
+   *
+   * El front consume primero el shortId vía `LinkResolutionService.consumeLink`
+   * y obtiene `leadId`; luego llama a este método, que POSTea
+   * `/api/lead-registration/resume-init` con `{ leadId, shortId }` y devuelve:
+   *   - `data.leadToken`  (JWT para setear en cookie)
+   *   - `data.leadId`
+   *   - `data.es_cliente`
+   *   - `data.celular`
+   *   - `data.maxSlots`   (default 3; el back puede aumentarlo si el operador
+   *                        requirió recibos extra — ver spec
+   *                        "Recibo resubida operador" 2026-09-07).
+   *
+   * El back siempre responde HTTP 200; el rechazo viene en el body con
+   * `success: false` + `cause`. Si `response.ok === false` (red/auth fail)
+   * propagamos un Error con `cause` cuando esté disponible.
+   */
+  static async iniciarSesionResume({ leadId, shortId }, signal = null) {
+    try {
+      const url = `${LANDING_BACKEND_URL}/api/lead-registration/resume-init`;
+      const response = await HttpApi(
+        url,
+        { leadId, shortId },
+        HTTP_METHOD.POST,
+        LANDING_BACKEND_API_KEY,
+        null,
+        signal,
+      );
+      const data = await response.json();
+      if (!response.ok) {
+        const err = new Error(data.message || "Error al iniciar sesión de resume");
+        if (data.cause) err.cause = data.cause;
+        throw err;
+      }
+      return data;
+    } catch (error) {
+      console.error("RESUME_INIT_SERVICE_ERROR:", error);
+      throw error;
+    }
+  }
 }

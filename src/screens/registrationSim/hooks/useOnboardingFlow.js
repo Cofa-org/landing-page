@@ -210,7 +210,6 @@ export const useOnboardingFlow = () => {
 
         // Solo sincronizar si hay un estado previo que actualizar
         if (leadId && estadoBackendPrev) {
-          console.log("estadoBackendPrev", estadoBackendPrev);
           await LeadRegistrationService.actualizarEstadoOnboarding({
             leadId,
             estado: estadoBackendPrev,
@@ -493,6 +492,13 @@ export const useOnboardingFlow = () => {
     rejectedFechaExpiracionBloqueo,
     pickerContext,
     setPickerContext,
+    // Setters expuestos para callers que necesitan plantar estado manualmente
+    // (ej. OnboardingFlowScreen resume branch, spec "Recibo resubida operador"
+    // 2026-09-07: consume link → setLeadData + setLeadToken + setOnboardingStep
+    // para entrar a RECIBO_UPLOAD sin pasar por el flow normal).
+    setLeadData,
+    setLeadToken,
+    setOnboardingStep,
 
     // Navegación
     navigateToNext,
