@@ -33,6 +33,20 @@ const PhonePickerStep = React.lazy(
 );
 
 const OnboardingFlowScreen = () => {
+  // Resume branch (spec "Recibo resubida operador" 2026-09-07):
+  // El operador genera un shortId que el cliente abre como
+  // `/?id=<shortId>`. Consumimos el link, iniciamos la sesión,
+  // sembramos el cookie + state de onboarding y saltamos directo a
+  // RECIBO_UPLOAD (saltando PHONE_VALIDATION / DNI_UPLOAD).
+  //
+  // resumeShortId se declara ANTES de useOnboardingFlow porque el hook
+  // lo recibe como parámetro para saber si debe skipear el restore y
+  // evitar una race condition con el resume effect (caso ?id=peor
+  // quedaba stuck en LEAD_REGISTRATION porque el restore corría después
+  // del resume y sobrescribía RECIBO_UPLOAD con LEAD_REGISTRATION).
+  const [searchParams] = useSearchParams();
+  const resumeShortId = searchParams.get("id");
+  
   const {
     onboardingStep,
     navigateToNext,
@@ -55,7 +69,7 @@ const OnboardingFlowScreen = () => {
     setLeadToken,
     setOnboardingStep,
     restoringOnboarding,
-  } = useOnboardingFlow();
+  } = useOnboardingFlow(resumeShortId);
 
   const { verificarOTP, reenviarOTP, validating, error } = usePhoneOTP(getLeadId);
   const { submitPick, submitting: pickerLoading, error: pickerError } = usePhonePicker();
@@ -65,13 +79,6 @@ const OnboardingFlowScreen = () => {
   const [identitySelectionError, setIdentitySelectionError] = useState(null);
   const [identitySelectionLoading, setIdentitySelectionLoading] = useState(false);
 
-  // Resume branch (spec "Recibo resubida operador" 2026-09-07):
-  // El operador genera un shortId que el cliente abre como
-  // `/?resume=<shortId>`. Consumimos el link, iniciamos la sesión,
-  // sembramos el cookie + state de onboarding y saltamos directo a
-  // RECIBO_UPLOAD (saltando PHONE_VALIDATION / DNI_UPLOAD).
-  const [searchParams] = useSearchParams();
-  const resumeShortId = searchParams.get("id");
   const [resumeMaxSlots, setResumeMaxSlots] = useState(3);
   const [resumeError, setResumeError] = useState(null);
   const [resumeLoading, setResumeLoading] = useState(false);
@@ -94,7 +101,7 @@ const OnboardingFlowScreen = () => {
           leadId: consumed.data.leadId,
           shortId: resumeShortId,
         });
-        
+
         if (cancelled) return;
         if (!init?.success) {
           setResumeError(init?.message || "No pudimos iniciar la sesión");
@@ -198,7 +205,7 @@ const OnboardingFlowScreen = () => {
             onRejected={handleRejected}
             onAnalysis={handleAnalysis}
             onNext={() => navigateToNext(LOAN_SIM_STEPS.LEAD_REGISTRATION)}
-            error={null}
+            error={resumeError}
           />
         );
       case LOAN_SIM_STEPS.DNI_UPLOAD:

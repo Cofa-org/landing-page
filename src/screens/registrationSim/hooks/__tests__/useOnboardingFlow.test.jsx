@@ -355,4 +355,49 @@ describe("useOnboardingFlow — restoringOnboarding gate (flash fix 2026-09-11)"
     });
     expect(result.current.onboardingStep).toBe("LEAD_REGISTRATION");
   });
+
+  it("con resumeShortId: el restore se skipea — NO llama a obtenerEstadoOnboarding y baja el flag inmediatamente", async () => {
+    // Race condition fix 2026-09-11: cuando hay ?id= en la URL, el resume
+    // effect del screen es autoritativo. Si el restore corre paralelo, su
+    // setOnboardingStep (LEAD_REGISTRATION default si no hay cookie, o el
+    // state del backend si hay cookie stale) sobrescribe el
+    // RECIBO_UPLOAD que el resume setea. El hook ahora skipea el restore
+    // cuando se le pasa un resumeShortId.
+    const LeadRegistrationService = (
+      await import("../../../../services/leadRegistrationService.js")
+    ).default;
+
+    const { result } = renderHook(() => useOnboardingFlow("Pq94sS-bWb"));
+
+    await waitFor(() => {
+      expect(result.current.restoringOnboarding).toBe(false);
+    });
+    // El step queda en LEAD_REGISTRATION (initial) — el resume effect del
+    // screen (fuera del scope de este hook) será el que setee RECIBO_UPLOAD.
+    expect(result.current.onboardingStep).toBe("LEAD_REGISTRATION");
+    // Crítico: NUNCA se llamó al endpoint de restore.
+    expect(
+      LeadRegistrationService.obtenerEstadoOnboarding,
+    ).not.toHaveBeenCalled();
+  });
+
+  it("con resumeShortId + cookie válido: aún así skipea el restore (resume es autoritativo)", async () => {
+    // Aunque haya cookie con leadId válido, el resume gana. El restore
+    // no debe leer el cookie ni llamar al endpoint.
+    const { getCookie } = await import("../../../../lib/utils.js");
+    const LeadRegistrationService = (
+      await import("../../../../services/leadRegistrationService.js")
+    ).default;
+
+    getCookie.mockResolvedValue("jwt-with-leadId");
+
+    const { result } = renderHook(() => useOnboardingFlow("Pq94sS-bWb"));
+
+    await waitFor(() => {
+      expect(result.current.restoringOnboarding).toBe(false);
+    });
+    expect(
+      LeadRegistrationService.obtenerEstadoOnboarding,
+    ).not.toHaveBeenCalled();
+  });
 });

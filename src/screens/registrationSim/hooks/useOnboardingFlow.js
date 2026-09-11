@@ -48,7 +48,7 @@ const PREV_STEP_MAP = {
 const getPrevStepFromReciboUpload = (esCliente) =>
   esCliente === true ? null : LOAN_SIM_STEPS.DNI_UPLOAD;
 
-export const useOnboardingFlow = () => {
+export const useOnboardingFlow = (resumeShortId = null) => {
   const [leadData, setLeadData] = useState(null);
   const [leadToken, setLeadToken] = useState(null);
   const [onboardingStep, setOnboardingStep] = useState(LOAN_SIM_STEPS.LEAD_REGISTRATION);
@@ -79,6 +79,18 @@ export const useOnboardingFlow = () => {
 
   useEffect(() => {
     const restoreOnboardingState = async () => {
+      // Si hay un shortId en la URL, el resume effect del screen es
+      // autoritativo — consumeLink + iniciarSesionResume van a setear el
+      // step al final del flow. Si el restore también corre (async), puede
+      // sobrescribir RECIBO_UPLOAD con LEAD_REGISTRATION (caso sin cookie) o
+      // con el state del backend (caso con cookie stale). Esto deja al
+      // usuario "stuck" en el step equivocado sin redirección. Salteamos
+      // el restore para que el resume sea el único que toca el step.
+      // Ver memoria race-condition-restore-resume-2026-09-11.
+      if (resumeShortId) {
+        setRestoringOnboarding(false);
+        return;
+      }
       setRestoringOnboarding(true);
       try {
         const leadTokenValue = await getCookie(COOKIE_LEAD_TOKEN_CONFIG.NAME);
@@ -172,7 +184,7 @@ export const useOnboardingFlow = () => {
       }
     };
     restoreOnboardingState();
-  }, []);
+  }, [resumeShortId]);
 
   const BACK_BUTTON_STEPS = [
     LOAN_SIM_STEPS.IDENTITY_SELECTION,
