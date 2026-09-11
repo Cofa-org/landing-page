@@ -54,6 +54,7 @@ const OnboardingFlowScreen = () => {
     setLeadData,
     setLeadToken,
     setOnboardingStep,
+    restoringOnboarding,
   } = useOnboardingFlow();
 
   const { verificarOTP, reenviarOTP, validating, error } = usePhoneOTP(getLeadId);
@@ -279,11 +280,39 @@ const OnboardingFlowScreen = () => {
     } else {
       toggleCallbellWebchat(true);
     }
-    
+
     return () => {
       toggleCallbellWebchat(true);
     };
   }, [isFirstOrLastStep]);
+
+  // Gate de primera paint: mientras la restore del cookie (restoringOnboarding)
+  // O la resume del shortId (resumeLoading, caso ?id=) estén in-flight,
+  // mostramos un loader full-screen en lugar del step ya calculado en
+  // onboardingStep. Sin este gate, el usuario ve un flash de LEAD_REGISTRATION
+  // (caso sin ?id=) o tres transiciones (caso ?id=peor). Espejo de
+  // LoanSimScreen.jsx:75 + 260-278 (`initialSimulationResolved` precedent).
+  const isInitializing = restoringOnboarding || resumeLoading;
+
+  if (isInitializing) {
+    return (
+      <>
+        <Header
+          hideHelpButton={true}
+          helpButtonPreset="Hola!! Quiero mi préstamo!!"
+        />
+        <div className={styles.homeCalculator_calculatorBox}>
+          <div className={styles.calculatorContainer}>
+            <div className={styles.loaderContainer}>
+              <Loader />
+              <p className={styles.loadingText}>Preparando tu onboarding...</p>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </>
+    );
+  }
 
   return (
     <>

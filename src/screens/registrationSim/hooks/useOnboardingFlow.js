@@ -52,7 +52,15 @@ export const useOnboardingFlow = () => {
   const [leadData, setLeadData] = useState(null);
   const [leadToken, setLeadToken] = useState(null);
   const [onboardingStep, setOnboardingStep] = useState(LOAN_SIM_STEPS.LEAD_REGISTRATION);
-  const [restoringOnboarding, setRestoringOnboarding] = useState(false);
+  // Initial: true. Si arranco en false, la primera paint (anterior al useEffect)
+  // ve `restoringOnboarding === false` y OnboardingFlowScreen renderiza el step
+  // calculado en `onboardingStep` (LEAD_REGISTRATION por default) antes de que
+  // el effect determine el step real — flash visible. Con initial=true el
+  // gate del Screen se queda cerrado durante la primera paint y el effect
+  // luego lo abre en `finally`. Espejo del patrón de useLoanSimulator.js
+  // (`initialSimulationResolved`) con polaridad "in-flight" en vez de "resolved".
+  // Ver memoria loan-sim-initial-loading-race-2026-07-30.
+  const [restoringOnboarding, setRestoringOnboarding] = useState(true);
   const [pendingIdentities, setPendingIdentities] = useState(null);
   const [pendingDni, setPendingDni] = useState(null);
   const [pendingCelular, setPendingCelular] = useState(null);

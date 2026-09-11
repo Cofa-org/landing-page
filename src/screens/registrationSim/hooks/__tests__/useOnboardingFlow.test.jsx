@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { renderHook, act } from "@testing-library/react";
+import { renderHook, act, waitFor } from "@testing-library/react";
 
 vi.mock("../../../../services/leadRegistrationService.js", () => ({
   __esModule: true,
@@ -237,5 +237,122 @@ describe("useOnboardingFlow — handleLeadSuccess persiste token en cookie", () 
 
     expect(setCookie).not.toHaveBeenCalled();
     expect(result.current.onboardingStep).toBe("IDENTITY_SELECTION");
+  });
+});
+
+// 2026-09-11 — flash-of-step fix: el gate de primera paint en
+// OnboardingFlowScreen depende de que `restoringOnboarding` arranque en
+// `true` (la primera paint ocurre antes del useEffect). Si el initial
+// vuelve a `false`, el gate queda ABIERTO durante la primera paint y el
+// usuario ve el flash de LEAD_REGISTRATION. Cubrimos cada rama de salida
+// del effect (early returns + success + error + no-data) para asegurar que
+// el flag SIEMPRE baja a false y nunca queda atascado en true.
+describe("useOnboardingFlow — restoringOnboarding gate (flash fix 2026-09-11)", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("estado inicial: restoringOnboarding === true (cierra el gate en primera paint)", () => {
+    const { result } = renderHook(() => useOnboardingFlow());
+    expect(result.current.restoringOnboarding).toBe(true);
+  });
+
+  it("restoringOnboarding → false cuando NO hay cookie (early return línea 80) y step queda en LEAD_REGISTRATION", async () => {
+    // getCookie mockeado a null en vi.mock al inicio del archivo.
+    const { result } = renderHook(() => useOnboardingFlow());
+
+    await waitFor(() => {
+      expect(result.current.restoringOnboarding).toBe(false);
+    });
+    expect(result.current.onboardingStep).toBe("LEAD_REGISTRATION");
+  });
+
+  it("restoringOnboarding → false cuando decoded token no tiene leadId (early return línea 87)", async () => {
+    const { getDecodedToken } = await import("../../../../lib/token.js");
+    const { getCookie } = await import("../../../../lib/utils.js");
+    getCookie.mockResolvedValue("some-jwt");
+    getDecodedToken.mockReturnValue({});
+
+    const { result } = renderHook(() => useOnboardingFlow());
+
+    await waitFor(() => {
+      expect(result.current.restoringOnboarding).toBe(false);
+    });
+    expect(result.current.onboardingStep).toBe("LEAD_REGISTRATION");
+  });
+
+  it("restoringOnboarding → false cuando leadId es null (early return línea 93)", async () => {
+    const { getDecodedToken } = await import("../../../../lib/token.js");
+    const { getCookie } = await import("../../../../lib/utils.js");
+    getCookie.mockResolvedValue("some-jwt");
+    getDecodedToken.mockReturnValue({ leadId: null });
+
+    const { result } = renderHook(() => useOnboardingFlow());
+
+    await waitFor(() => {
+      expect(result.current.restoringOnboarding).toBe(false);
+    });
+  });
+
+  it("restoringOnboarding → false después de obtenerEstadoOnboarding exitoso y step navega a RECIBO_UPLOAD", async () => {
+    const { getDecodedToken } = await import("../../../../lib/token.js");
+    const { getCookie } = await import("../../../../lib/utils.js");
+    const LeadRegistrationService = (
+      await import("../../../../services/leadRegistrationService.js")
+    ).default;
+
+    getCookie.mockResolvedValue("jwt-with-leadId");
+    getDecodedToken.mockReturnValue({ leadId: 42 });
+    LeadRegistrationService.obtenerEstadoOnboarding.mockResolvedValueOnce({
+      success: true,
+      data: { estado_onboarding: "DNI_SUBIDO" },
+    });
+
+    const { result } = renderHook(() => useOnboardingFlow());
+
+    await waitFor(() => {
+      expect(result.current.restoringOnboarding).toBe(false);
+    });
+    expect(result.current.onboardingStep).toBe("RECIBO_UPLOAD");
+  });
+
+  it("restoringOnboarding → false cuando obtenerEstadoOnboarding tira error (catch línea 159) y step no cambia", async () => {
+    const { getDecodedToken } = await import("../../../../lib/token.js");
+    const { getCookie } = await import("../../../../lib/utils.js");
+    const LeadRegistrationService = (
+      await import("../../../../services/leadRegistrationService.js")
+    ).default;
+
+    getCookie.mockResolvedValue("jwt-with-leadId");
+    getDecodedToken.mockReturnValue({ leadId: 42 });
+    LeadRegistrationService.obtenerEstadoOnboarding.mockRejectedValueOnce(
+      new Error("network down"),
+    );
+
+    const { result } = renderHook(() => useOnboardingFlow());
+
+    await waitFor(() => {
+      expect(result.current.restoringOnboarding).toBe(false);
+    });
+    // El catch NO modifica onboardingStep — debe quedar en el default
+    // LEAD_REGISTRATION para que el usuario pueda completar el flow.
+    expect(result.current.onboardingStep).toBe("LEAD_REGISTRATION");
+  });
+
+  it("restoringOnboarding → false cuando obtenerEstadoOnboarding devuelve success=false (sin data)", async () => {
+    const { getDecodedToken } = await import("../../../../lib/token.js");
+    const { getCookie } = await import("../../../../lib/utils.js");
+
+    getCookie.mockResolvedValue("jwt-with-leadId");
+    getDecodedToken.mockReturnValue({ leadId: 42 });
+    // Default del mock al inicio: { success: false } — entra al bloque
+    // `if (response.success && response.data)` por false, no modifica state,
+    // pero el finally sí baja el flag.
+    const { result } = renderHook(() => useOnboardingFlow());
+
+    await waitFor(() => {
+      expect(result.current.restoringOnboarding).toBe(false);
+    });
+    expect(result.current.onboardingStep).toBe("LEAD_REGISTRATION");
   });
 });
