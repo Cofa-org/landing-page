@@ -125,6 +125,14 @@
   color: var(--primary-color);
 }
 
+/* compressing: misma familia visual que uploading — el usuario está
+   trabajando en el slot. Mismo color que 'uploading' para mantener
+   consistencia visual entre los dos estados "no me toques". */
+.statusBadge[data-state="compressing"] {
+  background: var(--primary-color-10);
+  color: var(--primary-color);
+}
+
 .statusBadge[data-state="uploaded"] {
   background: #e8f5e9;
   color: #2e7d32;

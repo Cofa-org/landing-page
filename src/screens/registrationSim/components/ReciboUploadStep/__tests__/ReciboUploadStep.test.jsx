@@ -14,6 +14,19 @@ vi.mock("../../../../../services/leadRegistrationService.js", () => ({
   },
 }));
 
+// Mock imageCompression (2026-09-14 recibo-compression): los tests
+// existentes usan JPEG via makeFile(); sin este mock, addFileToSlot
+// iría a status='compressing' (JPEGs son compressibles) y los tests
+// que esperan Quitar visible (idle) fallarían. El mock resuelve
+// inmediatamente con el mismo file, manteniendo el flujo "idle tras
+// selección" que estos tests asumen.
+vi.mock("../../../../../lib/imageCompression.js", () => ({
+  compressImageFile: vi.fn(async (file) => ({ blob: file, filename: file.name })),
+  isCompressibleImage: vi.fn((file) =>
+    /^image\/(jpeg|png|webp|heic|heif)$/.test(file?.type || "")
+  ),
+}));
+
 import LeadRegistrationService from "../../../../../services/leadRegistrationService.js";
 import ReciboUploadStep from "../ReciboUploadStep.jsx";
 
@@ -251,14 +264,15 @@ describe("ReciboUploadStep", () => {
       await waitFor(() => {
         expect(screen.getByTestId("slot-1-input")).toBeInTheDocument();
       });
-      // Slot 1 (data-testid="slot-1-input") → fire change. Slot pasa a idle.
+      // Slot 1 (data-testid="slot-1-input") → fire change. Slot pasa a compressing → idle.
       fireEvent.change(screen.getByTestId("slot-1-input"), {
         target: { files: [makeFile("a.jpg")] },
       });
-      // Quitar debe estar visible — el usuario puede descartar la selección
-      // antes de mandar Continuar. Selector cambia a data-testid porque
-      // el nuevo Quitar es icon-only con aria-label.
-      expect(screen.getByTestId("slot-1-quitar")).toBeInTheDocument();
+      // 2026-09-14 compression: addFileToSlot es async (compresión).
+      // Quitar aparece solo cuando el slot llega a 'idle' — esperar la transición.
+      await waitFor(() => {
+        expect(screen.getByTestId("slot-1-quitar")).toBeInTheDocument();
+      });
     });
 
     it("shows Cambiar archivo button when slot has idle status (pre-upload)", async () => {
@@ -270,8 +284,10 @@ describe("ReciboUploadStep", () => {
       fireEvent.change(screen.getByTestId("slot-1-input"), {
         target: { files: [makeFile("a.jpg")] },
       });
-      // Cambiar archivo es el botón full-width del footer del tile.
-      expect(screen.getByTestId("slot-1-retake")).toBeInTheDocument();
+      // 2026-09-14 compression: Cambiar archivo solo aparece en 'idle' — esperar.
+      await waitFor(() => {
+        expect(screen.getByTestId("slot-1-retake")).toBeInTheDocument();
+      });
     });
 
     it("calls onClear when Quitar is clicked (pre-upload)", async () => {
@@ -283,7 +299,8 @@ describe("ReciboUploadStep", () => {
       fireEvent.change(screen.getByTestId("slot-1-input"), {
         target: { files: [makeFile("a.jpg")] },
       });
-      const quitarBtn = screen.getByTestId("slot-1-quitar");
+      // 2026-09-14 compression: esperar que el slot llegue a 'idle' antes de Quitar.
+      const quitarBtn = await waitFor(() => screen.getByTestId("slot-1-quitar"));
       fireEvent.click(quitarBtn);
       // Tras Quitar, el slot vuelve al placeholder: aparece "Subir Recibo 1".
       expect(screen.getByText(/\+ Subir Recibo 1/i)).toBeInTheDocument();

@@ -122,3 +122,52 @@ describe("ReciboSlotTile — accept attribute includes HEIC variants (2026-09-14
     expect(accept).toContain(HEIF_ACCEPT_REQUIRED);
   });
 });
+
+describe("ReciboSlotTile — compressing status (2026-09-14 recibo-compression)", () => {
+  it("renders 'Comprimiendo...' badge cuando slot.status === 'compressing'", () => {
+    const file = new File(["orig"], "r.jpg", { type: "image/jpeg" });
+    const slot = {
+      file,
+      preview: "blob:http://localhost/r.jpg",
+      status: "compressing",
+    };
+
+    render(<ReciboSlotTile orden={1} slot={slot} onAddFile={noop} onClear={noop} />);
+
+    expect(screen.getByText("Comprimiendo...")).toBeInTheDocument();
+  });
+
+  it("'compressing' NO muestra el botón Quitar (todavía no es idle ni error)", () => {
+    const file = new File(["orig"], "r.jpg", { type: "image/jpeg" });
+    const slot = {
+      file,
+      preview: "blob:http://localhost/r.jpg",
+      status: "compressing",
+    };
+
+    render(<ReciboSlotTile orden={1} slot={slot} onAddFile={noop} onClear={noop} />);
+
+    // El botón Quitar tiene aria-label "Quitar Recibo N" — verificar que
+    // NO está presente mientras el slot está en estado 'compressing'
+    // (la app está trabajando, no se debe permitir descartar).
+    expect(screen.queryByLabelText("Quitar Recibo 1")).not.toBeInTheDocument();
+  });
+
+  it("'compressing' NO muestra el botón Cambiar archivo", () => {
+    const file = new File(["orig"], "r.jpg", { type: "image/jpeg" });
+    const slot = {
+      file,
+      preview: "blob:http://localhost/r.jpg",
+      status: "compressing",
+    };
+
+    const { container } = render(
+      <ReciboSlotTile orden={1} slot={slot} onAddFile={noop} onClear={noop} />
+    );
+
+    // El retake button solo aparece cuando showActions=true, lo cual
+    // excluye status 'compressing'.
+    const retakeInput = container.querySelector('label input[type="file"][data-testid="slot-1-retake"]');
+    expect(retakeInput).toBeNull();
+  });
+});

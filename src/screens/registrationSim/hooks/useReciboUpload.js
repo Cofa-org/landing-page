@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import LeadRegistrationService from "../../../services/leadRegistrationService";
 import { getFriendlyErrorMessage } from "../../../lib/network-error";
+import { compressImageFile, isCompressibleImage } from "../../../lib/imageCompression.js";
 
 const SLOT_COUNT_BASE = 3;
 const SUBIR_RECIBOS_RETRY_CONFIG = { retries: 1, backoffMs: 1500 };
@@ -57,17 +58,60 @@ export const useReciboUpload = ({ maxSlots: maxSlotsProp } = {}) => {
   }, [maxSlots]);
 
   const addFileToSlot = useCallback(
-    (orden, file) => {
+    async (orden, file) => {
       if (!file) return;
+      if (!isValidOrden(orden, maxSlots)) return;
+      const index = toSlotIndex(orden);
+
+      // Paso 1: ocupar el slot inmediatamente con el preview del file
+      // original. Sin importar si es imagen o PDF, el usuario quiere ver
+      // feedback de que su selección se registró.
+      const initialPreview = URL.createObjectURL(file);
       applySlotUpdate(orden, () => ({
         file,
-        preview: URL.createObjectURL(file),
+        preview: initialPreview,
         reciboId: undefined,
-        status: "idle",
+        status: isCompressibleImage(file) ? "compressing" : "idle",
       }));
       setUploadError("");
+
+      // Paso 2: si es imagen, comprimir y swap atómico. Si es PDF (u octet-
+      // stream), ya quedó en 'idle' arriba — no hay nada que esperar.
+      if (!isCompressibleImage(file)) return;
+
+      try {
+        const { blob: compressed, filename } = await compressImageFile(file);
+        // Revocar el preview del original y aplicar el del comprimido.
+        // C-2 race (análogo a setSlotHydrated): si mientras
+        // comprimíamos el usuario seleccionó otro file en este mismo
+        // slot, el `file` capturado en este closure YA NO es el
+        // `current.file` del slot. El guard `current.file !== file`
+        // detecta exactamente eso y no pisa la elección más reciente.
+        URL.revokeObjectURL(initialPreview);
+        applySlotUpdate(orden, (current) => {
+          if (!current) return current;
+          if (current.file !== file) return current;
+          return {
+            ...current,
+            file: new File([compressed], filename, { type: compressed.type }),
+            preview: URL.createObjectURL(compressed),
+            status: "idle",
+            error: undefined,
+          };
+        });
+      } catch (err) {
+        applySlotUpdate(orden, (current) => {
+          if (!current) return current;
+          if (current.file !== file) return current;
+          return {
+            ...current,
+            status: "error",
+            error: `${err?.message || "Error al comprimir"} 😊`,
+          };
+        });
+      }
     },
-    [applySlotUpdate],
+    [applySlotUpdate, maxSlots],
   );
 
   const clearSlot = useCallback(

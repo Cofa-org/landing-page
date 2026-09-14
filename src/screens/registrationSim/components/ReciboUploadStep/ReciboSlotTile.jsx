@@ -35,6 +35,7 @@ import styles from "./ReciboUploadStep.module.css";
  */
 const STATE_LABEL = {
   idle: "Pendiente",
+  compressing: "Comprimiendo...",
   uploading: "Subiendo...",
   uploaded: "Subido",
   error: "Error",
@@ -71,7 +72,12 @@ const ReciboSlotTile = ({ orden, slot, onAddFile, onClear }) => {
   }
 
   const isImage = (slot.file?.type ?? slot.mime)?.startsWith("image/");
-  const showActions = slot.status !== "uploaded";
+  // showActions: permitir Quitar/Cambiar solo en estados terminales del
+  // usuario (idle/error). 'compressing' y 'uploading' bloquean para que
+  // el usuario no descarte ni reemplace mientras la app está trabajando.
+  // 'uploaded' bloquea porque el borrado es responsabilidad del operador
+  // vía backoffice direct-DB (post-upload pivot 2026-08-21).
+  const showActions = slot.status === "idle" || slot.status === "error";
   return (
     <div className={styles.slotTile} data-state={slot.status}>
       {showActions && (
