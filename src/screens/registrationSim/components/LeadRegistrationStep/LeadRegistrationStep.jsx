@@ -168,6 +168,7 @@ const LeadRegistrationStep = ({
         name='celular'
         type='tel'
         inputMode='tel'
+        maxLength={10}
         value={formData.celular}
         onChange={handleChange}
         placeholder='Ej: 1145678901'

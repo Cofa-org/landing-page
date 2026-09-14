@@ -84,7 +84,7 @@ const DNIUploadStep = ({ leadId, leadToken, onSuccess, loading, error: externalE
                 <span>Tocar para subir</span>
                 <input
                   type="file"
-                  accept="image/*"
+                  accept="image/*,application/pdf,image/heic,image/heif"
                   capture="environment"
                   onChange={(e) => handleFileChange(e, setDniFront, setPreviewFront)}
                   className={styles.fileInput}
@@ -107,7 +107,7 @@ const DNIUploadStep = ({ leadId, leadToken, onSuccess, loading, error: externalE
                 <span>Tocar para subir</span>
                 <input
                   type="file"
-                  accept="image/*"
+                  accept="image/*,application/pdf,image/heic,image/heif"
                   capture="environment"
                   onChange={(e) => handleFileChange(e, setDniBack, setPreviewBack)}
                   className={styles.fileInput}

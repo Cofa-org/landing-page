@@ -54,10 +54,10 @@ const ReciboSlotTile = ({ orden, slot, onAddFile, onClear }) => {
         <div className={styles.slotNumberBadge}>{orden}</div>
         <FaCamera className={styles.cameraIcon} />
         <span className={styles.uploadLabel}>+ Subir Recibo {orden}</span>
-        <span className={styles.uploadHint}>JPG, PNG o PDF · máx. 5MB</span>
+        <span className={styles.uploadHint}>JPG, PNG, HEIC o PDF · máx. 5MB</span>
         <input
           type="file"
-          accept="image/*,application/pdf"
+          accept="image/*,application/pdf,image/heic,image/heif"
           data-testid={`slot-${orden}-input`}
           onChange={(e) => {
             const file = e.target.files?.[0];
@@ -119,7 +119,7 @@ const ReciboSlotTile = ({ orden, slot, onAddFile, onClear }) => {
           <FaSyncAlt /> Cambiar archivo
           <input
             type="file"
-            accept="image/*,application/pdf"
+            accept="image/*,application/pdf,image/heic,image/heif"
             data-testid={`slot-${orden}-retake`}
             onChange={(e) => {
               const file = e.target.files?.[0];

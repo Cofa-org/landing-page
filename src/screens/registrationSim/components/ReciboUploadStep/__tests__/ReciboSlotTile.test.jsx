@@ -81,3 +81,44 @@ describe("ReciboSlotTile — detección de imagen vs PDF", () => {
     expect(container.querySelector("img")).toBeNull();
   });
 });
+
+describe("ReciboSlotTile — accept attribute includes HEIC variants (2026-09-14 heic-upload-support)", () => {
+  const HEIC_ACCEPT_REQUIRED = "image/heic";
+  const HEIF_ACCEPT_REQUIRED = "image/heif";
+
+  it("empty slot: el input de carga acepta image/heic y image/heif", () => {
+    // slot === null → render del "drop area" con el input principal.
+    const { container } = render(
+      <ReciboSlotTile orden={1} slot={null} onAddFile={noop} onClear={noop} />
+    );
+
+    const input = container.querySelector('input[type="file"]');
+    expect(input, "empty slot debe renderizar un input[type=file]").not.toBeNull();
+    const accept = input.getAttribute("accept") || "";
+    expect(accept).toContain(HEIC_ACCEPT_REQUIRED);
+    expect(accept).toContain(HEIF_ACCEPT_REQUIRED);
+  });
+
+  it("slot con contenido: el input de Cambiar archivo acepta image/heic y image/heif", () => {
+    // slot NO null → render del tile con preview + retake button input.
+    const file = new File(["(binary)"], "local.jpg", { type: "image/jpeg" });
+    const slot = {
+      file,
+      preview: "blob:http://localhost/local.jpg",
+      mime: "image/jpeg",
+      size: 12345,
+      status: "idle",
+    };
+
+    const { container } = render(
+      <ReciboSlotTile orden={2} slot={slot} onAddFile={noop} onClear={noop} />
+    );
+
+    // El tile con contenido expone exactamente UN input file (el del retake).
+    const inputs = container.querySelectorAll('input[type="file"]');
+    expect(inputs.length).toBe(1);
+    const accept = inputs[0].getAttribute("accept") || "";
+    expect(accept).toContain(HEIC_ACCEPT_REQUIRED);
+    expect(accept).toContain(HEIF_ACCEPT_REQUIRED);
+  });
+});

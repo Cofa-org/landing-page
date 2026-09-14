@@ -7,6 +7,32 @@ import { COOKIE_LEAD_TOKEN_CONFIG, SITUACION_LABORAL_OPTIONS } from "../../../co
 const DNI_REGEX = /^\d{7,8}$/;
 const CELULAR_REGEX = /^\d{10}$/;
 
+// Detecta prefijos argentinos que el lead tipea por error y que el backoffice
+// concatena mal, rompiendo el envío de SMS a LabsMobile.
+//   549...  -> usuario tipeó "+549" (país + 9 mobile), debería ser sólo 10 dígitos locales
+//   54...   -> usuario tipeó "+54" sin el 9 obligatorio de mobile
+//   15...   -> prefijo legacy "15" sin código de área
+//   011...  -> interurbano legacy Buenos Aires
+//   0X...   -> cualquier interurbano nacional (0230, 0348, 02920, etc.)
+const detectCelularPrefijoInvalido = (digits) => {
+  if (/^549/.test(digits)) {
+    return "Incluiste 549 (código de país). Ingresá sólo los 10 dígitos locales, sin el +549 (ej: 1145678901).";
+  }
+  if (/^54/.test(digits)) {
+    return "Incluiste 54 sin el 9. Ingresá sólo los 10 dígitos locales (ej: 1145678901).";
+  }
+  if (/^15/.test(digits)) {
+    return "Incluiste 15 (formato viejo). Ingresá los 10 dígitos con código de área (ej: 1145678901).";
+  }
+  if (/^011/.test(digits)) {
+    return "Incluiste 011 (formato viejo). Ingresá los 10 dígitos con código de área, sin el 011 (ej: 1145678901).";
+  }
+  if (/^0\d/.test(digits)) {
+    return "Incluiste un 0 interurbano. Ingresá sólo los 10 dígitos sin el 0 (ej: 1145678901).";
+  }
+  return null;
+};
+
 // Age validation moved to backend (pre-scoring gate in `crearLead`, 2026-09-02).
 // Regla asimétrica: < 18 siempre rechaza; > 60 rechaza solo si NO es cliente COFA.
 // El back persiste el rechazo con motivo_rechazo=EDAD_INVALIDA para visibilidad en backoffice.
@@ -59,6 +85,12 @@ export const useLeadRegistration = (turnstileToken) => {
     fechaNacimiento: "",
     situacionLaboral: "",
   });
+  // Flag de caracter inválido tipeado en celular. Se setea en handleChange
+  // ANTES de strippear para que validateField pueda reportar con un mensaje
+  // específico (ej: "incluiste +"). Sin este flag, strip + slice borraba el +
+  // silenciosamente y el lead nunca entendía por qué fallaba la validación.
+  // Valores: null | "plus" | "separators"
+  const [celularInvalidChar, setCelularInvalidChar] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -93,9 +125,28 @@ export const useLeadRegistration = (turnstileToken) => {
       }
       case "celular": {
         if (!value) return "El celular es requerido";
-        if (!CELULAR_REGEX.test(value)) {
+        // Caracteres prohibidos: el flag se setea en handleChange antes de
+        // strippear, así que ya sabemos si el usuario tipeó + o separadores.
+        if (celularInvalidChar === "plus") {
+          return "El símbolo + no está permitido. Ingresá sólo los 10 dígitos locales (ej: 1145678901).";
+        }
+        if (celularInvalidChar === "separators") {
+          return "El celular sólo admite dígitos. Quita los espacios, guiones o paréntesis.";
+        }
+        if (value.length === 0) {
           return "Ingresá los 10 dígitos de tu celular";
         }
+        if (value.length < 10) {
+          return `Te faltan ${10 - value.length} dígitos. Ingresá los 10 dígitos de tu celular.`;
+        }
+        if (value.length > 10) {
+          return "Ingresaste más de 10 dígitos. Verificá que sea un celular local sin código de país.";
+        }
+        if (!CELULAR_REGEX.test(value)) {
+          return "Ingresá sólo los 10 dígitos de tu celular";
+        }
+        const prefixError = detectCelularPrefijoInvalido(value);
+        if (prefixError) return prefixError;
         return "";
       }
       case "fechaNacimiento": {
@@ -114,17 +165,31 @@ export const useLeadRegistration = (turnstileToken) => {
       default:
         return "";
     }
-  }, []);
+  }, [celularInvalidChar]);
 
   const handleChange = useCallback(
     (e) => {
       const { name, value } = e.target;
-      const sanitized =
-        name === "dni"
-          ? value.replace(/\D/g, "").slice(0, 8)
-          : name === "celular"
-          ? value.replace(/\D/g, "").slice(0, 10)
-          : value;
+      let sanitized;
+      if (name === "dni") {
+        sanitized = value.replace(/\D/g, "").slice(0, 8);
+      } else if (name === "celular") {
+        // Detectamos caracteres prohibidos ANTES de strippearlos, así
+        // validateField puede reportarlos con mensaje específico.
+        if (value.includes("+")) {
+          setCelularInvalidChar("plus");
+        } else if (/[\s\-\(\)]/.test(value)) {
+          setCelularInvalidChar("separators");
+        } else {
+          setCelularInvalidChar(null);
+        }
+        // Strip de no-dígitos + cap a 10. El cap es la red de seguridad final:
+        // maxLength en el JSX evita tipear/pegar más de 10, pero esto protege
+        // de inputs programáticos.
+        sanitized = value.replace(/\D/g, "").slice(0, 10);
+      } else {
+        sanitized = value;
+      }
       setFormData((prev) => ({ ...prev, [name]: sanitized }));
       if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
     },
