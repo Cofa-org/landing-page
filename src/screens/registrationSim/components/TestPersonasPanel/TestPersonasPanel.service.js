@@ -13,7 +13,10 @@ export async function fetchTestPersonas() {
 
 export async function fetchTestPersonaById(id) {
   try {
-    const r = await fetch(`${API_URL}/api/test/personas/${id}`);
+    // Defense-in-depth: validate id shape + URL-encode before using in path.
+    // Prevents path traversal and unexpected chars hitting the backend route.
+    if (!id || !/^[A-Z0-9_]+$/.test(String(id).slice(0, 64))) return null;
+    const r = await fetch(`${API_URL}/api/test/personas/${encodeURIComponent(id)}`);
     if (!r.ok) return null;
     return await r.json();
   } catch {
