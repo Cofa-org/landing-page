@@ -15,6 +15,7 @@ import RejectedStep from "./components/RejectedStep/RejectedStep.jsx";
 import LinkResolutionService from "../../services/linkResolutionService.js";
 import LeadRegistrationService from "../../services/leadRegistrationService.js";
 import { setCookie } from "../../lib/utils.js";
+import TestPersonasPanel from "./components/TestPersonasPanel/TestPersonasPanel.jsx";
 
 const LeadRegistrationStep = React.lazy(
   () => import("./components/LeadRegistrationStep/LeadRegistrationStep.jsx"),
@@ -155,7 +156,7 @@ const OnboardingFlowScreen = () => {
     },
     [handleIdentitySelected],
   );
-
+  
   const handleVerificarOTP = useCallback(
     async (codigo) => {
       const result = await verificarOTP(codigo);
@@ -163,6 +164,7 @@ const OnboardingFlowScreen = () => {
       // Phone picker trigger: el back devolvió el shape `requiresPhonePicker`
       // en lugar de `success: true`. Persistimos el contexto (options + target)
       // y navegamos al step PHONE_PICKER. La presentación queda en PhonePickerStep.
+     
       if (result?.requiresPhonePicker) {
         handlePickerTriggered({
           options: result.options ?? [],
@@ -357,6 +359,7 @@ const OnboardingFlowScreen = () => {
         </div>
       </main>
       <Footer />
+      <TestPersonasPanel />
     </>
   );
 };

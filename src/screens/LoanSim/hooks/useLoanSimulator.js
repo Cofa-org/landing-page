@@ -1,9 +1,19 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
-import { deleteCookie, getCookie, roundToFiveHundreds, setCookieWithDuration } from "../../../lib/utils.js";
+import {
+  deleteCookie,
+  getCookie,
+  roundToFiveHundreds,
+  setCookieWithDuration,
+} from "../../../lib/utils.js";
 import { useDebounce } from "../../../hooks/useDebounce";
 import SimuladorService from "../../../services/simuladorService";
-import { COOKIE_CONFIG, COOKIE_LOAN_INFO_CONFIG, COOKIE_SIMULADOR_TOKEN_CONFIG, LOAN_SIM_STEPS } from "../../../constants/LOAN_SIM.js";
+import {
+  COOKIE_CONFIG,
+  COOKIE_LOAN_INFO_CONFIG,
+  COOKIE_SIMULADOR_TOKEN_CONFIG,
+  LOAN_SIM_STEPS,
+} from "../../../constants/LOAN_SIM.js";
 import LinkResolutionService from "../../../services/linkResolutionService.js";
 import { ERROR_CAUSE } from "../../../constants/error";
 import { getFingerprint, mapFingerprintToHuellaData } from "../../../lib/fingerprint.js";
@@ -66,7 +76,6 @@ export const useLoanSimulator = () => {
       setLoading(true);
       setStep(LOAN_SIM_STEPS.SIMULACION);
       try {
-       
         const response = await LinkResolutionService.consumeLink(shortId);
         if (response.success && response.data) {
           // Get the fingerprint BEFORE any state update that triggers the initial
@@ -150,7 +159,9 @@ export const useLoanSimulator = () => {
           setHuellaRequestId(fingerprint?.requestId || null);
         } else {
           const errorMessage =
-            response.message || response.error?.message || "El enlace de acceso es inválido o ha expirado";
+            response.message ||
+            response.error?.message ||
+            "El enlace de acceso es inválido o ha expirado";
           setError(`${errorMessage} 😕`);
         }
       } catch (err) {
@@ -210,7 +221,7 @@ export const useLoanSimulator = () => {
         }
 
         const response = await SimuladorService.calcularPlanes(params, controller.signal);
-     
+
         // Discard response if this request was superseded by a newer one.
         if (controller.signal.aborted) return;
 
@@ -377,7 +388,7 @@ export const useLoanSimulator = () => {
         };
 
         const response = await SimuladorService.guardarPlan(payload);
-        
+
         if (
           (response.success && !existingSimulation?.email_validado) ||
           (response.data && !existingSimulation?.email_validado)
@@ -441,9 +452,7 @@ export const useLoanSimulator = () => {
         setEmail(emailValue);
         setStep(LOAN_SIM_STEPS.OTP_VALIDATION);
       } else {
-        setError(
-          response.message ? `${response.message} 😊` : "Error al validar el email",
-        );
+        setError(response.message ? `${response.message} 😊` : "Error al validar el email");
       }
     } catch (err) {
       setError(err.message ? `${err.message} 😊` : "Error de conexión al validar email");
@@ -453,6 +462,7 @@ export const useLoanSimulator = () => {
   };
 
   const verificarOTP = async (code) => {
+   
     setValidating(true);
     setError(null);
     try {
@@ -462,6 +472,7 @@ export const useLoanSimulator = () => {
         scoringId: scoringData.scoringId,
       };
       const response = await SimuladorService.verificarOTP(params);
+      
       if (response.success || response.data) {
         setStep(LOAN_SIM_STEPS.COMPLIANCE);
       } else {
@@ -505,11 +516,7 @@ export const useLoanSimulator = () => {
         );
       }
     } catch (err) {
-      setError(
-        err.message
-          ? `${err.message} 😊`
-          : "Error de conexión al guardar compliance",
-      );
+      setError(err.message ? `${err.message} 😊` : "Error de conexión al guardar compliance");
     } finally {
       setValidating(false);
     }
@@ -607,11 +614,7 @@ export const useLoanSimulator = () => {
     // Cookie scoringId: legacy — se setea para no romper sistemas externos
     // que la busquen. No se usa en el nuevo flujo del simulador.
     try {
-      await setCookieWithDuration(
-        COOKIE_CONFIG.NAME,
-        scoringId,
-        COOKIE_CONFIG.EXPIRY_MS,
-      );
+      await setCookieWithDuration(COOKIE_CONFIG.NAME, scoringId, COOKIE_CONFIG.EXPIRY_MS);
     } catch (err) {
       console.error("SCORING_ID_COOKIE_ERROR:", err);
     }

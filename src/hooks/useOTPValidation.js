@@ -67,9 +67,9 @@ export const useOTPValidation = ({ destination, onValidate, onResend, otpLength 
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+    e.preventDefault(); 
     const code = otp.join("");
-    if (code.length === otpLength) onValidate(code);
+    if (code?.length === otpLength) onValidate(code);
   };
 
   const handleResendClick = async () => {
