@@ -199,9 +199,10 @@ const OnboardingFlowScreen = () => {
   };
 
   const isFirstOrLastStep =
-    onboardingStep === LOAN_SIM_STEPS.LEAD_REGISTRATION ||
+    onboardingStep === LOAN_SIM_STEPS.PHONE_VALIDATION ||
     onboardingStep === LOAN_SIM_STEPS.WELCOME ||
-    onboardingStep === LOAN_SIM_STEPS.RECHAZADO;
+    onboardingStep === LOAN_SIM_STEPS.RECHAZADO ||
+    onboardingStep === LOAN_SIM_STEPS.OTP_VALIDATION;
 
   useEffect(() => {
     if (isFirstOrLastStep) {

@@ -75,6 +75,7 @@ const LoanSimScreen = () => {
   const isInitializing = !initialSimulationResolved;
 
   const isFirstOrLastStep = step === LOAN_SIM_STEPS.SIMULACION || step === LOAN_SIM_STEPS.COMPLETADO || step === LOAN_SIM_STEPS.RECHAZADO || step === LOAN_SIM_STEPS.DISPOSITIVO_RECHAZADO;
+  const shouldHideHelpButton = isFirstOrLastStep || LOAN_SIM_STEPS.CBU_VALIDATION;
   const shouldHideCallbell = isInitializing || isFirstOrLastStep;
 
   useEffect(() => {
@@ -280,9 +281,9 @@ const LoanSimScreen = () => {
 
   return (
     <>
-      <Header 
-        hideHelpButton={isFirstOrLastStep} 
-        helpButtonPreset="Hola!! Necesito ayuda para simular mi préstamo!" 
+      <Header
+        hideHelpButton={shouldHideHelpButton}
+        helpButtonPreset='Hola!! Necesito ayuda para simular mi préstamo!'
       />
       <main id='main-content'>
         <div className={styles.splitLayout}>
