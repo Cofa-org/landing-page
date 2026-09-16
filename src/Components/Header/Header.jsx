@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
+import { openCallbellWebchat } from "../../utils/callbellHelpers";
 import { Link, useLocation } from "react-router-dom";
 import { FiMenu } from "react-icons/fi";
 import { IoMdArrowBack } from "react-icons/io";
@@ -58,7 +59,7 @@ const NavLinks = ({ pageType, selectedLink, onLinkClick }) => {
   );
 };
 
-const Header = ({ hideHelpButton = false }) => {
+const Header = ({ hideHelpButton = false, helpButtonPreset }) => {
   const { pathname } = useLocation();
   const { scrolled } = useScrollContext();
   const [isOpen, setIsOpen] = useState(false);
@@ -133,16 +134,19 @@ const Header = ({ hideHelpButton = false }) => {
       <div className='buttons-container'>
         {pathname === '/registro-simulador' || pathname === '/simulador' ? (
           !hideHelpButton && (
-            <a 
-              href='http://wa.me/5491137570853?text=Hola!!%20Necesito%20ayuda%20para%20simular%20mi%20pr%C3%A9stamo!' 
-              target='_blank' 
-              rel='noopener noreferrer' 
-              aria-label='Solicitar ayuda por WhatsApp'
+            <button 
+              className='primary-btn header-primary-btn'
+              onClick={() => {
+                if (helpButtonPreset) {
+                  window.open(`https://wa.me/5491137570853?text=${encodeURIComponent(helpButtonPreset)}`, '_blank', 'noopener,noreferrer');
+                } else {
+                  openCallbellWebchat();
+                }
+              }}
+              aria-label='Solicitar ayuda'
             >
-              <button className='primary-btn header-primary-btn'>
-                Solicitar ayuda
-              </button>
-            </a>
+              Solicitar ayuda
+            </button>
           )
         ) : (
           <Link to='/registro-simulador' aria-label='Quiero mi préstamo'>

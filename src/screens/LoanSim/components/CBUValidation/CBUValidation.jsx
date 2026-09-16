@@ -91,7 +91,7 @@ const CBUValidation = ({ onValidate, loading, error, onBack, isClient, existingC
               <GenericButton
                 type='button'
                 variant='secondary'
-                onClick={() => (window.location.href = "http://wa.me/5491137570853")}
+                onClick={() => window.open("https://wa.me/5491137570853", "_blank", "noopener,noreferrer")}
                 style={{ flex: 1 }}
               >
                 Comunicarse con un asesor

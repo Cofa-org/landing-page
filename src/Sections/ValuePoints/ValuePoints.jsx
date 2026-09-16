@@ -1,4 +1,5 @@
 import React from 'react'
+import { openCallbellWebchat } from '../../utils/callbellHelpers';
 import './ValuePoints.css'
 import { GoArrowRight } from "react-icons/go";
 import { BsCheckCircle } from "react-icons/bs";
@@ -15,9 +16,7 @@ const ValuePoints = () => {
                 <p>
                     Si el participante del programa refiere a 5 personas, cada una de las cuales obtiene un préstamo, a partir del 6° referido consigue el doble de Puntos COFA.
                 </p>
-                <a href='http://wa.me/5491137570853' target="_blank" rel="noopener noreferrer">
-                    <button className='primary-btn btn-refer'>Referir A Un Amigo <GoArrowRight /></button>
-                </a>
+                <button className='primary-btn btn-refer' onClick={openCallbellWebchat}>Referir A Un Amigo <GoArrowRight /></button>
             </div>
             <div className='cards-value-points'>
                 <div className='style-card'>

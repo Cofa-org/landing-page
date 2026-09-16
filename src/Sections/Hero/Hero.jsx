@@ -1,4 +1,5 @@
 import React from "react";
+import { openCallbellWebchat } from "../../utils/callbellHelpers";
 import "./Hero.css";
 import { infoList } from "../../data/info";
 import { AnimatedTitle, Carrusel } from "../../Components";
@@ -23,19 +24,14 @@ const Hero = () => {
           <h1>Préstamos</h1>
           <AnimatedTitle />
           {pathname === '/registro-simulador' ? (
-            <a
-              href='http://wa.me/5491137570853?text=Hola!!%20Necesito%20ayuda%20para%20simular%20mi%20pr%C3%A9stamo!'
-              target='_blank'
-              rel='noopener noreferrer'
-              aria-label='Solicitar ayuda por WhatsApp'
+            <button
+              className='primary-btn btn-loan-main'
+              id='btn-hero-prestamo'
+              onClick={openCallbellWebchat}
+              aria-label='Solicitar ayuda'
             >
-              <button
-                className='primary-btn btn-loan-main'
-                id='btn-hero-prestamo'
-              >
-                SOLICITAR AYUDA
-              </button>
-            </a>
+              SOLICITAR AYUDA
+            </button>
           ) : (
             <Link to='/registro-simulador' aria-label='Quiero mi préstamo'>
               <button

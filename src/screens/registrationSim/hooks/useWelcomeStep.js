@@ -16,7 +16,7 @@ export const useWelcomeStep = () => {
 
         if (result.success) {
           window.open(
-            "http://wa.me/5491137570853?text=Hola!%20Quiero%20mi%20pr%C3%A9stamo!!%20%3Ablush%3A",
+            "https://wa.me/5491137570853?text=Hola!%20Quiero%20mi%20pr%C3%A9stamo!!%20%3Ablush%3A",
             "_blank",
             "noopener,noreferrer",
           );

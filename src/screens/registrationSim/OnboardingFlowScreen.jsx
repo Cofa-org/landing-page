@@ -1,4 +1,5 @@
-import React, { Suspense, memo, useCallback, useState } from "react";
+import React, { Suspense, memo, useCallback, useState, useEffect } from "react";
+import { toggleCallbellWebchat } from "../../utils/callbellHelpers";
 import BackButton from "../../Components/buttons/backbutton/BackButton.jsx";
 import { Footer, Header } from "../../Components/index.js";
 import Loader from "../../Components/Loader/Loader.jsx";
@@ -199,11 +200,27 @@ const OnboardingFlowScreen = () => {
 
   const isFirstOrLastStep =
     onboardingStep === LOAN_SIM_STEPS.LEAD_REGISTRATION ||
-    onboardingStep === LOAN_SIM_STEPS.WELCOME;
+    onboardingStep === LOAN_SIM_STEPS.WELCOME ||
+    onboardingStep === LOAN_SIM_STEPS.RECHAZADO;
+
+  useEffect(() => {
+    if (isFirstOrLastStep) {
+      toggleCallbellWebchat(false);
+    } else {
+      toggleCallbellWebchat(true);
+    }
+    
+    return () => {
+      toggleCallbellWebchat(true);
+    };
+  }, [isFirstOrLastStep]);
 
   return (
     <>
-      <Header hideHelpButton={isFirstOrLastStep} />
+      <Header 
+        hideHelpButton={isFirstOrLastStep} 
+        helpButtonPreset="Hola!! Quiero mi préstamo!!" 
+      />
       <main id='main-content'>
         <div className={styles.splitLayout}>
           <div className={styles.leftColumn}>
@@ -233,7 +250,7 @@ const OnboardingFlowScreen = () => {
           </div>
         </div>
       </main>
-      <Footer hideWhatsAppBtn={isFirstOrLastStep} />
+      <Footer />
     </>
   );
 };

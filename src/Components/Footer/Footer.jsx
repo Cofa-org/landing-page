@@ -1,19 +1,13 @@
 import React from "react";
 
 import { BiRegistered } from "react-icons/bi";
-import { FaWhatsapp } from "react-icons/fa";
 import "./Footer.css";
 import { Link, useLocation } from "react-router-dom";
 /*  */
 const Footer = ({ hideWhatsAppBtn = false }) => {
   const { pathname } = useLocation();
 
-  let whatsappUrl = "http://wa.me/5491137570853";
-  if (pathname === '/registro-simulador') {
-    whatsappUrl += "?text=" + encodeURIComponent("Hola!! Necesito ayuda para simular mi préstamo!");
-  } else {
-    whatsappUrl += "?text=" + encodeURIComponent("Hola! Necesito ayuda!");
-  }
+
 
   return (
     <footer>
@@ -236,17 +230,6 @@ const Footer = ({ hideWhatsAppBtn = false }) => {
         </p>
         <p> CUIT 33-71133479-9</p>
       </div>
-      {!hideWhatsAppBtn && (
-        <Link
-          to={whatsappUrl}
-          className='wsp-contact'
-          target='_blank'
-          id='btn-whatsapp'
-          aria-label='whatsapp'
-        >
-          <FaWhatsapp />
-        </Link>
-      )}
     </footer>
   );
 };

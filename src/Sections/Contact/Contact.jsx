@@ -1,4 +1,5 @@
 import React from "react";
+import { openCallbellWebchat } from "../../utils/callbellHelpers";
 import "./Contact.css";
 import { AiOutlineClockCircle } from "react-icons/ai";
 import {
@@ -25,9 +26,8 @@ const Contact = () => {
         <span>
           <BsTelephone />
           <a
-            href='http://wa.me/5491137570853?text=Hola!%20Necesito%20ayuda!'
-            target='_blank'
-            rel='noopener noreferrer'
+            style={{cursor: 'pointer'}}
+            onClick={openCallbellWebchat}
           >
             <span>1137570853</span>
           </a>
