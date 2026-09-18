@@ -17,17 +17,29 @@ export const useSimulationStep = ({ simulationData, installment }) => {
     [simulationData?.planes_disponibles, installment]
   );
 
+  // Tasas del bloque `tasas` que devuelve calculadora-planes en /calcular
+  // (mismo set que persiste `buildPlanInsert` en `simulador_prestamos_plan`).
+  // Antes se usaban fuentes distintas (tasa_nominal/tasaOp) y tna derivaba
+  // con magic 0.79 — ahora leemos los valores reales directo del upstream.
+  //
+  // Nota: tna y cftna son anuales, constantes para todos los plazos — se leen
+  // del top-level `simulationData.tasas`. cftno es mensual y VARÍA por plan
+  // (a menor plazo, menor cftno), por eso se lee del plan seleccionado.
+  // Sin esto, al cambiar de plazo el CFTO quedaba pegado al valor del plazo=6.
+  const tna = useMemo(
+    () => ((simulationData?.tasas?.tna || 0) * 100).toFixed(2),
+    [simulationData?.tasas?.tna]
+  );
+
   const cfta = useMemo(
-    () => ((simulationData?.tasa_nominal || 0) * 100).toFixed(2),
-    [simulationData?.tasa_nominal]
+    () => ((simulationData?.tasas?.cftna || 0) * 100).toFixed(2),
+    [simulationData?.tasas?.cftna]
   );
 
   const cfto = useMemo(
-    () => ((selectedPlan?.tasaOp || 0) * 100).toFixed(2),
-    [selectedPlan?.tasaOp]
+    () => ((selectedPlan?.tasas?.cftno || 0) * 100).toFixed(2),
+    [selectedPlan?.tasas?.cftno]
   );
-
-  const tna = useMemo(() => (cfta * 0.79).toFixed(2), [cfta]);
 
   const usedCapital = simulationData?.capital_utilizado;
   const discountInstallment = simulationData?.cuotaADescontar;
