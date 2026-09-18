@@ -27,9 +27,13 @@ const RejectedStep = lazy(() =>
 );
 import { useLoanSimulator } from "./hooks/useLoanSimulator";
 import { useComplianceForm } from "./hooks/useComplianceForm";
+import { useTestSimuladorPanel } from "./hooks/useTestSimuladorPanel";
+import TestSimuladorPanel from "./components/TestSimuladorPanel/TestSimuladorPanel.jsx";
 import styles from "./LoanSimScreen.module.css";
 
 const LoanSimScreen = () => {
+  const testPanel = useTestSimuladorPanel();
+  
   const {
     amount,
     installment,
@@ -120,6 +124,7 @@ const LoanSimScreen = () => {
     existingCompliance,
     cuit,
   );
+
 
   const renderStep = () => {
     return (
@@ -280,9 +285,17 @@ const LoanSimScreen = () => {
 
   return (
     <>
-      <Header 
-        hideHelpButton={isFirstOrLastStep} 
-        helpButtonPreset="Hola!! Necesito ayuda para simular mi préstamo!" 
+      {testPanel.personas.length > 0 && (
+        <TestSimuladorPanel
+          personas={testPanel.personas}
+          loading={testPanel.loading}
+          onSelectPersona={testPanel.selectPersona}
+          onReset={testPanel.resetSession}
+        />
+      )}
+      <Header
+        hideHelpButton={isFirstOrLastStep}
+        helpButtonPreset="Hola!! Necesito ayuda para simular mi préstamo!"
       />
       <main id='main-content'>
         <div className={styles.splitLayout}>

@@ -93,10 +93,14 @@ describe("useLoanSimulator — initial link paste", () => {
     getFingerprint.mockResolvedValue(FINGERPRINT_RAW);
     mapFingerprintToHuellaData.mockReturnValue(HUELLA_DATA);
     SimuladorService.calcularPlanes.mockResolvedValue(calcularPlanesResponse);
+    SimuladorService.iniciarSesion.mockResolvedValue({ success: true, data: { token: "mock-jwt" } });
+    // Defensive: ensure no leftover persona from previous tests
+    sessionStorage.clear();
   });
 
   afterEach(() => {
     vi.useRealTimers();
+    sessionStorage.clear();
   });
 
   it("calls SimuladorService.calcularPlanes exactly once within the debounce window after the link is consumed for the first time", async () => {
@@ -466,6 +470,11 @@ describe("useLoanSimulator - phone-not-validated gate", () => {
     });
     getFingerprint.mockResolvedValue({ requestId: "req-1" });
     mapFingerprintToHuellaData.mockReturnValue({ visitorId: "fp-1" });
+    sessionStorage.clear();
+  });
+
+  afterEach(() => {
+    sessionStorage.clear();
   });
 
   it("setea step=RECHAZADO y rejectionReason='PHONE_NOT_VALIDATED' cuando /init responde con cause=PHONE_NOT_VALIDATED", async () => {
@@ -524,5 +533,124 @@ describe("useLoanSimulator - phone-not-validated gate", () => {
 
     expect(result.current.step).not.toBe(LOAN_SIM_STEPS.RECHAZADO);
     expect(result.current.rejectionReason).toBeNull();
+  });
+});
+
+describe("useLoanSimulator — sessionStorage simuladorTestPersona bypass", () => {
+  // Test persona: cuando el backoffice genera un link de prueba para QA,
+  // escribe este objeto en sessionStorage antes de redirigir al simulador.
+  // El hook debe saltarse consumeLink y usar cuit/scoringId directamente.
+  const personaCuil = "20-12345678-9";
+  const personaScoringId = 555;
+  const personaCuitSinGuiones = "20123456789";
+  const MOCK_PERSONA = {
+    id: "SIM_HAPPY",
+    cuit: personaCuil,
+    dni: "12345678",
+    simuladorConfig: {
+      scoringId: personaScoringId,
+    },
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    sessionStorage.clear();
+    getFingerprint.mockResolvedValue(FINGERPRINT_RAW);
+    mapFingerprintToHuellaData.mockReturnValue(HUELLA_DATA);
+    SimuladorService.calcularPlanes.mockResolvedValue(calcularPlanesResponse);
+    SimuladorService.iniciarSesion.mockResolvedValue({
+      success: true,
+      data: { token: "mock-jwt" },
+    });
+  });
+
+  afterEach(() => {
+    sessionStorage.clear();
+    vi.useRealTimers();
+  });
+
+  it("skips consumeLink and uses persona's cuit + simuladorConfig.scoringId when simuladorTestPersona is in sessionStorage", async () => {
+    sessionStorage.setItem("simuladorTestPersona", JSON.stringify(MOCK_PERSONA));
+
+    const { result } = renderHook(() => useLoanSimulator(), {
+      wrapper: ({ children }) => (
+        // El panel del test navega a /simulador?tp=<personaId>. Sin ?id= → shortId es null.
+        // El bypass se activa por la combinación tp= + sessionStorage coincidente.
+        <MemoryRouter initialEntries={[`/simulador?tp=${MOCK_PERSONA.id}`]}>{children}</MemoryRouter>
+      ),
+    });
+
+    await waitFor(() => expect(result.current.scoringId).toBe(String(personaScoringId)));
+
+    // consumeLink NO se llamó (bypass activo).
+    expect(LinkResolutionService.consumeLink).not.toHaveBeenCalled();
+
+    // iniciarSesion se llamó con scoringId del simuladorConfig y cuit sin guiones.
+    expect(SimuladorService.iniciarSesion).toHaveBeenCalledWith({
+      scoringId: String(personaScoringId),
+      cuit: personaCuitSinGuiones,
+      shortId: null,
+    });
+
+    // El flujo continuó: scoringData poblada, step SIMULACION.
+    expect(result.current.cuit).toBe(personaCuitSinGuiones);
+    expect(result.current.step).toBe(LOAN_SIM_STEPS.SIMULACION);
+  });
+
+  it("falls back to LEAD_REGISTRATION when neither shortId nor persona is present", async () => {
+    sessionStorage.clear();
+
+    const { result } = renderHook(() => useLoanSimulator(), {
+      wrapper: ({ children }) => <MemoryRouter initialEntries={["/"]}>{children}</MemoryRouter>,
+    });
+
+    await waitFor(() => expect(result.current.step).toBe(LOAN_SIM_STEPS.LEAD_REGISTRATION));
+
+    expect(LinkResolutionService.consumeLink).not.toHaveBeenCalled();
+    expect(SimuladorService.iniciarSesion).not.toHaveBeenCalled();
+  });
+
+  it("ignora sessionStorage con JSON malformado y cae al flujo de shortId (defensa contra parse errors)", async () => {
+    // Valor roto: no es JSON válido. El hook debe swallowear el error y
+    // continuar como si no hubiera persona. Con shortId presente, debe
+    // ejecutar el flujo normal de consumeLink.
+    sessionStorage.setItem("simuladorTestPersona", "{esto no es json valido");
+    LinkResolutionService.consumeLink.mockResolvedValue(consumeLinkResponse);
+
+    const { result } = renderHook(() => useLoanSimulator(), {
+      wrapper: ({ children }) => (
+        <MemoryRouter initialEntries={[`/?id=${SHORT_ID}`]}>{children}</MemoryRouter>
+      ),
+    });
+
+    await waitFor(() => expect(result.current.scoringId).toBe(SCORING_ID));
+
+    expect(LinkResolutionService.consumeLink).toHaveBeenCalledWith(SHORT_ID);
+    expect(SimuladorService.iniciarSesion).toHaveBeenCalledWith({
+      scoringId: SCORING_ID,
+      cuit: CUIT,
+      shortId: SHORT_ID,
+    });
+  });
+
+  it("shortId presente tiene prioridad cuando NO hay persona en sessionStorage", async () => {
+    // Regresión: el cambio no debe romper el flujo existente de shortId sin persona.
+    sessionStorage.clear();
+    LinkResolutionService.consumeLink.mockResolvedValue(consumeLinkResponse);
+
+    const { result } = renderHook(() => useLoanSimulator(), {
+      wrapper: ({ children }) => (
+        <MemoryRouter initialEntries={[`/?id=${SHORT_ID}`]}>{children}</MemoryRouter>
+      ),
+    });
+
+    await waitFor(() => expect(result.current.scoringId).toBe(SCORING_ID));
+
+    expect(LinkResolutionService.consumeLink).toHaveBeenCalledWith(SHORT_ID);
+    expect(SimuladorService.iniciarSesion).toHaveBeenCalledWith({
+      scoringId: SCORING_ID,
+      cuit: CUIT,
+      shortId: SHORT_ID,
+    });
   });
 });
