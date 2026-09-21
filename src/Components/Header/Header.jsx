@@ -59,7 +59,7 @@ const NavLinks = ({ pageType, selectedLink, onLinkClick }) => {
   );
 };
 
-const Header = ({ hideHelpButton = false, helpButtonPreset }) => {
+const Header = () => {
   const { pathname } = useLocation();
   const { scrolled } = useScrollContext();
   const [isOpen, setIsOpen] = useState(false);
@@ -132,29 +132,13 @@ const Header = ({ hideHelpButton = false, helpButtonPreset }) => {
       </nav>
 
       <div className='buttons-container'>
-        {pathname === '/registro-simulador' || pathname === '/simulador' ? (
-          !hideHelpButton && (
-            <button 
-              className='primary-btn header-primary-btn'
-              onClick={() => {
-                if (helpButtonPreset) {
-                  window.open(`https://wa.me/5491137570853?text=${encodeURIComponent(helpButtonPreset)}`, '_blank', 'noopener,noreferrer');
-                } else {
-                  openCallbellWebchat();
-                }
-              }}
-              aria-label='Solicitar ayuda'
-            >
-              Solicitar ayuda
-            </button>
-          )
-        ) : (
+       
           <Link to='/registro-simulador' aria-label='Quiero mi préstamo'>
             <button className='primary-btn header-primary-btn'>
               Quiero mi préstamo
             </button>
           </Link>
-        )}
+      
         <button className='btn-show-links' onClick={() => handleToggleNavbar(true)} aria-label='Abrir menú de navegación'>
           <FiMenu />
         </button>
