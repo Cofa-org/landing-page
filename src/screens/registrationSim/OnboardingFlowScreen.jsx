@@ -169,9 +169,7 @@ const OnboardingFlowScreen = () => {
           />
         );
       case LOAN_SIM_STEPS.RECHAZADO:
-        return (
-          <RejectedStep />
-        );
+        return <RejectedStep />;
       case LOAN_SIM_STEPS.EN_ANALISIS:
         return <AnalysisStep onBack={navigateToPrev} />;
       case LOAN_SIM_STEPS.IDENTITY_SELECTION:
@@ -199,10 +197,9 @@ const OnboardingFlowScreen = () => {
   };
 
   const isFirstOrLastStep =
-    onboardingStep === LOAN_SIM_STEPS.PHONE_VALIDATION ||
     onboardingStep === LOAN_SIM_STEPS.WELCOME ||
     onboardingStep === LOAN_SIM_STEPS.RECHAZADO ||
-    onboardingStep === LOAN_SIM_STEPS.OTP_VALIDATION;
+    onboardingStep === LOAN_SIM_STEPS.EN_ANALISIS;
 
   useEffect(() => {
     if (isFirstOrLastStep) {
@@ -210,7 +207,7 @@ const OnboardingFlowScreen = () => {
     } else {
       toggleCallbellWebchat(true);
     }
-    
+
     return () => {
       toggleCallbellWebchat(true);
     };
@@ -218,10 +215,7 @@ const OnboardingFlowScreen = () => {
 
   return (
     <>
-      <Header 
-        hideHelpButton={isFirstOrLastStep} 
-        helpButtonPreset="Hola!! Quiero mi préstamo!!" 
-      />
+      <Header />
       <main id='main-content'>
         <div className={styles.splitLayout}>
           <div className={styles.leftColumn}>

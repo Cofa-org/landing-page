@@ -40,17 +40,28 @@ const NavLinks = ({ pageType, selectedLink, onLinkClick }) => {
     <>
       {links.map(({ href, to, text, id, disabled }) => {
         const className = `${selectedLink === id ? "link-selected" : ""} ${disabled ? "link-disabled" : ""}`;
-        
+
         if (href) {
           return (
-            <a key={text} href={href} className={className} onClick={onLinkClick}>
+            <a
+              key={text}
+              href={href}
+              className={className}
+              onClick={onLinkClick}
+            >
               {text}
             </a>
           );
         }
-        
+
         return (
-          <Link key={text} to={to || ""} className={className} onClick={disabled ? (e) => e.preventDefault() : onLinkClick} aria-disabled={disabled}>
+          <Link
+            key={text}
+            to={to || ""}
+            className={className}
+            onClick={disabled ? (e) => e.preventDefault() : onLinkClick}
+            aria-disabled={disabled}
+          >
             {text}
           </Link>
         );
@@ -59,7 +70,7 @@ const NavLinks = ({ pageType, selectedLink, onLinkClick }) => {
   );
 };
 
-const Header = ({ hideHelpButton = false, helpButtonPreset }) => {
+const Header = () => {
   const { pathname } = useLocation();
   const { scrolled } = useScrollContext();
   const [isOpen, setIsOpen] = useState(false);
@@ -73,7 +84,7 @@ const Header = ({ hideHelpButton = false, helpButtonPreset }) => {
 
   // Efecto para el scroll spy
   useEffect(() => {
-    if (pageType !== 'home') return;
+    if (pageType !== "home") return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -83,7 +94,7 @@ const Header = ({ hideHelpButton = false, helpButtonPreset }) => {
           }
         });
       },
-      { rootMargin: "-20% 0px -40% 0px", threshold: 0 }
+      { rootMargin: "-20% 0px -40% 0px", threshold: 0 },
     );
 
     NAV_SECTIONS.forEach((id) => {
@@ -98,20 +109,19 @@ const Header = ({ hideHelpButton = false, helpButtonPreset }) => {
       });
     };
   }, [pageType]);
-  
+
   // Setea el link activo inicial
   useEffect(() => {
-    if (pageType === 'blog') {
-      setSelectedLink('cofa-tips');
-    } else if (pageType === 'home') {
-      setSelectedLink('prestamos');
-    } else if (pathname === '/preguntas-frecuentes') {
-      setSelectedLink('preguntas-frecuentes');
+    if (pageType === "blog") {
+      setSelectedLink("cofa-tips");
+    } else if (pageType === "home") {
+      setSelectedLink("prestamos");
+    } else if (pathname === "/preguntas-frecuentes") {
+      setSelectedLink("preguntas-frecuentes");
     } else {
-      setSelectedLink('');
+      setSelectedLink("");
     }
   }, [pageType, pathname]);
-
 
   const handleToggleNavbar = (open) => {
     setIsOpen(open);
@@ -124,52 +134,62 @@ const Header = ({ hideHelpButton = false, helpButtonPreset }) => {
   return (
     <header className={scrolled ? "solid" : ""}>
       <Link to={"/"}>
-        <img src='/Logo.svg' alt='Logo de COFA' width='218' height='46' />
+        <img
+          src='/Logo.svg'
+          alt='Logo de COFA'
+          width='218'
+          height='46'
+        />
       </Link>
-      
-      <nav className="desktop-nav">
-        <NavLinks pageType={pageType} selectedLink={selectedLink} />
+
+      <nav className='desktop-nav'>
+        <NavLinks
+          pageType={pageType}
+          selectedLink={selectedLink}
+        />
       </nav>
 
       <div className='buttons-container'>
-        {pathname === '/registro-simulador' || pathname === '/simulador' ? (
-          !hideHelpButton && (
-            <button 
-              className='primary-btn header-primary-btn'
-              onClick={() => {
-                if (helpButtonPreset) {
-                  window.open(`https://wa.me/5491137570853?text=${encodeURIComponent(helpButtonPreset)}`, '_blank', 'noopener,noreferrer');
-                } else {
-                  openCallbellWebchat();
-                }
-              }}
-              aria-label='Solicitar ayuda'
-            >
-              Solicitar ayuda
-            </button>
-          )
-        ) : (
-          <Link to='/registro-simulador' aria-label='Quiero mi préstamo'>
-            <button className='primary-btn header-primary-btn'>
-              Quiero mi préstamo
-            </button>
+        {pathname === "/registro-simulador" || pathname === "/simulador" ? null : (
+          <Link
+            to='/registro-simulador'
+            aria-label='Quiero mi préstamo'
+          >
+            <button className='primary-btn header-primary-btn'>Quiero mi préstamo</button>
           </Link>
         )}
-        <button className='btn-show-links' onClick={() => handleToggleNavbar(true)} aria-label='Abrir menú de navegación'>
+        <button
+          className='btn-show-links'
+          onClick={() => handleToggleNavbar(true)}
+          aria-label='Abrir menú de navegación'
+        >
           <FiMenu />
         </button>
       </div>
 
       <div className={`mobible-navbar ${isOpen ? "open" : ""}`}>
         <nav className='mobible-links'>
-          <button onClick={handleCloseNavbar} className='btn-back' aria-label="Cerrar menú de navegación">
+          <button
+            onClick={handleCloseNavbar}
+            className='btn-back'
+            aria-label='Cerrar menú de navegación'
+          >
             <IoMdArrowBack />
           </button>
-          <NavLinks pageType={pageType} selectedLink={selectedLink} onLinkClick={handleCloseNavbar} />
+          <NavLinks
+            pageType={pageType}
+            selectedLink={selectedLink}
+            onLinkClick={handleCloseNavbar}
+          />
         </nav>
       </div>
 
-      {isOpen && <div className='background-layer' onClick={handleCloseNavbar}></div>}
+      {isOpen && (
+        <div
+          className='background-layer'
+          onClick={handleCloseNavbar}
+        ></div>
+      )}
     </header>
   );
 };

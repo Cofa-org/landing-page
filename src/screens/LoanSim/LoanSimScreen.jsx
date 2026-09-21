@@ -74,9 +74,7 @@ const LoanSimScreen = () => {
   // finally de fetchSimulation, así que cubre éxito y error.
   const isInitializing = !initialSimulationResolved;
 
-  const isFirstOrLastStep = step === LOAN_SIM_STEPS.SIMULACION || step === LOAN_SIM_STEPS.COMPLETADO || step === LOAN_SIM_STEPS.RECHAZADO || step === LOAN_SIM_STEPS.DISPOSITIVO_RECHAZADO;
-  const shouldHideHelpButton = isFirstOrLastStep || LOAN_SIM_STEPS.CBU_VALIDATION;
-  const shouldHideCallbell = isInitializing || isFirstOrLastStep;
+  const shouldHideCallbell = isInitializing;
 
   useEffect(() => {
     if (shouldHideCallbell) {
@@ -281,10 +279,7 @@ const LoanSimScreen = () => {
 
   return (
     <>
-      <Header
-        hideHelpButton={shouldHideHelpButton}
-        helpButtonPreset='Hola!! Necesito ayuda para simular mi préstamo!'
-      />
+      <Header/>
       <main id='main-content'>
         <div className={styles.splitLayout}>
           <div className={styles.leftColumn}>
