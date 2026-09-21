@@ -19,12 +19,10 @@ const OTPValidation = lazy(() => import("../../Components/OTPValidation/OTPValid
 const ComplianceStep = lazy(() => import("./components/ComplianceStep/ComplianceStep"));
 const CBUValidation = lazy(() => import("./components/CBUValidation/CBUValidation"));
 const SuccessStep = lazy(() => import("./components/SuccessStep/SuccessStep"));
-const MobbexSubscriptionStep = lazy(() =>
-  import("./components/MobbexSubscriptionStep/MobbexSubscriptionStep"),
+const MobbexSubscriptionStep = lazy(
+  () => import("./components/MobbexSubscriptionStep/MobbexSubscriptionStep"),
 );
-const RejectedStep = lazy(() =>
-  import("./components/RejectedStep/RejectedStep"),
-);
+const RejectedStep = lazy(() => import("./components/RejectedStep/RejectedStep"));
 import { useLoanSimulator } from "./hooks/useLoanSimulator";
 import { useComplianceForm } from "./hooks/useComplianceForm";
 import styles from "./LoanSimScreen.module.css";
@@ -82,7 +80,7 @@ const LoanSimScreen = () => {
     } else {
       toggleCallbellWebchat(true);
     }
-    
+
     return () => {
       toggleCallbellWebchat(true);
     };
@@ -244,7 +242,13 @@ const LoanSimScreen = () => {
             <GenericButton
               type='button'
               variant='primary'
-              onClick={() => window.open("https://wa.me/5491137570853?text=Hola!!%20Necesito%20ayuda%20para%20simular%20mi%20pr%C3%A9stamo!", "_blank", "noopener,noreferrer")}
+              onClick={() =>
+                window.open(
+                  "https://wa.me/5491137570853?text=Hola!!%20Necesito%20ayuda%20para%20simular%20mi%20pr%C3%A9stamo!",
+                  "_blank",
+                  "noopener,noreferrer",
+                )
+              }
               style={{ marginTop: "1rem" }}
             >
               Comunicarse con un asesor
@@ -259,10 +263,7 @@ const LoanSimScreen = () => {
   if (isInitializing) {
     return (
       <>
-        <Header 
-          hideHelpButton={true} 
-          helpButtonPreset="Hola!! Necesito ayuda para simular mi préstamo!" 
-        />
+        <Header />
         <div className={styles.homeCalculator_calculatorBox}>
           <div className={styles.calculatorContainer}>
             <div className={styles.loaderContainer}>
@@ -276,10 +277,9 @@ const LoanSimScreen = () => {
     );
   }
 
-
   return (
     <>
-      <Header/>
+      <Header />
       <main id='main-content'>
         <div className={styles.splitLayout}>
           <div className={styles.leftColumn}>
