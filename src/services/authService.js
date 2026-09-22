@@ -63,6 +63,12 @@ const authService = {
   /** Token del link + nueva contraseña → actualiza y revoca sesiones. */
   resetPassword: (token, newPassword, turnstileToken) =>
     authFetch("/password/reset", { body: { token, newPassword, turnstileToken } }),
+
+  /**
+   * Devuelve { solicitudes, tieneHistorial } del usuario autenticado.
+   * Si no tiene lead vinculado, solicitudes = [] y tieneHistorial = false.
+   */
+  getSolicitudes: () => authFetch("/solicitudes", { method: "GET" }),
 };
 
 export default authService;

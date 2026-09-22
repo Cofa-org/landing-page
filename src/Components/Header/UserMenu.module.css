@@ -40,11 +40,13 @@
   text-align: left;
   font-size: 0.9rem;
   cursor: pointer;
-  color: var(--text-color);
+  color: var(--text-color) !important; /* normaliza <a> y <button> */
+  text-decoration: none !important;   /* evita subrayado en <Link> */
   display: flex;
   align-items: center;
   gap: 8px;
   transition: background-color 0.15s;
+  box-sizing: border-box;
 }
 
 .dropdownItem:hover {

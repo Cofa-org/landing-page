@@ -22,6 +22,16 @@ const RedirectIfAuth = ({ children }) => {
   return children;
 };
 
+/**
+ * Guard que redirige a /ingresar si el usuario NO tiene sesión activa.
+ * Renderiza los children mientras authLoading es true (optimistic).
+ */
+const RequireAuth = ({ children }) => {
+  const { user, loading: authLoading } = useAuth();
+  if (!authLoading && !user) return <Navigate to="/ingresar" replace />;
+  return children;
+};
+
 // Lazy-loaded screens
 const HomeScreen = lazy(() => import("./screens/HomeScreen/HomeScreen"));
 const LoanSimScreen = lazy(() => import("./screens/LoanSim/LoanSimScreen"));
@@ -49,6 +59,7 @@ const BlogDetailScreen = lazy(() => import("./screens/blogDetailScreen/BlogDetai
 const IaPoliciesScreen = lazy(() => import("./screens/IaPoliciesScreen.jsx/IaPoliciesScreen.jsx"));
 const ReqAutoridadesScreen = lazy(() => import("./screens/ReqAutoridadesScreen/ReqAutoridadesScreen.jsx"));
 const DNIUploadMobileScreen = lazy(() => import("./screens/DNIUploadMobile/DNIUploadMobileScreen"));
+const MisSolicitudesScreen = lazy(() => import("./screens/MisSolicitudesScreen/MisSolicitudesScreen"));
 
 /* import SuggestionsScreen from './screens/SuggestionsScreen/SuggestionsScreen' */
 
@@ -192,6 +203,10 @@ const RouterScreens = () => {
         <Route
           path='/restablecer-contrasena'
           element={<ResetPasswordScreen />}
+        />
+        <Route
+          path='/mis-solicitudes'
+          element={<RequireAuth><MisSolicitudesScreen /></RequireAuth>}
         />
 
         <Route

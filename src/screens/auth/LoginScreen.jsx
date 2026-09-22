@@ -74,7 +74,9 @@ const LoginScreen = () => {
             onSubmit={handleSubmit}
           >
             {successMessage && (
-              <p className={`${styles.alert} ${styles.alertSuccess}`}>{successMessage}</p>
+              <p className={`${styles.alert} ${styles.alertSuccess} ${styles.alertSpaced}`}>
+                {successMessage}
+              </p>
             )}
 
             <GenericInput
