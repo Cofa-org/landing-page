@@ -13,8 +13,14 @@ vi.mock("../../../../services/leadRegistrationService.js", () => ({
   },
 }));
 
+vi.mock("../../../../lib/imageCompression.js", () => ({
+  compressImageFile: vi.fn(),
+  isCompressibleImage: vi.fn(),
+}));
+
 import LeadRegistrationService from "../../../../services/leadRegistrationService.js";
 import { NetworkError } from "../../../../lib/network-error";
+import { compressImageFile, isCompressibleImage } from "../../../../lib/imageCompression.js";
 import { useReciboUpload } from "../useReciboUpload";
 
 const makeFile = (name = "recibo.jpg") =>
@@ -538,6 +544,94 @@ describe("useReciboUpload", () => {
     });
   });
 
+  describe("maxSlots parameterization (recibo-resubida-operador 2026-09-07)", () => {
+    it("default (sin prop) → 3 slots", () => {
+      const { result } = renderHook(() => useReciboUpload());
+      expect(result.current.slots).toHaveLength(3);
+      expect(result.current.slots).toEqual([null, null, null]);
+    });
+
+    it("maxSlots=6 → 6 slots inicializados a null", () => {
+      const { result } = renderHook(() => useReciboUpload({ maxSlots: 6 }));
+      expect(result.current.slots).toHaveLength(6);
+      expect(result.current.slots).toEqual([null, null, null, null, null, null]);
+    });
+
+    it("maxSlots=6 → permite agregar archivo en slot 5 (orden 5)", () => {
+      const { result } = renderHook(() => useReciboUpload({ maxSlots: 6 }));
+      const file = makeFile("x.pdf");
+      // mutate file extension so makeFile generates pdf-ish; type set to keep
+      // happy with how the hook tracks (no specific MIME validation).
+      Object.defineProperty(file, "type", { value: "application/pdf" });
+      act(() => {
+        result.current.addFileToSlot(5, file);
+      });
+      expect(result.current.slots[4]).toBeDefined();
+      expect(result.current.slots[4]?.file).toBe(file);
+      expect(result.current.slots[4]?.status).toBe("idle");
+    });
+
+    it("maxSlots=3 (default) → rechaza slot 5 (fuera de rango)", () => {
+      const { result } = renderHook(() => useReciboUpload());
+      const file = makeFile("x.pdf");
+      Object.defineProperty(file, "type", { value: "application/pdf" });
+      act(() => {
+        result.current.addFileToSlot(5, file);
+      });
+      // Con default maxSlots=3, el array sigue siendo length 3. El slot 5
+      // (index 4) ni siquiera existe — verificamos que NO se extendió el
+      // array y que los 3 slots siguen vacíos.
+      expect(result.current.slots).toHaveLength(3);
+      expect(result.current.slots).toEqual([null, null, null]);
+    });
+
+    it("isFormValid con maxSlots=6 → true si hay al menos un file en cualquier slot 1..6", () => {
+      const { result } = renderHook(() => useReciboUpload({ maxSlots: 6 }));
+      const file = makeFile("x.pdf");
+      Object.defineProperty(file, "type", { value: "application/pdf" });
+      act(() => {
+        result.current.addFileToSlot(5, file);
+      });
+      expect(result.current.isFormValid).toBe(true);
+    });
+
+    it("setSlotHydrated con maxSlots=6 → hidrata slot 6 correctamente", () => {
+      const { result } = renderHook(() => useReciboUpload({ maxSlots: 6 }));
+      act(() => {
+        result.current.setSlotHydrated(6, {
+          reciboId: "uuid-6",
+          url: "blob:recibos/6",
+          mime: "image/jpeg",
+          size: 256,
+        });
+      });
+      expect(result.current.slots[5]).toMatchObject({
+        preview: "blob:recibos/6",
+        reciboId: "uuid-6",
+        status: "uploaded",
+        hydrated: true,
+      });
+    });
+
+    it("clearSlot con maxSlots=6 → limpia slot 6 correctamente", async () => {
+      const { result } = renderHook(() => useReciboUpload({ maxSlots: 6 }));
+      act(() => {
+        result.current.setSlotHydrated(6, {
+          reciboId: "uuid-6",
+          url: "blob:recibos/6",
+          mime: "image/jpeg",
+          size: 256,
+        });
+      });
+      expect(result.current.slots[5]).not.toBeNull();
+
+      await act(async () => {
+        await result.current.clearSlot(6);
+      });
+      expect(result.current.slots[5]).toBeNull();
+    });
+  });
+
   describe("rehydration end-to-end", () => {
     /**
      * Harness simula el flujo de ReciboUploadStep (Task 11):
@@ -581,12 +675,133 @@ describe("useReciboUpload", () => {
 
       render(<RehydrationHarness leadId={42} />);
 
-      // esperamos a que el effect asíncrono aplique las hidrataciones
+      // esperamos a que el effect asíncrono aplique lashidrataciones
       expect(await screen.findByText("uuid-1")).toBeInTheDocument();
       expect(screen.getByTestId("slot-1")).toHaveTextContent("null");
       expect(screen.getByTestId("slot-2")).toHaveTextContent("uuid-3");
 
       expect(LeadRegistrationService.getRecibosPendientes).toHaveBeenCalledWith(42);
+    });
+  });
+
+  describe("addFileToSlot — image compression integration (2026-09-14)", () => {
+    it("PDF: pasa el file tal cual sin llamar compressImageFile", async () => {
+      isCompressibleImage.mockReturnValue(false);
+      const { result } = renderHook(() => useReciboUpload());
+      const pdf = new File(["pdf"], "recibo.pdf", { type: "application/pdf" });
+      await act(async () => {
+        await result.current.addFileToSlot(1, pdf);
+      });
+      expect(compressImageFile).not.toHaveBeenCalled();
+      expect(result.current.slots[0]?.file).toBe(pdf);
+      expect(result.current.slots[0]?.status).toBe("idle");
+    });
+
+    it("JPEG: muestra 'compressing' transitoriamente y termina con idle + blob comprimido", async () => {
+      // Mock con delay para que el caller pueda samplear el estado
+      // intermedio 'compressing' antes de que se resuelva la promesa.
+      isCompressibleImage.mockReturnValue(true);
+      const compressed = new File(["cmp"], "r.jpg", { type: "image/jpeg" });
+      let resolveCompress;
+      compressImageFile.mockImplementation(
+        () => new Promise((res) => { resolveCompress = () => res({ blob: compressed, filename: "r.jpg" }); })
+      );
+
+      const { result } = renderHook(() => useReciboUpload());
+
+      let inFlightPromise;
+      act(() => {
+        inFlightPromise = result.current.addFileToSlot(1, new File(["orig"], "r.jpg", { type: "image/jpeg" }));
+      });
+
+      // Mientras compressImageFile no se resolvió, el slot está en 'compressing'.
+      expect(result.current.slots[0]?.status).toBe("compressing");
+      expect(result.current.slots[0]?.file).toBeInstanceOf(File);
+
+      await act(async () => {
+        resolveCompress();
+        await inFlightPromise;
+      });
+
+      expect(compressImageFile).toHaveBeenCalledTimes(1);
+      // El hook envuelve el blob en un File nuevo para preservar filename
+      // (Blobs no tienen nombre); comparamos por name+type en vez de identidad.
+      expect(result.current.slots[0]?.file.name).toBe("r.jpg");
+      expect(result.current.slots[0]?.file.type).toBe("image/jpeg");
+      expect(result.current.slots[0]?.status).toBe("idle");
+    });
+
+    it("JPEG: si compressImageFile rechaza, marca el slot como 'error' y expone mensaje", async () => {
+      isCompressibleImage.mockReturnValue(true);
+      compressImageFile.mockRejectedValue(new Error("decode failed"));
+
+      const { result } = renderHook(() => useReciboUpload());
+      await act(async () => {
+        await result.current.addFileToSlot(1, new File(["orig"], "r.jpg", { type: "image/jpeg" }));
+      });
+      expect(result.current.slots[0]?.status).toBe("error");
+      expect(result.current.slots[0]?.error).toContain("decode failed");
+    });
+
+    it("JPEG: el preview URL se reemplaza por el del blob comprimido", async () => {
+      isCompressibleImage.mockReturnValue(true);
+      const compressed = new File(["cmp"], "r.jpg", { type: "image/jpeg" });
+      compressImageFile.mockResolvedValue({ blob: compressed, filename: "r.jpg" });
+
+      const { result } = renderHook(() => useReciboUpload());
+      await act(async () => {
+        await result.current.addFileToSlot(1, new File(["orig"], "r.jpg", { type: "image/jpeg" }));
+      });
+      expect(result.current.slots[0]?.preview).toMatch(/^blob:/);
+      // El hook envuelve el blob en un File nuevo (ver test anterior); comparamos name.
+      expect(result.current.slots[0]?.file.name).toBe("r.jpg");
+    });
+
+    it("JPEG: filename del slot refleja el filename del blob comprimido (preserva original)", async () => {
+      isCompressibleImage.mockReturnValue(true);
+      const compressed = new File(["cmp"], "recibo-de-julio.png", { type: "image/jpeg" });
+      compressImageFile.mockResolvedValue({ blob: compressed, filename: "recibo-de-julio.png" });
+
+      const { result } = renderHook(() => useReciboUpload());
+      await act(async () => {
+        await result.current.addFileToSlot(1, new File(["orig"], "recibo-de-julio.png", { type: "image/png" }));
+      });
+      expect(result.current.slots[0]?.file.name).toBe("recibo-de-julio.png");
+    });
+
+    it("JPEG: si el usuario cambia el file mientras compressImageFile está in-flight, NO pisa con el comprimido tardío (C-2 race)", async () => {
+      isCompressibleImage.mockReturnValue(true);
+      const stale = new File(["stale"], "old.jpg", { type: "image/jpeg" });
+      const fresh = new File(["fresh"], "new.jpg", { type: "image/jpeg" });
+      // IMPORTANTE: setear TODOS los mocks ANTES de los act() — sino
+      // el segundo addFileToSlot usa el mockResolvedValue del test
+      // anterior (vi.clearAllMocks() resetea call history pero NO
+      // las mock implementations).
+      let resolveStaleCompress;
+      compressImageFile.mockImplementationOnce(
+        () => new Promise((res) => { resolveStaleCompress = () => res({ blob: stale, filename: "old.jpg" }); })
+      );
+      compressImageFile.mockResolvedValue({ blob: fresh, filename: "new.jpg" });
+
+      const { result } = renderHook(() => useReciboUpload());
+
+      let p1;
+      act(() => {
+        p1 = result.current.addFileToSlot(1, stale);
+      });
+
+      // Usuario cambia de idea mientras el primero está comprimiendo
+      act(() => {
+        result.current.addFileToSlot(1, fresh);
+      });
+
+      await act(async () => {
+        resolveStaleCompress();
+        await p1;
+      });
+
+      // El slot debe tener el fresh (no el stale comprimido)
+      expect(result.current.slots[0]?.file.name).toBe("new.jpg");
     });
   });
 });

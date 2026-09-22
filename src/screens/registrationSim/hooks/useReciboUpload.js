@@ -1,23 +1,25 @@
 import { useState, useCallback } from "react";
 import LeadRegistrationService from "../../../services/leadRegistrationService";
 import { getFriendlyErrorMessage } from "../../../lib/network-error";
+import { compressImageFile, isCompressibleImage } from "../../../lib/imageCompression.js";
 
-const SLOT_COUNT = 3;
+const SLOT_COUNT_BASE = 3;
 const SUBIR_RECIBOS_RETRY_CONFIG = { retries: 1, backoffMs: 1500 };
 
-const initialSlots = () => Array(SLOT_COUNT).fill(null);
+const initialSlots = (count) => Array(count).fill(null);
 
-const isValidOrden = (orden) =>
-  Number.isInteger(orden) && orden >= 1 && orden <= SLOT_COUNT;
+const isValidOrden = (orden, maxSlots) =>
+  Number.isInteger(orden) && orden >= 1 && orden <= maxSlots;
 
 const toSlotIndex = (orden) => orden - 1;
 
 /**
- * Hook que gestiona hasta 3 recibos de sueldo en slots numerados 1..3.
+ * Hook que gestiona hasta `maxSlots` recibos de sueldo en slots numerados
+ * 1..maxSlots.
  *
  * Contrato:
- *  - `slots` es un array de longitud 3; cada entry es `null` o un objeto
- *    `{ file, preview, reciboId, status, error, mime?, size?, hydrated? }`
+ *  - `slots` es un array de longitud `maxSlots`; cada entry es `null` o un
+ *    objeto `{ file, preview, reciboId, status, error, mime?, size?, hydrated? }`
  *    con `status ∈ 'idle' | 'uploading' | 'uploaded' | 'error'`.
  *  - `addFileToSlot(orden, file)` puebla el slot asignado por `orden` (1-indexed).
  *  - `clearSlot(orden)` limpia el estado local del slot. Quitar works
@@ -34,38 +36,87 @@ const toSlotIndex = (orden) => orden - 1;
  * 2026-08-21 porque el post-upload ya es compromiso del operador (backoffice
  * direct-DB per Plan B). Los slots `uploaded` también se pueden "quitar" de
  * la UI, pero el archivo sigue en Storage/DB hasta que el operador lo borre.
+ *
+ * El parámetro `maxSlots` (default 3) viene del back via
+ * `LeadRegistrationService.iniciarSesionResume` (2026-09-07 spec "Recibo
+ * resubida operador"): el operador puede requerir más de 3 recibos y el
+ * front debe reflejarlos sin asumir un límite fijo.
  */
-export const useReciboUpload = () => {
-  const [slots, setSlots] = useState(initialSlots);
+export const useReciboUpload = ({ maxSlots: maxSlotsProp } = {}) => {
+  const maxSlots = maxSlotsProp ?? SLOT_COUNT_BASE;
+  const [slots, setSlots] = useState(() => initialSlots(maxSlots));
   const [uploadError, setUploadError] = useState("");
 
   const applySlotUpdate = useCallback((orden, mutator) => {
-    if (!isValidOrden(orden)) return;
+    if (!isValidOrden(orden, maxSlots)) return;
     const index = toSlotIndex(orden);
     setSlots((prev) => {
       const next = prev.slice();
       next[index] = mutator(prev[index]);
       return next;
     });
-  }, []);
+  }, [maxSlots]);
 
   const addFileToSlot = useCallback(
-    (orden, file) => {
+    async (orden, file) => {
       if (!file) return;
+      if (!isValidOrden(orden, maxSlots)) return;
+      const index = toSlotIndex(orden);
+
+      // Paso 1: ocupar el slot inmediatamente con el preview del file
+      // original. Sin importar si es imagen o PDF, el usuario quiere ver
+      // feedback de que su selección se registró.
+      const initialPreview = URL.createObjectURL(file);
       applySlotUpdate(orden, () => ({
         file,
-        preview: URL.createObjectURL(file),
+        preview: initialPreview,
         reciboId: undefined,
-        status: "idle",
+        status: isCompressibleImage(file) ? "compressing" : "idle",
       }));
       setUploadError("");
+
+      // Paso 2: si es imagen, comprimir y swap atómico. Si es PDF (u octet-
+      // stream), ya quedó en 'idle' arriba — no hay nada que esperar.
+      if (!isCompressibleImage(file)) return;
+
+      try {
+        const { blob: compressed, filename } = await compressImageFile(file);
+        // Revocar el preview del original y aplicar el del comprimido.
+        // C-2 race (análogo a setSlotHydrated): si mientras
+        // comprimíamos el usuario seleccionó otro file en este mismo
+        // slot, el `file` capturado en este closure YA NO es el
+        // `current.file` del slot. El guard `current.file !== file`
+        // detecta exactamente eso y no pisa la elección más reciente.
+        URL.revokeObjectURL(initialPreview);
+        applySlotUpdate(orden, (current) => {
+          if (!current) return current;
+          if (current.file !== file) return current;
+          return {
+            ...current,
+            file: new File([compressed], filename, { type: compressed.type }),
+            preview: URL.createObjectURL(compressed),
+            status: "idle",
+            error: undefined,
+          };
+        });
+      } catch (err) {
+        applySlotUpdate(orden, (current) => {
+          if (!current) return current;
+          if (current.file !== file) return current;
+          return {
+            ...current,
+            status: "error",
+            error: `${err?.message || "Error al comprimir"} 😊`,
+          };
+        });
+      }
     },
-    [applySlotUpdate],
+    [applySlotUpdate, maxSlots],
   );
 
   const clearSlot = useCallback(
     async (orden) => {
-      if (!isValidOrden(orden)) return;
+      if (!isValidOrden(orden, maxSlots)) return;
       const index = toSlotIndex(orden);
       const slot = slots[index];
       if (!slot) return;
@@ -88,12 +139,12 @@ export const useReciboUpload = () => {
         return next;
       });
     },
-    [slots],
+    [slots, maxSlots],
   );
 
   const setSlotHydrated = useCallback(
     (orden, { reciboId, url, mime, size, filename }) => {
-      if (!isValidOrden(orden)) return;
+      if (!isValidOrden(orden, maxSlots)) return;
       const index = toSlotIndex(orden);
       // Whole-branch fix C-2 (2026-08-21): si el usuario ya seleccionó un file en
       // este slot mientras el rehydration estaba en flight, NO pisar el slot
@@ -119,7 +170,7 @@ export const useReciboUpload = () => {
         return next;
       });
     },
-    [],
+    [maxSlots],
   );
 
   const uploadAll = useCallback(
@@ -167,7 +218,7 @@ export const useReciboUpload = () => {
           setSlots((prev) => {
             const next = prev.slice();
             for (const recibo of recibos) {
-              if (!isValidOrden(recibo.orden)) continue;
+              if (!isValidOrden(recibo.orden, maxSlots)) continue;
               const idx = toSlotIndex(recibo.orden);
               const existing = next[idx];
               next[idx] = {
@@ -215,9 +266,9 @@ export const useReciboUpload = () => {
         return { success: false, error: msg };
       }
     },
-    [slots],
+    [slots, maxSlots],
   );
-  
+
 
   const isUploading = slots.some((s) => s?.status === "uploading");
   // El botón Continuar se habilita en cuanto hay al menos un file seleccionado

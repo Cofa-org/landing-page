@@ -9,7 +9,7 @@ import ReciboSlotTile from "./ReciboSlotTile.jsx";
 import styles from "./ReciboUploadStep.module.css";
 import { openCallbellWebchat } from "../../../../utils/callbellHelpers.js";
 
-const MAX_SLOTS = 3;
+const MAX_SLOTS_BASE = 3;
 
 /**
  * Extrae el filename original del `storage_path` de un recibo persistido.
@@ -24,10 +24,10 @@ const extractFilenameFromStoragePath = (storagePath) => {
 };
 
 /**
- * ReciboUploadStep — pantalla multi-recibo (hasta 3).
+ * ReciboUploadStep — pantalla multi-recibo (hasta `maxSlots`).
  *
  * Cambios vs versión anterior:
- *  - Rinde hasta 3 `ReciboSlotTile` (cada uno expone su "+ Agregar Recibo N").
+ *  - Rinde hasta `maxSlots` `ReciboSlotTile` (cada uno expone su "+ Agregar Recibo N").
  *  - Al montar, si tenemos `leadId`, consulta `getRecibosPendientes` y
  *    rehidrata los slots llamando `setSlotHydrated` por cada recibo
  *    persistido en el back. Esto permite volver a esta pantalla sin
@@ -35,14 +35,20 @@ const extractFilenameFromStoragePath = (storagePath) => {
  *  - Refactored to batch upload via `uploadAll`.
  *  - Mantiene el routing post-submit: si el back transiciona al lead a
  *    `EN_ANALISIS`, navega a la pantalla de análisis; si no, flujo normal.
+ *
+ * `maxSlots` viene como prop del padre (default 3). En el path de resubida
+ * (OnboardingFlowScreen resume branch, spec 2026-09-07), el back puede
+ * devolver un número mayor si el operador requirió más de 3 recibos.
  */
 const ReciboUploadStep = ({
   leadId,
+  maxSlots: maxSlotsProp,
   onSuccess,
   onAnalysisAfterRecibo,
   loading,
   error: externalError,
 }) => {
+  const maxSlots = maxSlotsProp ?? MAX_SLOTS_BASE;
   const {
     slots,
     isUploading,
@@ -52,7 +58,7 @@ const ReciboUploadStep = ({
     clearSlot,
     uploadAll,
     setSlotHydrated,
-  } = useReciboUpload();
+  } = useReciboUpload({ maxSlots });
 
   // `hydrating` cubre la ventana de RTT de `getRecibosPendientes` para
   // evitar el flash de 3 slots vacíos antes de que el back responda
@@ -115,7 +121,7 @@ const ReciboUploadStep = ({
     }
   };
 
-  const visibleSlots = slots.slice(0, MAX_SLOTS);
+  const visibleSlots = slots.slice(0, maxSlots);
 
   return (
     <GenericForm
@@ -127,7 +133,7 @@ const ReciboUploadStep = ({
     >
       <div className={styles.uploadAreaWrapper}>
         {hydrating
-          ? Array.from({ length: MAX_SLOTS }, (_, idx) => (
+          ? Array.from({ length: maxSlots }, (_, idx) => (
               <div
                 key={idx}
                 data-testid='hydration-skeleton'
@@ -142,7 +148,7 @@ const ReciboUploadStep = ({
                 slot={slot}
                 onAddFile={addFileToSlot}
                 onClear={clearSlot}
-                maxSlots={MAX_SLOTS}
+                maxSlots={maxSlots}
               />
             ))}
       </div>
@@ -170,6 +176,7 @@ const ReciboUploadStep = ({
 
 ReciboUploadStep.propTypes = {
   leadId: PropTypes.number,
+  maxSlots: PropTypes.number,
   onSuccess: PropTypes.func,
   onAnalysisAfterRecibo: PropTypes.func,
   loading: PropTypes.bool,

@@ -1,8 +1,6 @@
 import { useState, useCallback, useRef } from "react";
 import { ERROR_MESSAGE } from "../../../constants/camera.constants.js";
-
-const MAX_CAPTURE_WIDTH = 1280;
-const JPEG_QUALITY = 0.85;
+import { compressImageToBlob } from "../../../lib/imageCompression.js";
 
 export const useCameraCapture = () => {
   const [stream, setStream] = useState(null);
@@ -56,26 +54,16 @@ export const useCameraCapture = () => {
   }, []);
 
   const captureFrame = useCallback((videoEl, canvasEl) => {
-    const ctx = canvasEl.getContext("2d");
-    const sourceWidth = videoEl.videoWidth;
-    const sourceHeight = videoEl.videoHeight;
-
-    // Re-escalar a max-width 1280 preservando aspect ratio. Para un DNI
-    // capturado por cámara de 12MP, baja de 4032×3024 a 1280×960 (o similar).
+    // Shared helper con `useReciboUpload` — fuente única de los parámetros
+    // de compresión (max-width 1280, JPEG q=0.85). Para un DNI capturado
+    // por cámara de 12MP, baja de 4032×3024 a 1280×960 (o similar).
     // El texto del DNI queda 6-12px de alto en el preview — totalmente legible.
-    const scale = sourceWidth > MAX_CAPTURE_WIDTH
-      ? MAX_CAPTURE_WIDTH / sourceWidth
-      : 1;
-    const targetWidth = Math.round(sourceWidth * scale);
-    const targetHeight = Math.round(sourceHeight * scale);
-
-    canvasEl.width = targetWidth;
-    canvasEl.height = targetHeight;
-    ctx.drawImage(videoEl, 0, 0, targetWidth, targetHeight);
-
-    return new Promise((resolve) => {
-      canvasEl.toBlob((blob) => resolve(blob), "image/jpeg", JPEG_QUALITY);
-    });
+    return compressImageToBlob(
+      videoEl,
+      videoEl.videoWidth,
+      videoEl.videoHeight,
+      canvasEl,
+    );
   }, []);
 
   return {

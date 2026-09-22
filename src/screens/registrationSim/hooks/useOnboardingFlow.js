@@ -48,11 +48,19 @@ const PREV_STEP_MAP = {
 const getPrevStepFromReciboUpload = (esCliente) =>
   esCliente === true ? null : LOAN_SIM_STEPS.DNI_UPLOAD;
 
-export const useOnboardingFlow = () => {
+export const useOnboardingFlow = (resumeShortId = null) => {
   const [leadData, setLeadData] = useState(null);
   const [leadToken, setLeadToken] = useState(null);
   const [onboardingStep, setOnboardingStep] = useState(LOAN_SIM_STEPS.LEAD_REGISTRATION);
-  const [restoringOnboarding, setRestoringOnboarding] = useState(false);
+  // Initial: true. Si arranco en false, la primera paint (anterior al useEffect)
+  // ve `restoringOnboarding === false` y OnboardingFlowScreen renderiza el step
+  // calculado en `onboardingStep` (LEAD_REGISTRATION por default) antes de que
+  // el effect determine el step real — flash visible. Con initial=true el
+  // gate del Screen se queda cerrado durante la primera paint y el effect
+  // luego lo abre en `finally`. Espejo del patrón de useLoanSimulator.js
+  // (`initialSimulationResolved`) con polaridad "in-flight" en vez de "resolved".
+  // Ver memoria loan-sim-initial-loading-race-2026-07-30.
+  const [restoringOnboarding, setRestoringOnboarding] = useState(true);
   const [pendingIdentities, setPendingIdentities] = useState(null);
   const [pendingDni, setPendingDni] = useState(null);
   const [pendingCelular, setPendingCelular] = useState(null);
@@ -71,6 +79,18 @@ export const useOnboardingFlow = () => {
 
   useEffect(() => {
     const restoreOnboardingState = async () => {
+      // Si hay un shortId en la URL, el resume effect del screen es
+      // autoritativo — consumeLink + iniciarSesionResume van a setear el
+      // step al final del flow. Si el restore también corre (async), puede
+      // sobrescribir RECIBO_UPLOAD con LEAD_REGISTRATION (caso sin cookie) o
+      // con el state del backend (caso con cookie stale). Esto deja al
+      // usuario "stuck" en el step equivocado sin redirección. Salteamos
+      // el restore para que el resume sea el único que toca el step.
+      // Ver memoria race-condition-restore-resume-2026-09-11.
+      if (resumeShortId) {
+        setRestoringOnboarding(false);
+        return;
+      }
       setRestoringOnboarding(true);
       try {
         const leadTokenValue = await getCookie(COOKIE_LEAD_TOKEN_CONFIG.NAME);
@@ -164,7 +184,7 @@ export const useOnboardingFlow = () => {
       }
     };
     restoreOnboardingState();
-  }, []);
+  }, [resumeShortId]);
 
   const BACK_BUTTON_STEPS = [
     LOAN_SIM_STEPS.IDENTITY_SELECTION,
@@ -210,7 +230,6 @@ export const useOnboardingFlow = () => {
 
         // Solo sincronizar si hay un estado previo que actualizar
         if (leadId && estadoBackendPrev) {
-          console.log("estadoBackendPrev", estadoBackendPrev);
           await LeadRegistrationService.actualizarEstadoOnboarding({
             leadId,
             estado: estadoBackendPrev,
@@ -493,6 +512,13 @@ export const useOnboardingFlow = () => {
     rejectedFechaExpiracionBloqueo,
     pickerContext,
     setPickerContext,
+    // Setters expuestos para callers que necesitan plantar estado manualmente
+    // (ej. OnboardingFlowScreen resume branch, spec "Recibo resubida operador"
+    // 2026-09-07: consume link → setLeadData + setLeadToken + setOnboardingStep
+    // para entrar a RECIBO_UPLOAD sin pasar por el flow normal).
+    setLeadData,
+    setLeadToken,
+    setOnboardingStep,
 
     // Navegación
     navigateToNext,
