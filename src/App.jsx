@@ -1,7 +1,7 @@
 import './index.css'
 
 import RouterScreens from './RouterScreens'
-import { ScrollContextProvider } from './context'
+import { AuthProvider, ScrollContextProvider } from './context'
 import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 
@@ -18,10 +18,11 @@ function App() {
 
   return (
     <>
-      <ScrollContextProvider>
-        <RouterScreens />
-      </ScrollContextProvider>
-
+      <AuthProvider>
+        <ScrollContextProvider>
+          <RouterScreens />
+        </ScrollContextProvider>
+      </AuthProvider>
     </>
   )
 }

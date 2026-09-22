@@ -1,7 +1,26 @@
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, Navigate } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import Loader from "./Components/Loader/Loader";
 import OnboardingFlowScreen from "./screens/registrationSim/OnboardingFlowScreen.jsx";
+import { useAuth } from "./context/index.js";
+import LoginScreen from "./screens/auth/LoginScreen.jsx";
+import RegisterScreen from "./screens/auth/RegisterScreen.jsx";
+import ForgotPasswordScreen from "./screens/auth/ForgotPasswordScreen.jsx";
+import ResetPasswordScreen from "./screens/auth/ResetPasswordScreen.jsx";
+
+/**
+ * Guard que redirige al home si el usuario ya tiene sesión activa.
+ * - Mientras authLoading es true mostramos los children (optimistic): si el usuario
+ *   sí tiene sesión, el redirect ocurre igual en cuanto me() responde (< 200 ms).
+ *   Esto evita mostrar una página en blanco mientras se verifica la cookie.
+ * IMPORTANTE: definida fuera del componente para que React no la trate como un
+ * tipo nuevo en cada render (lo que causaría unmount/remount de la ruta).
+ */
+const RedirectIfAuth = ({ children }) => {
+  const { user, loading: authLoading } = useAuth();
+  if (!authLoading && user) return <Navigate to="/" replace />;
+  return children;
+};
 
 // Lazy-loaded screens
 const HomeScreen = lazy(() => import("./screens/HomeScreen/HomeScreen"));
@@ -34,7 +53,6 @@ const DNIUploadMobileScreen = lazy(() => import("./screens/DNIUploadMobile/DNIUp
 /* import SuggestionsScreen from './screens/SuggestionsScreen/SuggestionsScreen' */
 
 const RouterScreens = () => {
-  
   return (
     <Suspense
       fallback={
@@ -158,6 +176,24 @@ const RouterScreens = () => {
           path='/subir-dni'
           element={<DNIUploadMobileScreen />}
         />
+        {/* Auth */}
+        <Route
+          path='/ingresar'
+          element={<RedirectIfAuth><LoginScreen /></RedirectIfAuth>}
+        />
+        <Route
+          path='/crear-cuenta'
+          element={<RedirectIfAuth><RegisterScreen /></RedirectIfAuth>}
+        />
+        <Route
+          path='/recuperar-contrasena'
+          element={<ForgotPasswordScreen />}
+        />
+        <Route
+          path='/restablecer-contrasena'
+          element={<ResetPasswordScreen />}
+        />
+
         <Route
           path='*'
           element={<ErrorScreen />}

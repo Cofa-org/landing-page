@@ -1,0 +1,149 @@
+/* ── Layout split: imagen + formulario ─────────────────────────────────── */
+
+.splitLayout {
+  display: flex;
+  min-height: calc(100vh - 100px); /* 100px = alto del header */
+  align-items: stretch;
+}
+
+/* Panel izquierdo: visual/branding */
+.leftPanel {
+  flex: 1;
+  background: linear-gradient(150deg, var(--primary-color) 0%, #0b3d22 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 40px;
+  gap: 24px;
+  text-align: center;
+}
+
+.leftPanelLogo {
+  filter: brightness(0) invert(1);
+  width: 160px;
+  margin-bottom: 8px;
+}
+
+.leftPanelTitle {
+  color: #fff;
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.3;
+  margin: 0;
+}
+
+.leftPanelSub {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0;
+  max-width: 280px;
+}
+
+.leftPanelImage {
+  width: 100%;
+  max-width: 320px;
+  border-radius: var(--border-radius-lg);
+  object-fit: cover;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
+  margin-top: 8px;
+}
+
+/* Panel derecho: formulario */
+.rightPanel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 32px;
+  background-color: var(--background-color);
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .splitLayout {
+    flex-direction: column;
+  }
+
+  .leftPanel {
+    padding: 32px 24px 24px;
+    min-height: auto;
+  }
+
+  .leftPanelImage {
+    max-width: 200px;
+  }
+
+  .leftPanelTitle {
+    font-size: 1.3rem;
+  }
+
+  .rightPanel {
+    padding: 24px 16px 40px;
+  }
+}
+
+/* ── Mensajes de feedback dentro del formulario ─────────────────────────── */
+
+.alert {
+  padding: 12px 16px;
+  border-radius: var(--border-radius-sm);
+  font-size: 0.9rem;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.alertSuccess {
+  background-color: rgba(36, 149, 87, 0.1);
+  color: var(--primary-color);
+  border: 1px solid rgba(36, 149, 87, 0.3);
+}
+
+.alertError {
+  background-color: rgba(255, 77, 79, 0.08);
+  color: #c0392b;
+  border: 1px solid rgba(255, 77, 79, 0.3);
+}
+
+/* ── Links auxiliares ───────────────────────────────────────────────────── */
+
+.auxLink {
+  text-align: center;
+  font-size: 0.88rem;
+  color: #777;
+  margin-top: 4px;
+}
+
+.auxLink a {
+  color: var(--primary-color);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.auxLink a:hover {
+  text-decoration: underline;
+}
+
+/* ── Turnstile centrado ─────────────────────────────────────────────────── */
+
+.turnstileWrapper {
+  display: flex;
+  justify-content: center;
+}
+
+/* ── Área de acción del formulario (botón principal + link auxiliar) ────── */
+/* Agrega aire entre el último campo/widget y el botón de submit,           */
+/* y entre el botón y el link de abajo. Sólo aplica dentro de auth screens. */
+.formActions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px; /* espacio extra sobre el botón */
+}
+
+/* Margen extra encima de un alert de feedback (éxito o error) */
+.alertSpaced {
+  margin-top: 12px;
+}

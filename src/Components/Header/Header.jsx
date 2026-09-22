@@ -3,7 +3,8 @@ import { openCallbellWebchat } from "../../utils/callbellHelpers";
 import { Link, useLocation } from "react-router-dom";
 import { FiMenu } from "react-icons/fi";
 import { IoMdArrowBack } from "react-icons/io";
-import { useScrollContext } from "../../context";
+import { useScrollContext, useAuth } from "../../context";
+import UserMenu from "./UserMenu.jsx";
 import "./Header.css";
 
 const NAV_SECTIONS = ["prestamos", "nosotros", "preguntas-frecuentes", "cofa-tips", "contacto"];
@@ -62,6 +63,7 @@ const NavLinks = ({ pageType, selectedLink, onLinkClick }) => {
 const Header = ({ hideHelpButton = false, helpButtonPreset }) => {
   const { pathname } = useLocation();
   const { scrolled } = useScrollContext();
+  const { user, loading: authLoading } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [selectedLink, setSelectedLink] = useState("");
 
@@ -155,6 +157,14 @@ const Header = ({ hideHelpButton = false, helpButtonPreset }) => {
             </button>
           </Link>
         )}
+
+        {/* Sesión: optimista — mostramos "Ingresar" siempre que no haya sesión
+            confirmada. Si la hay, UserMenu aparece en cuanto me() responde (< 200 ms). */}
+        {user && !authLoading
+          ? <UserMenu />
+          : <Link to='/ingresar' className='header-account-btn' aria-label='Ingresar a mi cuenta'>Ingresar</Link>
+        }
+
         <button className='btn-show-links' onClick={() => handleToggleNavbar(true)} aria-label='Abrir menú de navegación'>
           <FiMenu />
         </button>

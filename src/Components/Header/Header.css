@@ -74,6 +74,63 @@ header nav a {
   letter-spacing: 0.8px;
 }
 
+/* Botón "Ingresar" en el header — outline, mismo alto que primary */
+.header-account-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 12px 20px;           /* misma altura que .primary-btn */
+  border: 1.5px solid var(--primary-color);
+  border-radius: 7px;
+  background-color: transparent;
+  color: var(--primary-color) !important;
+  font-size: 16px;              /* igual que .header-primary-btn */
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-decoration: none !important;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.header-account-btn:hover {
+  background-color: var(--primary-color-10);
+}
+
+/* Avatar del usuario logueado */
+.header-avatar-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid var(--primary-color);
+  background-color: transparent;
+  color: var(--primary-color) !important; /* ícono verde por defecto */
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s, transform 0.15s;
+  flex-shrink: 0;
+}
+
+/* Hover: rellena el círculo en verde → ícono blanco para no perderse */
+.header-avatar-btn:hover {
+  background-color: var(--primary-color);
+  color: #fff !important;
+  transform: scale(1.05);
+}
+
+/* Controla el stroke del SVG directamente para evitar inconsistencias */
+.header-avatar-btn svg {
+  display: block;
+  stroke: var(--primary-color);
+  transition: stroke 0.2s;
+}
+
+.header-avatar-btn:hover svg {
+  stroke: #fff;
+}
+
 @keyframes to-right {
   0% {
     right: -250px;
