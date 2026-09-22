@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FiUser, FiLogOut, FiFileText } from "react-icons/fi";
+import { FiUser, FiLogOut, FiFileText, FiSettings } from "react-icons/fi";
 import { useAuth } from "../../context/index.js";
 import styles from "./UserMenu.module.css";
 
@@ -62,6 +62,15 @@ const UserMenu = () => {
           >
             <FiFileText size={14} />
             Mis solicitudes
+          </Link>
+          <Link
+            to="/mi-perfil"
+            className={styles.dropdownItem}
+            role="menuitem"
+            onClick={() => setOpen(false)}
+          >
+            <FiSettings size={14} />
+            Mi perfil
           </Link>
           <div className={styles.divider} />
           <button

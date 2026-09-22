@@ -69,6 +69,22 @@ const authService = {
    * Si no tiene lead vinculado, solicitudes = [] y tieneHistorial = false.
    */
   getSolicitudes: () => authFetch("/solicitudes", { method: "GET" }),
+
+  /** Cambia la contraseña desde el perfil (requiere contraseña actual). */
+  changePassword: (currentPassword, newPassword) =>
+    authFetch("/profile/password", { body: { currentPassword, newPassword } }),
+
+  /**
+   * Paso 1 del cambio de email: verifica contraseña y envía OTP al nuevo email.
+   */
+  requestEmailChange: (currentPassword, newEmail) =>
+    authFetch("/profile/email/request", { body: { currentPassword, newEmail } }),
+
+  /**
+   * Paso 2 del cambio de email: confirma con el OTP recibido en el nuevo email.
+   */
+  confirmEmailChange: (code) =>
+    authFetch("/profile/email/confirm", { body: { code } }),
 };
 
 export default authService;

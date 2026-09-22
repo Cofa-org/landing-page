@@ -60,6 +60,7 @@ const IaPoliciesScreen = lazy(() => import("./screens/IaPoliciesScreen.jsx/IaPol
 const ReqAutoridadesScreen = lazy(() => import("./screens/ReqAutoridadesScreen/ReqAutoridadesScreen.jsx"));
 const DNIUploadMobileScreen = lazy(() => import("./screens/DNIUploadMobile/DNIUploadMobileScreen"));
 const MisSolicitudesScreen = lazy(() => import("./screens/MisSolicitudesScreen/MisSolicitudesScreen"));
+const MiPerfilScreen = lazy(() => import("./screens/MiPerfilScreen/MiPerfilScreen"));
 
 /* import SuggestionsScreen from './screens/SuggestionsScreen/SuggestionsScreen' */
 
@@ -207,6 +208,10 @@ const RouterScreens = () => {
         <Route
           path='/mis-solicitudes'
           element={<RequireAuth><MisSolicitudesScreen /></RequireAuth>}
+        />
+        <Route
+          path='/mi-perfil'
+          element={<RequireAuth><MiPerfilScreen /></RequireAuth>}
         />
 
         <Route
