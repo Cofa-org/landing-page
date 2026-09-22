@@ -90,7 +90,6 @@ export const useLoanSimulator = () => {
         setInitialSimulationResolved(true);
         return;
       }
-     
       setLoading(true);
       setStep(LOAN_SIM_STEPS.SIMULACION);
       try {
@@ -200,7 +199,36 @@ export const useLoanSimulator = () => {
             motivo: response.data.motivo || null,
           });
 
-          setHuellaData(mapFingerprintToHuellaData(fingerprint));
+          // Test persona bypass (SIM_DEVICE_REJECTED): si la persona persistida
+          // en sessionStorage tiene huellaVisitorId mock, construimos huellaData
+          // desde ese mock en lugar del fingerprint real del browser. Asi el
+          // backend puede detectar el bypass via shouldForceDeviceMismatchForTestPersona
+          // y simular DEVICE_FINGERPRINT_MISMATCH. Si no hay mock, usamos el
+          // fingerprint real (path normal).
+          let testHuellaMock = null;
+          try {
+            const raw = sessionStorage.getItem("simuladorTestPersona");
+            if (raw) {
+              const stored = JSON.parse(raw);
+              if (stored?.simuladorConfig?.huellaVisitorId) {
+                testHuellaMock = stored.simuladorConfig.huellaVisitorId;
+              }
+            }
+          } catch (parseErr) {
+            // ignore — fall through to real fingerprint
+          }
+          if (testHuellaMock) {
+            setHuellaData({
+              visitor_id: testHuellaMock,
+              ip_address: "127.0.0.1",
+              browser_name: fingerprint?.browserName || "test",
+              browser_version: fingerprint?.browserVersion || "0",
+              plataforma: "test",
+              es_movil: false,
+            });
+          } else {
+            setHuellaData(mapFingerprintToHuellaData(fingerprint));
+          }
           setHuellaRequestId(fingerprint?.requestId || null);
         } else {
           const errorMessage =
