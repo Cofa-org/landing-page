@@ -69,14 +69,68 @@ export const useLoanSimulator = () => {
 
   useEffect(() => {
     const initVerification = async () => {
-      if (!shortId) {
+      // Check sessionStorage for test persona first (mocked link flow from
+      // backoffice) AND also check the `tp` searchParam that the test panel
+      // sets when navigating here. Malformed JSON is swallowed so the hook
+      // falls through to the shortId-based flow.
+      let mockPersona = null;
+      const tpFromUrl = searchParams.get("tp");
+      if (tpFromUrl) {
+        try {
+          const raw = sessionStorage.getItem("simuladorTestPersona");
+          if (raw) {
+            const stored = JSON.parse(raw);
+            // Match the personaId passed in the URL — re-validate that the
+            // sessionStorage payload matches the URL param (in case the user
+            // clicked multiple personas quickly).
+            if (stored && stored.id === tpFromUrl) {
+              mockPersona = stored;
+            }
+          }
+        } catch (parseErr) {
+          // ignore — fall through to shortId-based flow
+        }
+      }
+     
+      if (!shortId && !mockPersona) {
         setStep(LOAN_SIM_STEPS.LEAD_REGISTRATION);
+        // Sin link ni persona test: el flujo original cae a LEAD_REGISTRATION.
+        // Liberar el loading inicial para que LoanSimScreen no quede colgado
+        // en el loading screen cuando no hay nada que verificar.
+        setInitialSimulationResolved(true);
         return;
       }
       setLoading(true);
       setStep(LOAN_SIM_STEPS.SIMULACION);
       try {
-        const response = await LinkResolutionService.consumeLink(shortId);
+        let response;
+        if (mockPersona) {
+          // Bypass consumeLink — synthesize a response matching the consumeLink
+          // shape so the existing fingerprint + iniciarSesion + setScoringData
+          // flow runs unchanged. ScoringId falls back to dni when
+          // simuladorConfig.scoringId is absent.
+          const personaScoringId = String(
+            mockPersona.simuladorConfig?.scoringId || mockPersona.dni || "",
+          );
+          const personaCuit = (mockPersona.cuit || "").replace(/-/g, "");
+          response = {
+            success: true,
+            data: {
+              scoringId: personaScoringId,
+              cuit: personaCuit,
+              nombreCompleto: mockPersona.nombreCompleto || null,
+              capitalMaximoOperador: null,
+              tasaOperador: null,
+              plazoMaximoOperador: null,
+              cuotaADescontar: null,
+              nroCuota: null,
+              nroPrestamo: null,
+              motivo: null,
+            },
+          };
+        } else {
+          response = await LinkResolutionService.consumeLink(shortId);
+        }
         if (response.success && response.data) {
           // Get the fingerprint BEFORE any state update that triggers the initial
           // fetch. This way, scoringId and huellaData are set in the same React
@@ -155,7 +209,36 @@ export const useLoanSimulator = () => {
             motivo: response.data.motivo || null,
           });
 
-          setHuellaData(mapFingerprintToHuellaData(fingerprint));
+          // Test persona bypass (SIM_DEVICE_REJECTED): si la persona persistida
+          // en sessionStorage tiene huellaVisitorId mock, construimos huellaData
+          // desde ese mock en lugar del fingerprint real del browser. Asi el
+          // backend puede detectar el bypass via shouldForceDeviceMismatchForTestPersona
+          // y simular DEVICE_FINGERPRINT_MISMATCH. Si no hay mock, usamos el
+          // fingerprint real (path normal).
+          let testHuellaMock = null;
+          try {
+            const raw = sessionStorage.getItem("simuladorTestPersona");
+            if (raw) {
+              const stored = JSON.parse(raw);
+              if (stored?.simuladorConfig?.huellaVisitorId) {
+                testHuellaMock = stored.simuladorConfig.huellaVisitorId;
+              }
+            }
+          } catch (parseErr) {
+            // ignore — fall through to real fingerprint
+          }
+          if (testHuellaMock) {
+            setHuellaData({
+              visitor_id: testHuellaMock,
+              ip_address: "127.0.0.1",
+              browser_name: fingerprint?.browserName || "test",
+              browser_version: fingerprint?.browserVersion || "0",
+              plataforma: "test",
+              es_movil: false,
+            });
+          } else {
+            setHuellaData(mapFingerprintToHuellaData(fingerprint));
+          }
           setHuellaRequestId(fingerprint?.requestId || null);
         } else {
           const errorMessage =
@@ -173,7 +256,7 @@ export const useLoanSimulator = () => {
     };
 
     initVerification();
-  }, [shortId]);
+  }, [shortId, searchParams.get("tp")]);
 
   const fetchSimulation = useCallback(
     async (currentAmount, isInitial = false) => {
@@ -221,7 +304,7 @@ export const useLoanSimulator = () => {
         }
 
         const response = await SimuladorService.calcularPlanes(params, controller.signal);
-
+      
         // Discard response if this request was superseded by a newer one.
         if (controller.signal.aborted) return;
 
