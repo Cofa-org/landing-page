@@ -103,6 +103,21 @@ export const useReciboUpload = ({ maxSlots: maxSlotsProp } = {}) => {
         applySlotUpdate(orden, (current) => {
           if (!current) return current;
           if (current.file !== file) return current;
+          // Recibo HEIC decode-failed 2026-09-23 (lead 16582 / LEDESMA, Chrome
+          // 153 en Android): cuando el browser no decodifica HEIC localmente
+          // (`createImageBitmap` y fallback `<img>` ambos fallan en Chrome
+          // Android / Firefox / Chrome Win-Linux desktop), preservamos el
+          // file original en estado 'idle' para que el back corra
+          // `convertHeicToJpg` (sharp) como segunda red de seguridad.
+          // Otros tipos (JPEG/PNG/WEBP) NO tienen esa segunda red y siguen
+          // marcando 'error' para que el usuario re-suba el archivo.
+          if (file.type === "image/heic" || file.type === "image/heif") {
+            return {
+              ...current,
+              status: "idle",
+              error: undefined,
+            };
+          }
           return {
             ...current,
             status: "error",
