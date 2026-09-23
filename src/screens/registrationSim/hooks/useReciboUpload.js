@@ -2,9 +2,9 @@ import { useState, useCallback } from "react";
 import LeadRegistrationService from "../../../services/leadRegistrationService";
 import { getFriendlyErrorMessage } from "../../../lib/network-error";
 import { compressImageFile, isCompressibleImage } from "../../../lib/imageCompression.js";
+import { getSubirRecibosRetryConfig } from "../../../lib/recibo-upload-config";
 
 const SLOT_COUNT_BASE = 3;
-const SUBIR_RECIBOS_RETRY_CONFIG = { retries: 1, backoffMs: 1500 };
 
 const initialSlots = (count) => Array(count).fill(null);
 
@@ -62,7 +62,7 @@ export const useReciboUpload = ({ maxSlots: maxSlotsProp } = {}) => {
       if (!file) return;
       if (!isValidOrden(orden, maxSlots)) return;
       const index = toSlotIndex(orden);
-
+     
       // Paso 1: ocupar el slot inmediatamente con el preview del file
       // original. Sin importar si es imagen o PDF, el usuario quiere ver
       // feedback de que su selección se registró.
@@ -219,13 +219,13 @@ export const useReciboUpload = ({ maxSlots: maxSlotsProp } = {}) => {
         return next;
       });
       setUploadError("");
-
+      
       try {
         const response = await LeadRegistrationService.subirRecibos(
           { leadId },
           filesByOrden,
           null,
-          SUBIR_RECIBOS_RETRY_CONFIG,
+          getSubirRecibosRetryConfig(),
         );
 
         if (response?.success) {

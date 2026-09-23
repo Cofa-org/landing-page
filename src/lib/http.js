@@ -1,29 +1,11 @@
-
 import { NetworkError } from "./network-error";
 
-/**
- * Identifica fallos de red puros del fetch (no errores HTTP).
- *
- * `TypeError: Failed to fetch` es lo que tira Chromium cuando el socket
- * TCP muere antes de cualquier HTTP response (WiFi cut, DNS fail, CORS
- * preflight abort). En Firefox el mensaje es "NetworkError when
- * attempting to fetch resource" pero también es instanceof TypeError
- * semánticamente — es la convención del DOM spec ya adoptada por
- * ambos browsers.
- *
- * NO incluimos AbortError en esta lista: si el caller aborta
- * intencionalmente, no queremos reintentar (su request ya no le
- * interesa).
- */
 function isRetryableNetworkError(err) {
-  return err instanceof TypeError;
+  if (err instanceof TypeError) return true;
+  if (err instanceof DOMException && err.name === "TimeoutError") return true;
+  return false;
 }
 
-/**
- * Espera `ms` ms, abortable. Si el signal se aborta durante el delay,
- * rechaza con DOMException("Aborted", "AbortError") inmediatamente y
- * limpia el timer.
- */
 function delay(ms, signal) {
   return new Promise((resolve, reject) => {
     if (signal?.aborted) {
@@ -40,34 +22,71 @@ function delay(ms, signal) {
 }
 
 /**
- * Wrapper de fetch con retry opcional para errores de red.
- *
- * El retry aplica sólo a `TypeError` (la marca de network failure).
- * NO reintentamos respuestas HTTP 4xx/5xx: son errores del server y
- * reintentar no cambia el outcome. El caller debe manejar esos por
- * su cuenta (e.g. `parseErrorResponse` para body no-JSON).
- *
- * Args:
- *   - url, body, method, apiKey, token: como antes.
- *   - signal: AbortController.signal del caller. Si aborta, todo
- *     intento en curso aborta y NO se intenta el siguiente.
- *   - retryConfig: { retries, backoffMs } o null/undefined. Si null,
- *     comportamiento legacy (un solo intento, sin retry).
- *
- * Comportamiento:
- *   - maxAttempts = retries + 1.
- *   - Si el último intento falla con TypeError, se envuelve en
- *     NetworkError antes de propagar (así el caller puede mostrar
- *     un mensaje user-facing diferenciado).
- *   - Si aborta, propaga el AbortError sin envolver.
+ * Parsea el string de `xhr.getAllResponseHeaders()` a objeto plano de headers.
+ * Formato: `"Content-Type: application/json\r\nX-Foo: bar"`.
  */
+function parseXhrHeaders(raw) {
+  const result = {};
+  if (!raw) return result;
+  for (const line of raw.split(/\r?\n/)) {
+    const idx = line.indexOf(":");
+    if (idx === -1) continue;
+    const name = line.slice(0, idx).trim();
+    const value = line.slice(idx + 1).trim();
+    if (name) result[name] = value;
+  }
+  return result;
+}
+
 export async function HttpApi(url, body, method, apiKey, token, signal = null, retryConfig = null) {
   const maxAttempts = (retryConfig?.retries ?? 0) + 1;
   const backoffMs = retryConfig?.backoffMs ?? 0;
   const isFormData = body instanceof FormData;
+  const timeoutMs = (typeof retryConfig?.timeoutMs === "number" && retryConfig.timeoutMs > 0) ? retryConfig.timeoutMs : 0;
+
+  // XHR helper para multipart: más robusto que fetch en browsers legacy
+  // (Samsung Internet, WhatsApp/Facebook/Instagram in-app).
+  const xhrRequest = () => new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open(method, url);
+    const cbSessionId = typeof window !== "undefined" ? localStorage.getItem("callbell_session_id") : null;
+    if (apiKey) xhr.setRequestHeader("x-api-key", apiKey);
+    if (token) xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+    if (cbSessionId) xhr.setRequestHeader("x-callbell-session-id", cbSessionId);
+    // NO setear Content-Type para FormData — browser auto-genera con boundary.
+    if (timeoutMs > 0) xhr.timeout = timeoutMs;
+
+    xhr.onload = () => {
+      // Construye un Headers object desde el string raw de getAllResponseHeaders()
+      // para preservar el contrato fetch Response (mailService.js usa
+      // response.headers.get("content-type")).
+      const headers = new Headers(xhr.getAllResponseHeaders ? parseXhrHeaders(xhr.getAllResponseHeaders()) : {});
+      resolve({
+        status: xhr.status,
+        ok: xhr.status >= 200 && xhr.status < 300,
+        headers,
+        json: async () => JSON.parse(xhr.responseText),
+        text: async () => xhr.responseText,
+      });
+    };
+    xhr.onerror = () => {
+      if (xhr.status === 0) reject(new TypeError("NetworkError"));
+      else reject(new TypeError("Failed to fetch"));
+    };
+    xhr.ontimeout = () => reject(new DOMException("timeout", "TimeoutError"));
+    xhr.onabort = () => reject(new DOMException("aborted", "AbortError"));
+
+    if (signal) {
+      if (signal.aborted) {
+        reject(new DOMException("Aborted", "AbortError"));
+        return;
+      }
+      signal.addEventListener("abort", () => xhr.abort(), { once: true });
+    }
+    xhr.send(body);
+  });
 
   const buildOptions = () => {
-    // Intentamos recuperar el ID de sesión de Callbell si fue generado
     const cbSessionId = typeof window !== "undefined" ? localStorage.getItem("callbell_session_id") : null;
     return {
       headers: {
@@ -82,21 +101,15 @@ export async function HttpApi(url, body, method, apiKey, token, signal = null, r
     };
   };
 
-  // Sólo wrappeamos TypeError en NetworkError cuando el caller optó por
-  // retry. Sin retryConfig, propagamos el TypeError crudo para no
-  // cambiar el comportamiento de los 22+ call-sites existentes (varios
-  // servicios chequean `err.message` directamente en su catch). El
-  // friendly error message de los hooks de upload sigue funcionando
-  // porque ÉSOS pasan retryConfig → HttpApi les entrega NetworkError.
   const shouldWrap = retryConfig !== null;
   let lastError = null;
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     if (signal?.aborted) {
       throw new DOMException("Aborted", "AbortError");
     }
-    
+
     try {
-      return await fetch(url, buildOptions());
+      return isFormData ? await xhrRequest() : await fetch(url, buildOptions());
     } catch (err) {
       lastError = err;
       const isLast = attempt === maxAttempts;
@@ -109,7 +122,5 @@ export async function HttpApi(url, body, method, apiKey, token, signal = null, r
       await delay(backoffMs, signal);
     }
   }
-  // Defensa: el loop siempre retorna o tira adentro; este throw es
-  // inalcanzable pero mantiene el flow-control explícito.
   throw shouldWrap ? new NetworkError(lastError) : lastError;
 }
