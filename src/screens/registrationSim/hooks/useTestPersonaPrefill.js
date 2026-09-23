@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { fetchTestPersonaById } from "../components/TestPersonasPanel/TestPersonasPanel.service.js";
+import { fetchTestPersonaById } from "../../../services/testPersonasService.js";
 
 // Strip "+549" (or "+54" + carrier) prefix to get the local 10-digit format
 // that the registration form expects.

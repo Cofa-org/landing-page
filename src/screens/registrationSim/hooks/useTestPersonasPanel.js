@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
-import { fetchTestPersonas } from "../components/TestPersonasPanel/TestPersonasPanel.service.js";
+import { fetchTestPersonas } from "../../../services/testPersonasService.js";
 
 export function useTestPersonasPanel() {
   const [searchParams, setSearchParams] = useSearchParams();
