@@ -37,7 +37,10 @@ const TestSimuladorPanel = ({
       aria-label='Test personas (simulador)'
     >
       <div className={styles.header}>
-        <span className={styles.title}>🧪 Test Personas (Simulador)</span>
+        <span className={styles.title}>
+          <span className={styles.titleIcon} aria-hidden='true'>🧪</span>
+          Test Personas (Simulador)
+        </span>
         {onReset && (
           <GenericButton
             type='button'
@@ -45,10 +48,13 @@ const TestSimuladorPanel = ({
             onClick={onReset}
             className={styles.resetButton}
           >
-            Reset session
+            Reset
           </GenericButton>
         )}
       </div>
+      <span className={styles.subtitle}>
+        Elegí una persona para saltar el flujo de links externos.
+      </span>
       <div className={styles.list}>
         {personas.map((persona) => (
           <GenericButton
@@ -56,8 +62,15 @@ const TestSimuladorPanel = ({
             type='button'
             variant='outline'
             onClick={() => onSelectPersona(persona.id)}
+            className={styles.personaButton}
           >
-            {persona.label}
+            <span className={styles.personaLabel}>{persona.label}</span>
+            {persona.descripcion && (
+              <span className={styles.personaDesc}>{persona.descripcion}</span>
+            )}
+            {persona.tip && (
+              <span className={styles.personaTip}>💡 {persona.tip}</span>
+            )}
           </GenericButton>
         ))}
       </div>

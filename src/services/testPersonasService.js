@@ -36,3 +36,33 @@ export async function fetchTestPersonaById(id) {
     return null;
   }
 }
+
+/**
+ * Resetea la simulación asociada a una persona del catálogo
+ * (caso NORIEGA — testing E2E contra un cliente real sin bypass).
+ * Solo aplica para personas con `simuladorConfig.realClient === true`;
+ * el backend rechaza con 400 si la persona no es real-client.
+ *
+ * Devuelve `{ success: true, data: { message, ... } }` o lanza Error si
+ * el backend responde non-OK (incluye el `message` del body si existe).
+ */
+export async function resetTestPersonaSimulation(id) {
+  if (!id || !VALID_ID.test(String(id).slice(0, 64))) {
+    throw new Error("id inválido");
+  }
+  const response = await fetch(
+    `${LANDING_BACKEND_URL}${PERSONAS_PATH}/${encodeURIComponent(id)}/reset-simulacion`,
+    { method: "POST" },
+  );
+  if (!response.ok) {
+    let body = {};
+    try {
+      body = await response.json();
+    } catch {
+      // body no es JSON
+    }
+    const message = body?.message || body?.error || `reset failed (HTTP ${response.status})`;
+    throw new Error(message);
+  }
+  return response.json();
+}

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   fetchTestPersonaById,
   fetchTestPersonas,
+  resetTestPersonaSimulation,
 } from "../../../services/testPersonasService.js";
 
 /**
@@ -81,6 +82,31 @@ export function useTestSimuladorPanel() {
     async (personaId) => {
       const persona = await fetchTestPersonaById(personaId);
       if (!persona) return;
+
+      // Caso NORIEGA (cliente real): resetear simulación via API y navegar
+      // al link real con full reload. NO usamos sessionStorage ni
+      // `?tp=...` porque el flujo debe correr toda la lógica real del
+      // simulador contra el lead existente, sin bypass.
+      if (persona.simuladorConfig?.realClient) {
+        try {
+          await resetTestPersonaSimulation(personaId);
+        } catch (resetErr) {
+          console.warn("RESET_SIMULACION_FAILED:", resetErr);
+          // Continuamos igual: el usuario puede reintentar manualmente
+          // desde el panel, o seguir con la simulación existente.
+        }
+        sessionStorage.removeItem(SIMULADOR_TEST_PERSONA_STORAGE_KEY);
+        const shortId = persona.simuladorConfig.shortId;
+        if (!shortId) {
+          console.warn("REAL_CLIENT_PERSONA_MISSING_SHORT_ID", { personaId });
+          return;
+        }
+        // Full reload para que /simulador?id=... arranque el path real
+        // de consumeLink desde cero (no useLoanSimulator hidratado).
+        window.location.href = `/simulador?id=${encodeURIComponent(shortId)}`;
+        return;
+      }
+
       sessionStorage.setItem(
         SIMULADOR_TEST_PERSONA_STORAGE_KEY,
         JSON.stringify(persona),
