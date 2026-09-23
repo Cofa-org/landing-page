@@ -2,9 +2,9 @@ import { useState, useCallback } from "react";
 import LeadRegistrationService from "../../../services/leadRegistrationService";
 import { getFriendlyErrorMessage } from "../../../lib/network-error";
 import { compressImageFile, isCompressibleImage } from "../../../lib/imageCompression.js";
+import { getSubirRecibosRetryConfig } from "../../../lib/recibo-upload-config";
 
 const SLOT_COUNT_BASE = 3;
-const SUBIR_RECIBOS_RETRY_CONFIG = { retries: 1, backoffMs: 1500 };
 
 const initialSlots = (count) => Array(count).fill(null);
 
@@ -62,7 +62,7 @@ export const useReciboUpload = ({ maxSlots: maxSlotsProp } = {}) => {
       if (!file) return;
       if (!isValidOrden(orden, maxSlots)) return;
       const index = toSlotIndex(orden);
-
+     
       // Paso 1: ocupar el slot inmediatamente con el preview del file
       // original. Sin importar si es imagen o PDF, el usuario quiere ver
       // feedback de que su selección se registró.
@@ -103,6 +103,21 @@ export const useReciboUpload = ({ maxSlots: maxSlotsProp } = {}) => {
         applySlotUpdate(orden, (current) => {
           if (!current) return current;
           if (current.file !== file) return current;
+          // Recibo HEIC decode-failed 2026-09-23 (lead 16582 / LEDESMA, Chrome
+          // 153 en Android): cuando el browser no decodifica HEIC localmente
+          // (`createImageBitmap` y fallback `<img>` ambos fallan en Chrome
+          // Android / Firefox / Chrome Win-Linux desktop), preservamos el
+          // file original en estado 'idle' para que el back corra
+          // `convertHeicToJpg` (sharp) como segunda red de seguridad.
+          // Otros tipos (JPEG/PNG/WEBP) NO tienen esa segunda red y siguen
+          // marcando 'error' para que el usuario re-suba el archivo.
+          if (file.type === "image/heic" || file.type === "image/heif") {
+            return {
+              ...current,
+              status: "idle",
+              error: undefined,
+            };
+          }
           return {
             ...current,
             status: "error",
@@ -204,13 +219,13 @@ export const useReciboUpload = ({ maxSlots: maxSlotsProp } = {}) => {
         return next;
       });
       setUploadError("");
-
+      
       try {
         const response = await LeadRegistrationService.subirRecibos(
           { leadId },
           filesByOrden,
           null,
-          SUBIR_RECIBOS_RETRY_CONFIG,
+          getSubirRecibosRetryConfig(),
         );
 
         if (response?.success) {

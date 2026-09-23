@@ -249,9 +249,7 @@ const OnboardingFlowScreen = () => {
           />
         );
       case LOAN_SIM_STEPS.RECHAZADO:
-        return (
-          <RejectedStep />
-        );
+        return <RejectedStep />;
       case LOAN_SIM_STEPS.EN_ANALISIS:
         return <AnalysisStep onBack={navigateToPrev} />;
       case LOAN_SIM_STEPS.IDENTITY_SELECTION:
@@ -278,10 +276,8 @@ const OnboardingFlowScreen = () => {
     }
   };
 
-  const isFirstOrLastStep =
-    onboardingStep === LOAN_SIM_STEPS.LEAD_REGISTRATION ||
-    onboardingStep === LOAN_SIM_STEPS.WELCOME ||
-    onboardingStep === LOAN_SIM_STEPS.RECHAZADO;
+  const isFirstOrLastStep = onboardingStep === LOAN_SIM_STEPS.WELCOME ||
+    onboardingStep === LOAN_SIM_STEPS.RECHAZADO || onboardingStep === LOAN_SIM_STEPS.EN_ANALISIS;
 
   useEffect(() => {
     if (isFirstOrLastStep) {
@@ -306,10 +302,7 @@ const OnboardingFlowScreen = () => {
   if (isInitializing) {
     return (
       <>
-        <Header
-          hideHelpButton={true}
-          helpButtonPreset="Hola!! Quiero mi préstamo!!"
-        />
+        <Header />
         <div className={styles.homeCalculator_calculatorBox}>
           <div className={styles.calculatorContainer}>
             <div className={styles.loaderContainer}>
@@ -325,10 +318,7 @@ const OnboardingFlowScreen = () => {
 
   return (
     <>
-      <Header 
-        hideHelpButton={isFirstOrLastStep} 
-        helpButtonPreset="Hola!! Quiero mi préstamo!!" 
-      />
+      <Header />
       <main id='main-content'>
         <div className={styles.splitLayout}>
           <div className={styles.leftColumn}>
