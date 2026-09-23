@@ -88,6 +88,17 @@ export function useTestSimuladorPanel() {
       // `?tp=...` porque el flujo debe correr toda la lógica real del
       // simulador contra el lead existente, sin bypass.
       if (persona.simuladorConfig?.realClient) {
+        // Defense-in-depth: el state-changing sink (POST + navegación
+        // cross-origin al link real) solo corre en builds de dev. Si
+        // el panel se renderizó por `?testMode=1` en un build de prod,
+        // abortamos antes del POST para evitar resetear una simulación
+        // real desde la UI. El backend también rechaza via
+        // isTestPersonasEnabled() + NODE_ENV check, pero la defensa
+        // en frontend debe ser conservadora también.
+        if (!import.meta.env.DEV) {
+          console.warn("REAL_CLIENT_RESET_BLOCKED_IN_PRODUCTION", { personaId });
+          return;
+        }
         try {
           await resetTestPersonaSimulation(personaId);
         } catch (resetErr) {
