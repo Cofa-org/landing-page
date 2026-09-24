@@ -1,15 +1,14 @@
 import { memo } from "react";
-import { useSearchParams } from "react-router-dom";
 import GenericButton from "../../../../Components/buttons/GenericButton/GenericButton.jsx";
+import { isTestPersonasVisible } from "../../../../config.js";
 import styles from "./TestSimuladorPanel.module.css";
 
 /**
  * Dev-only panel mounted over /loan-sim to let QA pick a "test persona"
  * (SIM_HAPPY / SIM_DEVICE_REJECTED / SIM_SKIP_MOBBEX / SIM_OTP_EXPIRED).
  *
- * Rendering gate (any one enables it):
- *  - import.meta.env.DEV === true
- *  - URL has ?testMode=1
+ * Rendering gate lives in src/config.js → `isTestPersonasVisible()`:
+ * habilita la UI cuando Vite está en dev O la URL trae `?testMode=1`.
  *
  * Pure presentational: all data + navigation lives in the parent hook
  * (useTestSimuladorPanel, created in Task 0.6.1). This component only
@@ -21,11 +20,7 @@ const TestSimuladorPanel = ({
   onReset,
   loading = false,
 }) => {
-  const [searchParams] = useSearchParams();
-  const isDevMode =
-    import.meta.env.DEV || searchParams.get("testMode") === "1";
-
-  if (!isDevMode) return null;
+  if (!isTestPersonasVisible()) return null;
   if (loading) return null;
   if (!personas || personas.length === 0) return null;
 

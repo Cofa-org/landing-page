@@ -1,11 +1,10 @@
 import { useTestPersonasPanel } from "../../hooks/useTestPersonasPanel.js";
 import GenericButton from "../../../../Components/buttons/GenericButton/GenericButton.jsx";
+import { isTestPersonasVisible } from "../../../../config.js";
 import styles from "./TestPersonasPanel.module.css";
 
 const TestPersonasPanel = () => {
-  const isDev = import.meta.env.DEV;
-  const isTestMode = new URLSearchParams(window.location.search).get("testMode") === "1";
-  if (!isDev && !isTestMode) return null;
+  if (!isTestPersonasVisible()) return null;
 
   const { collapsed, setCollapsed, personas, activePersonaId, selectPersona, resetSession } = useTestPersonasPanel();
   return (

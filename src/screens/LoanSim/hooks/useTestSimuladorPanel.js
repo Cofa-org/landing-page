@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { isTestPersonasVisible } from "../../../config.js";
 import {
   fetchTestPersonaById,
   fetchTestPersonas,
@@ -43,14 +44,9 @@ export function useTestSimuladorPanel() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Single source of truth del gate: true sólo en dev o con ?testMode=1.
-    // Devuelve `true` cuando cualquiera de las dos está activa.
-    const searchParams = new URLSearchParams(window.location.search);
-       
-    const isTestMode =
-      import.meta.env.DEV || searchParams.get("testMode") === "1";
-
-    if (!isTestMode) {
+    // Gate del panel centralizado en `isTestPersonasVisible` (config.js):
+    // habilita el panel cuando Vite está en dev o la URL trae ?testMode=1.
+    if (!isTestPersonasVisible()) {
       setLoading(false);
       return undefined;
     }
