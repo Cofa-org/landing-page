@@ -13,6 +13,22 @@
   gap: 24px;
 }
 
+/* Desktop: grilla de 2 columnas */
+@media (min-width: 860px) {
+  .inner {
+    max-width: 920px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto;
+    align-items: start;
+  }
+
+  /* El heading y el banner ocupan el ancho completo */
+  .heading {
+    grid-column: 1 / -1;
+  }
+}
+
 /* ── Encabezado ──────────────────────────────────────────────────────── */
 .heading h1 {
   font-size: 1.75rem;
@@ -44,7 +60,7 @@
 .cardHeader h2 {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--text-color);
+  color: var(--primary-color);
   margin: 0;
 }
 
@@ -143,6 +159,14 @@
 }
 
 /* ── Responsive ─────────────────────────────────────────────────────── */
+@media (max-width: 859px) {
+  .inner {
+    max-width: 680px;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
 @media (max-width: 600px) {
   .page {
     padding: 32px 5vw 48px;
