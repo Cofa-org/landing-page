@@ -11,6 +11,7 @@ import styles from "./auth.module.css";
 
 const ForgotPasswordScreen = () => {
   const [email, setEmail] = useState("");
+  const [honeypot, setHoneypot] = useState("");
   const [turnstileToken, setTurnstileToken] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -22,6 +23,7 @@ const ForgotPasswordScreen = () => {
   const handleTurnstileClear = useCallback(() => setTurnstileToken(""), []);
 
   const handleSubmit = async () => {
+    if (honeypot) return; // Silently ignore — probable bot
     if (!turnstileToken) {
       setError("Completá la verificación de seguridad.");
       return;
@@ -89,6 +91,18 @@ const ForgotPasswordScreen = () => {
                 placeholder="tu@email.com"
                 required
                 autoComplete="email"
+              />
+
+              {/* Honeypot — campo oculto anti-bot */}
+              <input
+                type="text"
+                name="website"
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                value={honeypot}
+                onChange={(e) => setHoneypot(e.target.value)}
+                style={{ position: "absolute", left: "-9999px", top: "auto", width: "1px", height: "1px", overflow: "hidden", opacity: 0 }}
               />
 
               <div className={styles.turnstileWrapper}>

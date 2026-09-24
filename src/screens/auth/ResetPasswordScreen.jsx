@@ -18,6 +18,7 @@ const ResetPasswordScreen = () => {
 
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [honeypot, setHoneypot] = useState("");
   const [turnstileToken, setTurnstileToken] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -68,6 +69,7 @@ const ResetPasswordScreen = () => {
   }
 
   const handleSubmit = async () => {
+    if (honeypot) return; // Silently ignore — probable bot
     if (newPassword !== confirmPassword) {
       setError("Las contraseñas no coinciden.");
       return;
@@ -128,6 +130,18 @@ const ResetPasswordScreen = () => {
                   ? "Las contraseñas no coinciden."
                   : ""
               }
+            />
+
+            {/* Honeypot — campo oculto anti-bot */}
+            <input
+              type="text"
+              name="website"
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+              value={honeypot}
+              onChange={(e) => setHoneypot(e.target.value)}
+              style={{ position: "absolute", left: "-9999px", top: "auto", width: "1px", height: "1px", overflow: "hidden", opacity: 0 }}
             />
 
             <div className={styles.turnstileWrapper}>

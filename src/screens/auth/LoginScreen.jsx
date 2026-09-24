@@ -17,6 +17,7 @@ const LoginScreen = () => {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [honeypot, setHoneypot] = useState("");
   const [turnstileToken, setTurnstileToken] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -30,6 +31,7 @@ const LoginScreen = () => {
   const successMessage = location.state?.successMessage ?? "";
 
   const handleSubmit = async () => {
+    if (honeypot) return; // Silently ignore — probable bot
     if (!turnstileToken) {
       setError("Completá la verificación de seguridad.");
       return;
@@ -101,6 +103,18 @@ const LoginScreen = () => {
             <div className={styles.auxLink} style={{ textAlign: "right", marginTop: "-8px" }}>
               <Link to="/recuperar-contrasena">¿Olvidaste tu contraseña?</Link>
             </div>
+
+            {/* Honeypot — campo oculto anti-bot */}
+            <input
+              type="text"
+              name="website"
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+              value={honeypot}
+              onChange={(e) => setHoneypot(e.target.value)}
+              style={{ position: "absolute", left: "-9999px", top: "auto", width: "1px", height: "1px", overflow: "hidden", opacity: 0 }}
+            />
 
             <div className={styles.turnstileWrapper}>
               <Turnstile

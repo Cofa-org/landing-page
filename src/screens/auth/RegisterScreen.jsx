@@ -19,6 +19,7 @@ const RegisterScreen = () => {
   const [step, setStep] = useState(STEP.REGISTER);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [honeypot, setHoneypot] = useState("");
 
   // Paso 1
   const [turnstileToken1, setTurnstileToken1] = useState("");
@@ -40,6 +41,7 @@ const RegisterScreen = () => {
 
   /* ── Paso 1: registrar cuenta ── */
   const handleRegister = async () => {
+    if (honeypot) return; // Silently ignore — probable bot
     if (!turnstileToken1) {
       setError1("Completá la verificación de seguridad.");
       return;
@@ -174,6 +176,18 @@ const RegisterScreen = () => {
               autoComplete="new-password"
               required
               helperText="Mínimo 8 caracteres."
+            />
+
+            {/* Honeypot — campo oculto anti-bot */}
+            <input
+              type="text"
+              name="website"
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+              value={honeypot}
+              onChange={(e) => setHoneypot(e.target.value)}
+              style={{ position: "absolute", left: "-9999px", top: "auto", width: "1px", height: "1px", overflow: "hidden", opacity: 0 }}
             />
 
             <div className={styles.turnstileWrapper}>
