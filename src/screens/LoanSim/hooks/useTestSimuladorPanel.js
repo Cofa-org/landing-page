@@ -130,6 +130,7 @@ export function useTestSimuladorPanel() {
 
   const resetSession = useCallback(() => {
     sessionStorage.removeItem(SIMULADOR_TEST_PERSONA_STORAGE_KEY);
+    navigate("/simulador");
   }, []);
 
   return { personas, loading, error, selectPersona, resetSession };
