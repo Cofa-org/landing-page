@@ -44,20 +44,27 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
 }
 
 .cardHeader {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 12px;
 }
 
+.cardHeaderLeft {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
 .cardRef {
-  font-size: 0.82rem;
-  color: #999;
+  font-size: 0.78rem;
+  color: #aaa;
   font-weight: 500;
   letter-spacing: 0.3px;
 }
@@ -65,7 +72,18 @@
 .cardDate {
   font-size: 0.82rem;
   color: #aaa;
+  white-space: nowrap;
+  padding-top: 2px;
 }
+
+/* ── Descripción del estado ──────────────────────────────────────────── */
+.estadoDesc {
+  font-size: 0.9rem;
+  color: #555;
+  line-height: 1.5;
+  margin: 0;
+}
+
 
 /* ── Badge de estado ─────────────────────────────────────────────────── */
 .badge {
