@@ -3,6 +3,7 @@
   top: 88px;
   left: 250px;
   z-index: 9999;
+  min-width: 375px;
   max-width: calc(100vw - 40px);
   padding: 16px 16px 14px;
   border-radius: var(--border-radius-md, 15px);
