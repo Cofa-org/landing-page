@@ -40,7 +40,8 @@ const SISTEMA_FRANCES_ON = parseBool(import.meta.env.VITE_SISTEMA_FRANCES_ON);
  * @returns {boolean}
  */
 function isTestPersonasVisible() {
-  return import.meta.env.DEV || new URLSearchParams(window.location.search).get("testMode") === "1";
+  console.log("DEBUG: isTestPersonasVisible", import.meta.env.VITE_DEV, window.location.search);
+  return import.meta.env.VITE_DEV || new URLSearchParams(window.location.search).get("testMode") === "1";
 }
 
 export {

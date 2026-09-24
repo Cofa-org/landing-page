@@ -96,7 +96,7 @@ export const useMobbexSubscription = (scoringId, onSubscriptionCompleted) => {
   // paralelo (aceptaTerminos devuelve skipMobbex:true), pero acá cubrimos
   // el caso en que igual llegamos a este step.
   const isTestPersonaBypass = (() => {
-    if (!import.meta.env.DEV) return false;
+    if (!import.meta.env.VITE_DEV) return false;
     try {
       const raw = sessionStorage.getItem("simuladorTestPersona");
       return raw ? JSON.parse(raw) !== null : false;
