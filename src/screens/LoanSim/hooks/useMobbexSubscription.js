@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
+import { DEV } from "../../../config.js";
 import SimuladorService from "../../../services/simuladorService";
 
 const MOBBEX_RETRY_MESSAGE =
@@ -96,7 +97,7 @@ export const useMobbexSubscription = (scoringId, onSubscriptionCompleted) => {
   // paralelo (aceptaTerminos devuelve skipMobbex:true), pero acá cubrimos
   // el caso en que igual llegamos a este step.
   const isTestPersonaBypass = (() => {
-    if (!import.meta.env.VITE_DEV) return false;
+    if (!DEV) return false;
     try {
       const raw = sessionStorage.getItem("simuladorTestPersona");
       return raw ? JSON.parse(raw) !== null : false;

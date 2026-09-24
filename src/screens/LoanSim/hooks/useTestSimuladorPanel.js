@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { isTestPersonasVisible } from "../../../config.js";
+import { DEV, isTestPersonasVisible } from "../../../config.js";
 import {
   fetchTestPersonaById,
   fetchTestPersonas,
@@ -91,7 +91,7 @@ export function useTestSimuladorPanel() {
         // real desde la UI. El backend también rechaza via
         // isTestPersonasEnabled() + NODE_ENV check, pero la defensa
         // en frontend debe ser conservadora también.
-        if (!import.meta.env.VITE_DEV) {
+        if (!DEV) {
           console.warn("REAL_CLIENT_RESET_BLOCKED_IN_PRODUCTION", { personaId });
           return;
         }
