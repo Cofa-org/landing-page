@@ -51,7 +51,6 @@ const ENABLE_TEST_PERSONAS = parseBool(import.meta.env.VITE_ENABLE_TEST_PERSONAS
  * @returns {boolean}
  */
 function isTestPersonasVisible() {
-  console.log("DEBUG: isTestPersonasVisible", import.meta.env.VITE_DEV, window.location.search);
   return DEV || new URLSearchParams(window.location.search).get("testMode") === "1";
 }
 
