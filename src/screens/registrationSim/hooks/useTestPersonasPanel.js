@@ -11,7 +11,18 @@ export function useTestPersonasPanel() {
   useEffect(() => {
     let cancelled = false;
     fetchTestPersonas()
-      .then((p) => { if (!cancelled) setPersonas(p); })
+      .then((all) => {
+        if (cancelled) return;
+        // Filter por useCases: el panel del registro solo muestra personas
+        // marcadas con `useCases.includes("registro")`. Sin este filter
+        // aparecen personas del simulador (ej. SIM_NORIEGA_REAL) que
+        // rompen el flow del registro — su `selectPersona` solo setea
+        // searchParams, no llama al reset ni navega al link real.
+        const filtered = (all || []).filter((persona) =>
+          (persona.useCases || []).includes("registro"),
+        );
+        setPersonas(filtered);
+      })
       .catch(() => { if (!cancelled) setPersonas([]); });
     return () => { cancelled = true; };
   }, []);
