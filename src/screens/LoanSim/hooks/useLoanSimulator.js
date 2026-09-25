@@ -1,9 +1,19 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
-import { deleteCookie, getCookie, roundToFiveHundreds, setCookieWithDuration } from "../../../lib/utils.js";
+import {
+  deleteCookie,
+  getCookie,
+  roundToFiveHundreds,
+  setCookieWithDuration,
+} from "../../../lib/utils.js";
 import { useDebounce } from "../../../hooks/useDebounce";
 import SimuladorService from "../../../services/simuladorService";
-import { COOKIE_CONFIG, COOKIE_LOAN_INFO_CONFIG, COOKIE_SIMULADOR_TOKEN_CONFIG, LOAN_SIM_STEPS } from "../../../constants/LOAN_SIM.js";
+import {
+  COOKIE_CONFIG,
+  COOKIE_LOAN_INFO_CONFIG,
+  COOKIE_SIMULADOR_TOKEN_CONFIG,
+  LOAN_SIM_STEPS,
+} from "../../../constants/LOAN_SIM.js";
 import LinkResolutionService from "../../../services/linkResolutionService.js";
 import { ERROR_CAUSE } from "../../../constants/error";
 import { getFingerprint, mapFingerprintToHuellaData } from "../../../lib/fingerprint.js";
@@ -59,15 +69,68 @@ export const useLoanSimulator = () => {
 
   useEffect(() => {
     const initVerification = async () => {
-      if (!shortId) {
+      // Check sessionStorage for test persona first (mocked link flow from
+      // backoffice) AND also check the `tp` searchParam that the test panel
+      // sets when navigating here. Malformed JSON is swallowed so the hook
+      // falls through to the shortId-based flow.
+      let mockPersona = null;
+      const tpFromUrl = searchParams.get("tp");
+      if (tpFromUrl) {
+        try {
+          const raw = sessionStorage.getItem("simuladorTestPersona");
+          if (raw) {
+            const stored = JSON.parse(raw);
+            // Match the personaId passed in the URL — re-validate that the
+            // sessionStorage payload matches the URL param (in case the user
+            // clicked multiple personas quickly).
+            if (stored && stored.id === tpFromUrl) {
+              mockPersona = stored;
+            }
+          }
+        } catch (parseErr) {
+          // ignore — fall through to shortId-based flow
+        }
+      }
+     
+      if (!shortId && !mockPersona) {
         setStep(LOAN_SIM_STEPS.LEAD_REGISTRATION);
+        // Sin link ni persona test: el flujo original cae a LEAD_REGISTRATION.
+        // Liberar el loading inicial para que LoanSimScreen no quede colgado
+        // en el loading screen cuando no hay nada que verificar.
+        setInitialSimulationResolved(true);
         return;
       }
       setLoading(true);
       setStep(LOAN_SIM_STEPS.SIMULACION);
       try {
-       
-        const response = await LinkResolutionService.consumeLink(shortId);
+        let response;
+        if (mockPersona) {
+          // Bypass consumeLink — synthesize a response matching the consumeLink
+          // shape so the existing fingerprint + iniciarSesion + setScoringData
+          // flow runs unchanged. ScoringId falls back to dni when
+          // simuladorConfig.scoringId is absent.
+          const personaScoringId = String(
+            mockPersona.simuladorConfig?.scoringId || mockPersona.dni || "",
+          );
+          const personaCuit = (mockPersona.cuit || "").replace(/-/g, "");
+          response = {
+            success: true,
+            data: {
+              scoringId: personaScoringId,
+              cuit: personaCuit,
+              nombreCompleto: mockPersona.nombreCompleto || null,
+              capitalMaximoOperador: null,
+              tasaOperador: null,
+              plazoMaximoOperador: null,
+              cuotaADescontar: null,
+              nroCuota: null,
+              nroPrestamo: null,
+              motivo: null,
+            },
+          };
+        } else {
+          response = await LinkResolutionService.consumeLink(shortId);
+        }
         if (response.success && response.data) {
           // Get the fingerprint BEFORE any state update that triggers the initial
           // fetch. This way, scoringId and huellaData are set in the same React
@@ -146,11 +209,42 @@ export const useLoanSimulator = () => {
             motivo: response.data.motivo || null,
           });
 
-          setHuellaData(mapFingerprintToHuellaData(fingerprint));
+          // Test persona bypass (SIM_DEVICE_REJECTED): si la persona persistida
+          // en sessionStorage tiene huellaVisitorId mock, construimos huellaData
+          // desde ese mock en lugar del fingerprint real del browser. Asi el
+          // backend puede detectar el bypass via shouldForceDeviceMismatchForTestPersona
+          // y simular DEVICE_FINGERPRINT_MISMATCH. Si no hay mock, usamos el
+          // fingerprint real (path normal).
+          let testHuellaMock = null;
+          try {
+            const raw = sessionStorage.getItem("simuladorTestPersona");
+            if (raw) {
+              const stored = JSON.parse(raw);
+              if (stored?.simuladorConfig?.huellaVisitorId) {
+                testHuellaMock = stored.simuladorConfig.huellaVisitorId;
+              }
+            }
+          } catch (parseErr) {
+            // ignore — fall through to real fingerprint
+          }
+          if (testHuellaMock) {
+            setHuellaData({
+              visitor_id: testHuellaMock,
+              ip_address: "127.0.0.1",
+              browser_name: fingerprint?.browserName || "test",
+              browser_version: fingerprint?.browserVersion || "0",
+              plataforma: "test",
+              es_movil: false,
+            });
+          } else {
+            setHuellaData(mapFingerprintToHuellaData(fingerprint));
+          }
           setHuellaRequestId(fingerprint?.requestId || null);
         } else {
           const errorMessage =
-            response.message || response.error?.message || "El enlace de acceso es inválido o ha expirado";
+            response.message ||
+            response.error?.message ||
+            "El enlace de acceso es inválido o ha expirado";
           setError(`${errorMessage} 😕`);
         }
       } catch (err) {
@@ -162,7 +256,7 @@ export const useLoanSimulator = () => {
     };
 
     initVerification();
-  }, [shortId]);
+  }, [shortId, searchParams.get("tp")]);
 
   const fetchSimulation = useCallback(
     async (currentAmount, isInitial = false) => {
@@ -210,7 +304,7 @@ export const useLoanSimulator = () => {
         }
 
         const response = await SimuladorService.calcularPlanes(params, controller.signal);
-     
+      
         // Discard response if this request was superseded by a newer one.
         if (controller.signal.aborted) return;
 
@@ -377,7 +471,7 @@ export const useLoanSimulator = () => {
         };
 
         const response = await SimuladorService.guardarPlan(payload);
-        
+
         if (
           (response.success && !existingSimulation?.email_validado) ||
           (response.data && !existingSimulation?.email_validado)
@@ -441,9 +535,7 @@ export const useLoanSimulator = () => {
         setEmail(emailValue);
         setStep(LOAN_SIM_STEPS.OTP_VALIDATION);
       } else {
-        setError(
-          response.message ? `${response.message} 😊` : "Error al validar el email",
-        );
+        setError(response.message ? `${response.message} 😊` : "Error al validar el email");
       }
     } catch (err) {
       setError(err.message ? `${err.message} 😊` : "Error de conexión al validar email");
@@ -453,6 +545,7 @@ export const useLoanSimulator = () => {
   };
 
   const verificarOTP = async (code) => {
+   
     setValidating(true);
     setError(null);
     try {
@@ -462,6 +555,7 @@ export const useLoanSimulator = () => {
         scoringId: scoringData.scoringId,
       };
       const response = await SimuladorService.verificarOTP(params);
+      
       if (response.success || response.data) {
         setStep(LOAN_SIM_STEPS.COMPLIANCE);
       } else {
@@ -505,11 +599,7 @@ export const useLoanSimulator = () => {
         );
       }
     } catch (err) {
-      setError(
-        err.message
-          ? `${err.message} 😊`
-          : "Error de conexión al guardar compliance",
-      );
+      setError(err.message ? `${err.message} 😊` : "Error de conexión al guardar compliance");
     } finally {
       setValidating(false);
     }
@@ -607,11 +697,7 @@ export const useLoanSimulator = () => {
     // Cookie scoringId: legacy — se setea para no romper sistemas externos
     // que la busquen. No se usa en el nuevo flujo del simulador.
     try {
-      await setCookieWithDuration(
-        COOKIE_CONFIG.NAME,
-        scoringId,
-        COOKIE_CONFIG.EXPIRY_MS,
-      );
+      await setCookieWithDuration(COOKIE_CONFIG.NAME, scoringId, COOKIE_CONFIG.EXPIRY_MS);
     } catch (err) {
       console.error("SCORING_ID_COOKIE_ERROR:", err);
     }

@@ -115,7 +115,7 @@ export const useOnboardingFlow = (resumeShortId = null) => {
         }
 
         const response = await LeadRegistrationService.obtenerEstadoOnboarding(leadId);
-
+        
         if (response.success && response.data) {
           const estadoOnboarding = response.data.estado_onboarding;
 
@@ -415,6 +415,7 @@ export const useOnboardingFlow = (resumeShortId = null) => {
    * aunque React haya batcheado updates pendientes.
    */
   const handlePickerTriggered = useCallback(({ options, target }) => {
+    
     setPickerContext((prev) => ({
       options: options ?? [],
       target: target ?? null,

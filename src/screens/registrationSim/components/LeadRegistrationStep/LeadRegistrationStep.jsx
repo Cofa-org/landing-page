@@ -6,6 +6,7 @@ import GenericSelect from "../../../../Components/Forms/GenericInput/GenericSele
 import GenericButton from "../../../../Components/buttons/GenericButton/GenericButton.jsx";
 import { SITUACION_LABORAL_OPTIONS } from "../../../../constants/LOAN_SIM.js";
 import { useLeadRegistration, SECURITY_SLIDES } from "../../hooks/useLeadRegistration.js";
+import { useTestPersonaPrefill } from "../../hooks/useTestPersonaPrefill.js";
 import Turnstile from "../../../../Components/Turnstile/Turnstile.jsx";
 import { TURNSTILE_SITE_KEY } from "../../../../config.js";
 import { FraudWarning } from "../../../../Components/index.js";
@@ -33,11 +34,15 @@ const LeadRegistrationStep = ({
     handleChange,
     handleTerminosChange,
     crearLead,
+    setFormData,
     currentSlide,
     setCurrentSlide,
     handleExpire,
     handleError,
   } = useLeadRegistration(turnstileToken);
+
+  // Test persona bypass: pre-rellena el form cuando hay ?testPersona=ID en URL.
+  useTestPersonaPrefill(setFormData);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

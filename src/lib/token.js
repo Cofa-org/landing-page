@@ -9,8 +9,10 @@ export function getDecodedToken(token) {
   try {
     if (!token) return null;
     return decodeJwt(token);
-  } catch (error) {
-    console.error("TOKEN_DECODE_ERROR:", error);
+  } catch {
+    // Silently return null: an invalid/stale token is expected (e.g., previous
+    // test sessions, expired tokens, malformed cookies). The caller treats
+    // null as "no session" and continues without restoring onboarding state.
     return null;
   }
 }

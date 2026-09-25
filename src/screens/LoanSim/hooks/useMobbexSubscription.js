@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
+import { DEV } from "../../../config.js";
 import SimuladorService from "../../../services/simuladorService";
 
 const MOBBEX_RETRY_MESSAGE =
@@ -89,7 +90,30 @@ export const useMobbexSubscription = (scoringId, onSubscriptionCompleted) => {
     confirm();
   }, [fromMobbex, scoringId, mobbexSid, mobbexUid, mobbexStatus]);
 
+  // Detecta modo test persona (panel de QA visual). En ese modo, el flujo
+  // del simulador bypashea Mobbex: no hay link real, no redirigimos a su
+  // plataforma, sino que vamos directo a onSubscriptionCompleted (que setea
+  // el step a COMPLETADO). Defense-in-depth: el backend tiene un bypass
+  // paralelo (aceptaTerminos devuelve skipMobbex:true), pero acá cubrimos
+  // el caso en que igual llegamos a este step.
+  const isTestPersonaBypass = (() => {
+    if (!DEV) return false;
+    try {
+      const raw = sessionStorage.getItem("simuladorTestPersona");
+      return raw ? JSON.parse(raw) !== null : false;
+    } catch {
+      return false;
+    }
+  })();
+
   const handleSuscribirse = useCallback(async () => {
+    if (isTestPersonaBypass) {
+      // Bypass de QA: saltamos Mobbex y vamos directo a COMPLETADO.
+      // El backend ya creó el préstamo y marcó la simulación vía
+      // aceptarTerminos; no necesitamos confirmar nada contra Mobbex.
+      onSubscriptionCompletedRef.current?.();
+      return;
+    }
     if (!linkId) {
       setError("No se encontró el identificador del link en la URL");
       setLoading(false);
@@ -117,7 +141,7 @@ export const useMobbexSubscription = (scoringId, onSubscriptionCompleted) => {
       setError(err.message || "Error al obtener la URL de suscripción");
       setLoading(false);
     }
-  }, [scoringId, linkId]);
+  }, [scoringId, linkId, isTestPersonaBypass]);
 
   return {
     isConfirming,
