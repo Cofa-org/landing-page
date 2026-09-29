@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Header, Footer } from "../../Components/index.js";
 import authService from "../../services/authService.js";
+import { setCookieWithDuration } from "../../lib/utils.js";
+import { COOKIE_LEAD_TOKEN_CONFIG } from "../../constants/LOAN_SIM.js";
 import styles from "./MisSolicitudesScreen.module.css";
 
 /* ── Helpers de fecha ────────────────────────────────────────────── */
@@ -129,7 +131,7 @@ const BADGE_CLASS = {
 };
 
 /* ── Tarjeta de solicitud ────────────────────────────────────────── */
-function SolicitudCard({ solicitud }) {
+function SolicitudCard({ solicitud, onRetomar, retomando }) {
   const estado = resolveEstado(solicitud);
   const { prestamo } = solicitud;
 
@@ -159,6 +161,18 @@ function SolicitudCard({ solicitud }) {
       ) : estado.descripcion ? (
         <p className={styles.estadoDesc}>{estado.descripcion}</p>
       ) : null}
+
+      {/* Botón Retomar — solo para solicitudes incompletas */}
+      {estado.label === "Solicitud incompleta" && onRetomar && (
+        <button
+          type="button"
+          className={styles.retakeBtn}
+          onClick={() => onRetomar(solicitud.id)}
+          disabled={retomando}
+        >
+          {retomando ? "Cargando…" : "Retomar solicitud →"}
+        </button>
+      )}
 
       {/* Detalle del préstamo (si existe) */}
       {prestamo &&
@@ -217,9 +231,12 @@ function EmptyState() {
 
 /* ── Pantalla ─────────────────────────────────────────────────────── */
 const MisSolicitudesScreen = () => {
+  const navigate = useNavigate();
   const [solicitudes, setSolicitudes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [retomando, setRetomando] = useState(false);
+  const [retomandoError, setRetomandoError] = useState("");
 
   useEffect(() => {
     authService
@@ -230,6 +247,27 @@ const MisSolicitudesScreen = () => {
       )
       .finally(() => setLoading(false));
   }, []);
+
+  const handleRetomar = async (_solicitudId) => {
+    setRetomando(true);
+    setRetomandoError("");
+    try {
+      const result = await authService.resumeSolicitud();
+      // Guardar el leadToken en cookie para que el flujo de onboarding lo lea
+      await setCookieWithDuration(
+        COOKIE_LEAD_TOKEN_CONFIG.NAME,
+        result.data.leadToken,
+        COOKIE_LEAD_TOKEN_CONFIG.EXPIRY_MS,
+      );
+      navigate("/registro-simulador");
+    } catch (err) {
+      setRetomandoError(
+        err.message || "No pudimos retomar la solicitud. Intentá de nuevo.",
+      );
+    } finally {
+      setRetomando(false);
+    }
+  };
 
   return (
     <>
@@ -255,10 +293,22 @@ const MisSolicitudesScreen = () => {
 
           {!loading && !error && solicitudes.length === 0 && <EmptyState />}
 
+          {retomandoError && (
+            <div className={styles.empty}>
+              <span className={styles.emptyIcon}>⚠️</span>
+              <p>{retomandoError}</p>
+            </div>
+          )}
+
           {!loading && !error && solicitudes.length > 0 && (
             <div className={styles.list}>
               {solicitudes.map((s) => (
-                <SolicitudCard key={s.id} solicitud={s} />
+                <SolicitudCard
+                  key={s.id}
+                  solicitud={s}
+                  onRetomar={handleRetomar}
+                  retomando={retomando}
+                />
               ))}
             </div>
           )}

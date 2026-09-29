@@ -148,3 +148,96 @@
   margin-top: 12px;
   margin-bottom: 4px;
 }
+
+/* ── Títulos y subtítulos dentro del panel derecho (pasos sin GenericForm) ─ */
+
+.formTitle {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-color, #1a1a1a);
+  margin: 0 0 8px;
+}
+
+.formSubtitle {
+  font-size: 0.92rem;
+  color: #666;
+  margin: 0 0 24px;
+  line-height: 1.5;
+}
+
+/* ── Selección de identidad (paso IDENTITY) ─────────────────────────────── */
+
+.identityList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.identityOption {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 16px 20px;
+  background: #fff;
+  border: 2px solid #e0e0e0;
+  border-radius: var(--border-radius-sm, 8px);
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.identityOption:hover,
+.identityOption:focus-visible {
+  border-color: var(--primary-color);
+  background: rgba(36, 149, 87, 0.04);
+  outline: none;
+}
+
+.identityName {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-color, #1a1a1a);
+}
+
+.identityCuit {
+  font-size: 0.82rem;
+  color: #888;
+  font-family: monospace;
+}
+
+/* ── Botón "Volver" discreto ─────────────────────────────────────────────── */
+
+.backLink {
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 0.88rem;
+  cursor: pointer;
+  padding: 0;
+  text-align: center;
+  align-self: center;
+}
+
+.backLink:hover {
+  color: var(--primary-color);
+  text-decoration: underline;
+}
+
+/* ── Caja informativa (paso EXISTING) ─────────────────────────────────────── */
+
+.infoBox {
+  background: rgba(36, 149, 87, 0.06);
+  border: 1px solid rgba(36, 149, 87, 0.2);
+  border-radius: var(--border-radius-sm, 8px);
+  padding: 14px 18px;
+}
+
+.infoBoxText {
+  font-size: 0.9rem;
+  color: #444;
+  margin: 0;
+  line-height: 1.5;
+}

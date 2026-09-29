@@ -187,6 +187,31 @@
   font-size: 0.95rem;
 }
 
+/* ── Botón Retomar (solicitud incompleta) ────────────────────────────── */
+.retakeBtn {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 12px;
+  padding: 10px 20px;
+  background: var(--primary-color);
+  color: #fff;
+  border: none;
+  border-radius: var(--border-radius-sm, 8px);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, opacity 0.15s;
+}
+
+.retakeBtn:hover:not(:disabled) {
+  background: var(--primary-dark-color, #1b7a3f);
+}
+
+.retakeBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* ── Responsive ──────────────────────────────────────────────────────── */
 @media (max-width: 600px) {
   .page {

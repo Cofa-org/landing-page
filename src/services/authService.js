@@ -34,9 +34,23 @@ async function authFetch(path, { method = "POST", body } = {}) {
 }
 
 const authService = {
+  /**
+   * Iter 1: Resuelve identidades AFIP para un DNI.
+   * Devuelve { identities: [{cuit, nombreCompleto}], existingClient: {maskedEmail}|null }
+   */
+  resolveDni: (dni, turnstileToken) =>
+    authFetch("/dni/resolve", { body: { dni, turnstileToken } }),
+
+  /**
+   * Iter 1: Registro de cliente existente (email determinado por CUIT, no ingresado por usuario).
+   * Devuelve { maskedEmail, email } — email se usa internamente para el paso OTP.
+   */
+  registerExistingClient: (cuit, password, turnstileToken) =>
+    authFetch("/register-existing-client", { body: { cuit, password, turnstileToken } }),
+
   /** Crea la cuenta. Respuesta genérica (anti-enumeration). */
-  register: (email, password, turnstileToken) =>
-    authFetch("/register", { body: { email, password, turnstileToken } }),
+  register: (email, password, turnstileToken, cuit = null) =>
+    authFetch("/register", { body: { email, password, turnstileToken, ...(cuit ? { cuit } : {}) } }),
 
   /** Verifica el email con el código OTP de 6 dígitos del registro. */
   verifyEmail: (email, code, turnstileToken) =>
@@ -69,6 +83,12 @@ const authService = {
    * Si no tiene lead vinculado, solicitudes = [] y tieneHistorial = false.
    */
   getSolicitudes: () => authFetch("/solicitudes", { method: "GET" }),
+
+  /**
+   * Iter 2: Retoma una solicitud incompleta desde la sesión autenticada.
+   * Devuelve { success, data: { leadToken, leadId, es_cliente, celular, maxSlots, estadoOnboarding } }
+   */
+  resumeSolicitud: () => authFetch("/solicitudes/resume"),
 
   /** Cambia la contraseña desde el perfil (requiere contraseña actual). */
   changePassword: (currentPassword, newPassword) =>
