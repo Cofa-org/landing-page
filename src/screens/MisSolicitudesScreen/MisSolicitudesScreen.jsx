@@ -4,9 +4,10 @@ import { Header, Footer } from "../../Components/index.js";
 import authService from "../../services/authService.js";
 import { setCookieWithDuration } from "../../lib/utils.js";
 import { COOKIE_LEAD_TOKEN_CONFIG } from "../../constants/LOAN_SIM.js";
+import { resolveEstado } from "./resolveEstado.js";
 import styles from "./MisSolicitudesScreen.module.css";
 
-/* ── Helpers de fecha ────────────────────────────────────────────── */
+/* ── Helpers de formato ───────────────────────────────────────────── */
 function formatDate(iso) {
   if (!iso) return "—";
   return new Date(iso).toLocaleDateString("es-AR", {
@@ -16,11 +17,6 @@ function formatDate(iso) {
   });
 }
 
-function addDays(iso, days) {
-  if (!iso) return null;
-  return new Date(new Date(iso).getTime() + days * 24 * 60 * 60 * 1000);
-}
-
 function formatCurrency(value) {
   if (value == null) return null;
   return new Intl.NumberFormat("es-AR", {
@@ -28,99 +24,6 @@ function formatCurrency(value) {
     currency: "ARS",
     maximumFractionDigits: 0,
   }).format(value);
-}
-
-/* ── Resolución de estado (6 estados con prioridad) ─────────────── */
-/**
- * Devuelve { label, tipo, descripcion, accion, retryDate }
- *  tipo: 'success' | 'warning' | 'danger' | 'neutral'
- *  accion: 'webchat' | null
- *  retryDate: Date | null  (solo para NO_APROBADA)
- *
- * Nota sobre estado_gestion:
- *  El backoffice deriva este campo con una lógica COALESCE (scoring + onboarding).
- *  Nosotros leemos el valor crudo de la DB, por eso normalizamos a uppercase y
- *  tratamos como equivalentes el rechazo por gestión y por onboarding.
- */
-function resolveEstado(solicitud) {
-  const {
-    estadoOnboarding,
-    estadoOnboardingFecha,
-    estadoGestion,
-    fechaEstadoGestion,
-    prestamo,
-  } = solicitud;
-
-  // Normalizamos para evitar problemas de case (ediciones manuales en Supabase, etc.)
-  const gestion = estadoGestion?.toUpperCase() ?? null;
-  const onboarding = estadoOnboarding?.toUpperCase() ?? null;
-
-  // 1. Préstamo procesado en sistema externo → solicitud finalizada
-  if (prestamo?.idPrestamoDB) {
-    return {
-      label: "Solicitud finalizada",
-      tipo: "success",
-      descripcion: "Tu préstamo fue procesado exitosamente.",
-      accion: null,
-      retryDate: null,
-    };
-  }
-
-  // 2. Aprobada por gestión
-  if (gestion === "ACEPTADO") {
-    return {
-      label: "Aprobada",
-      tipo: "success",
-      descripcion:
-        "Tu solicitud fue aprobada. Estamos gestionando tu préstamo.",
-      accion: null,
-      retryDate: null,
-    };
-  }
-
-  // 3. No aprobada — rechazada explícitamente por gestión
-  if (gestion === "RECHAZADO") {
-    const fechaRechazo = fechaEstadoGestion ?? estadoOnboardingFecha ?? null;
-    return {
-      label: "No aprobada",
-      tipo: "danger",
-      descripcion: null,
-      accion: null,
-      retryDate: fechaRechazo ? addDays(fechaRechazo, 45) : null,
-    };
-  }
-
-  // 4. No aprobada — rechazada en el flujo de onboarding
-  if (onboarding === "RECHAZADO") {
-    const fechaRechazo = estadoOnboardingFecha ?? fechaEstadoGestion ?? null;
-    return {
-      label: "No aprobada",
-      tipo: "danger",
-      descripcion: null,
-      accion: null,
-      retryDate: fechaRechazo ? addDays(fechaRechazo, 45) : null,
-    };
-  }
-
-  // 5. En análisis (onboarding completo, esperando resolución de gestión)
-  if (gestion === "ANALIZAR" || onboarding === "ONBOARDING_COMPLETO") {
-    return {
-      label: "En análisis",
-      tipo: "warning",
-      descripcion: "Estamos revisando tu solicitud.",
-      accion: null,
-      retryDate: null,
-    };
-  }
-
-  // 6. Solicitud incompleta (LEAD_CREADO, DNI_SUBIDO, RECIBO_SUBIDO, CELULAR_VALIDADO, ABANDONADO, etc.)
-  return {
-    label: "Solicitud incompleta",
-    tipo: "neutral",
-    descripcion: "Para retomar tu solicitud, comunicate con un asesor.",
-    accion: null,
-    retryDate: null,
-  };
 }
 
 const BADGE_CLASS = {
