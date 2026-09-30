@@ -16,6 +16,11 @@ export const LOAN_SIM_STEPS = {
   IDENTITY_SELECTION: "IDENTITY_SELECTION",
   DISPOSITIVO_RECHAZADO: "DISPOSITIVO_RECHAZADO",
   PHONE_PICKER: "PHONE_PICKER",
+  // Plan 2026-09-29 (cliente email OTP): cuando el cliente COFA elige la
+  // opción correcta del phone picker, el back pide OTP por email. Este step
+  // renderiza el mismo `OTPValidation` con `destinationType: email` apuntando
+  // al `cliente.Email` de SB.
+  EMAIL_OTP_VALIDATION: "EMAIL_OTP_VALIDATION",
 };
 
 export const OTP_CONFIG = {

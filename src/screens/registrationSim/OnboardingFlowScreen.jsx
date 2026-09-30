@@ -8,6 +8,7 @@ import { HeroLoanSim } from "../../Sections/index.js";
 import { LOAN_SIM_STEPS, OTP_CONFIG, ONBOARDING_STATES, COOKIE_LEAD_TOKEN_CONFIG } from "../../constants/LOAN_SIM.js";
 import { useOnboardingFlow } from "./hooks/useOnboardingFlow.js";
 import { usePhoneOTP } from "./hooks/usePhoneOTP.js";
+import { useEmailOTP } from "./hooks/useEmailOTP.js";
 import { usePhonePicker } from "./hooks/usePhonePicker.js";
 import OTPValidation from "../../Components/OTPValidation/OTPValidation.jsx";
 import styles from "./OnboardingFlow.module.css";
@@ -70,9 +71,12 @@ const OnboardingFlowScreen = () => {
     setLeadToken,
     setOnboardingStep,
     restoringOnboarding,
+    emailOtpDestination,
   } = useOnboardingFlow(resumeShortId);
 
   const { verificarOTP, reenviarOTP, validating, error } = usePhoneOTP(getLeadId);
+  // Plan 2026-09-29 (cliente email OTP): handlers para EMAIL_OTP_VALIDATION.
+  const { verificarOTPEmail, reenviarOTPEmail, validating: validatingEmail, error: errorEmail } = useEmailOTP(getLeadId);
   const { submitPick, submitting: pickerLoading, error: pickerError } = usePhonePicker();
 
   const handlePrevStep = navigateToPrev;
@@ -191,6 +195,38 @@ const OnboardingFlowScreen = () => {
     [verificarOTP, onboardingStep, leadData, handleRejected, navigateToNext, handlePickerTriggered],
   );
 
+  // Plan 2026-09-29 (cliente email OTP): handler para el submit del OTP por
+  // email. Misma forma que `handleVerificarOTP` pero:
+  //   - No dispara picker (los clientes con pick exitoso van directo al email).
+  //   - En match, `result.data.estado_onboarding` viene como CELULAR_VALIDADO
+  //     (es el mismo flag que el OTP celular, plan unified state) y avanzamos
+  //     por la misma ruta (RECIBO_UPLOAD para clientes / DNI_UPLOAD para
+  //     no-clientes, vía `navigateToNext`).
+  //   - En max-fail-attempts exceeded, `useEmailOTP.verificarOTPEmail` re-throw
+  //     el error con `cause=OTP_MAX_FAIL_ATTEMPTS_EXCEEDED`. Lo capturamos y
+  //     navegamos a RECHAZADO (el back ya persistió el rechazo vía
+  //     `rechazarLead`).
+  const handleVerificarEmailOTP = useCallback(
+    async (codigo) => {
+      try {
+        const result = await verificarOTPEmail(codigo);
+        if (!result?.success) return;
+        navigateToNext(onboardingStep, {
+          esCliente: result.data?.es_cliente ?? leadData?.es_cliente,
+        });
+      } catch (err) {
+        const cause = err?.cause || err?.data?.cause;
+        if (cause === "OTP_MAX_FAIL_ATTEMPTS_EXCEEDED") {
+          handleRejected();
+          return;
+        }
+        // Otros errores (network, 5xx): el hook ya seteó `error` state, el
+        // OTPValidation lo muestra. No navegamos.
+      }
+    },
+    [verificarOTPEmail, onboardingStep, leadData, navigateToNext, handleRejected],
+  );
+
   const handlePickerPick = useCallback(
     async (opcionElegida) => {
       await submitPickerPick(submitPick, opcionElegida);
@@ -239,6 +275,24 @@ const OnboardingFlowScreen = () => {
             onBack={handlePrevStep}
             loading={validating}
             error={error}
+          />
+        );
+      case LOAN_SIM_STEPS.EMAIL_OTP_VALIDATION:
+        // Plan 2026-09-29 (cliente email OTP): reutilizamos `OTPValidation`
+        // con `destinationType: email`. El destination es el email del
+        // cliente COFA resuelto por SB (persistido en `emailOtpDestination`
+        // al momento del pick exitoso). En match, el back devuelve
+        // estado_onboarding='CELULAR_VALIDADO' y avanzamos por el flujo
+        // normal post-OTP (RECIBO_UPLOAD o DNI_UPLOAD según esCliente).
+        return (
+          <OTPValidation
+            destination={emailOtpDestination}
+            destinationType={OTP_CONFIG.DESTINATION_TYPE.EMAIL}
+            onValidate={handleVerificarEmailOTP}
+            onResend={reenviarOTPEmail}
+            onBack={handlePrevStep}
+            loading={validatingEmail}
+            error={errorEmail}
           />
         );
       case LOAN_SIM_STEPS.WELCOME:

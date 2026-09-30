@@ -305,6 +305,70 @@ export default class LeadRegistrationService {
     }
   }
 
+  // Plan 2026-09-29 (cliente email OTP): re-envía un código OTP al email del
+  // cliente COFA (`cliente.Email` de SB). El `leadId` se lee del JWT (el back
+  // no lo necesita en el body). El email se resuelve internamente.
+  static async solicitarOTPEmail(_args = {}, signal = null) {
+    try {
+      const url = `${LANDING_BACKEND_URL}/api/lead-registration/solicitar-otp-email`;
+      const token = await getCookie(COOKIE_LEAD_TOKEN_CONFIG.NAME);
+      const response = await HttpApi(
+        url,
+        {},
+        HTTP_METHOD.POST,
+        LANDING_BACKEND_API_KEY,
+        token,
+        signal,
+      );
+      const data = await response.json();
+      if (!response.ok) {
+        // Whole-branch review BLOCKER #1 (plan 2026-09-29): preservar
+        // `data.cause` para que `useEmailOTP.verificarOTPEmail` y
+        // `handleVerificarEmailOTP` puedan distinguir entre
+        // OTP_INVALID (recoverable) y OTP_MAX_FAIL_ATTEMPTS_EXCEEDED
+        // (terminal → handleRejected → RECHAZADO step).
+        const err = new Error(data.message || "Error al solicitar OTP de email");
+        if (data.cause) err.cause = data.cause;
+        throw err;
+      }
+      return data;
+    } catch (error) {
+      console.error("SOLICITAR_OTP_EMAIL_SERVICE_ERROR:", error);
+      throw error;
+    }
+  }
+
+  // Plan 2026-09-29 (cliente email OTP): valida el código OTP tipeado por el
+  // usuario tras el post-pick del picker. Devuelve `data.estado_onboarding`
+  // (CELULAR_VALIDADO) en match.
+  static async verificarOTPEmail({ codigo }, signal = null) {
+    try {
+      const url = `${LANDING_BACKEND_URL}/api/lead-registration/verificar-otp-email`;
+      const token = await getCookie(COOKIE_LEAD_TOKEN_CONFIG.NAME);
+      const body = { codigo };
+      const response = await HttpApi(
+        url,
+        body,
+        HTTP_METHOD.POST,
+        LANDING_BACKEND_API_KEY,
+        token,
+        signal,
+      );
+      const data = await response.json();
+      if (!response.ok) {
+        // Ver BLOCKER #1 arriba: `data.cause` es la señal que el hook usa
+        // para decidir si navegar a RECHAZADO.
+        const err = new Error(data.message || "Error al verificar OTP de email");
+        if (data.cause) err.cause = data.cause;
+        throw err;
+      }
+      return data;
+    } catch (error) {
+      console.error("VERIFICAR_OTP_EMAIL_SERVICE_ERROR:", error);
+      throw error;
+    }
+  }
+
   static async phonePickerPick({ opcionElegida }, signal = null) {
     try {
       const url = `${LANDING_BACKEND_URL}/api/lead-registration/phone-picker-pick`;

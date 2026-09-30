@@ -37,6 +37,9 @@ const PREV_STEP_MAP = {
   [LOAN_SIM_STEPS.WELCOME]: LOAN_SIM_STEPS.RECIBO_UPLOAD,
   [LOAN_SIM_STEPS.EN_ANALISIS]: LOAN_SIM_STEPS.RECIBO_UPLOAD,
   [LOAN_SIM_STEPS.PHONE_PICKER]: LOAN_SIM_STEPS.PHONE_VALIDATION,
+  // Plan 2026-09-29 (cliente email OTP): si el usuario vuelve desde
+  // EMAIL_OTP_VALIDATION, retornamos al picker para que pueda re-pickear.
+  [LOAN_SIM_STEPS.EMAIL_OTP_VALIDATION]: LOAN_SIM_STEPS.PHONE_PICKER,
 };
 
 /**
@@ -67,6 +70,10 @@ export const useOnboardingFlow = (resumeShortId = null) => {
   const [pendingSituacionLaboral, setPendingSituacionLaboral] = useState(null);
   const [rejectedFechaExpiracionBloqueo, setRejectedFechaExpiracionBloqueo] = useState(null);
   const [pickerContext, setPickerContext] = useState(null);
+  // Plan 2026-09-29 (cliente email OTP): email destino del OTP que el back
+  // envía tras el pick exitoso del picker. Lo lee `OnboardingFlowScreen`
+  // para pasar como `destination` a `OTPValidation destinationType="email"`.
+  const [emailOtpDestination, setEmailOtpDestination] = useState(null);
 
   const getLeadId = useCallback(() => {
     if (leadData?.leadId) return leadData.leadId;
@@ -156,6 +163,20 @@ export const useOnboardingFlow = (resumeShortId = null) => {
               setPickerContext(response.data.pickerContext);
             }
           }
+
+          // Plan 2026-09-30 (email OTP validation restore): si el back
+          // reportó que hay un OTP EMAIL activo (emailOtpDestination
+          // presente), forzamos el step a EMAIL_OTP_VALIDATION y
+          // limpiamos el pickerContext (es stale — el usuario ya pickeó,
+          // está esperando verificar el código de email). Sin este
+          // override, el restore caía a PHONE_PICKER y el usuario
+          // re-pickeaba, generando una segunda fila basura en
+          // webapp_sim_2fa.
+          if (response.data.emailOtpDestination) {
+            targetStep = LOAN_SIM_STEPS.EMAIL_OTP_VALIDATION;
+            setPickerContext(null);
+            setEmailOtpDestination(response.data.emailOtpDestination);
+          }
           // Patch 2026-08-31 (OTP resend fix): la condición original
           // `if (leadData?.celular)` estaba invertida — sólo sobrescribía
           // `leadData` cuando YA tenía celular, dejando `leadData.celular`
@@ -198,7 +219,15 @@ export const useOnboardingFlow = (resumeShortId = null) => {
 
   const navigateToNext = useCallback((currentStep, extras = {}) => {
     let next;
-    if (currentStep === LOAN_SIM_STEPS.PHONE_VALIDATION) {
+    // Plan 2026-09-29 (cliente email OTP): EMAIL_OTP_VALIDATION comparte el
+    // mismo routing dinámico que PHONE_VALIDATION — un cliente COFA que
+    // validó el OTP email avanza a RECIBO_UPLOAD (saltea DNI_UPLOAD).
+    // Sin esta rama, `NEXT_STEP_MAP[EMAIL_OTP_VALIDATION]` es undefined y el
+    // usuario queda atascado en la pantalla de validación (bug E2E lead 30).
+    if (
+      currentStep === LOAN_SIM_STEPS.PHONE_VALIDATION ||
+      currentStep === LOAN_SIM_STEPS.EMAIL_OTP_VALIDATION
+    ) {
       next = getNextStepAfterPhoneValidation(extras.esCliente);
     } else {
       next = NEXT_STEP_MAP[currentStep];
@@ -443,6 +472,25 @@ export const useOnboardingFlow = (resumeShortId = null) => {
 
       const decision = result.data?.decision;
 
+      // Plan 2026-09-29 (cliente email OTP): tras pick correcto del picker para
+      // cliente COFA, el back ya NO avanza directo a CELULAR_VALIDADO. En su
+      // lugar, devuelve `requiresEmailVerification: true` y `tipo: EMAIL`.
+      // Persistimos el email destino (viene en `result.data.destination` si el
+      // back lo incluye, sino lo derivamos de `leadData.email`) y navegamos a
+      // el step `EMAIL_OTP_VALIDATION` donde `OnboardingFlowScreen` renderiza
+      // `OTPValidation destinationType="email"`.
+      if (result.data?.requiresEmailVerification === true) {
+        const destination =
+          result.data.destination ??
+          result.data.email ??
+          leadData?.email ??
+          null;
+        setEmailOtpDestination(destination);
+        setPickerContext(null);
+        setOnboardingStep(LOAN_SIM_STEPS.EMAIL_OTP_VALIDATION);
+        return result;
+      }
+
       // 2nd-attempt: el back devolvió retryAvailable=true y mantiene al usuario
       // en el picker con un set de opciones/target actualizado. Re-disparamos
       // el picker en lugar de avanzar.
@@ -513,6 +561,7 @@ export const useOnboardingFlow = (resumeShortId = null) => {
     rejectedFechaExpiracionBloqueo,
     pickerContext,
     setPickerContext,
+    emailOtpDestination,
     // Setters expuestos para callers que necesitan plantar estado manualmente
     // (ej. OnboardingFlowScreen resume branch, spec "Recibo resubida operador"
     // 2026-09-07: consume link → setLeadData + setLeadToken + setOnboardingStep
