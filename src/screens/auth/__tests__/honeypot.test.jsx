@@ -46,11 +46,14 @@ vi.mock("../../../context/index.js", async (importOriginal) => {
 
 vi.mock("../../../services/authService.js", () => ({
   default: {
-    register:       vi.fn(),
-    forgotPassword: vi.fn(),
-    resetPassword:  vi.fn(),
-    resendOtp:      vi.fn(),
-    verifyEmail:    vi.fn(),
+    register:               vi.fn(),
+    forgotPassword:         vi.fn(),
+    resetPassword:          vi.fn(),
+    resendOtp:              vi.fn(),
+    verifyEmail:            vi.fn(),
+    resolveDni:             vi.fn(),
+    registerExistingClient: vi.fn(),
+    resumeSolicitud:        vi.fn(),
   },
 }));
 
@@ -138,13 +141,31 @@ describe("RegisterScreen — honeypot", () => {
   let RegisterScreen;
   let authService;
 
+  // Helper: completa el paso DNI y espera a que aparezca el formulario email/contraseña
+  async function completeDniStep(container) {
+    const dniInput = container.querySelector('input[name="dni"]');
+    expect(dniInput, "Input name=dni debe existir en el paso DNI").not.toBeNull();
+    fireEvent.change(dniInput, { target: { value: "30123456" } });
+    fireEvent.submit(dniInput.closest("form"));
+    // Esperar a que aparezca el campo email (paso siguiente)
+    await waitFor(() => {
+      expect(container.querySelector('input[name="email"]')).not.toBeNull();
+    });
+  }
+
   beforeEach(async () => {
     vi.clearAllMocks();
     RegisterScreen = (await import("../RegisterScreen.jsx")).default;
     authService = (await import("../../../services/authService.js")).default;
+    // resolveDni devuelve una identidad → nuevo usuario
+    authService.resolveDni.mockResolvedValue({
+      identities: [{ cuit: "20301234568", nombreCompleto: "Juan Pérez" }],
+      existingClient: null,
+      padronOk: true,
+    });
   });
 
-  it("tiene un campo honeypot oculto en el paso de registro", () => {
+  it("tiene un campo honeypot oculto ya en el paso DNI inicial", () => {
     const { container } = renderInRouter(<RegisterScreen />);
     const hp = container.querySelector('input[name="website"]');
     expect(hp).toBeTruthy();
@@ -154,6 +175,10 @@ describe("RegisterScreen — honeypot", () => {
   it("no llama a register si el honeypot está relleno", async () => {
     const { container } = renderInRouter(<RegisterScreen />);
 
+    // 1. Completar paso DNI
+    await completeDniStep(container);
+
+    // 2. Rellenar email, contraseña y honeypot
     fillByName(container, "email", "nuevo@test.com");
     fillByName(container, "password", "password123");
     fillHoneypot(container);
@@ -165,10 +190,14 @@ describe("RegisterScreen — honeypot", () => {
     });
   });
 
-  it("sí llama a register si el honeypot está vacío", async () => {
+  it("sí llama a register (con cuit) si el honeypot está vacío", async () => {
     authService.register.mockResolvedValue({ success: true });
     const { container } = renderInRouter(<RegisterScreen />);
 
+    // 1. Completar paso DNI
+    await completeDniStep(container);
+
+    // 2. Rellenar email y contraseña (sin honeypot)
     fillByName(container, "email", "nuevo@test.com");
     fillByName(container, "password", "password123");
 
@@ -178,7 +207,8 @@ describe("RegisterScreen — honeypot", () => {
       expect(authService.register).toHaveBeenCalledWith(
         "nuevo@test.com",
         "password123",
-        "fake-turnstile-token"
+        "fake-turnstile-token",
+        "20301234568", // cuit del paso DNI
       );
     });
   });

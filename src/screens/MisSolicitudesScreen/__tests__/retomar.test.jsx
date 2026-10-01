@@ -65,6 +65,7 @@ function renderScreen() {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  vi.restoreAllMocks();
 });
 
 describe("MisSolicitudesScreen — botón Retomar", () => {
@@ -127,9 +128,11 @@ describe("MisSolicitudesScreen — botón Retomar", () => {
     expect(screen.queryByRole("button", { name: /retomar solicitud/i })).toBeNull();
   });
 
-  it("click en Retomar llama resumeSolicitud y navega a /registro-simulador", async () => {
+  it("click en Retomar llama resumeSolicitud y abre /registro-simulador en pestaña nueva", async () => {
     authService.getSolicitudes.mockResolvedValue({ solicitudes: [make()] });
     mockResumeSolicitud.mockResolvedValue({ data: { leadToken: "tok-abc" } });
+    const newTab = { closed: false, location: { href: "" }, close: vi.fn() };
+    vi.spyOn(window, "open").mockReturnValue(newTab);
 
     renderScreen();
     const btn = await screen.findByRole("button", { name: /retomar solicitud/i });
@@ -137,6 +140,22 @@ describe("MisSolicitudesScreen — botón Retomar", () => {
 
     await waitFor(() => {
       expect(mockResumeSolicitud).toHaveBeenCalledTimes(1);
+      expect(window.open).toHaveBeenCalledWith("about:blank", "_blank");
+      expect(newTab.location.href).toBe("/registro-simulador");
+    });
+    expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+  it("si el popup está bloqueado, navega en la misma pestaña", async () => {
+    authService.getSolicitudes.mockResolvedValue({ solicitudes: [make()] });
+    mockResumeSolicitud.mockResolvedValue({ data: { leadToken: "tok-abc" } });
+    vi.spyOn(window, "open").mockReturnValue(null);
+
+    renderScreen();
+    const btn = await screen.findByRole("button", { name: /retomar solicitud/i });
+    fireEvent.click(btn);
+
+    await waitFor(() => {
       expect(mockNavigate).toHaveBeenCalledWith("/registro-simulador");
     });
   });
@@ -144,6 +163,8 @@ describe("MisSolicitudesScreen — botón Retomar", () => {
   it("muestra error si resumeSolicitud falla", async () => {
     authService.getSolicitudes.mockResolvedValue({ solicitudes: [make()] });
     mockResumeSolicitud.mockRejectedValue(new Error("No podemos retomar"));
+    const newTab = { closed: false, location: { href: "" }, close: vi.fn() };
+    vi.spyOn(window, "open").mockReturnValue(newTab);
 
     renderScreen();
     const btn = await screen.findByRole("button", { name: /retomar solicitud/i });
@@ -152,6 +173,7 @@ describe("MisSolicitudesScreen — botón Retomar", () => {
     await waitFor(() => {
       expect(screen.getByText(/No podemos retomar/i)).toBeTruthy();
     });
+    expect(newTab.close).toHaveBeenCalled();
     expect(mockNavigate).not.toHaveBeenCalled();
   });
 });

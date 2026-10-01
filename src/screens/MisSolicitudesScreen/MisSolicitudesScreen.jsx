@@ -154,16 +154,25 @@ const MisSolicitudesScreen = () => {
   const handleRetomar = async (_solicitudId) => {
     setRetomando(true);
     setRetomandoError("");
+    // Abrimos la pestaña en el click (síncrono) para no chocar con el popup blocker
+    // después del await. Si resume falla, la cerramos.
+    const newTab = window.open("about:blank", "_blank");
     try {
       const result = await authService.resumeSolicitud();
-      // Guardar el leadToken en cookie para que el flujo de onboarding lo lea
       await setCookieWithDuration(
         COOKIE_LEAD_TOKEN_CONFIG.NAME,
         result.data.leadToken,
         COOKIE_LEAD_TOKEN_CONFIG.EXPIRY_MS,
       );
-      navigate("/registro-simulador");
+      if (newTab && !newTab.closed) {
+        newTab.location.href = "/registro-simulador";
+      } else {
+        // Popup bloqueado: no sacar al usuario del perfil queda imposible,
+        // caemos a la misma pestaña.
+        navigate("/registro-simulador");
+      }
     } catch (err) {
+      newTab?.close();
       setRetomandoError(
         err.message || "No pudimos retomar la solicitud. Intentá de nuevo.",
       );

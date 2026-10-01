@@ -192,15 +192,33 @@ describe("RegisterScreen — paso DNI inicial", () => {
     });
   });
 
-  it("sin identidades en padrón → avanza al paso email/contraseña (registro manual)", async () => {
-    mockResolveDni.mockResolvedValue({ identities: [], existingClient: null });
+  it("sin identidades y padronOk:true → BLOQUEA y muestra error de identidad no verificable", async () => {
+    // Iter 1 fix: CUIT es obligatorio; no se puede registrar sin pasar la
+    // verificación de identidad en AFIP.
+    mockResolveDni.mockResolvedValue({ identities: [], existingClient: null, padronOk: true });
     renderScreen();
     const input = screen.getByLabelText(/dni/i);
     fireEvent.change(input, { target: { value: "30123456" } });
     fireEvent.submit(input.closest("form"));
 
     await waitFor(() => {
-      expect(screen.getByLabelText(/^email$/i)).toBeTruthy();
+      // Debe quedar en el paso DNI (no hay campo email)
+      expect(screen.queryByLabelText(/^email$/i)).toBeNull();
+      // Debe mostrar el error
+      expect(screen.getByText(/no pudimos verificar tu identidad/i)).toBeTruthy();
+    });
+  });
+
+  it("sin identidades y padronOk:false → BLOQUEA con mensaje de servicio no disponible", async () => {
+    mockResolveDni.mockResolvedValue({ identities: [], existingClient: null, padronOk: false });
+    renderScreen();
+    const input = screen.getByLabelText(/dni/i);
+    fireEvent.change(input, { target: { value: "30123456" } });
+    fireEvent.submit(input.closest("form"));
+
+    await waitFor(() => {
+      expect(screen.queryByLabelText(/^email$/i)).toBeNull();
+      expect(screen.getByText(/motivos ajenos a nosotros/i)).toBeTruthy();
     });
   });
 });

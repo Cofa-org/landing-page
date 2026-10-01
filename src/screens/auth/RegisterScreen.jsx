@@ -128,8 +128,16 @@ const RegisterScreen = () => {
           setStep(STEP.REGISTER);
         }
       } else {
-        // Sin identidades en padrón → igual puede registrarse (ingresa email manual)
-        setStep(STEP.REGISTER);
+        // Sin identidades en padrón → BLOQUEAR. El CUIT es obligatorio (Iter 1).
+        // padronOk: true  → DNI no figura en AFIP (identidad no verificable)
+        // padronOk: false → servicio temporalmente no disponible
+        const msg =
+          result.padronOk === false
+            ? "Por motivos ajenos a nosotros no pudimos verificar tu identidad en este momento. Por favor, intentá más tarde o contactate con un asesor."
+            : "No pudimos verificar tu identidad con este DNI. Si creés que es un error, contactate con un asesor.";
+        setErrorDni(msg);
+        turnstileDniRef.current?.reset();
+        setTurnstileDni("");
       }
     } catch (err) {
       setErrorDni(err.message || "No pudimos verificar tu DNI. Intentá de nuevo.");
@@ -153,6 +161,7 @@ const RegisterScreen = () => {
 
   /* ── Paso 2a: registro de nuevo usuario ── */
   const handleRegister = async () => {
+    if (honeypot) return;
     if (!turnstileReg) {
       setErrorReg("Completá la verificación de seguridad.");
       return;
@@ -173,6 +182,7 @@ const RegisterScreen = () => {
 
   /* ── Paso 2b: registro de cliente existente ── */
   const handleExistingClientRegister = async () => {
+    if (honeypot) return;
     if (!turnstileExisting) {
       setErrorExisting("Completá la verificación de seguridad.");
       return;
