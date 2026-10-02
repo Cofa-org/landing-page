@@ -114,7 +114,11 @@ export const useOnboardingFlow = (resumeShortId = null) => {
           return;
         }
 
-        const response = await LeadRegistrationService.obtenerEstadoOnboarding(leadId);
+        const response = await LeadRegistrationService.obtenerEstadoOnboarding(
+          leadId,
+          null,
+          decoded.solicitudId ?? null,
+        );
 
         if (response.success && response.data) {
           const estadoOnboarding = response.data.estado_onboarding;

@@ -212,11 +212,13 @@ const LoanSimScreen = () => {
             rejection={
               rejectionReason === "PHONE_NOT_VALIDATED"
                 ? REJECTION_CONFIG.PHONE_NOT_VALIDATED
-                : REJECTION_CONFIG.DEVICE_MISMATCH
+                : REJECTION_CONFIG.SIM_RECHAZADO
             }
           />
         )}
-        {step === LOAN_SIM_STEPS.DISPOSITIVO_RECHAZADO && <RejectedStep />}
+        {step === LOAN_SIM_STEPS.DISPOSITIVO_RECHAZADO && (
+          <RejectedStep rejection={REJECTION_CONFIG.DEVICE_MISMATCH} />
+        )}
       </Suspense>
     );
   };

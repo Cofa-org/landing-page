@@ -9,6 +9,15 @@ vi.mock("../../../../services/linkResolutionService.js", () => ({
   },
 }));
 
+vi.mock("../../../../services/authService.js", () => ({
+  default: {
+    resumeSolicitud: vi.fn().mockResolvedValue({
+      kind: "simulador",
+      data: { scoringId: "s1", cuit: "20123456789" },
+    }),
+  },
+}));
+
 vi.mock("../../../../services/simuladorService.js", () => ({
   default: {
     calcularPlanes: vi.fn(),
@@ -41,6 +50,7 @@ vi.mock("../../../../lib/utils.js", () => ({
 // (which would only update it).
 
 import LinkResolutionService from "../../../../services/linkResolutionService.js";
+import authService from "../../../../services/authService.js";
 import SimuladorService from "../../../../services/simuladorService.js";
 import { getFingerprint, mapFingerprintToHuellaData } from "../../../../lib/fingerprint.js";
 import { getCookie, setCookie, setCookieWithDuration, deleteCookie } from "../../../../lib/utils.js";
@@ -114,6 +124,23 @@ describe("useLoanSimulator — initial link paste", () => {
     await new Promise((r) => setTimeout(r, 50));
 
     expect(SimuladorService.calcularPlanes).toHaveBeenCalledTimes(1);
+  });
+
+  it("sin ?id= inicia el simulador por sesión (resumeSolicitud, sin consumeLink)", async () => {
+    renderUseLoanSimulator();
+
+    await waitFor(() => {
+      expect(authService.resumeSolicitud).toHaveBeenCalled();
+      expect(SimuladorService.iniciarSesion).toHaveBeenCalled();
+    });
+    expect(LinkResolutionService.consumeLink).not.toHaveBeenCalled();
+    expect(SimuladorService.iniciarSesion).toHaveBeenCalledWith(
+      expect.objectContaining({
+        scoringId: "s1",
+        cuit: "20123456789",
+        shortId: null,
+      }),
+    );
   });
 
   it("sends huella_dispositivo in the first calcularPlanes call (fingerprint awaited before first fetch)", async () => {

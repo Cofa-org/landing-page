@@ -40,7 +40,7 @@ const LoginScreen = () => {
     setLoading(true);
     try {
       await login(email.trim(), password, turnstileToken);
-      navigate("/", { replace: true });
+      navigate("/mi-perfil", { replace: true });
     } catch (err) {
       setError(err.message || "No pudimos iniciar sesión. Revisá los datos e intentá de nuevo.");
       turnstileRef.current?.reset();
@@ -139,7 +139,7 @@ const LoginScreen = () => {
 
               <p className={styles.auxLink}>
                 ¿No tenés cuenta?{" "}
-                <Link to="/crear-cuenta">Registrate</Link>
+                <Link to="/crear-cuenta" state={location.state}>Registrate</Link>
               </p>
             </div>
           </GenericForm>

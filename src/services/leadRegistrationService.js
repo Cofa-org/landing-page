@@ -161,9 +161,10 @@ export default class LeadRegistrationService {
     }
   }
 
-  static async obtenerEstadoOnboarding(leadId, signal = null) {
+  static async obtenerEstadoOnboarding(leadId, signal = null, solicitudId = null) {
     try {
-      const url = `${LANDING_BACKEND_URL}/api/lead-registration/${leadId}/estado`;
+      const qs = solicitudId ? `?solicitudId=${encodeURIComponent(solicitudId)}` : "";
+      const url = `${LANDING_BACKEND_URL}/api/lead-registration/${leadId}/estado${qs}`;
       const token = await getCookie(COOKIE_LEAD_TOKEN_CONFIG.NAME);
       const response = await HttpApi(
         url,

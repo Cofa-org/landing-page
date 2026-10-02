@@ -72,7 +72,7 @@ describe("MisSolicitudesScreen — botón Retomar", () => {
   it("muestra el botón Retomar para solicitud incompleta (estado vacío)", async () => {
     authService.getSolicitudes.mockResolvedValue({ solicitudes: [make()] });
     renderScreen();
-    const btn = await screen.findByRole("button", { name: /retomar solicitud/i });
+    const btn = await screen.findByRole("button", { name: /retomá tu registro/i });
     expect(btn).toBeTruthy();
   });
 
@@ -81,7 +81,7 @@ describe("MisSolicitudesScreen — botón Retomar", () => {
       solicitudes: [make({ estadoOnboarding: "LEAD_CREADO" })],
     });
     renderScreen();
-    expect(await screen.findByRole("button", { name: /retomar solicitud/i })).toBeTruthy();
+    expect(await screen.findByRole("button", { name: /retomá tu registro/i })).toBeTruthy();
   });
 
   it("muestra el botón Retomar cuando estado_onboarding = DNI_SUBIDO", async () => {
@@ -89,25 +89,55 @@ describe("MisSolicitudesScreen — botón Retomar", () => {
       solicitudes: [make({ estadoOnboarding: "DNI_SUBIDO" })],
     });
     renderScreen();
-    expect(await screen.findByRole("button", { name: /retomar solicitud/i })).toBeTruthy();
+    expect(await screen.findByRole("button", { name: /retomá tu registro/i })).toBeTruthy();
+  });
+
+  it("muestra Retomar aunque scoring/gestión esté ACEPTADO (onboarding incompleto)", async () => {
+    authService.getSolicitudes.mockResolvedValue({
+      solicitudes: [make({ estadoOnboarding: "LEAD_CREADO", estadoGestion: "ACEPTADO" })],
+    });
+    renderScreen();
+    expect(await screen.findByRole("button", { name: /retomá tu registro/i })).toBeTruthy();
   });
 
   it("NO muestra el botón Retomar para solicitud aprobada", async () => {
     authService.getSolicitudes.mockResolvedValue({
-      solicitudes: [make({ estadoGestion: "ACEPTADO" })],
+      solicitudes: [
+        make({
+          estadoOnboarding: "ONBOARDING_COMPLETO",
+          estadoGestion: "ACEPTADO",
+          prestamo: { estado: "COMPLETADO" },
+        }),
+      ],
     });
     renderScreen();
     await screen.findByText("Aprobada");
-    expect(screen.queryByRole("button", { name: /retomar solicitud/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /retomá tu registro/i })).toBeNull();
   });
 
-  it("NO muestra el botón Retomar para solicitud en análisis", async () => {
+  it("NO muestra botón de resume para solicitud en análisis", async () => {
     authService.getSolicitudes.mockResolvedValue({
-      solicitudes: [make({ estadoGestion: "ANALIZAR" })],
+      solicitudes: [make({ estadoOnboarding: "ONBOARDING_COMPLETO", estadoGestion: "ANALIZAR" })],
     });
     renderScreen();
     await screen.findByText("En análisis");
-    expect(screen.queryByRole("button", { name: /retomar solicitud/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /retomá tu registro/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /continuá tu simulación/i })).toBeNull();
+  });
+
+  it("muestra Continuá tu simulación cuando el onboarding ya está completo", async () => {
+    authService.getSolicitudes.mockResolvedValue({
+      solicitudes: [make({ estadoOnboarding: "ONBOARDING_COMPLETO" })],
+    });
+    const newTab = { closed: false, location: { href: "" }, close: vi.fn() };
+    vi.spyOn(window, "open").mockReturnValue(newTab);
+    renderScreen();
+    const btn = await screen.findByRole("button", { name: /continuá tu simulación/i });
+    fireEvent.click(btn);
+    await waitFor(() => {
+      expect(newTab.location.href).toBe("/simulador?solicitud=1");
+    });
+    expect(mockResumeSolicitud).not.toHaveBeenCalled();
   });
 
   it("NO muestra el botón Retomar para solicitud rechazada (No aprobada)", async () => {
@@ -116,7 +146,7 @@ describe("MisSolicitudesScreen — botón Retomar", () => {
     });
     renderScreen();
     await screen.findByText("No aprobada");
-    expect(screen.queryByRole("button", { name: /retomar solicitud/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /retomá tu registro/i })).toBeNull();
   });
 
   it("NO muestra el botón Retomar para solicitud finalizada (con préstamo SB)", async () => {
@@ -125,21 +155,21 @@ describe("MisSolicitudesScreen — botón Retomar", () => {
     });
     renderScreen();
     await screen.findByText("Solicitud finalizada");
-    expect(screen.queryByRole("button", { name: /retomar solicitud/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /retomá tu registro/i })).toBeNull();
   });
 
   it("click en Retomar llama resumeSolicitud y abre /registro-simulador en pestaña nueva", async () => {
     authService.getSolicitudes.mockResolvedValue({ solicitudes: [make()] });
-    mockResumeSolicitud.mockResolvedValue({ data: { leadToken: "tok-abc" } });
+    mockResumeSolicitud.mockResolvedValue({ kind: "onboarding", data: { leadToken: "tok-abc" } });
     const newTab = { closed: false, location: { href: "" }, close: vi.fn() };
     vi.spyOn(window, "open").mockReturnValue(newTab);
 
     renderScreen();
-    const btn = await screen.findByRole("button", { name: /retomar solicitud/i });
+    const btn = await screen.findByRole("button", { name: /retomá tu registro/i });
     fireEvent.click(btn);
 
     await waitFor(() => {
-      expect(mockResumeSolicitud).toHaveBeenCalledTimes(1);
+      expect(mockResumeSolicitud).toHaveBeenCalledWith(1);
       expect(window.open).toHaveBeenCalledWith("about:blank", "_blank");
       expect(newTab.location.href).toBe("/registro-simulador");
     });
@@ -148,11 +178,11 @@ describe("MisSolicitudesScreen — botón Retomar", () => {
 
   it("si el popup está bloqueado, navega en la misma pestaña", async () => {
     authService.getSolicitudes.mockResolvedValue({ solicitudes: [make()] });
-    mockResumeSolicitud.mockResolvedValue({ data: { leadToken: "tok-abc" } });
+    mockResumeSolicitud.mockResolvedValue({ kind: "onboarding", data: { leadToken: "tok-abc" } });
     vi.spyOn(window, "open").mockReturnValue(null);
 
     renderScreen();
-    const btn = await screen.findByRole("button", { name: /retomar solicitud/i });
+    const btn = await screen.findByRole("button", { name: /retomá tu registro/i });
     fireEvent.click(btn);
 
     await waitFor(() => {
@@ -167,7 +197,7 @@ describe("MisSolicitudesScreen — botón Retomar", () => {
     vi.spyOn(window, "open").mockReturnValue(newTab);
 
     renderScreen();
-    const btn = await screen.findByRole("button", { name: /retomar solicitud/i });
+    const btn = await screen.findByRole("button", { name: /retomá tu registro/i });
     fireEvent.click(btn);
 
     await waitFor(() => {

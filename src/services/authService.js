@@ -88,7 +88,10 @@ const authService = {
    * Iter 2: Retoma una solicitud incompleta desde la sesión autenticada.
    * Devuelve { success, data: { leadToken, leadId, es_cliente, celular, maxSlots, estadoOnboarding } }
    */
-  resumeSolicitud: () => authFetch("/solicitudes/resume"),
+  resumeSolicitud: (solicitudId = null) =>
+    authFetch("/solicitudes/resume", {
+      body: solicitudId != null ? { solicitudId } : {},
+    }),
 
   /** Cambia la contraseña desde el perfil (requiere contraseña actual). */
   changePassword: (currentPassword, newPassword) =>

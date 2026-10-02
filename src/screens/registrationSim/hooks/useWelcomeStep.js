@@ -28,8 +28,6 @@ export const useWelcomeStep = () => {
     }
   }, []);
 
-  // Imagen random estable durante toda la vida del hook.
-  // Se re-sortea cada vez que el componente que usa el hook se monta de nuevo.
   const welcomeImage = useMemo(
     () => WELCOME_IMAGES[Math.floor(Math.random() * WELCOME_IMAGES.length)],
     [],

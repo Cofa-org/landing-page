@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Header, Footer } from "../../Components/index.js";
 import GenericForm from "../../Components/Forms/GenericForm/GenericForm.jsx";
 import GenericInput from "../../Components/Forms/GenericInput/GenericInput.jsx";
@@ -44,6 +44,7 @@ const LeftPanel = ({ title, sub }) => (
 
 const RegisterScreen = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   /* ── Estado compartido entre pasos ── */
   const [step, setStep] = useState(STEP.DNI);
@@ -218,7 +219,10 @@ const RegisterScreen = () => {
       await authService.verifyEmail(emailParaVerificar, code, turnstileVerify);
       navigate("/ingresar", {
         replace: true,
-        state: { successMessage: "¡Cuenta creada! Ya podés ingresar con tu contraseña." },
+        state: {
+          successMessage: "¡Cuenta creada! Ya podés ingresar con tu contraseña.",
+          from: location.state?.from,
+        },
       });
     } catch (err) {
       setErrorVerify(err.message || "El código es inválido o expiró. Pedí uno nuevo.");
@@ -478,7 +482,7 @@ const RegisterScreen = () => {
 
                 <p className={styles.auxLink}>
                   ¿Ya tenés cuenta?{" "}
-                  <Link to="/ingresar">Ingresá</Link>
+                  <Link to="/ingresar" state={location.state}>Ingresá</Link>
                 </p>
               </div>
             </GenericForm>
@@ -549,9 +553,9 @@ const RegisterScreen = () => {
                 Continuar
               </GenericButton>
 
-              <p className={styles.auxLink}>
+                <p className={styles.auxLink}>
                 ¿Ya tenés cuenta?{" "}
-                <Link to="/ingresar">Ingresá</Link>
+                <Link to="/ingresar" state={location.state}>Ingresá</Link>
               </p>
             </div>
           </GenericForm>

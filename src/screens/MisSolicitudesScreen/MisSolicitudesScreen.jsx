@@ -4,7 +4,7 @@ import { Header, Footer } from "../../Components/index.js";
 import authService from "../../services/authService.js";
 import { setCookieWithDuration } from "../../lib/utils.js";
 import { COOKIE_LEAD_TOKEN_CONFIG } from "../../constants/LOAN_SIM.js";
-import { resolveEstado } from "./resolveEstado.js";
+import { resolveEstado, RESUME_ACCION } from "./resolveEstado.js";
 import styles from "./MisSolicitudesScreen.module.css";
 
 /* ── Helpers de formato ───────────────────────────────────────────── */
@@ -65,15 +65,18 @@ function SolicitudCard({ solicitud, onRetomar, retomando }) {
         <p className={styles.estadoDesc}>{estado.descripcion}</p>
       ) : null}
 
-      {/* Botón Retomar — solo para solicitudes incompletas */}
-      {estado.label === "Solicitud incompleta" && onRetomar && (
+      {estado.accion && onRetomar && (
         <button
           type="button"
           className={styles.retakeBtn}
-          onClick={() => onRetomar(solicitud.id)}
+          onClick={() => onRetomar(solicitud.id, estado.accion)}
           disabled={retomando}
         >
-          {retomando ? "Cargando…" : "Retomar solicitud →"}
+          {retomando
+            ? "Cargando…"
+            : estado.accion === RESUME_ACCION.CONTINUAR_SIMULACION
+              ? "Continuá tu simulación →"
+              : "Retomá tu registro →"}
         </button>
       )}
 
@@ -151,14 +154,32 @@ const MisSolicitudesScreen = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  const handleRetomar = async (_solicitudId) => {
+  const handleRetomar = async (solicitudId, accion) => {
     setRetomando(true);
     setRetomandoError("");
-    // Abrimos la pestaña en el click (síncrono) para no chocar con el popup blocker
-    // después del await. Si resume falla, la cerramos.
     const newTab = window.open("about:blank", "_blank");
     try {
-      const result = await authService.resumeSolicitud();
+      if (accion === RESUME_ACCION.CONTINUAR_SIMULACION) {
+        const href = `/simulador?solicitud=${encodeURIComponent(solicitudId)}`;
+        if (newTab && !newTab.closed) {
+          newTab.location.href = href;
+        } else {
+          navigate(href);
+        }
+        return;
+      }
+
+      const result = await authService.resumeSolicitud(solicitudId);
+      if (result.kind === "simulador") {
+        const href = `/simulador?solicitud=${encodeURIComponent(result.solicitudId ?? solicitudId)}`;
+        if (newTab && !newTab.closed) {
+          newTab.location.href = href;
+        } else {
+          navigate(href);
+        }
+        return;
+      }
+
       await setCookieWithDuration(
         COOKIE_LEAD_TOKEN_CONFIG.NAME,
         result.data.leadToken,
@@ -167,8 +188,6 @@ const MisSolicitudesScreen = () => {
       if (newTab && !newTab.closed) {
         newTab.location.href = "/registro-simulador";
       } else {
-        // Popup bloqueado: no sacar al usuario del perfil queda imposible,
-        // caemos a la misma pestaña.
         navigate("/registro-simulador");
       }
     } catch (err) {

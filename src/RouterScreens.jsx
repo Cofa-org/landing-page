@@ -1,4 +1,4 @@
-import { Route, Routes, Navigate } from "react-router-dom";
+import { Route, Routes, Navigate, useSearchParams, useLocation } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import Loader from "./Components/Loader/Loader";
 import OnboardingFlowScreen from "./screens/registrationSim/OnboardingFlowScreen.jsx";
@@ -18,7 +18,7 @@ import ResetPasswordScreen from "./screens/auth/ResetPasswordScreen.jsx";
  */
 const RedirectIfAuth = ({ children }) => {
   const { user, loading: authLoading } = useAuth();
-  if (!authLoading && user) return <Navigate to="/" replace />;
+  if (!authLoading && user) return <Navigate to="/mi-perfil" replace />;
   return children;
 };
 
@@ -28,7 +28,31 @@ const RedirectIfAuth = ({ children }) => {
  */
 const RequireAuth = ({ children }) => {
   const { user, loading: authLoading } = useAuth();
-  if (!authLoading && !user) return <Navigate to="/ingresar" replace />;
+  const location = useLocation();
+  if (!authLoading && !user) {
+    return <Navigate to="/ingresar" replace state={{ from: location.pathname + location.search }} />;
+  }
+  return children;
+};
+
+/**
+ * Onboarding y simulador exigen cuenta, salvo el link de operador (?id=).
+ * fromMobbex sin ?id= también exige sesión (vuelta por cookie).
+ */
+const RequireAuthUnlessOperatorLink = ({ children }) => {
+  const { user, loading: authLoading } = useAuth();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const hasOperatorLink = Boolean(searchParams.get("id"));
+  if (!authLoading && !user && !hasOperatorLink) {
+    return (
+      <Navigate
+        to="/ingresar"
+        replace
+        state={{ from: location.pathname + location.search }}
+      />
+    );
+  }
   return children;
 };
 
@@ -94,11 +118,11 @@ const RouterScreens = () => {
         />
         <Route
           path='/simulador'
-          element={<LoanSimScreen />}
+          element={<RequireAuthUnlessOperatorLink><LoanSimScreen /></RequireAuthUnlessOperatorLink>}
         />
         <Route
           path='/registro-simulador'
-          element={<OnboardingFlowScreen />}
+          element={<RequireAuthUnlessOperatorLink><OnboardingFlowScreen /></RequireAuthUnlessOperatorLink>}
         />
         {/* Preguntas Frecuentes */}
         <Route

@@ -90,16 +90,14 @@ export const useMobbexSubscription = (scoringId, onSubscriptionCompleted) => {
   }, [fromMobbex, scoringId, mobbexSid, mobbexUid, mobbexStatus]);
 
   const handleSuscribirse = useCallback(async () => {
-    if (!linkId) {
-      setError("No se encontró el identificador del link en la URL");
-      setLoading(false);
-      return;
-    }
     setLoading(true);
     setError(null);
     setMessage(null);
     try {
-      const response = await SimuladorService.solicitarSuscripcionMobbex({ scoringId, linkId });
+      const response = await SimuladorService.solicitarSuscripcionMobbex({
+        scoringId,
+        ...(linkId ? { linkId } : {}),
+      });
       if (!response?.success) {
         setError(
           `${response?.message} 😕` ||

@@ -80,6 +80,25 @@ describe("useMobbexSubscription", () => {
     expect(window.location.href).toBe("https://mobbex.com/p/test");
   });
 
+  test("handleSuscribirse sin ?id= llama a Mobbex solo con scoringId", async () => {
+    SimuladorService.solicitarSuscripcionMobbex.mockResolvedValue({
+      success: true,
+      data: { subscriptionURL: "https://mobbex.com/p/session" },
+    });
+    const { result } = renderHook(() => useMobbexSubscription("abc123", vi.fn()), {
+      wrapper: makeWrapper("/simulador?fromMobbex=false"),
+    });
+
+    await act(async () => {
+      await result.current.handleSuscribirse();
+    });
+
+    expect(SimuladorService.solicitarSuscripcionMobbex).toHaveBeenCalledWith({
+      scoringId: "abc123",
+    });
+    expect(window.location.href).toBe("https://mobbex.com/p/session");
+  });
+
   test("handleSuscribirse setea error si la API falla", async () => {
     SimuladorService.solicitarSuscripcionMobbex.mockRejectedValue(new Error("Network"));
     const { result } = renderHook(() => useMobbexSubscription("abc123", vi.fn()), {

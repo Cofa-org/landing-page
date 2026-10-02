@@ -70,6 +70,7 @@ export async function HttpApi(url, body, method, apiKey, token, signal = null, r
     // Intentamos recuperar el ID de sesión de Callbell si fue generado
     const cbSessionId = typeof window !== "undefined" ? localStorage.getItem("callbell_session_id") : null;
     return {
+      credentials: "include",
       headers: {
         ...(apiKey && { "x-api-key": apiKey }),
         ...(token && { Authorization: `Bearer ${token}` }),

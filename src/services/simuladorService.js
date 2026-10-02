@@ -293,7 +293,7 @@ export default class SimuladorService {
     try {
       const url = `${LANDING_BACKEND_URL}/api/simulador-prestamos/suscripcion-mobbex`;
       const apiKey = LANDING_BACKEND_API_KEY;
-      const body = { scoringId, linkId };
+      const body = { scoringId, ...(linkId ? { linkId } : {}) };
       const token = await getCookie(COOKIE_SIMULADOR_TOKEN_CONFIG.NAME);
       const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, token);
       if (!response.ok) {

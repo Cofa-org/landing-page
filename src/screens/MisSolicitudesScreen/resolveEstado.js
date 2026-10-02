@@ -3,9 +3,74 @@
  * Exportada separadamente para permitir unit testing sin renderizar el componente.
  */
 
+export const RESUME_ACCION = {
+  RETOMAR_REGISTRO: "retomar_registro",
+  CONTINUAR_SIMULACION: "continuar_simulacion",
+};
+
+const SIM_EN_CURSO = new Set([
+  "PENDIENTE",
+  "SIMULACION",
+  "EMAIL_VALIDATION",
+  "OTP_VALIDATION",
+  "COMPLIANCE",
+  "CBU_VALIDATION",
+  "MOBBEX_SUBSCRIPTION",
+]);
+
+const ONBOARDING_INCOMPLETO = new Set([
+  "LEAD_CREADO",
+  "CELULAR_VALIDADO",
+  "DNI_SUBIDO",
+  "RECIBO_SUBIDO",
+  "PHONE_PICKER",
+  "PENDIENTE",
+  "REALIZADO",
+]);
+
 export function addDays(iso, days) {
   if (!iso) return null;
   return new Date(new Date(iso).getTime() + days * 24 * 60 * 60 * 1000);
+}
+
+function noAprobada(fechaRechazo) {
+  return {
+    label: "No aprobada",
+    tipo: "danger",
+    descripcion: null,
+    accion: null,
+    retryDate: fechaRechazo ? addDays(fechaRechazo, 45) : null,
+  };
+}
+
+function enAnalisis() {
+  return {
+    label: "En análisis",
+    tipo: "warning",
+    descripcion: "Estamos revisando tu solicitud.",
+    accion: null,
+    retryDate: null,
+  };
+}
+
+function continuarSimulacion() {
+  return {
+    label: "Solicitud incompleta",
+    tipo: "neutral",
+    descripcion: "Continuá la simulación de tu préstamo.",
+    accion: RESUME_ACCION.CONTINUAR_SIMULACION,
+    retryDate: null,
+  };
+}
+
+function retomarRegistro() {
+  return {
+    label: "Solicitud incompleta",
+    tipo: "neutral",
+    descripcion: "Retomá tu registro donde lo dejaste.",
+    accion: RESUME_ACCION.RETOMAR_REGISTRO,
+    retryDate: null,
+  };
 }
 
 /**
@@ -13,21 +78,17 @@ export function addDays(iso, days) {
  *  tipo: 'success' | 'warning' | 'danger' | 'neutral'
  *  retryDate: Date | null  (solo para NO_APROBADA)
  *
- * Prioridad de estados (6 niveles):
- *  1. Préstamo en sistema externo → "Solicitud finalizada"
- *  2. gestión ACEPTADO → "Aprobada"
- *  3. gestión RECHAZADO → "No aprobada"
- *  4. onboarding RECHAZADO → "No aprobada"
- *  5. gestión ANALIZAR | onboarding ONBOARDING_COMPLETO → "En análisis"
- *  6. default → "Solicitud incompleta"
+ * El onboarding manda mientras el registro no terminó. estado_gestion lo
+ * copia el trigger desde scoring (ACEPTADO/ANALIZAR) apenas existe el lead,
+ * y no puede tapar "Retomá tu registro" / "Continuá tu simulación".
  *
- * Nota sobre fecha_estado_gestion vs estado_onboarding_fecha:
- *  El trigger `materialize_estado_gestion` (BEFORE UPDATE en webapp_sim_solicitudes)
- *  puede setear fecha_estado_gestion = NOW() cuando deriva estado_gestion = 'RECHAZADO'
- *  a partir de estado_onboarding = 'RECHAZADO'. Esa fecha refleja CUÁNDO CORRIÓ EL
- *  TRIGGER, no cuándo ocurrió el rechazo real.
- *  Por eso, cuando onboarding también es RECHAZADO, usamos estado_onboarding_fecha
- *  (la fecha del evento de rechazo real) como base del cálculo de los 45 días.
+ * Prioridad:
+ *  1. Préstamo SB → "Solicitud finalizada"
+ *  2. onboarding RECHAZADO / EN_ANALISIS
+ *  3. onboarding incompleto → retomar registro (ignora gestión)
+ *  4. sim en curso → continuar simulación
+ *  5. ONBOARDING_COMPLETO → continuar sim, salvo gestión/sim terminales
+ *  6. gestión ACEPTADO / RECHAZADO / ANALIZAR
  */
 export function resolveEstado(solicitud) {
   const {
@@ -40,8 +101,8 @@ export function resolveEstado(solicitud) {
 
   const gestion = estadoGestion?.toUpperCase() ?? null;
   const onboarding = estadoOnboarding?.toUpperCase() ?? null;
+  const simEstado = prestamo?.estado?.toUpperCase() ?? null;
 
-  // 1. Préstamo procesado en sistema externo → solicitud finalizada
   if (prestamo?.idPrestamoDB) {
     return {
       label: "Solicitud finalizada",
@@ -52,7 +113,50 @@ export function resolveEstado(solicitud) {
     };
   }
 
-  // 2. Aprobada por gestión
+  if (onboarding === "RECHAZADO") {
+    const fechaRechazo = estadoOnboardingFecha ?? fechaEstadoGestion ?? null;
+    return noAprobada(fechaRechazo);
+  }
+
+  if (onboarding === "EN_ANALISIS") {
+    return enAnalisis();
+  }
+
+  if (!onboarding || ONBOARDING_INCOMPLETO.has(onboarding)) {
+    return retomarRegistro();
+  }
+
+  if (simEstado && SIM_EN_CURSO.has(simEstado)) {
+    return continuarSimulacion();
+  }
+
+  if (onboarding === "ONBOARDING_COMPLETO") {
+    if (simEstado === "COMPLETADO") {
+      if (gestion === "RECHAZADO") {
+        const fechaRechazo = fechaEstadoGestion ?? estadoOnboardingFecha ?? null;
+        return noAprobada(fechaRechazo);
+      }
+      if (gestion === "ACEPTADO") {
+        return {
+          label: "Aprobada",
+          tipo: "success",
+          descripcion: "Tu solicitud fue aprobada. Estamos gestionando tu préstamo.",
+          accion: null,
+          retryDate: null,
+        };
+      }
+      return enAnalisis();
+    }
+    if (gestion === "RECHAZADO") {
+      const fechaRechazo = fechaEstadoGestion ?? estadoOnboardingFecha ?? null;
+      return noAprobada(fechaRechazo);
+    }
+    if (gestion === "ANALIZAR") {
+      return enAnalisis();
+    }
+    return continuarSimulacion();
+  }
+
   if (gestion === "ACEPTADO") {
     return {
       label: "Aprobada",
@@ -63,55 +167,14 @@ export function resolveEstado(solicitud) {
     };
   }
 
-  // 3. No aprobada — rechazada por gestión
   if (gestion === "RECHAZADO") {
-    // Si onboarding también es RECHAZADO, la gestión fue derivada por el trigger
-    // (fecha_estado_gestion = cuándo corrió el trigger, no cuándo ocurrió el rechazo).
-    // Preferimos estado_onboarding_fecha como fecha del evento real.
-    // Si el operador rechazó manualmente (onboarding != RECHAZADO), la fecha de
-    // gestión es la correcta.
-    const fechaRechazo =
-      onboarding === "RECHAZADO"
-        ? (estadoOnboardingFecha ?? fechaEstadoGestion ?? null)
-        : (fechaEstadoGestion ?? estadoOnboardingFecha ?? null);
-    return {
-      label: "No aprobada",
-      tipo: "danger",
-      descripcion: null,
-      accion: null,
-      retryDate: fechaRechazo ? addDays(fechaRechazo, 45) : null,
-    };
+    const fechaRechazo = fechaEstadoGestion ?? estadoOnboardingFecha ?? null;
+    return noAprobada(fechaRechazo);
   }
 
-  // 4. No aprobada — rechazada en onboarding (sin rechazo explícito de gestión)
-  if (onboarding === "RECHAZADO") {
-    const fechaRechazo = estadoOnboardingFecha ?? fechaEstadoGestion ?? null;
-    return {
-      label: "No aprobada",
-      tipo: "danger",
-      descripcion: null,
-      accion: null,
-      retryDate: fechaRechazo ? addDays(fechaRechazo, 45) : null,
-    };
+  if (gestion === "ANALIZAR") {
+    return enAnalisis();
   }
 
-  // 5. En análisis (onboarding completo, esperando resolución de gestión)
-  if (gestion === "ANALIZAR" || onboarding === "ONBOARDING_COMPLETO") {
-    return {
-      label: "En análisis",
-      tipo: "warning",
-      descripcion: "Estamos revisando tu solicitud.",
-      accion: null,
-      retryDate: null,
-    };
-  }
-
-  // 6. Solicitud incompleta (LEAD_CREADO, DNI_SUBIDO, CELULAR_VALIDADO, etc.)
-  return {
-    label: "Solicitud incompleta",
-    tipo: "neutral",
-    descripcion: "Para retomar tu solicitud, comunicate con un asesor.",
-    accion: null,
-    retryDate: null,
-  };
+  return retomarRegistro();
 }

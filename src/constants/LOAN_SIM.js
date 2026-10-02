@@ -123,6 +123,18 @@ export const REJECTION_CONFIG = {
       target: "_self",
     },
   },
+  SIM_RECHAZADO: {
+    cause: "SIM_RECHAZADO",
+    title: "No podemos continuar con esta simulación",
+    description:
+      "Esta solicitud ya no se puede simular. Si creés que es un error, comunicate con un asesor.",
+    illustration: "/img/rejected_empathy.webp",
+    primaryAction: {
+      label: "Comunicarme con un asesor",
+      href: "https://wa.me/5491137570853?text=Hola!!%20Necesito%20ayuda%20para%20simular%20mi%20préstamo!",
+      target: "_blank",
+    },
+  },
   PHONE_NOT_VALIDATED: {
     cause: "PHONE_NOT_VALIDATED",
     title: "En este momento no podemos avanzar con tu simulación.",

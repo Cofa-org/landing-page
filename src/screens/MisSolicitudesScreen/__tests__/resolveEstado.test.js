@@ -36,15 +36,35 @@ describe("resolveEstado — 6 estados", () => {
     expect(r.retryDate).toBeNull();
   });
 
-  it("2. gestión ACEPTADO → Aprobada", () => {
-    const r = resolveEstado({ ...base, estadoGestion: "ACEPTADO" });
+  it("2. gestión ACEPTADO + sim COMPLETADO → Aprobada", () => {
+    const r = resolveEstado({
+      ...base,
+      estadoOnboarding: "ONBOARDING_COMPLETO",
+      estadoGestion: "ACEPTADO",
+      prestamo: { estado: "COMPLETADO" },
+    });
     expect(r.label).toBe("Aprobada");
     expect(r.tipo).toBe("success");
+    expect(r.accion).toBeNull();
   });
 
-  it("2b. gestión aceptado (lowercase) → Aprobada (case-insensitive)", () => {
-    const r = resolveEstado({ ...base, estadoGestion: "aceptado" });
-    expect(r.label).toBe("Aprobada");
+  it("2b. gestión ACEPTADO no pisa onboarding incompleto", () => {
+    const r = resolveEstado({
+      ...base,
+      estadoOnboarding: "LEAD_CREADO",
+      estadoGestion: "ACEPTADO",
+    });
+    expect(r.label).toBe("Solicitud incompleta");
+    expect(r.accion).toBe("retomar_registro");
+  });
+
+  it("2c. gestión ACEPTADO + ONBOARDING_COMPLETO (sin sim) → continuar simulación", () => {
+    const r = resolveEstado({
+      ...base,
+      estadoOnboarding: "ONBOARDING_COMPLETO",
+      estadoGestion: "ACEPTADO",
+    });
+    expect(r.accion).toBe("continuar_simulacion");
   });
 
   it("3. gestión RECHAZADO + onboarding NO RECHAZADO → retryDate desde fechaEstadoGestion", () => {
@@ -124,15 +144,55 @@ describe("resolveEstado — 6 estados", () => {
     expect(r.retryDate.toISOString().slice(0, 10)).toBe(expectedRetry.toISOString().slice(0, 10));
   });
 
-  it("5a. gestión ANALIZAR → En análisis", () => {
-    const r = resolveEstado({ ...base, estadoGestion: "ANALIZAR" });
+  it("5a. gestión ANALIZAR + ONBOARDING_COMPLETO → En análisis", () => {
+    const r = resolveEstado({
+      ...base,
+      estadoOnboarding: "ONBOARDING_COMPLETO",
+      estadoGestion: "ANALIZAR",
+    });
     expect(r.label).toBe("En análisis");
     expect(r.tipo).toBe("warning");
+    expect(r.accion).toBeNull();
   });
 
-  it("5b. onboarding ONBOARDING_COMPLETO → En análisis", () => {
-    const r = resolveEstado({ ...base, estadoOnboarding: "ONBOARDING_COMPLETO" });
+  it("5a2. gestión ANALIZAR no pisa onboarding incompleto (antes del recibo)", () => {
+    const r = resolveEstado({
+      ...base,
+      estadoOnboarding: "DNI_SUBIDO",
+      estadoGestion: "ANALIZAR",
+    });
+    expect(r.accion).toBe("retomar_registro");
+  });
+
+  it("5a3. RECIBO_SUBIDO → retomar (Welcome); no se salta el click de Quiero mi préstamo", () => {
+    const r = resolveEstado({
+      ...base,
+      estadoOnboarding: "RECIBO_SUBIDO",
+      estadoGestion: "ANALIZAR",
+    });
+    expect(r.label).toBe("Solicitud incompleta");
+    expect(r.accion).toBe("retomar_registro");
+  });
+
+  it("5b. onboarding EN_ANALISIS → En análisis (sin acción)", () => {
+    const r = resolveEstado({ ...base, estadoOnboarding: "EN_ANALISIS" });
     expect(r.label).toBe("En análisis");
+    expect(r.accion).toBeNull();
+  });
+
+  it("5c. onboarding ONBOARDING_COMPLETO → continuar simulación", () => {
+    const r = resolveEstado({ ...base, estadoOnboarding: "ONBOARDING_COMPLETO" });
+    expect(r.label).toBe("Solicitud incompleta");
+    expect(r.accion).toBe("continuar_simulacion");
+  });
+
+  it("5d. simulación en Mobbex → continuar simulación", () => {
+    const r = resolveEstado({
+      ...base,
+      estadoOnboarding: "ONBOARDING_COMPLETO",
+      prestamo: { estado: "MOBBEX_SUBSCRIPTION" },
+    });
+    expect(r.accion).toBe("continuar_simulacion");
   });
 
   it("6. Estado vacío → Solicitud incompleta", () => {
@@ -164,13 +224,13 @@ describe("resolveEstado — 6 estados", () => {
   });
 
   it("prestamo sin idPrestamoDB no pisa los otros estados", () => {
-    // prestamo presente pero sin idPrestamoDB → no debe resolver como "finalizada"
     const r = resolveEstado({
       ...base,
+      estadoOnboarding: "ONBOARDING_COMPLETO",
       estadoGestion: "ACEPTADO",
-      prestamo: { idPrestamoDB: null, capitalSeleccionado: 50000 },
+      prestamo: { idPrestamoDB: null, estado: "COMPLETADO", capitalSeleccionado: 50000 },
     });
-    expect(r.label).toBe("Aprobada"); // no "Solicitud finalizada"
+    expect(r.label).toBe("Aprobada");
   });
 
   it("estado_scoring RECHAZAR solo no activa No aprobada (solo gestión y onboarding importan)", () => {

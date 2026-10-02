@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { deleteCookie, getCookie, roundToFiveHundreds, setCookieWithDuration } from "../../../lib/utils.js";
 import { useDebounce } from "../../../hooks/useDebounce";
 import SimuladorService from "../../../services/simuladorService";
+import authService from "../../../services/authService.js";
 import { COOKIE_CONFIG, COOKIE_LOAN_INFO_CONFIG, COOKIE_SIMULADOR_TOKEN_CONFIG, LOAN_SIM_STEPS } from "../../../constants/LOAN_SIM.js";
 import LinkResolutionService from "../../../services/linkResolutionService.js";
 import { ERROR_CAUSE } from "../../../constants/error";
@@ -56,103 +57,97 @@ export const useLoanSimulator = () => {
   // memory simulator-response-cause-detection-2026-07-31.
   const [rejectionReason, setRejectionReason] = useState(null);
   const shortId = searchParams.get("id");
+  const solicitudId = searchParams.get("solicitud");
 
   useEffect(() => {
-    const initVerification = async () => {
-      if (!shortId) {
-        setStep(LOAN_SIM_STEPS.LEAD_REGISTRATION);
-        return;
+    const bootstrapSimSession = async ({ scoringId, cuit, extraScoringData = {}, initShortId = null }) => {
+      let fingerprint = null;
+      try {
+        fingerprint = await getFingerprint({ scoringId });
+      } catch (fpErr) {
+        console.warn("SIMULATOR_FINGERPRINT_ERROR:", fpErr);
       }
+
+      const initResponse = await SimuladorService.iniciarSesion({
+        scoringId: String(scoringId),
+        cuit: cuit || null,
+        shortId: initShortId,
+      });
+
+      if (
+        initResponse &&
+        initResponse.success === false &&
+        initResponse.cause === "PHONE_NOT_VALIDATED"
+      ) {
+        try {
+          await deleteCookie(COOKIE_SIMULADOR_TOKEN_CONFIG.NAME);
+        } catch (delCookieErr) {
+          console.warn("DELETE_COOKIE_FAILED:", delCookieErr);
+        }
+        setRejectionReason("PHONE_NOT_VALIDATED");
+        setStep(LOAN_SIM_STEPS.RECHAZADO);
+        setInitialSimulationResolved(true);
+        return false;
+      }
+
+      if (!initResponse || initResponse.success !== true) {
+        setError(
+          initResponse?.message
+            ? `${initResponse.message} 😊`
+            : "No se pudo iniciar la sesión del simulador. Por favor, intenta nuevamente.",
+        );
+        setInitialSimulationResolved(true);
+        return false;
+      }
+
+      setScoringData({
+        scoringId: String(scoringId),
+        cuit: cuit || null,
+        nombreCompleto: extraScoringData.nombreCompleto || null,
+        capitalMaximoOperador: extraScoringData.capitalMaximoOperador || null,
+        tasaOperador: extraScoringData.tasaOperador || null,
+        plazoMaximoOperador: extraScoringData.plazoMaximoOperador || null,
+        cuotaADescontar: extraScoringData.cuotaADescontar || null,
+        nroCuota: extraScoringData.nroCuota || null,
+        nroPrestamo: extraScoringData.nroPrestamo || null,
+        motivo: extraScoringData.motivo || null,
+      });
+      setHuellaData(mapFingerprintToHuellaData(fingerprint));
+      setHuellaRequestId(fingerprint?.requestId || null);
+      return true;
+    };
+
+    const initVerification = async () => {
       setLoading(true);
       setStep(LOAN_SIM_STEPS.SIMULACION);
       try {
-       
-        const response = await LinkResolutionService.consumeLink(shortId);
-        if (response.success && response.data) {
-          // Get the fingerprint BEFORE any state update that triggers the initial
-          // fetch. This way, scoringId and huellaData are set in the same React
-          // batch → 1 re-render → 1 fetchSimulation call → 1 backend insert.
-          // If we set scoringId first, the initial fetch effect fires without
-          // huellaData; then when huellaData arrives a second render triggers the
-          // effect again → 2 calls → 2 simulations persisted.
-          let fingerprint = null;
-          try {
-            fingerprint = await getFingerprint({
+        if (shortId) {
+          const response = await LinkResolutionService.consumeLink(shortId);
+          if (response.success && response.data) {
+            await bootstrapSimSession({
               scoringId: response.data.scoringId,
+              cuit: response.data.cuit || null,
+              extraScoringData: response.data,
+              initShortId: shortId,
             });
-          } catch (fpErr) {
-            console.warn("SIMULATOR_FINGERPRINT_ERROR:", fpErr);
+          } else {
+            const errorMessage =
+              response.message || response.error?.message || "El enlace de acceso es inválido o ha expirado";
+            setError(`${errorMessage} 😕`);
           }
-
-          // Intercambiar scoringId/cuit por un JWT del simulador ANTES de
-          // setScoringData: si lo hacemos después, el effect que dispara
-          // calcularPlanes al detectar scoringId correría antes de que el
-          // cookie del token esté escrita → 401 en la primera llamada.
-          // Espejo del patrón de useLeadRegistration: tras crearLead, setCookie(COOKIE_LEAD_TOKEN_CONFIG).
-          // Después de Task 4, iniciarSesion SIEMPRE retorna jsonResponse
-          // (no tira en success=false porque el back responde HTTP 200).
-          // Inspeccionar success/cause DESPUÉS del await (no en el catch)
-          // — patrón de useOnboardingFlow/useLeadRegistration, per memory
-          // simulator-response-cause-detection-2026-07-31.
-          const initResponse = await SimuladorService.iniciarSesion({
-            scoringId: String(response.data.scoringId),
-            cuit: response.data.cuit || null,
-            shortId: shortId || null,
-          });
-
-          if (
-            initResponse &&
-            initResponse.success === false &&
-            initResponse.cause === "PHONE_NOT_VALIDATED"
-          ) {
-            // Limpiar cookie simuladorToken por las dudas (caso sesión cruzada).
-            try {
-              await deleteCookie(COOKIE_SIMULADOR_TOKEN_CONFIG.NAME);
-            } catch (delCookieErr) {
-              console.warn("DELETE_COOKIE_FAILED:", delCookieErr);
-            }
-            setRejectionReason("PHONE_NOT_VALIDATED");
-            setStep(LOAN_SIM_STEPS.RECHAZADO);
-            // initialSimulationResolved se setea en el finally de abajo.
-            setInitialSimulationResolved(true);
-            return;
-          }
-
-          if (!initResponse || initResponse.success !== true) {
-            // Cualquier otro cause de /init → error genérico (no es
-            // PHONE_NOT_VALIDATED, así que no mostramos la pantalla de asesor).
-            setError(
-              initResponse?.message
-                ? `${initResponse.message} 😊`
-                : "No se pudo iniciar la sesión del simulador. Por favor, intenta nuevamente.",
-            );
-            setInitialSimulationResolved(true);
-            return;
-          }
-
-          // All setState calls below execute in the same synchronous chunk.
-          // React 18 batches them into a single render → the initial fetch
-          // effect runs exactly once with both scoringId and huellaData ready.
-          setScoringData({
-            scoringId: String(response.data.scoringId),
-            cuit: response.data.cuit || null,
-            nombreCompleto: response.data.nombreCompleto || null,
-            capitalMaximoOperador: response.data.capitalMaximoOperador || null,
-            tasaOperador: response.data.tasaOperador || null,
-            plazoMaximoOperador: response.data.plazoMaximoOperador || null,
-            cuotaADescontar: response.data.cuotaADescontar || null,
-            nroCuota: response.data.nroCuota || null,
-            nroPrestamo: response.data.nroPrestamo || null,
-            motivo: response.data.motivo || null,
-          });
-
-          setHuellaData(mapFingerprintToHuellaData(fingerprint));
-          setHuellaRequestId(fingerprint?.requestId || null);
-        } else {
-          const errorMessage =
-            response.message || response.error?.message || "El enlace de acceso es inválido o ha expirado";
-          setError(`${errorMessage} 😕`);
+          return;
         }
+
+        const resume = await authService.resumeSolicitud(solicitudId);
+        if (resume.kind !== "simulador" || !resume.data?.scoringId) {
+          setError("No pudimos abrir el simulador. Intentá de nuevo desde tus solicitudes.");
+          setInitialSimulationResolved(true);
+          return;
+        }
+        await bootstrapSimSession({
+          scoringId: resume.data.scoringId,
+          cuit: resume.data.cuit || null,
+        });
       } catch (err) {
         setError(err.message ? `${err.message} 😊` : "Error al verificar el acceso");
         console.error("VERIFY_LINK_ERROR:", err);
@@ -162,7 +157,7 @@ export const useLoanSimulator = () => {
     };
 
     initVerification();
-  }, [shortId]);
+  }, [shortId, solicitudId]);
 
   const fetchSimulation = useCallback(
     async (currentAmount, isInitial = false) => {
