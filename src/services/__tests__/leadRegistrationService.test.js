@@ -188,3 +188,98 @@ describe("LeadRegistrationService.iniciarSesionResume (recibo-resubida-operador 
     expect(fetchOpts.headers.Authorization).toBeUndefined();
   });
 });
+
+// Plan 2026-09-29 (cliente email OTP): tests para preservación de `cause` en
+// errores 4xx. Whole-branch review BLOCKER #1: si el front service descarta
+// `data.cause`, el hook `useEmailOTP.verificarOTPEmail` no puede distinguir
+// OTP_INVALID (recoverable) de OTP_MAX_FAIL_ATTEMPTS_EXCEEDED (terminal
+// → navegar a RECHAZADO).
+describe("LeadRegistrationService.email OTP — preserva cause en errores 4xx", () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+    global.fetch = vi.fn();
+  });
+
+  it("verificarOTPEmail: error 400 + data.cause=OTP_MAX_FAIL_ATTEMPTS_EXCEEDED → el throw preserva err.cause", async () => {
+    global.fetch.mockResolvedValue({
+      ok: false,
+      json: () =>
+        Promise.resolve({
+          message: "Alcanzaste el máximo de intentos fallidos",
+          cause: "OTP_MAX_FAIL_ATTEMPTS_EXCEEDED",
+        }),
+    });
+
+    let caught;
+    try {
+      await LeadRegistrationService.verificarOTPEmail({ codigo: "111111" });
+    } catch (e) {
+      caught = e;
+    }
+
+    expect(caught).toBeInstanceOf(Error);
+    expect(caught.cause).toBe("OTP_MAX_FAIL_ATTEMPTS_EXCEEDED");
+    expect(caught.message).toBe("Alcanzaste el máximo de intentos fallidos");
+  });
+
+  it("verificarOTPEmail: error 400 + data.cause=OTP_INVALID → el throw preserva err.cause (recoverable)", async () => {
+    global.fetch.mockResolvedValue({
+      ok: false,
+      json: () =>
+        Promise.resolve({
+          message: "El código que ingresaste no es correcto",
+          cause: "OTP_INVALID",
+        }),
+    });
+
+    let caught;
+    try {
+      await LeadRegistrationService.verificarOTPEmail({ codigo: "000000" });
+    } catch (e) {
+      caught = e;
+    }
+
+    expect(caught.cause).toBe("OTP_INVALID");
+  });
+
+  it("verificarOTPEmail: error 400 sin cause → throw normal sin .cause (no rompe)", async () => {
+    global.fetch.mockResolvedValue({
+      ok: false,
+      json: () =>
+        Promise.resolve({
+          message: "Algo salió mal",
+          // sin cause
+        }),
+    });
+
+    let caught;
+    try {
+      await LeadRegistrationService.verificarOTPEmail({ codigo: "111111" });
+    } catch (e) {
+      caught = e;
+    }
+
+    expect(caught).toBeInstanceOf(Error);
+    expect(caught.cause).toBeUndefined();
+  });
+
+  it("solicitarOTPEmail: error 400 + data.cause=CELULAR_SIN_EMAIL_EN_SB → el throw preserva err.cause", async () => {
+    global.fetch.mockResolvedValue({
+      ok: false,
+      json: () =>
+        Promise.resolve({
+          message: "Tu cuenta en SB no tiene un email registrado",
+          cause: "CELULAR_SIN_EMAIL_EN_SB",
+        }),
+    });
+
+    let caught;
+    try {
+      await LeadRegistrationService.solicitarOTPEmail({});
+    } catch (e) {
+      caught = e;
+    }
+
+    expect(caught.cause).toBe("CELULAR_SIN_EMAIL_EN_SB");
+  });
+});

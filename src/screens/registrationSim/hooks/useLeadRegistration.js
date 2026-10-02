@@ -357,5 +357,6 @@ export const useLeadRegistration = (turnstileToken) => {
     setCurrentSlide,
     handleExpire,
     handleError,
+    setFormData,
   };
 };

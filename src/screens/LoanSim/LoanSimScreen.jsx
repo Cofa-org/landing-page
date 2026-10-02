@@ -19,17 +19,19 @@ const OTPValidation = lazy(() => import("../../Components/OTPValidation/OTPValid
 const ComplianceStep = lazy(() => import("./components/ComplianceStep/ComplianceStep"));
 const CBUValidation = lazy(() => import("./components/CBUValidation/CBUValidation"));
 const SuccessStep = lazy(() => import("./components/SuccessStep/SuccessStep"));
-const MobbexSubscriptionStep = lazy(() =>
-  import("./components/MobbexSubscriptionStep/MobbexSubscriptionStep"),
+const MobbexSubscriptionStep = lazy(
+  () => import("./components/MobbexSubscriptionStep/MobbexSubscriptionStep"),
 );
-const RejectedStep = lazy(() =>
-  import("./components/RejectedStep/RejectedStep"),
-);
+const RejectedStep = lazy(() => import("./components/RejectedStep/RejectedStep"));
 import { useLoanSimulator } from "./hooks/useLoanSimulator";
 import { useComplianceForm } from "./hooks/useComplianceForm";
+import { useTestSimuladorPanel } from "./hooks/useTestSimuladorPanel";
+import TestSimuladorPanel from "./components/TestSimuladorPanel/TestSimuladorPanel.jsx";
 import styles from "./LoanSimScreen.module.css";
 
 const LoanSimScreen = () => {
+  const testPanel = useTestSimuladorPanel();
+  
   const {
     amount,
     installment,
@@ -74,8 +76,7 @@ const LoanSimScreen = () => {
   // finally de fetchSimulation, así que cubre éxito y error.
   const isInitializing = !initialSimulationResolved;
 
-  const isFirstOrLastStep = step === LOAN_SIM_STEPS.SIMULACION || step === LOAN_SIM_STEPS.COMPLETADO || step === LOAN_SIM_STEPS.RECHAZADO || step === LOAN_SIM_STEPS.DISPOSITIVO_RECHAZADO;
-  const shouldHideCallbell = isInitializing || isFirstOrLastStep;
+  const shouldHideCallbell = isInitializing;
 
   useEffect(() => {
     if (shouldHideCallbell) {
@@ -83,7 +84,7 @@ const LoanSimScreen = () => {
     } else {
       toggleCallbellWebchat(true);
     }
-    
+
     return () => {
       toggleCallbellWebchat(true);
     };
@@ -120,6 +121,7 @@ const LoanSimScreen = () => {
     existingCompliance,
     cuit,
   );
+
 
   const renderStep = () => {
     return (
@@ -247,7 +249,13 @@ const LoanSimScreen = () => {
             <GenericButton
               type='button'
               variant='primary'
-              onClick={() => window.open("https://wa.me/5491137570853?text=Hola!!%20Necesito%20ayuda%20para%20simular%20mi%20pr%C3%A9stamo!", "_blank", "noopener,noreferrer")}
+              onClick={() =>
+                window.open(
+                  "https://wa.me/5491137570853?text=Hola!!%20Necesito%20ayuda%20para%20simular%20mi%20pr%C3%A9stamo!",
+                  "_blank",
+                  "noopener,noreferrer",
+                )
+              }
               style={{ marginTop: "1rem" }}
             >
               Comunicarse con un asesor
@@ -262,10 +270,7 @@ const LoanSimScreen = () => {
   if (isInitializing) {
     return (
       <>
-        <Header 
-          hideHelpButton={true} 
-          helpButtonPreset="Hola!! Necesito ayuda para simular mi préstamo!" 
-        />
+        <Header />
         <div className={styles.homeCalculator_calculatorBox}>
           <div className={styles.calculatorContainer}>
             <div className={styles.loaderContainer}>
@@ -279,13 +284,17 @@ const LoanSimScreen = () => {
     );
   }
 
-
   return (
     <>
-      <Header 
-        hideHelpButton={isFirstOrLastStep} 
-        helpButtonPreset="Hola!! Necesito ayuda para simular mi préstamo!" 
-      />
+      {testPanel.personas.length > 0 && (
+        <TestSimuladorPanel
+          personas={testPanel.personas}
+          loading={testPanel.loading}
+          onSelectPersona={testPanel.selectPersona}
+          onReset={testPanel.resetSession}
+        />
+      )}
+      <Header />
       <main id='main-content'>
         <div className={styles.splitLayout}>
           <div className={styles.leftColumn}>

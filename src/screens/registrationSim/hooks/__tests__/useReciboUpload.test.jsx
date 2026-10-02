@@ -743,6 +743,65 @@ describe("useReciboUpload", () => {
       expect(result.current.slots[0]?.error).toContain("decode failed");
     });
 
+    /**
+     * RED — recibo HEIC decode fail 2026-09-23 (lead 16582 / LEDESMA).
+     *
+     * Caso: Chrome en Android (sin códec HEIC expuesto al motor de decode del
+     * browser) tira `Error("image decode failed")` en `createImageBitmap` y
+     * `<img>` fallback. El comportamiento PRE-FIX era dropear el file en slot
+     * 'error', impidiendo que `uploadAll` lo mande al back — `convertHeicToJpg`
+     * (sharp) NUNCA corría y el usuario quedaba bloqueado.
+     *
+     * El fix es fallback específico para HEIC/HEIF: dejar el slot en 'idle'
+     * con el file original para que el back corra `convertHeicToJpg`. Otros
+     * tipos (JPEG/PNG/WEBP corruptos) NO tienen segunda red → mantienen 'error'.
+     */
+    it("HEIC: si compressImageFile rechaza (decode local falla en Android Chrome), deja slot 'idle' para que el back convierta con sharp", async () => {
+      isCompressibleImage.mockReturnValue(true);
+      compressImageFile.mockRejectedValue(new Error("image decode failed"));
+
+      const { result } = renderHook(() => useReciboUpload());
+      const heicFile = new File(["heic-binary"], "recibo.heic", { type: "image/heic" });
+      await act(async () => {
+        await result.current.addFileToSlot(1, heicFile);
+      });
+
+      expect(result.current.slots[0]?.status).toBe("idle");
+      expect(result.current.slots[0]?.file).toBe(heicFile);
+      expect(result.current.slots[0]?.error).toBeUndefined();
+    });
+
+    it("HEIF: idem HEIC (mismo branch en convertHeicToJpg — sniffed bytes)", async () => {
+      isCompressibleImage.mockReturnValue(true);
+      compressImageFile.mockRejectedValue(new Error("image decode failed"));
+
+      const { result } = renderHook(() => useReciboUpload());
+      const heifFile = new File(["heif-binary"], "recibo.heif", { type: "image/heif" });
+      await act(async () => {
+        await result.current.addFileToSlot(1, heifFile);
+      });
+
+      expect(result.current.slots[0]?.status).toBe("idle");
+      expect(result.current.slots[0]?.file).toBe(heifFile);
+    });
+
+    it("JPEG: si compressImageFile rechaza, MANTIENE slot 'error' (sin segunda red en el back)", async () => {
+      // Caso explícito de no-regresión: JPEG/PNG/WEBP corruptos NO tienen
+      // fallback en el back (`convertHeicToJpg` solo aplica a HEIC/HEIF
+      // sniff). Si el decode local falla, pedir al usuario que re-suba
+      // sigue siendo lo correcto.
+      isCompressibleImage.mockReturnValue(true);
+      compressImageFile.mockRejectedValue(new Error("decode failed"));
+
+      const { result } = renderHook(() => useReciboUpload());
+      const jpeg = new File(["orig"], "r.jpg", { type: "image/jpeg" });
+      await act(async () => {
+        await result.current.addFileToSlot(1, jpeg);
+      });
+      expect(result.current.slots[0]?.status).toBe("error");
+      expect(result.current.slots[0]?.error).toContain("decode failed");
+    });
+
     it("JPEG: el preview URL se reemplaza por el del blob comprimido", async () => {
       isCompressibleImage.mockReturnValue(true);
       const compressed = new File(["cmp"], "r.jpg", { type: "image/jpeg" });

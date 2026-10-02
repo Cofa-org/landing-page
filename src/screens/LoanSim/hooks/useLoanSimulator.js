@@ -1,10 +1,20 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
-import { deleteCookie, getCookie, roundToFiveHundreds, setCookieWithDuration } from "../../../lib/utils.js";
+import {
+  deleteCookie,
+  getCookie,
+  roundToFiveHundreds,
+  setCookieWithDuration,
+} from "../../../lib/utils.js";
 import { useDebounce } from "../../../hooks/useDebounce";
 import SimuladorService from "../../../services/simuladorService";
 import authService from "../../../services/authService.js";
-import { COOKIE_CONFIG, COOKIE_LOAN_INFO_CONFIG, COOKIE_SIMULADOR_TOKEN_CONFIG, LOAN_SIM_STEPS } from "../../../constants/LOAN_SIM.js";
+import {
+  COOKIE_CONFIG,
+  COOKIE_LOAN_INFO_CONFIG,
+  COOKIE_SIMULADOR_TOKEN_CONFIG,
+  LOAN_SIM_STEPS,
+} from "../../../constants/LOAN_SIM.js";
 import LinkResolutionService from "../../../services/linkResolutionService.js";
 import { ERROR_CAUSE } from "../../../constants/error";
 import { getFingerprint, mapFingerprintToHuellaData } from "../../../lib/fingerprint.js";
@@ -59,7 +69,37 @@ export const useLoanSimulator = () => {
   const shortId = searchParams.get("id");
   const solicitudId = searchParams.get("solicitud");
 
+  const tpParam = searchParams.get("tp");
+
   useEffect(() => {
+    const applyHuella = (fingerprint) => {
+      let testHuellaMock = null;
+      try {
+        const raw = sessionStorage.getItem("simuladorTestPersona");
+        if (raw) {
+          const stored = JSON.parse(raw);
+          if (stored?.simuladorConfig?.huellaVisitorId) {
+            testHuellaMock = stored.simuladorConfig.huellaVisitorId;
+          }
+        }
+      } catch {
+        // ignore — fingerprint real
+      }
+      if (testHuellaMock) {
+        setHuellaData({
+          visitor_id: testHuellaMock,
+          ip_address: "127.0.0.1",
+          browser_name: fingerprint?.browserName || "test",
+          browser_version: fingerprint?.browserVersion || "0",
+          plataforma: "test",
+          es_movil: false,
+        });
+      } else {
+        setHuellaData(mapFingerprintToHuellaData(fingerprint));
+      }
+      setHuellaRequestId(fingerprint?.requestId || null);
+    };
+
     const bootstrapSimSession = async ({ scoringId, cuit, extraScoringData = {}, initShortId = null }) => {
       let fingerprint = null;
       try {
@@ -112,15 +152,37 @@ export const useLoanSimulator = () => {
         nroPrestamo: extraScoringData.nroPrestamo || null,
         motivo: extraScoringData.motivo || null,
       });
-      setHuellaData(mapFingerprintToHuellaData(fingerprint));
-      setHuellaRequestId(fingerprint?.requestId || null);
+      applyHuella(fingerprint);
       return true;
     };
 
+    const resolveTestPersona = () => {
+      if (!tpParam) return null;
+      try {
+        const raw = sessionStorage.getItem("simuladorTestPersona");
+        if (!raw) return null;
+        const stored = JSON.parse(raw);
+        if (stored && stored.id === tpParam) return stored;
+      } catch {
+        // ignore — fall through
+      }
+      return null;
+    };
+
     const initVerification = async () => {
+      const mockPersona = resolveTestPersona();
       setLoading(true);
       setStep(LOAN_SIM_STEPS.SIMULACION);
       try {
+        if (mockPersona) {
+          await bootstrapSimSession({
+            scoringId: String(mockPersona.simuladorConfig?.scoringId || mockPersona.dni || ""),
+            cuit: (mockPersona.cuit || "").replace(/-/g, "") || null,
+            extraScoringData: { nombreCompleto: mockPersona.nombreCompleto || null },
+          });
+          return;
+        }
+
         if (shortId) {
           const response = await LinkResolutionService.consumeLink(shortId);
           if (response.success && response.data) {
@@ -157,7 +219,7 @@ export const useLoanSimulator = () => {
     };
 
     initVerification();
-  }, [shortId, solicitudId]);
+  }, [shortId, solicitudId, tpParam]);
 
   const fetchSimulation = useCallback(
     async (currentAmount, isInitial = false) => {
@@ -205,7 +267,7 @@ export const useLoanSimulator = () => {
         }
 
         const response = await SimuladorService.calcularPlanes(params, controller.signal);
-     
+      
         // Discard response if this request was superseded by a newer one.
         if (controller.signal.aborted) return;
 
@@ -372,7 +434,7 @@ export const useLoanSimulator = () => {
         };
 
         const response = await SimuladorService.guardarPlan(payload);
-        
+
         if (
           (response.success && !existingSimulation?.email_validado) ||
           (response.data && !existingSimulation?.email_validado)
@@ -436,9 +498,7 @@ export const useLoanSimulator = () => {
         setEmail(emailValue);
         setStep(LOAN_SIM_STEPS.OTP_VALIDATION);
       } else {
-        setError(
-          response.message ? `${response.message} 😊` : "Error al validar el email",
-        );
+        setError(response.message ? `${response.message} 😊` : "Error al validar el email");
       }
     } catch (err) {
       setError(err.message ? `${err.message} 😊` : "Error de conexión al validar email");
@@ -448,6 +508,7 @@ export const useLoanSimulator = () => {
   };
 
   const verificarOTP = async (code) => {
+   
     setValidating(true);
     setError(null);
     try {
@@ -457,6 +518,7 @@ export const useLoanSimulator = () => {
         scoringId: scoringData.scoringId,
       };
       const response = await SimuladorService.verificarOTP(params);
+      
       if (response.success || response.data) {
         setStep(LOAN_SIM_STEPS.COMPLIANCE);
       } else {
@@ -500,11 +562,7 @@ export const useLoanSimulator = () => {
         );
       }
     } catch (err) {
-      setError(
-        err.message
-          ? `${err.message} 😊`
-          : "Error de conexión al guardar compliance",
-      );
+      setError(err.message ? `${err.message} 😊` : "Error de conexión al guardar compliance");
     } finally {
       setValidating(false);
     }
@@ -602,11 +660,7 @@ export const useLoanSimulator = () => {
     // Cookie scoringId: legacy — se setea para no romper sistemas externos
     // que la busquen. No se usa en el nuevo flujo del simulador.
     try {
-      await setCookieWithDuration(
-        COOKIE_CONFIG.NAME,
-        scoringId,
-        COOKIE_CONFIG.EXPIRY_MS,
-      );
+      await setCookieWithDuration(COOKIE_CONFIG.NAME, scoringId, COOKIE_CONFIG.EXPIRY_MS);
     } catch (err) {
       console.error("SCORING_ID_COOKIE_ERROR:", err);
     }
