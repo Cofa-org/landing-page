@@ -36,7 +36,7 @@ async function authFetch(path, { method = "POST", body } = {}) {
 const authService = {
   /**
    * Iter 1: Resuelve identidades AFIP para un DNI.
-   * Devuelve { identities: [{cuit, nombreCompleto}], existingClient: {maskedEmail}|null }
+   * Devuelve { identities, existingClient: { maskedEmail, alreadyRegistered, verified }|null }
    */
   resolveDni: (dni, turnstileToken) =>
     authFetch("/dni/resolve", { body: { dni, turnstileToken } }),

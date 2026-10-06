@@ -179,7 +179,7 @@ function SolicitudesResumen() {
             <span className={styles.solicitudesText}>
               Todavía no tenés solicitudes.
             </span>
-            <Link to="/" className={styles.solicitudesLink}>
+            <Link to="/registro-simulador" className={styles.solicitudesLink}>
               Quiero mi préstamo →
             </Link>
           </div>
@@ -273,7 +273,7 @@ function PrestamosResumen() {
             <span className={styles.solicitudesText}>
               No tenés préstamos en tu historial.
             </span>
-            <Link to="/" className={styles.solicitudesLink}>
+            <Link to="/registro-simulador" className={styles.solicitudesLink}>
               Quiero mi préstamo →
             </Link>
           </div>

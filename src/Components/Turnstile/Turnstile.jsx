@@ -14,6 +14,7 @@ const Turnstile = forwardRef(
       onVerify,
       onExpire,
       onError,
+      appearance = "always",
     },
     ref,
   ) => {
@@ -57,6 +58,7 @@ const Turnstile = forwardRef(
             containerRef.current,
             {
               sitekey: siteKey,
+              appearance,
               callback(token) {
                 onVerify?.(token);
               },
@@ -98,6 +100,7 @@ const Turnstile = forwardRef(
       };
     }, [
       siteKey,
+      appearance,
       onVerify,
       onExpire,
       onError,

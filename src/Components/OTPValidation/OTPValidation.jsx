@@ -14,6 +14,7 @@ const OTPValidation = ({
   error,
   destination,
   destinationType = "email",
+  children,
 }) => {
   const otpLength =
     destinationType === OTP_CONFIG.DESTINATION_TYPE.PHONE
@@ -95,6 +96,8 @@ const OTPValidation = ({
 
       {error && <div className={styles.errorText}>{error}</div>}
 
+      {children}
+
       <GenericButton type='submit' loading={loading} disabled={!isComplete}>
         Verificar código
       </GenericButton>
@@ -115,6 +118,7 @@ OTPValidation.propTypes = {
   error: PropTypes.string,
   destination: PropTypes.string,
   destinationType: PropTypes.oneOf(["phone", "email"]),
+  children: PropTypes.node,
 };
 
 export default memo(OTPValidation);

@@ -128,7 +128,7 @@ function EmptyState() {
         solicitudes va a aparecer acá.
       </p>
       <div className={styles.emptyAction}>
-        <Link to="/" className="primary-btn">
+        <Link to="/registro-simulador" className="primary-btn">
           Quiero mi préstamo
         </Link>
       </div>

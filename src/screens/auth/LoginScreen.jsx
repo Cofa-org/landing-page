@@ -8,6 +8,7 @@ import GenericButton from "../../Components/buttons/GenericButton/GenericButton.
 import Turnstile from "../../Components/Turnstile/Turnstile.jsx";
 import { useAuth } from "../../context/index.js";
 import { TURNSTILE_SITE_KEY } from "../../config.js";
+import HoneypotField from "./HoneypotField.jsx";
 import styles from "./auth.module.css";
 
 const LoginScreen = () => {
@@ -104,17 +105,7 @@ const LoginScreen = () => {
               <Link to="/recuperar-contrasena">¿Olvidaste tu contraseña?</Link>
             </div>
 
-            {/* Honeypot — campo oculto anti-bot */}
-            <input
-              type="text"
-              name="website"
-              tabIndex={-1}
-              autoComplete="off"
-              aria-hidden="true"
-              value={honeypot}
-              onChange={(e) => setHoneypot(e.target.value)}
-              style={{ position: "absolute", left: "-9999px", top: "auto", width: "1px", height: "1px", overflow: "hidden", opacity: 0 }}
-            />
+            <HoneypotField value={honeypot} onChange={(e) => setHoneypot(e.target.value)} />
 
             <div className={styles.turnstileWrapper}>
               <Turnstile

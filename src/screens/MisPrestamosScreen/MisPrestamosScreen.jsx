@@ -121,7 +121,7 @@ function EmptyState() {
         COFA, acá vas a ver los vigentes, finalizados y cancelados.
       </p>
       <div className={styles.emptyAction}>
-        <Link to="/" className="primary-btn">
+        <Link to="/registro-simulador" className="primary-btn">
           Quiero mi préstamo
         </Link>
       </div>

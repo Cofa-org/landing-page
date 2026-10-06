@@ -48,7 +48,9 @@ describe("MisPrestamosScreen", () => {
       }),
     ).toBeTruthy();
     expect(screen.getByText(/vigentes, finalizados y cancelados/i)).toBeTruthy();
-    expect(screen.getByRole("link", { name: /quiero mi préstamo/i })).toBeTruthy();
+    expect(screen.getByRole("link", { name: /quiero mi préstamo/i }).getAttribute("href")).toBe(
+      "/registro-simulador",
+    );
     expect(screen.getByRole("navigation", { name: /secciones de tu cuenta/i })).toBeTruthy();
   });
 

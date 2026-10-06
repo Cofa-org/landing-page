@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Header, Footer } from "../../Components/index.js";
 import GenericButton from "../../Components/buttons/GenericButton/GenericButton.jsx";
 import PasswordInput from "../../Components/Forms/GenericInput/PasswordInput.jsx";
@@ -118,8 +119,8 @@ function CambiarEmail({ onEmailChanged }) {
     setLoading(true);
     try {
       const res = await authService.confirmEmailChange(code);
-      setSuccess(res.message || "Email actualizado. Vas a ser desconectado.");
-      setTimeout(() => onEmailChanged(), 2500);
+      setSuccess(res.message || "Email actualizado. Ingresá de nuevo con tu nuevo email.");
+      setTimeout(() => onEmailChanged(), 2000);
     } catch (err) {
       setError(err.message || "El código es inválido o expiró. Pedí uno nuevo.");
     } finally {
@@ -209,9 +210,11 @@ function CambiarEmail({ onEmailChanged }) {
 
 const ConfiguracionScreen = () => {
   const { logout } = useAuth();
+  const navigate = useNavigate();
 
   const handleEmailChanged = async () => {
     await logout();
+    navigate("/ingresar", { replace: true });
   };
 
   return (

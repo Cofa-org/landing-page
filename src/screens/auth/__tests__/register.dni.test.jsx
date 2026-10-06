@@ -180,6 +180,28 @@ describe("RegisterScreen — paso DNI inicial", () => {
     });
   });
 
+  it("con cuenta ya verificada → muestra email enmascarado y avisa que ya tiene cuenta", async () => {
+    mockResolveDni.mockResolvedValue({
+      identities: [{ cuit: "20301234568", nombreCompleto: "Juan Pérez" }],
+      existingClient: {
+        cuit: "20301234568",
+        maskedEmail: "j****ez@gm****.com",
+        alreadyRegistered: true,
+        verified: true,
+      },
+    });
+    renderScreen();
+    const input = screen.getByLabelText(/dni/i);
+    fireEvent.change(input, { target: { value: "30123456" } });
+    fireEvent.submit(input.closest("form"));
+
+    await waitFor(() => {
+      expect(screen.getByText(/tu cuenta ya está activa/i)).toBeTruthy();
+      expect(screen.getByText(/j\*\*\*\*ez@gm\*\*\*\*\.com/)).toBeTruthy();
+      expect(screen.getByRole("button", { name: /ingresar/i })).toBeTruthy();
+    });
+  });
+
   it("error del servicio muestra mensaje al usuario", async () => {
     mockResolveDni.mockRejectedValue(new Error("Error de conexión"));
     renderScreen();

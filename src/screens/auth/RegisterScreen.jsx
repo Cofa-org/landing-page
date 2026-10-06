@@ -9,6 +9,7 @@ import Turnstile from "../../Components/Turnstile/Turnstile.jsx";
 import OTPValidation from "../../Components/OTPValidation/OTPValidation.jsx";
 import authService from "../../services/authService.js";
 import { TURNSTILE_SITE_KEY } from "../../config.js";
+import HoneypotField from "./HoneypotField.jsx";
 import styles from "./auth.module.css";
 
 /**
@@ -16,7 +17,8 @@ import styles from "./auth.module.css";
  * DNI         — el usuario ingresa su DNI
  * IDENTITY    — selección de CUIT cuando el padrón devuelve múltiples identidades
  * REGISTER    — nuevo usuario: ingresa email + contraseña
- * EXISTING    — cliente existente: el sistema ya tiene su email; ingresa solo contraseña
+ * EXISTING    — hay email asociado (lead SB o cuenta no verificada); ingresa solo contraseña
+ * ALREADY_REGISTERED — cuenta verificada para ese DNI/CUIT; ir a login
  * VERIFY      — verificación OTP del email
  */
 const STEP = {
@@ -24,7 +26,16 @@ const STEP = {
   IDENTITY: "identity",
   REGISTER: "register",
   EXISTING: "existing",
+  ALREADY_REGISTERED: "already_registered",
   VERIFY: "verify",
+};
+
+const nextStepFromExisting = (existingClient) => {
+  if (!existingClient?.maskedEmail) return STEP.REGISTER;
+  if (existingClient.alreadyRegistered && existingClient.verified) {
+    return STEP.ALREADY_REGISTERED;
+  }
+  return STEP.EXISTING;
 };
 
 /* ── Panel izquierdo compartido ──────────────────────────────────── */
@@ -57,6 +68,7 @@ const RegisterScreen = () => {
   // Para clientes existentes: email determinado por el sistema (NO ingresado por el usuario)
   const [existingMaskedEmail, setExistingMaskedEmail] = useState("");
   const [existingFullEmail, setExistingFullEmail] = useState(""); // solo para el paso OTP
+  const [existingFromResolve, setExistingFromResolve] = useState(null);
 
   // Para nuevos usuarios: email + contraseña ingresados por el usuario
   const [email, setEmail] = useState("");
@@ -112,22 +124,18 @@ const RegisterScreen = () => {
     try {
       const result = await authService.resolveDni(dni.trim(), turnstileDni);
 
+      const existing = result.existingClient ?? null;
+      setExistingFromResolve(existing);
+      setExistingMaskedEmail(existing?.maskedEmail || "");
+
       if (result.identities.length > 1) {
         // Múltiples CUITs → el usuario elige
         setIdentities(result.identities);
-        if (result.existingClient) {
-          setExistingMaskedEmail(result.existingClient.maskedEmail);
-        }
         setStep(STEP.IDENTITY);
       } else if (result.identities.length === 1) {
         const cuit = result.identities[0].cuit;
         setSelectedCuit(cuit);
-        if (result.existingClient) {
-          setExistingMaskedEmail(result.existingClient.maskedEmail);
-          setStep(STEP.EXISTING);
-        } else {
-          setStep(STEP.REGISTER);
-        }
+        setStep(nextStepFromExisting(existing));
       } else {
         // Sin identidades en padrón → BLOQUEAR. El CUIT es obligatorio (Iter 1).
         // padronOk: true  → DNI no figura en AFIP (identidad no verificable)
@@ -152,12 +160,9 @@ const RegisterScreen = () => {
   /* ── Paso 1b: selección de identidad ── */
   const handleIdentitySelect = (cuit) => {
     setSelectedCuit(cuit);
-    // Si el cuit seleccionado coincide con el del cliente existente, ir a EXISTING
-    if (existingMaskedEmail) {
-      setStep(STEP.EXISTING);
-    } else {
-      setStep(STEP.REGISTER);
-    }
+    const match = existingFromResolve?.cuit === cuit ? existingFromResolve : null;
+    setExistingMaskedEmail(match?.maskedEmail || "");
+    setStep(nextStepFromExisting(match));
   };
 
   /* ── Paso 2a: registro de nuevo usuario ── */
@@ -196,6 +201,11 @@ const RegisterScreen = () => {
         passwordExisting,
         turnstileExisting,
       );
+      if (result.alreadyVerified) {
+        setExistingMaskedEmail(result.maskedEmail || existingMaskedEmail);
+        setStep(STEP.ALREADY_REGISTERED);
+        return;
+      }
       // Guardamos el email completo (solo en memoria) para el paso OTP
       setExistingFullEmail(result.email);
       setStep(STEP.VERIFY);
@@ -213,6 +223,10 @@ const RegisterScreen = () => {
   const emailParaVerificar = existingFullEmail || email.trim();
 
   const handleVerify = async (code) => {
+    if (!turnstileVerify) {
+      setErrorVerify("Completá la verificación de seguridad.");
+      return;
+    }
     setErrorVerify("");
     setLoadingVerify(true);
     try {
@@ -234,6 +248,10 @@ const RegisterScreen = () => {
   };
 
   const handleResend = async () => {
+    if (!turnstileVerify) {
+      setErrorVerify("Completá la verificación de seguridad.");
+      return;
+    }
     try {
       await authService.resendOtp(emailParaVerificar, turnstileVerify);
     } catch {
@@ -268,15 +286,67 @@ const RegisterScreen = () => {
                 onBack={() => setStep(existingFullEmail ? STEP.EXISTING : STEP.REGISTER)}
                 loading={loadingVerify}
                 error={errorVerify}
-              />
-              <div className={styles.turnstileWrapper} style={{ marginTop: "16px" }}>
-                <Turnstile
-                  ref={turnstileVerifyRef}
-                  siteKey={TURNSTILE_SITE_KEY}
-                  onVerify={onVerifyVerify}
-                  onExpire={onClearVerify}
-                  onError={onClearVerify}
-                />
+              >
+                <div className={styles.turnstileWrapper} style={{ marginTop: "8px" }}>
+                  <Turnstile
+                    ref={turnstileVerifyRef}
+                    siteKey={TURNSTILE_SITE_KEY}
+                    appearance="always"
+                    onVerify={onVerifyVerify}
+                    onExpire={onClearVerify}
+                    onError={onClearVerify}
+                  />
+                </div>
+              </OTPValidation>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </>
+    );
+  }
+
+  /* ── PASO ALREADY_REGISTERED (cuenta verificada para ese DNI/CUIT) ── */
+  if (step === STEP.ALREADY_REGISTERED) {
+    return (
+      <>
+        <Header />
+        <div className={styles.splitLayout}>
+          <LeftPanel
+            title="Ya tenés cuenta"
+            sub="Encontramos una cuenta asociada a tu identidad. Ingresá con tu email y contraseña."
+          />
+          <div className={styles.rightPanel}>
+            <div style={{ width: "100%", maxWidth: "450px" }}>
+              <h2 className={styles.formTitle}>Tu cuenta ya está activa</h2>
+              <div className={styles.infoBox}>
+                <p className={styles.infoBoxText}>
+                  Hay una cuenta verificada para{" "}
+                  <strong>{existingMaskedEmail}</strong>. Si no recordás la
+                  contraseña, podés restablecerla.
+                </p>
+              </div>
+              <div className={styles.formActions}>
+                <GenericButton
+                  type="button"
+                  onClick={() =>
+                    navigate("/ingresar", { state: location.state })
+                  }
+                >
+                  Ingresar
+                </GenericButton>
+                <p className={styles.auxLink}>
+                  <Link to="/recuperar-contrasena">¿Olvidaste tu contraseña?</Link>
+                </p>
+                <button
+                  type="button"
+                  className={styles.backLink}
+                  onClick={() =>
+                    setStep(identities.length > 1 ? STEP.IDENTITY : STEP.DNI)
+                  }
+                >
+                  ← Volver
+                </button>
               </div>
             </div>
           </div>
@@ -314,6 +384,8 @@ const RegisterScreen = () => {
                 required
                 helperText="Mínimo 8 caracteres."
               />
+
+              <HoneypotField value={honeypot} onChange={(e) => setHoneypot(e.target.value)} />
 
               <div className={styles.turnstileWrapper}>
                 <Turnstile
@@ -435,17 +507,7 @@ const RegisterScreen = () => {
                 helperText="Mínimo 8 caracteres."
               />
 
-              {/* Honeypot — campo oculto anti-bot */}
-              <input
-                type="text"
-                name="website"
-                tabIndex={-1}
-                autoComplete="off"
-                aria-hidden="true"
-                value={honeypot}
-                onChange={(e) => setHoneypot(e.target.value)}
-                style={{ position: "absolute", left: "-9999px", top: "auto", width: "1px", height: "1px", overflow: "hidden", opacity: 0 }}
-              />
+              <HoneypotField value={honeypot} onChange={(e) => setHoneypot(e.target.value)} />
 
               <div className={styles.turnstileWrapper}>
                 <Turnstile
@@ -518,17 +580,7 @@ const RegisterScreen = () => {
               helperText="Sin puntos ni guiones."
             />
 
-            {/* Honeypot — campo oculto anti-bot */}
-            <input
-              type="text"
-              name="website"
-              tabIndex={-1}
-              autoComplete="off"
-              aria-hidden="true"
-              value={honeypot}
-              onChange={(e) => setHoneypot(e.target.value)}
-              style={{ position: "absolute", left: "-9999px", top: "auto", width: "1px", height: "1px", overflow: "hidden", opacity: 0 }}
-            />
+            <HoneypotField value={honeypot} onChange={(e) => setHoneypot(e.target.value)} />
 
             <div className={styles.turnstileWrapper}>
               <Turnstile
