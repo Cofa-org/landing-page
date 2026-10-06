@@ -29,11 +29,40 @@ const base = {
 /* ─────────────────────────────────────────────────────────────────── */
 
 describe("resolveEstado — 6 estados", () => {
-  it("1. Préstamo con idPrestamoDB → Solicitud finalizada", () => {
+  it("ONBOARDING_COMPLETO con idPrestamoDB → Solicitud finalizada", () => {
+    const r = resolveEstado({
+      ...base,
+      estadoOnboarding: "ONBOARDING_COMPLETO",
+      prestamo: { idPrestamoDB: "SB-123" },
+    });
+    expect(r.label).toBe("Solicitud finalizada");
+    expect(r.accion).toBeNull();
+  });
+
+  it("préstamo SB sin estado de onboarding → Solicitud finalizada", () => {
     const r = resolveEstado({ ...base, prestamo: { idPrestamoDB: "SB-123" } });
     expect(r.label).toBe("Solicitud finalizada");
     expect(r.tipo).toBe("success");
     expect(r.retryDate).toBeNull();
+  });
+
+  it("LEAD_CREADO con idPrestamoDB → Solicitud incompleta (onboarding manda)", () => {
+    const r = resolveEstado({
+      ...base,
+      estadoOnboarding: "LEAD_CREADO",
+      prestamo: { idPrestamoDB: "SB-123" },
+    });
+    expect(r.label).toBe("Solicitud incompleta");
+    expect(r.accion).toBe("retomar_registro");
+  });
+
+  it("RECIBO_SUBIDO con idPrestamoDB → Solicitud incompleta", () => {
+    const r = resolveEstado({
+      ...base,
+      estadoOnboarding: "RECIBO_SUBIDO",
+      prestamo: { idPrestamoDB: "SB-123" },
+    });
+    expect(r.accion).toBe("retomar_registro");
   });
 
   it("2. gestión ACEPTADO + sim COMPLETADO → Aprobada", () => {

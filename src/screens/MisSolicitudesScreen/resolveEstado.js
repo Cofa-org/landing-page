@@ -83,9 +83,9 @@ function retomarRegistro() {
  * y no puede tapar "Retomá tu registro" / "Continuá tu simulación".
  *
  * Prioridad:
- *  1. Préstamo SB → "Solicitud finalizada"
- *  2. onboarding RECHAZADO / EN_ANALISIS
- *  3. onboarding incompleto → retomar registro (ignora gestión)
+ *  1. onboarding RECHAZADO / EN_ANALISIS
+ *  2. onboarding incompleto → retomar registro (ignora gestión y préstamo SB)
+ *  3. Préstamo SB → "Solicitud finalizada"
  *  4. sim en curso → continuar simulación
  *  5. ONBOARDING_COMPLETO → continuar sim, salvo gestión/sim terminales
  *  6. gestión ACEPTADO / RECHAZADO / ANALIZAR
@@ -103,6 +103,19 @@ export function resolveEstado(solicitud) {
   const onboarding = estadoOnboarding?.toUpperCase() ?? null;
   const simEstado = prestamo?.estado?.toUpperCase() ?? null;
 
+  if (onboarding === "RECHAZADO") {
+    const fechaRechazo = estadoOnboardingFecha ?? fechaEstadoGestion ?? null;
+    return noAprobada(fechaRechazo);
+  }
+
+  if (onboarding === "EN_ANALISIS") {
+    return enAnalisis();
+  }
+
+  if (ONBOARDING_INCOMPLETO.has(onboarding)) {
+    return retomarRegistro();
+  }
+
   if (prestamo?.idPrestamoDB) {
     return {
       label: "Solicitud finalizada",
@@ -113,16 +126,7 @@ export function resolveEstado(solicitud) {
     };
   }
 
-  if (onboarding === "RECHAZADO") {
-    const fechaRechazo = estadoOnboardingFecha ?? fechaEstadoGestion ?? null;
-    return noAprobada(fechaRechazo);
-  }
-
-  if (onboarding === "EN_ANALISIS") {
-    return enAnalisis();
-  }
-
-  if (!onboarding || ONBOARDING_INCOMPLETO.has(onboarding)) {
+  if (!onboarding) {
     return retomarRegistro();
   }
 

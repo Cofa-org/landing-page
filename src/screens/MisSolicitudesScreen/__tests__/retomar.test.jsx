@@ -92,6 +92,19 @@ describe("MisSolicitudesScreen — botón Retomar", () => {
     expect(await screen.findByRole("button", { name: /retomá tu registro/i })).toBeTruthy();
   });
 
+  it("muestra Retomar en LEAD_CREADO aunque haya idPrestamoDB", async () => {
+    authService.getSolicitudes.mockResolvedValue({
+      solicitudes: [
+        make({
+          estadoOnboarding: "LEAD_CREADO",
+          prestamo: { idPrestamoDB: "SB-001", capitalSeleccionado: 50000 },
+        }),
+      ],
+    });
+    renderScreen();
+    expect(await screen.findByRole("button", { name: /retomá tu registro/i })).toBeTruthy();
+  });
+
   it("muestra Retomar aunque scoring/gestión esté ACEPTADO (onboarding incompleto)", async () => {
     authService.getSolicitudes.mockResolvedValue({
       solicitudes: [make({ estadoOnboarding: "LEAD_CREADO", estadoGestion: "ACEPTADO" })],
