@@ -67,7 +67,7 @@ const authService = {
   /** Revoca la sesión y limpia la cookie. */
   logout: () => authFetch("/logout"),
 
-  /** Devuelve { email, emailVerified, leadId } si la sesión es válida. */
+  /** Devuelve perfil de sesión: email, nombreCompleto, dni, fechaCreacion, fechaNacimiento, domicilio. */
   me: () => authFetch("/me", { method: "GET" }),
 
   /** Solicita link de reset. Respuesta siempre genérica (anti-enumeration). */
@@ -83,6 +83,13 @@ const authService = {
    * Si no tiene lead vinculado, solicitudes = [] y tieneHistorial = false.
    */
   getSolicitudes: () => authFetch("/solicitudes", { method: "GET" }),
+
+  /**
+   * Historial de préstamos en SB del usuario autenticado.
+   * Devuelve { esCliente, prestamos: [{ id, estado, capital, cuota, plazo, fecha }] }.
+   * Si no es cliente o SB no responde, prestamos = [].
+   */
+  getPrestamos: () => authFetch("/prestamos", { method: "GET" }),
 
   /**
    * Iter 2: Retoma una solicitud incompleta desde la sesión autenticada.

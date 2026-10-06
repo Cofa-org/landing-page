@@ -5,6 +5,7 @@ import authService from "../../services/authService.js";
 import { setCookieWithDuration } from "../../lib/utils.js";
 import { COOKIE_LEAD_TOKEN_CONFIG } from "../../constants/LOAN_SIM.js";
 import { resolveEstado, RESUME_ACCION } from "./resolveEstado.js";
+import PerfilTabs from "../MiPerfilScreen/PerfilTabs.jsx";
 import styles from "./MisSolicitudesScreen.module.css";
 
 /* ── Helpers de formato ───────────────────────────────────────────── */
@@ -208,6 +209,7 @@ const MisSolicitudesScreen = () => {
           <div className={styles.heading}>
             <h1>Mis solicitudes</h1>
             <p>El historial de tus pedidos de préstamo en COFA.</p>
+            <PerfilTabs />
           </div>
 
           {loading && (

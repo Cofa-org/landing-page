@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FiUser, FiLogOut, FiFileText, FiSettings } from "react-icons/fi";
+import { FiUser, FiLogOut, FiFileText, FiSettings, FiCreditCard } from "react-icons/fi";
 import { useAuth } from "../../context/index.js";
 import styles from "./UserMenu.module.css";
 
@@ -55,7 +55,16 @@ const UserMenu = () => {
           </div>
           <div className={styles.divider} />
           <Link
-            to="/mis-solicitudes"
+            to="/mi-perfil"
+            className={styles.dropdownItem}
+            role="menuitem"
+            onClick={() => setOpen(false)}
+          >
+            <FiUser size={14} />
+            Mi perfil
+          </Link>
+          <Link
+            to="/mi-perfil/solicitudes"
             className={styles.dropdownItem}
             role="menuitem"
             onClick={() => setOpen(false)}
@@ -64,13 +73,22 @@ const UserMenu = () => {
             Mis solicitudes
           </Link>
           <Link
-            to="/mi-perfil"
+            to="/mi-perfil/prestamos"
+            className={styles.dropdownItem}
+            role="menuitem"
+            onClick={() => setOpen(false)}
+          >
+            <FiCreditCard size={14} />
+            Mis préstamos
+          </Link>
+          <Link
+            to="/mi-perfil/configuracion"
             className={styles.dropdownItem}
             role="menuitem"
             onClick={() => setOpen(false)}
           >
             <FiSettings size={14} />
-            Mi perfil
+            Configuración
           </Link>
           <div className={styles.divider} />
           <button

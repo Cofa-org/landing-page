@@ -1,29 +1,110 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Header, Footer } from "../../Components/index.js";
-import GenericButton from "../../Components/buttons/GenericButton/GenericButton.jsx";
-import PasswordInput from "../../Components/Forms/GenericInput/PasswordInput.jsx";
-import GenericInput from "../../Components/Forms/GenericInput/GenericInput.jsx";
 import { useAuth } from "../../context/index.js";
 import authService from "../../services/authService.js";
+import PerfilTabs from "./PerfilTabs.jsx";
+import { resolveEstado } from "../MisSolicitudesScreen/resolveEstado.js";
 import styles from "./MiPerfilScreen.module.css";
 
 /* ── Helpers ──────────────────────────────────────────────────────── */
 function formatDate(iso) {
   if (!iso) return "—";
-  return new Date(iso).toLocaleDateString("es-AR", {
+  const raw = String(iso);
+  const dateOnly = raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  const date = dateOnly
+    ? new Date(Number(dateOnly[1]), Number(dateOnly[2]) - 1, Number(dateOnly[3]))
+    : new Date(iso);
+  if (Number.isNaN(date.getTime())) return raw;
+  return date.toLocaleDateString("es-AR", {
     day: "2-digit",
     month: "long",
     year: "numeric",
   });
 }
 
+function formatDni(dni) {
+  if (!dni) return "—";
+  const digits = String(dni).replace(/\D/g, "");
+  if (!digits) return String(dni);
+  return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
+const TITLE_CASE_PRESERVE = new Set(["CP", "C.P.", "DNI", "CUIT", "CBU", "CABA"]);
+
+function toTitleCase(value) {
+  if (typeof value !== "string") return "";
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+  return trimmed
+    .split(/(\s+)/)
+    .map((token) => {
+      if (/^\s+$/.test(token)) return token;
+      const match = token.match(/^(.*?)([,.;:]*)$/);
+      const core = match?.[1] ?? token;
+      const punct = match?.[2] ?? "";
+      if (!core) return token;
+      if (TITLE_CASE_PRESERVE.has(core.toUpperCase())) return `${core.toUpperCase()}${punct}`;
+      return `${core.charAt(0).toUpperCase()}${core.slice(1).toLowerCase()}${punct}`;
+    })
+    .join("");
+}
+
+function loanBadgeClass(estado) {
+  const key = String(estado || "").toUpperCase();
+  if (key === "VIGENTE") return styles.badgeSuccess;
+  if (key === "CANCELADO" || key === "FINALIZADO" || key === "LIQUIDADO") {
+    return styles.badgeNeutral;
+  }
+  if (key.includes("MORA") || key.includes("JUDICIAL") || key === "ANULADO") {
+    return styles.badgeDanger;
+  }
+  return styles.badgeWarning;
+}
+
+const PREVIEW_LIMIT = 2;
+const BADGE_CLASS = {
+  success: styles.badgeSuccess,
+  warning: styles.badgeWarning,
+  danger: styles.badgeDanger,
+  neutral: styles.badgeNeutral,
+};
+
 /* ── Sección: Información de cuenta ──────────────────────────────── */
 function InfoCuenta({ user }) {
+  const nombre = toTitleCase(user?.nombreCompleto);
+  const dni = user?.dni;
+  const fechaNacimiento = user?.fechaNacimiento;
+  const domicilio = toTitleCase(user?.domicilio);
+
   return (
-    <div className={styles.card}>
+    <div className={`${styles.card} ${styles.accountCard}`}>
       <div className={styles.cardHeader}><h2>Información de cuenta</h2></div>
       <div className={styles.cardBody}>
+        {nombre ? (
+          <div className={styles.infoRow}>
+            <span className={styles.infoLabel}>Nombre completo</span>
+            <span className={styles.infoValue}>{nombre}</span>
+          </div>
+        ) : null}
+        {dni ? (
+          <div className={styles.infoRow}>
+            <span className={styles.infoLabel}>DNI</span>
+            <span className={styles.infoValue}>{formatDni(dni)}</span>
+          </div>
+        ) : null}
+        {fechaNacimiento ? (
+          <div className={styles.infoRow}>
+            <span className={styles.infoLabel}>Fecha de nacimiento</span>
+            <span className={styles.infoValue}>{formatDate(fechaNacimiento)}</span>
+          </div>
+        ) : null}
+        {domicilio ? (
+          <div className={styles.infoRow}>
+            <span className={styles.infoLabel}>Domicilio</span>
+            <span className={styles.infoValue}>{domicilio}</span>
+          </div>
+        ) : null}
         <div className={styles.infoRow}>
           <span className={styles.infoLabel}>Email</span>
           <span className={styles.infoValue}>{user?.email ?? "—"}</span>
@@ -37,242 +118,186 @@ function InfoCuenta({ user }) {
   );
 }
 
+function SolicitudPreview({ solicitud }) {
+  const estado = resolveEstado(solicitud);
+  return (
+    <div className={styles.previewItem}>
+      <span className={styles.previewRef}>Solicitud #{solicitud.id}</span>
+      <span className={`${styles.infoLabel} ${styles.previewDateLabel}`}>
+        Fecha de solicitud
+      </span>
+      <span className={`${styles.badge} ${BADGE_CLASS[estado.tipo]}`}>
+        {estado.label}
+      </span>
+      <span className={styles.previewDate}>
+        {formatDate(solicitud.fechaSolicitud)}
+      </span>
+    </div>
+  );
+}
+
 /* ── Sección: Mis solicitudes (resumen) ───────────────────────────── */
 function SolicitudesResumen() {
-  const [count, setCount]   = useState(null);
+  const [solicitudes, setSolicitudes] = useState([]);
+  const [count, setCount] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     authService
       .getSolicitudes()
-      .then(({ solicitudes }) => setCount(solicitudes?.length ?? 0))
+      .then(({ solicitudes: data }) => {
+        const list = data ?? [];
+        setSolicitudes(list);
+        setCount(list.length);
+      })
       .catch(() => setCount(null))
       .finally(() => setLoading(false));
   }, []);
 
+  const preview = solicitudes.slice(0, PREVIEW_LIMIT);
+
   return (
-    <div className={styles.card}>
-      <div className={styles.cardHeader}><h2>Mis solicitudes</h2></div>
+    <div className={`${styles.card} ${styles.solicitudesCard}`}>
+      <div className={styles.cardHeader}>
+        <h2>
+          <Link to="/mi-perfil/solicitudes" className={styles.cardTitleLink}>
+            Mis solicitudes
+          </Link>
+        </h2>
+      </div>
       <div className={styles.cardBody}>
-        <div className={styles.solicitudesRow}>
+        {loading && <span className={styles.solicitudesText}>Cargando…</span>}
+
+        {!loading && count === null && (
           <span className={styles.solicitudesText}>
-            {loading
-              ? "Cargando…"
-              : count === null
-                ? "No pudimos cargar tus solicitudes."
-                : count === 0
-                  ? "Todavía no tenés solicitudes activas."
-                  : `Tenés ${count} solicitud${count !== 1 ? "es" : ""} registrada${count !== 1 ? "s" : ""}.`}
+            No pudimos cargar tus solicitudes.
           </span>
-          {!loading && count !== null && (
-            <Link to="/mis-solicitudes" className={styles.solicitudesLink}>
-              {count > 0 ? "Ver todas →" : "Quiero mi préstamo →"}
+        )}
+
+        {!loading && count === 0 && (
+          <div className={styles.solicitudesRow}>
+            <span className={styles.solicitudesText}>
+              Todavía no tenés solicitudes.
+            </span>
+            <Link to="/" className={styles.solicitudesLink}>
+              Quiero mi préstamo →
             </Link>
-          )}
-        </div>
+          </div>
+        )}
+
+        {!loading && count > 0 && (
+          <>
+            <div className={styles.previewList}>
+              {preview.map((s) => (
+                <SolicitudPreview key={s.id} solicitud={s} />
+              ))}
+            </div>
+            <div className={styles.solicitudesRow}>
+              <span className={styles.solicitudesText}>
+                {count > PREVIEW_LIMIT
+                  ? `Mostrando ${preview.length} de ${count}.`
+                  : `${count} solicitud${count !== 1 ? "es" : ""} registrada${count !== 1 ? "s" : ""}.`}
+              </span>
+              <Link to="/mi-perfil/solicitudes" className={styles.solicitudesLink}>
+                Ver todas →
+              </Link>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
 }
 
-/* ── Sección: Cambiar contraseña ──────────────────────────────────── */
-function CambiarContrasena() {
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword]         = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [loading, setLoading]                 = useState(false);
-  const [success, setSuccess]                 = useState("");
-  const [error, setError]                     = useState("");
-
-  const canSubmit =
-    !loading &&
-    currentPassword.length > 0 &&
-    newPassword.length >= 8 &&
-    newPassword === confirmPassword;
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!canSubmit) return;
-    setError("");
-    setSuccess("");
-    setLoading(true);
-    try {
-      const res = await authService.changePassword(currentPassword, newPassword);
-      setSuccess(res.message || "Contraseña actualizada.");
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
-    } catch (err) {
-      setError(err.message || "No pudimos actualizar la contraseña. Intentá de nuevo.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
+function PrestamoPreview({ prestamo }) {
+  const fechaAlta = formatDate(prestamo.fecha);
   return (
-    <div className={styles.card}>
-      <div className={styles.cardHeader}><h2>Cambiar contraseña</h2></div>
-      <div className={styles.cardBody}>
-        <form className={styles.form} onSubmit={handleSubmit}>
-          <PasswordInput
-            label="Contraseña actual"
-            name="currentPassword"
-            value={currentPassword}
-            onChange={(e) => setCurrentPassword(e.target.value)}
-            autoComplete="current-password"
-            required
-          />
-          <PasswordInput
-            label="Nueva contraseña"
-            name="newPassword"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            autoComplete="new-password"
-            required
-            helperText="Mínimo 8 caracteres."
-          />
-          <PasswordInput
-            label="Confirmar nueva contraseña"
-            name="confirmPassword"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            autoComplete="new-password"
-            required
-            error={
-              confirmPassword && newPassword !== confirmPassword
-                ? "Las contraseñas no coinciden."
-                : ""
-            }
-          />
-          {error   && <p className={`${styles.alert} ${styles.alertError}`}>{error}</p>}
-          {success && <p className={`${styles.alert} ${styles.alertSuccess}`}>{success}</p>}
-          <div className={styles.formActions}>
-            <GenericButton type="submit" loading={loading} disabled={!canSubmit}>
-              Actualizar contraseña
-            </GenericButton>
-          </div>
-        </form>
-      </div>
+    <div className={styles.previewItem}>
+      <span className={styles.previewRef}>
+        Préstamo {prestamo.id != null ? `#${prestamo.id}` : ""}
+      </span>
+      <span className={`${styles.infoLabel} ${styles.previewDateLabel}`}>
+        Fecha de alta
+      </span>
+      {prestamo.estado ? (
+        <span className={`${styles.badge} ${loanBadgeClass(prestamo.estado)}`}>
+          {prestamo.estado}
+        </span>
+      ) : (
+        <span />
+      )}
+      <span className={styles.previewDate}>{fechaAlta || "—"}</span>
     </div>
   );
 }
 
-/* ── Sección: Cambiar email ───────────────────────────────────────── */
-function CambiarEmail({ onEmailChanged }) {
-  // step: 'form' | 'otp'
-  const [step, setStep]                       = useState("form");
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newEmail, setNewEmail]               = useState("");
-  const [code, setCode]                       = useState("");
-  const [loading, setLoading]                 = useState(false);
-  const [success, setSuccess]                 = useState("");
-  const [error, setError]                     = useState("");
+function PrestamosResumen() {
+  const [prestamos, setPrestamos] = useState([]);
+  const [count, setCount] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const handleRequestChange = async (e) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
-    try {
-      await authService.requestEmailChange(currentPassword, newEmail);
-      setStep("otp");
-    } catch (err) {
-      setError(err.message || "No pudimos procesar el cambio. Intentá de nuevo.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  useEffect(() => {
+    authService
+      .getPrestamos()
+      .then(({ prestamos: data }) => {
+        const list = data ?? [];
+        setPrestamos(list);
+        setCount(list.length);
+      })
+      .catch(() => setCount(null))
+      .finally(() => setLoading(false));
+  }, []);
 
-  const handleConfirm = async (e) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
-    try {
-      const res = await authService.confirmEmailChange(code);
-      setSuccess(res.message || "Email actualizado. Vas a ser desconectado.");
-      // Notifica al padre para cerrar sesión / actualizar contexto
-      setTimeout(() => onEmailChanged(), 2500);
-    } catch (err) {
-      setError(err.message || "El código es inválido o expiró. Pedí uno nuevo.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (step === "otp") {
-    return (
-      <div className={styles.card}>
-        <div className={styles.cardHeader}><h2>Cambiar email — Confirmar</h2></div>
-        <div className={styles.cardBody}>
-          {success ? (
-            <p className={`${styles.alert} ${styles.alertSuccess}`}>{success}</p>
-          ) : (
-            <form className={styles.form} onSubmit={handleConfirm}>
-              <p className={styles.otpHint}>
-                Te enviamos un código de 6 dígitos a <strong>{newEmail}</strong>. Ingresalo para confirmar el cambio.
-              </p>
-              <GenericInput
-                label="Código de verificación"
-                name="code"
-                type="text"
-                inputMode="numeric"
-                value={code}
-                onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                placeholder="123456"
-                required
-              />
-              {error && <p className={`${styles.alert} ${styles.alertError}`}>{error}</p>}
-              <div className={styles.formActions}>
-                <GenericButton type="submit" loading={loading} disabled={loading || code.length !== 6}>
-                  Confirmar nuevo email
-                </GenericButton>
-                <GenericButton
-                  type="button"
-                  variant="secondary"
-                  onClick={() => { setStep("form"); setError(""); setCode(""); }}
-                >
-                  Volver
-                </GenericButton>
-              </div>
-            </form>
-          )}
-        </div>
-      </div>
-    );
-  }
+  const preview = prestamos.slice(0, PREVIEW_LIMIT);
 
   return (
-    <div className={styles.card}>
-      <div className={styles.cardHeader}><h2>Cambiar email</h2></div>
+    <div className={`${styles.card} ${styles.prestamosCard}`}>
+      <div className={styles.cardHeader}>
+        <h2>
+          <Link to="/mi-perfil/prestamos" className={styles.cardTitleLink}>
+            Mis préstamos
+          </Link>
+        </h2>
+      </div>
       <div className={styles.cardBody}>
-        <form className={styles.form} onSubmit={handleRequestChange}>
-          <PasswordInput
-            label="Contraseña actual"
-            name="currentPasswordEmail"
-            value={currentPassword}
-            onChange={(e) => setCurrentPassword(e.target.value)}
-            autoComplete="current-password"
-            required
-          />
-          <GenericInput
-            label="Nuevo email"
-            name="newEmail"
-            type="email"
-            value={newEmail}
-            onChange={(e) => setNewEmail(e.target.value)}
-            placeholder="nuevo@email.com"
-            required
-          />
-          {error && <p className={`${styles.alert} ${styles.alertError}`}>{error}</p>}
-          <div className={styles.formActions}>
-            <GenericButton
-              type="submit"
-              loading={loading}
-              disabled={loading || !currentPassword || !newEmail.trim()}
-            >
-              Enviar código de verificación
-            </GenericButton>
+        {loading && <span className={styles.solicitudesText}>Cargando…</span>}
+
+        {!loading && count === null && (
+          <span className={styles.solicitudesText}>
+            No pudimos cargar tus préstamos.
+          </span>
+        )}
+
+        {!loading && count === 0 && (
+          <div className={styles.solicitudesRow}>
+            <span className={styles.solicitudesText}>
+              No tenés préstamos en tu historial.
+            </span>
+            <Link to="/" className={styles.solicitudesLink}>
+              Quiero mi préstamo →
+            </Link>
           </div>
-        </form>
+        )}
+
+        {!loading && count > 0 && (
+          <>
+            <div className={styles.previewList}>
+              {preview.map((p, index) => (
+                <PrestamoPreview key={p.id ?? `prestamo-${index}`} prestamo={p} />
+              ))}
+            </div>
+            <div className={styles.solicitudesRow}>
+              <span className={styles.solicitudesText}>
+                {count > PREVIEW_LIMIT
+                  ? `Mostrando ${preview.length} de ${count}.`
+                  : `${count} préstamo${count !== 1 ? "s" : ""} en tu historial.`}
+              </span>
+              <Link to="/mi-perfil/prestamos" className={styles.solicitudesLink}>
+                Ver todos →
+              </Link>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
@@ -280,11 +305,7 @@ function CambiarEmail({ onEmailChanged }) {
 
 /* ── Pantalla principal ───────────────────────────────────────────── */
 const MiPerfilScreen = () => {
-  const { user, logout } = useAuth();
-
-  const handleEmailChanged = async () => {
-    await logout();
-  };
+  const { user } = useAuth();
 
   return (
     <>
@@ -293,13 +314,13 @@ const MiPerfilScreen = () => {
         <div className={styles.inner}>
           <div className={styles.heading}>
             <h1>Mi perfil</h1>
-            <p>Administrá tu cuenta y revisá tus solicitudes.</p>
+            <p>Tus datos, solicitudes y préstamos.</p>
+            <PerfilTabs />
           </div>
 
           <InfoCuenta user={user} />
           <SolicitudesResumen />
-          <CambiarContrasena />
-          <CambiarEmail onEmailChanged={handleEmailChanged} />
+          <PrestamosResumen />
         </div>
       </main>
       <Footer />

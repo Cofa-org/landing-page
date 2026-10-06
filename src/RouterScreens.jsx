@@ -85,6 +85,8 @@ const ReqAutoridadesScreen = lazy(() => import("./screens/ReqAutoridadesScreen/R
 const DNIUploadMobileScreen = lazy(() => import("./screens/DNIUploadMobile/DNIUploadMobileScreen"));
 const MisSolicitudesScreen = lazy(() => import("./screens/MisSolicitudesScreen/MisSolicitudesScreen"));
 const MiPerfilScreen = lazy(() => import("./screens/MiPerfilScreen/MiPerfilScreen"));
+const MisPrestamosScreen = lazy(() => import("./screens/MisPrestamosScreen/MisPrestamosScreen"));
+const ConfiguracionScreen = lazy(() => import("./screens/MiPerfilScreen/ConfiguracionScreen"));
 
 /* import SuggestionsScreen from './screens/SuggestionsScreen/SuggestionsScreen' */
 
@@ -231,11 +233,23 @@ const RouterScreens = () => {
         />
         <Route
           path='/mis-solicitudes'
-          element={<RequireAuth><MisSolicitudesScreen /></RequireAuth>}
+          element={<Navigate to="/mi-perfil/solicitudes" replace />}
         />
         <Route
           path='/mi-perfil'
           element={<RequireAuth><MiPerfilScreen /></RequireAuth>}
+        />
+        <Route
+          path='/mi-perfil/solicitudes'
+          element={<RequireAuth><MisSolicitudesScreen /></RequireAuth>}
+        />
+        <Route
+          path='/mi-perfil/prestamos'
+          element={<RequireAuth><MisPrestamosScreen /></RequireAuth>}
+        />
+        <Route
+          path='/mi-perfil/configuracion'
+          element={<RequireAuth><ConfiguracionScreen /></RequireAuth>}
         />
 
         <Route

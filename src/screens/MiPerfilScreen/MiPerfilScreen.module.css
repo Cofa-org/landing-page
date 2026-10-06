@@ -13,20 +13,31 @@
   gap: 24px;
 }
 
-/* Desktop: grilla de 2 columnas */
+/* Desktop: info a la izquierda, previews apilados a la derecha */
 @media (min-width: 860px) {
   .inner {
     max-width: 920px;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto;
+    grid-template-areas:
+      "heading heading"
+      "account solicitudes"
+      "account prestamos";
     align-items: start;
   }
 
-  /* El heading y el banner ocupan el ancho completo */
-  .heading {
-    grid-column: 1 / -1;
+  .innerConfig {
+    grid-template-areas:
+      "heading heading"
+      "password email";
   }
+
+  .heading { grid-area: heading; }
+  .accountCard { grid-area: account; }
+  .solicitudesCard { grid-area: solicitudes; }
+  .prestamosCard { grid-area: prestamos; }
+  .passwordCard { grid-area: password; }
+  .emailCard { grid-area: email; }
 }
 
 /* ── Encabezado ──────────────────────────────────────────────────────── */
@@ -40,7 +51,7 @@
 .heading p {
   font-size: 0.95rem;
   color: #666;
-  margin: 0;
+  margin: 0 0 16px;
 }
 
 /* ── Card de sección ────────────────────────────────────────────────── */
@@ -62,6 +73,15 @@
   font-weight: 700;
   color: var(--primary-color);
   margin: 0;
+}
+
+.cardTitleLink {
+  color: inherit;
+  text-decoration: none;
+}
+
+.cardTitleLink:hover {
+  text-decoration: underline;
 }
 
 .cardBody {
@@ -89,7 +109,7 @@
   font-size: 0.95rem;
   font-weight: 600;
   color: var(--text-color);
-  word-break: break-all;
+  overflow-wrap: anywhere;
 }
 
 /* ── Mis solicitudes resumen ─────────────────────────────────────────── */
@@ -115,6 +135,81 @@
 
 .solicitudesLink:hover {
   text-decoration: underline;
+}
+
+.previewList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.previewItem {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 12px;
+  row-gap: 6px;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.previewItem:first-child {
+  padding-top: 0;
+}
+
+.previewItem:last-child {
+  border-bottom: none;
+  padding-bottom: 4px;
+}
+
+.previewRef {
+  font-size: 0.75rem;
+  color: #aaa;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+}
+
+.previewDateLabel {
+  justify-self: end;
+  text-align: right;
+}
+
+.previewDate {
+  justify-self: end;
+  text-align: right;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.badge {
+  display: inline-block;
+  justify-self: start;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.badgeSuccess {
+  background-color: #e6f4ed;
+  color: #1a6a3d;
+}
+
+.badgeWarning {
+  background-color: #fff8e6;
+  color: #8a6200;
+}
+
+.badgeDanger {
+  background-color: #fdf0f0;
+  color: #b91c1c;
+}
+
+.badgeNeutral {
+  background-color: #f3f4f6;
+  color: #555;
 }
 
 /* ── Formulario de cambio ───────────────────────────────────────────── */
