@@ -67,11 +67,12 @@ const ForgotPasswordScreen = () => {
           {sent ? (
             <GenericForm title="Revisá tu bandeja de entrada">
               <p className={`${styles.alert} ${styles.alertSuccess}`}>
-                Si el email está registrado y verificado, te enviamos el link para restablecer tu
-                contraseña.
+                Si el email está registrado, te enviamos un mail para continuar.
+                Si todavía no confirmaste la cuenta, llega un código de 6 dígitos.
+                Si ya está verificada, un link para restablecer la contraseña.
                 <br />
                 <br />
-                El link vence en <strong>15 minutos</strong>.
+                El mail vence en <strong>15 minutos</strong>.
               </p>
               <p className={`${styles.auxLink} ${styles.alertSpaced}`}>
                 <Link to="/ingresar">Volver a ingresar</Link>

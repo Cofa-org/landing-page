@@ -224,6 +224,16 @@ describe("resolveEstado — 6 estados", () => {
     expect(r.accion).toBe("continuar_simulacion");
   });
 
+  it("sim en CBU_VALIDATION describe el paso", () => {
+    const r = resolveEstado({
+      ...base,
+      estadoOnboarding: "ONBOARDING_COMPLETO",
+      prestamo: { estado: "CBU_VALIDATION" },
+    });
+    expect(r.accion).toBe("continuar_simulacion");
+    expect(r.descripcion).toMatch(/cbu/i);
+  });
+
   it("6. Estado vacío → Solicitud incompleta", () => {
     const r = resolveEstado(base);
     expect(r.label).toBe("Solicitud incompleta");

@@ -53,11 +53,20 @@ function enAnalisis() {
   };
 }
 
-function continuarSimulacion() {
+function continuarSimulacion(simEstado) {
+  const detalle = {
+    PENDIENTE: "Elegí el préstamo para continuar.",
+    SIMULACION: "Elegí el préstamo para continuar.",
+    EMAIL_VALIDATION: "Falta validar el email de la simulación.",
+    OTP_VALIDATION: "Falta el código de la simulación.",
+    COMPLIANCE: "Falta completar la documentación.",
+    CBU_VALIDATION: "Falta validar el CBU.",
+    MOBBEX_SUBSCRIPTION: "Falta la firma y el débito.",
+  };
   return {
     label: "Solicitud incompleta",
     tipo: "neutral",
-    descripcion: "Continuá la simulación de tu préstamo.",
+    descripcion: detalle[simEstado] || "Continuá la simulación de tu préstamo.",
     accion: RESUME_ACCION.CONTINUAR_SIMULACION,
     retryDate: null,
   };
@@ -131,7 +140,7 @@ export function resolveEstado(solicitud) {
   }
 
   if (simEstado && SIM_EN_CURSO.has(simEstado)) {
-    return continuarSimulacion();
+    return continuarSimulacion(simEstado);
   }
 
   if (onboarding === "ONBOARDING_COMPLETO") {
@@ -158,7 +167,7 @@ export function resolveEstado(solicitud) {
     if (gestion === "ANALIZAR") {
       return enAnalisis();
     }
-    return continuarSimulacion();
+    return continuarSimulacion(simEstado);
   }
 
   if (gestion === "ACEPTADO") {
