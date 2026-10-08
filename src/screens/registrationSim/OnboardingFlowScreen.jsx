@@ -13,7 +13,6 @@ import { toggleCallbellWebchat } from "../../utils/callbellHelpers";
 import styles from "./OnboardingFlow.module.css";
 import RejectedStep from "./components/RejectedStep/RejectedStep.jsx";
 import TestPersonasPanel from "./components/TestPersonasPanel/TestPersonasPanel.jsx";
-import { useEmailOTP } from "./hooks/useEmailOTP.js";
 import { useOnboardingFlow } from "./hooks/useOnboardingFlow.js";
 import { usePhoneOTP } from "./hooks/usePhoneOTP.js";
 import { usePhonePicker } from "./hooks/usePhonePicker.js";
