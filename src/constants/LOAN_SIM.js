@@ -64,15 +64,18 @@ export const COOKIE_LOAN_INFO_CONFIG = {
 
 export const COOKIE_LEAD_TOKEN_CONFIG = {
   NAME: "leadToken",
-  EXPIRY_MS: Date.now() + 48 * 60 * 60 * 1000, // 2 hours in ms
+  // Pure duration in ms (NOT a frozen timestamp). The call-site passes this
+  // to setCookieWithDuration, which sums Date.now() at write time.
+  // 48h matches the JWT TTL (landing-page-backend/core/utils/token.utils.js
+  // → generateToken({...}, "48h") in lead-registration.service.js).
+  EXPIRY_MS: 48 * 60 * 60 * 1000, // 48 hours in ms
 };
 
 export const COOKIE_SIMULADOR_TOKEN_CONFIG = {
   NAME: "simuladorToken",
-  // 24 hours in ms — espejo de la duración del JWT (Task 0/1) para que la
-  // cookie no expire antes que el token. El usuario puede pausar y volver
-  // al día siguiente sin perder la sesión del simulador.
-  EXPIRY_MS: Date.now() + 24 * 60 * 60 * 1000,
+  // Pure duration in ms (NOT a frozen timestamp). 24h matches the simulador
+  // JWT TTL so the cookie doesn't expire before the token.
+  EXPIRY_MS: 24 * 60 * 60 * 1000, // 24 hours in ms
 };
 
 export const COMPLIANCE_STEPS = Object.freeze({
