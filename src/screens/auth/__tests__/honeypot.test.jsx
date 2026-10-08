@@ -2,7 +2,8 @@
  * Tests temporales — Honeypot en formularios de auth (frontend)
  * Verifican que el campo oculto existe y que un submit con el honeypot relleno
  * no dispara la acción real (login / register / forgot / reset).
- * Pueden eliminarse una vez confirmado el funcionamiento manual.
+ * Regression permanente: el honeypot no debe disparar el submit si un
+ * password manager (o un bot) rellena name="website".
  */
 
 // @vitest-environment jsdom

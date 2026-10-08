@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import authService from "../services/authService";
 
 const AuthContext = createContext(null);
@@ -13,28 +13,26 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const controller = new AbortController();
     authService
-      .me()
-      .then(setUser)
-      .catch(() => setUser(null))
-      .finally(() => setLoading(false));
+      .me(controller.signal)
+      .then((me) => {
+        if (!controller.signal.aborted) setUser(me);
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) setUser(null);
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
+    return () => controller.abort();
   }, []);
 
-  /** login → setea la cookie + actualiza el estado. */
+  /** login → setea la cookie y usa el perfil que devuelve el mismo POST. */
   const login = useCallback(async (email, password, turnstileToken) => {
-    // 1. Autentica y recibe la cookie de sesión
-    await authService.login(email, password, turnstileToken);
-    // 2. Usa la cookie para obtener los datos del usuario
-    try {
-      const me = await authService.me();
-      setUser(me);
-      return me;
-    } catch (meError) {
-      // Si /me falla inmediatamente después del login (edge case de timing),
-      // no dejamos un estado inconsistente: limpiamos y relanzamos.
-      setUser(null);
-      throw meError;
-    }
+    const me = await authService.login(email, password, turnstileToken);
+    setUser(me);
+    return me;
   }, []);
 
   /** logout → revoca la cookie + limpia el estado. */
@@ -47,8 +45,10 @@ export function AuthProvider({ children }) {
     setUser(null);
   }, []);
 
+  const value = useMemo(() => ({ user, loading, login, logout }), [user, loading, login, logout]);
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
@@ -56,6 +56,8 @@ export function AuthProvider({ children }) {
 
 export function useAuth() {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth debe usarse dentro de <AuthProvider>");
+  if (!ctx) {
+    throw new Error("useAuth debe usarse dentro de AuthProvider");
+  }
   return ctx;
 }

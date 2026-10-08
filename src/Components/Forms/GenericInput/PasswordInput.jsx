@@ -14,6 +14,7 @@ const PasswordInput = ({
   value,
   onChange,
   error,
+  helperText,
   placeholder = "••••••••",
   required = false,
   autoComplete = "current-password",
@@ -52,6 +53,9 @@ const PasswordInput = ({
           {show ? <FiEyeOff /> : <FiEye />}
         </button>
       </div>
+      {helperText && !error && (
+        <span className={styles.helperText}>{helperText}</span>
+      )}
       <span className={styles.errorText}>{error && error}</span>
     </div>
   );
@@ -63,6 +67,7 @@ PasswordInput.propTypes = {
   value: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
   error: PropTypes.string,
+  helperText: PropTypes.string,
   placeholder: PropTypes.string,
   required: PropTypes.bool,
   autoComplete: PropTypes.string,

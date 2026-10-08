@@ -62,7 +62,13 @@ function CambiarContrasena() {
             onChange={(e) => setNewPassword(e.target.value)}
             autoComplete="new-password"
             required
-            helperText="Mínimo 8 caracteres."
+            minLength={8}
+            helperText="Al menos 8 caracteres. No hace falta mayúsculas ni símbolos."
+            error={
+              newPassword.length > 0 && Array.from(newPassword).length < 8
+                ? "La contraseña tiene que tener al menos 8 caracteres."
+                : ""
+            }
           />
           <PasswordInput
             label="Confirmar nueva contraseña"
@@ -71,6 +77,7 @@ function CambiarContrasena() {
             onChange={(e) => setConfirmPassword(e.target.value)}
             autoComplete="new-password"
             required
+            minLength={8}
             error={
               confirmPassword && newPassword !== confirmPassword
                 ? "Las contraseñas no coinciden."
