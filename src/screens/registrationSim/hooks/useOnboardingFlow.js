@@ -1,9 +1,8 @@
-import { useState, useCallback, useEffect } from "react";
-import { LOAN_SIM_STEPS, ONBOARDING_STATES } from "../../../constants/LOAN_SIM.js";
-import { getCookie, setCookie } from "../../../lib/utils.js";
-import { COOKIE_LEAD_TOKEN_CONFIG } from "../../../constants/LOAN_SIM.js";
-import { getDecodedToken } from "../../../lib/token.js";
+import { useCallback, useEffect, useState } from "react";
 import { ERROR_CAUSE } from "../../../constants/error.js";
+import { COOKIE_LEAD_TOKEN_CONFIG, LOAN_SIM_STEPS, ONBOARDING_STATES } from "../../../constants/LOAN_SIM.js";
+import { getDecodedToken } from "../../../lib/token.js";
+import { getCookie, setCookieWithDuration } from "../../../lib/utils.js";
 import LeadRegistrationService from "../../../services/leadRegistrationService.js";
 
 const ONBOARDING_STEPS = {
@@ -280,7 +279,7 @@ export const useOnboardingFlow = (resumeShortId = null) => {
     // proporcionado" y `usePhoneOTP.reenviarOTP` muestra ese mensaje
     // mientras el cooldown arranca sin disparar nada. Persistir acá.
     if (data?.token) {
-      setCookie(
+      setCookieWithDuration(
         COOKIE_LEAD_TOKEN_CONFIG.NAME,
         data.token,
         COOKIE_LEAD_TOKEN_CONFIG.EXPIRY_MS,
@@ -339,7 +338,7 @@ export const useOnboardingFlow = (resumeShortId = null) => {
         setPendingDni(null);
         setPendingCelular(null);
         setPendingSituacionLaboral(null);
-        await setCookie(
+        await setCookieWithDuration(
           COOKIE_LEAD_TOKEN_CONFIG.NAME,
           response.data.token,
           COOKIE_LEAD_TOKEN_CONFIG.EXPIRY_MS,

@@ -1,21 +1,22 @@
-import React, { Suspense, memo, useCallback, useState, useEffect } from "react";
+import React, { Suspense, memo, useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { toggleCallbellWebchat } from "../../utils/callbellHelpers";
+import Loader from "../../Components/Loader/Loader.jsx";
+import OTPValidation from "../../Components/OTPValidation/OTPValidation.jsx";
 import BackButton from "../../Components/buttons/backbutton/BackButton.jsx";
 import { Footer, Header } from "../../Components/index.js";
-import Loader from "../../Components/Loader/Loader.jsx";
 import { HeroLoanSim } from "../../Sections/index.js";
-import { LOAN_SIM_STEPS, OTP_CONFIG, ONBOARDING_STATES, COOKIE_LEAD_TOKEN_CONFIG } from "../../constants/LOAN_SIM.js";
+import { COOKIE_LEAD_TOKEN_CONFIG, LOAN_SIM_STEPS, ONBOARDING_STATES, OTP_CONFIG } from "../../constants/LOAN_SIM.js";
+import { setCookieWithDuration } from "../../lib/utils.js";
+import LeadRegistrationService from "../../services/leadRegistrationService.js";
+import LinkResolutionService from "../../services/linkResolutionService.js";
+import { toggleCallbellWebchat } from "../../utils/callbellHelpers";
+import styles from "./OnboardingFlow.module.css";
+import RejectedStep from "./components/RejectedStep/RejectedStep.jsx";
+import TestPersonasPanel from "./components/TestPersonasPanel/TestPersonasPanel.jsx";
+import { useEmailOTP } from "./hooks/useEmailOTP.js";
 import { useOnboardingFlow } from "./hooks/useOnboardingFlow.js";
 import { usePhoneOTP } from "./hooks/usePhoneOTP.js";
 import { usePhonePicker } from "./hooks/usePhonePicker.js";
-import OTPValidation from "../../Components/OTPValidation/OTPValidation.jsx";
-import styles from "./OnboardingFlow.module.css";
-import RejectedStep from "./components/RejectedStep/RejectedStep.jsx";
-import LinkResolutionService from "../../services/linkResolutionService.js";
-import LeadRegistrationService from "../../services/leadRegistrationService.js";
-import { setCookie } from "../../lib/utils.js";
-import TestPersonasPanel from "./components/TestPersonasPanel/TestPersonasPanel.jsx";
 
 const LeadRegistrationStep = React.lazy(
   () => import("./components/LeadRegistrationStep/LeadRegistrationStep.jsx"),
@@ -108,7 +109,7 @@ const OnboardingFlowScreen = () => {
           setResumeError(init?.message || "No pudimos iniciar la sesión");
           return;
         }
-        await setCookie(
+        await setCookieWithDuration(
           COOKIE_LEAD_TOKEN_CONFIG.NAME,
           init.data.leadToken,
           COOKIE_LEAD_TOKEN_CONFIG.EXPIRY_MS,
