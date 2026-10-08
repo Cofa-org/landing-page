@@ -64,7 +64,7 @@ export const COOKIE_LOAN_INFO_CONFIG = {
 
 export const COOKIE_LEAD_TOKEN_CONFIG = {
   NAME: "leadToken",
-  EXPIRY_MS: Date.now() + 2 * 60 * 60 * 1000, // 2 hours in ms
+  EXPIRY_MS: Date.now() + 48 * 60 * 60 * 1000, // 2 hours in ms
 };
 
 export const COOKIE_SIMULADOR_TOKEN_CONFIG = {
