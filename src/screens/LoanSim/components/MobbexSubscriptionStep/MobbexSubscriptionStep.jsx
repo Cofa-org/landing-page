@@ -4,18 +4,20 @@ import GenericButton from "../../../../Components/buttons/GenericButton/GenericB
 import { useMobbexSubscription } from "../../hooks/useMobbexSubscription";
 import styles from "./MobbexSubscriptionStep.module.css";
 
-const MobbexSubscriptionStep = ({ scoringId, onSubscriptionCompleted, error: externalError }) => {
-  const { isConfirming, loading, error, message, handleSuscribirse } = useMobbexSubscription(
-    scoringId,
-    onSubscriptionCompleted,
-  );
+const MobbexSubscriptionStep = ({
+  scoringId,
+  onSubscriptionCompleted,
+  error: externalError,
+}) => {
+  const { isConfirming, loading, error, message, handleSuscribirse } =
+    useMobbexSubscription(scoringId, onSubscriptionCompleted);
 
   if (isConfirming) {
     return (
       <div className={styles.container}>
         <img
-          src='/img/mobbex_confirming.webp'
-          alt='Confirmando suscripción'
+          src="/img/mobbex_confirming.webp"
+          alt="Confirmando suscripción"
           className={styles.illustration}
         />
         <h2 className={styles.title}>Estamos confirmando tu suscripción!</h2>
@@ -28,15 +30,15 @@ const MobbexSubscriptionStep = ({ scoringId, onSubscriptionCompleted, error: ext
 
   return (
     <div className={styles.container}>
-      <h2 className={styles.title}>Suscribite al débito automático</h2>
+      <h2 className={styles.title}>Suscribite al pago recurrente</h2>
       <p className={styles.description}>
-        Para completar la solicitud de tu préstamo, suscribite al débito automático de tus cuotas a
-        través de Mobbex. Serás redirigido a su plataforma para finalizar el proceso de forma
-        segura.
+        Para completar la solicitud de tu préstamo, suscribite al pago
+        recurrente de tus cuotas. Tené a mano tu tarjeta de débito física o
+        digital desde la app de tu banco
       </p>
       <p className={styles.note}>
-        Si la suscripción no se completa o falla, comunicate con un operador para finalizar tu
-        préstamo.
+        Si la suscripción no se completa o falla, comunicate con un operador
+        para finalizar tu préstamo.
       </p>
       {displayError && <p className={styles.errorText}>{displayError}</p>}
       {message && <p className={styles.infoText}>{message}</p>}
@@ -46,12 +48,18 @@ const MobbexSubscriptionStep = ({ scoringId, onSubscriptionCompleted, error: ext
         disabled={loading}
         className={styles.button}
       >
-        Suscribirme en Mobbex
+        Suscribirme
       </GenericButton>
       <GenericButton
-        type='button'
-        variant='secondary'
-        onClick={() => window.open("https://wa.me/5491137570853", "_blank", "noopener,noreferrer")}
+        type="button"
+        variant="secondary"
+        onClick={() =>
+          window.open(
+            "https://wa.me/5491137570853",
+            "_blank",
+            "noopener,noreferrer",
+          )
+        }
         style={{ flex: 1, marginTop: "1rem" }}
       >
         Comunicarse con un asesor
