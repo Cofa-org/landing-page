@@ -1,5 +1,5 @@
-import AuthSplitLayout from "../AuthSplitLayout.jsx";
-import styles from "../auth.module.css";
+import AuthSplitLayout from "../../AuthSplitLayout.jsx";
+import styles from "../../auth.module.css";
 
 const RegisterIdentityStep = ({ identities, onSelect, onBack }) => (
   <AuthSplitLayout

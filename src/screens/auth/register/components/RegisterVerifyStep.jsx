@@ -1,8 +1,8 @@
-import OTPValidation from "../../../Components/OTPValidation/OTPValidation.jsx";
-import Turnstile from "../../../Components/Turnstile/Turnstile.jsx";
-import { TURNSTILE_SITE_KEY } from "../../../config.js";
-import AuthSplitLayout from "../AuthSplitLayout.jsx";
-import styles from "../auth.module.css";
+import OTPValidation from "../../../../Components/OTPValidation/OTPValidation.jsx";
+import Turnstile from "../../../../Components/Turnstile/Turnstile.jsx";
+import { TURNSTILE_SITE_KEY } from "../../../../config.js";
+import AuthSplitLayout from "../../AuthSplitLayout.jsx";
+import styles from "../../auth.module.css";
 
 const RegisterVerifyStep = ({
   destination,

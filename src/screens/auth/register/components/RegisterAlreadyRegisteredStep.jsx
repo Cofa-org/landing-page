@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
-import GenericButton from "../../../Components/buttons/GenericButton/GenericButton.jsx";
-import AuthSplitLayout from "../AuthSplitLayout.jsx";
-import styles from "../auth.module.css";
+import GenericButton from "../../../../Components/buttons/GenericButton/GenericButton.jsx";
+import AuthSplitLayout from "../../AuthSplitLayout.jsx";
+import styles from "../../auth.module.css";
 
 const RegisterAlreadyRegisteredStep = ({ maskedEmail, onLogin, onBack }) => (
   <AuthSplitLayout

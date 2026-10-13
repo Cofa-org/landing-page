@@ -1,16 +1,10 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import authService from "../../services/authService.js";
-import { useTurnstile } from "./useTurnstile.js";
-import { writeAuthFlash } from "./authFlash.js";
-import RegisterDniStep from "./register/RegisterDniStep.jsx";
-import RegisterIdentityStep from "./register/RegisterIdentityStep.jsx";
-import RegisterNewStep from "./register/RegisterNewStep.jsx";
-import RegisterExistingStep from "./register/RegisterExistingStep.jsx";
-import RegisterAlreadyRegisteredStep from "./register/RegisterAlreadyRegisteredStep.jsx";
-import RegisterVerifyStep from "./register/RegisterVerifyStep.jsx";
+import authService from "../../../../services/authService.js";
+import { useTurnstile } from "../../useTurnstile.js";
+import { writeAuthFlash } from "../../authFlash.js";
 
-const STEP = {
+export const STEP = {
   DNI: "dni",
   IDENTITY: "identity",
   REGISTER: "register",
@@ -19,7 +13,7 @@ const STEP = {
   VERIFY: "verify",
 };
 
-const nextStepFromExisting = (existingClient) => {
+export const nextStepFromExisting = (existingClient) => {
   if (!existingClient?.maskedEmail) return STEP.REGISTER;
   if (existingClient.alreadyRegistered && existingClient.verified) {
     return STEP.ALREADY_REGISTERED;
@@ -27,7 +21,7 @@ const nextStepFromExisting = (existingClient) => {
   return STEP.EXISTING;
 };
 
-const RegisterScreen = () => {
+export function useRegisterFlow() {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -113,9 +107,6 @@ const RegisterScreen = () => {
     setLoadingReg(true);
     try {
       await authService.register(email.trim(), password, turnstileReg.token, selectedCuit);
-      // Misma respuesta si el mail es nuevo o ya existía (anti-enumeración).
-      // No dejamos al usuario en "verificá tu mail" esperando un código que
-      // a veces no sale: el alta nueva verifica al ingresar (login → OTP).
       writeAuthFlash(
         "Si el email es nuevo, te mandamos un código. Si ya tenés cuenta, ingresá con tu contraseña.",
       );
@@ -192,89 +183,44 @@ const RegisterScreen = () => {
     }
   };
 
-  if (step === STEP.VERIFY) {
-    return (
-      <RegisterVerifyStep
-        destination={existingMaskedEmail || email.trim()}
-        onValidate={handleVerify}
-        onResend={handleResend}
-        onBack={() => setStep(existingFullEmail ? STEP.EXISTING : STEP.REGISTER)}
-        loading={loadingVerify}
-        error={errorVerify}
-        turnstile={turnstileVerify}
-      />
-    );
-  }
-
-  if (step === STEP.ALREADY_REGISTERED) {
-    return (
-      <RegisterAlreadyRegisteredStep
-        maskedEmail={existingMaskedEmail}
-        onLogin={() => navigate("/ingresar", { state: location.state })}
-        onBack={goBackIdentityOrDni}
-      />
-    );
-  }
-
-  if (step === STEP.EXISTING) {
-    return (
-      <RegisterExistingStep
-        maskedEmail={existingMaskedEmail}
-        password={passwordExisting}
-        setPassword={setPasswordExisting}
-        honeypot={honeypot}
-        setHoneypot={setHoneypot}
-        turnstile={turnstileExisting}
-        loading={loadingExisting}
-        error={errorExisting}
-        onSubmit={handleExistingClientRegister}
-        onBack={goBackIdentityOrDni}
-      />
-    );
-  }
-
-  if (step === STEP.IDENTITY) {
-    return (
-      <RegisterIdentityStep
-        identities={identities}
-        onSelect={handleIdentitySelect}
-        onBack={() => setStep(STEP.DNI)}
-      />
-    );
-  }
-
-  if (step === STEP.REGISTER) {
-    return (
-      <RegisterNewStep
-        email={email}
-        setEmail={setEmail}
-        password={password}
-        setPassword={setPassword}
-        honeypot={honeypot}
-        setHoneypot={setHoneypot}
-        turnstile={turnstileReg}
-        loading={loadingReg}
-        error={errorReg}
-        onSubmit={handleRegister}
-        onBack={goBackIdentityOrDni}
-        locationState={location.state}
-      />
-    );
-  }
-
-  return (
-    <RegisterDniStep
-      dni={dni}
-      setDni={setDni}
-      honeypot={honeypot}
-      setHoneypot={setHoneypot}
-      turnstile={turnstileDni}
-      loading={loadingDni}
-      error={errorDni}
-      onSubmit={handleDniSubmit}
-      locationState={location.state}
-    />
-  );
-};
-
-export default RegisterScreen;
+  return {
+    step,
+    STEP,
+    locationState: location.state,
+    dni,
+    setDni,
+    identities,
+    existingMaskedEmail,
+    email,
+    setEmail,
+    password,
+    setPassword,
+    honeypot,
+    setHoneypot,
+    passwordExisting,
+    setPasswordExisting,
+    turnstileDni,
+    turnstileReg,
+    turnstileExisting,
+    turnstileVerify,
+    loadingDni,
+    errorDni,
+    loadingReg,
+    errorReg,
+    loadingExisting,
+    errorExisting,
+    loadingVerify,
+    errorVerify,
+    goBackIdentityOrDni,
+    handleDniSubmit,
+    handleIdentitySelect,
+    handleRegister,
+    handleExistingClientRegister,
+    handleVerify,
+    handleResend,
+    goToLogin: () => navigate("/ingresar", { state: location.state }),
+    goBackFromVerify: () => setStep(existingFullEmail ? STEP.EXISTING : STEP.REGISTER),
+    goBackToDni: () => setStep(STEP.DNI),
+    verifyDestination: existingMaskedEmail || email.trim(),
+  };
+}

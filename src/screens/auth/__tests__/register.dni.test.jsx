@@ -90,7 +90,7 @@ vi.mock("../../../services/authService.js", () => ({
   },
 }));
 
-import RegisterScreen from "../RegisterScreen.jsx";
+import RegisterScreen from "../register/RegisterScreen.jsx";
 
 function renderScreen() {
   return render(

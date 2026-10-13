@@ -89,7 +89,7 @@ describe("LoginScreen — honeypot", () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    LoginScreen = (await import("../LoginScreen.jsx")).default;
+    LoginScreen = (await import("../login/LoginScreen.jsx")).default;
     ({ useAuth } = await import("../../../context/index.js"));
     loginMock = vi.fn().mockResolvedValue(undefined);
     useAuth.mockReturnValue({ login: loginMock, logout: vi.fn(), user: null, loading: false });
@@ -156,7 +156,7 @@ describe("RegisterScreen — honeypot", () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    RegisterScreen = (await import("../RegisterScreen.jsx")).default;
+    RegisterScreen = (await import("../register/RegisterScreen.jsx")).default;
     authService = (await import("../../../services/authService.js")).default;
     // resolveDni devuelve una identidad → nuevo usuario
     authService.resolveDni.mockResolvedValue({
@@ -224,7 +224,7 @@ describe("ForgotPasswordScreen — honeypot", () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    ForgotPasswordScreen = (await import("../ForgotPasswordScreen.jsx")).default;
+    ForgotPasswordScreen = (await import("../forgot-password/ForgotPasswordScreen.jsx")).default;
     authService = (await import("../../../services/authService.js")).default;
   });
 
@@ -257,7 +257,7 @@ describe("ResetPasswordScreen — honeypot", () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    ResetPasswordScreen = (await import("../ResetPasswordScreen.jsx")).default;
+    ResetPasswordScreen = (await import("../reset-password/ResetPasswordScreen.jsx")).default;
     authService = (await import("../../../services/authService.js")).default;
     ({ useAuth } = await import("../../../context/index.js"));
     useAuth.mockReturnValue({ login: vi.fn(), logout: vi.fn(), user: null, loading: false });

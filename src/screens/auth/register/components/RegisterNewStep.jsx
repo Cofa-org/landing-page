@@ -1,13 +1,13 @@
 import { Link } from "react-router-dom";
-import GenericForm from "../../../Components/Forms/GenericForm/GenericForm.jsx";
-import GenericInput from "../../../Components/Forms/GenericInput/GenericInput.jsx";
-import PasswordInput from "../../../Components/Forms/GenericInput/PasswordInput.jsx";
-import GenericButton from "../../../Components/buttons/GenericButton/GenericButton.jsx";
-import Turnstile from "../../../Components/Turnstile/Turnstile.jsx";
-import { TURNSTILE_SITE_KEY } from "../../../config.js";
-import HoneypotField from "../HoneypotField.jsx";
-import AuthSplitLayout from "../AuthSplitLayout.jsx";
-import styles from "../auth.module.css";
+import GenericForm from "../../../../Components/Forms/GenericForm/GenericForm.jsx";
+import GenericInput from "../../../../Components/Forms/GenericInput/GenericInput.jsx";
+import PasswordInput from "../../../../Components/Forms/GenericInput/PasswordInput.jsx";
+import GenericButton from "../../../../Components/buttons/GenericButton/GenericButton.jsx";
+import Turnstile from "../../../../Components/Turnstile/Turnstile.jsx";
+import { TURNSTILE_SITE_KEY } from "../../../../config.js";
+import HoneypotField from "../../HoneypotField.jsx";
+import AuthSplitLayout from "../../AuthSplitLayout.jsx";
+import styles from "../../auth.module.css";
 
 const RegisterNewStep = ({
   email,

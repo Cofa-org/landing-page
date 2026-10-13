@@ -3,10 +3,10 @@ import { lazy, Suspense } from "react";
 import Loader from "./Components/Loader/Loader";
 import OnboardingFlowScreen from "./screens/registrationSim/OnboardingFlowScreen.jsx";
 import { useAuth } from "./context/index.js";
-import LoginScreen from "./screens/auth/LoginScreen.jsx";
-import RegisterScreen from "./screens/auth/RegisterScreen.jsx";
-import ForgotPasswordScreen from "./screens/auth/ForgotPasswordScreen.jsx";
-import ResetPasswordScreen from "./screens/auth/ResetPasswordScreen.jsx";
+import LoginScreen from "./screens/auth/login/LoginScreen.jsx";
+import RegisterScreen from "./screens/auth/register/RegisterScreen.jsx";
+import ForgotPasswordScreen from "./screens/auth/forgot-password/ForgotPasswordScreen.jsx";
+import ResetPasswordScreen from "./screens/auth/reset-password/ResetPasswordScreen.jsx";
 
 /**
  * Guard que redirige al home si el usuario ya tiene sesión activa.
