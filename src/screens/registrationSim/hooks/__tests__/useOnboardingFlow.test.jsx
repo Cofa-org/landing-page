@@ -13,13 +13,14 @@ vi.mock("../../../../services/leadRegistrationService.js", () => ({
 vi.mock("../../../../lib/utils.js", () => ({
   getCookie: vi.fn().mockResolvedValue(null),
   setCookie: vi.fn().mockResolvedValue(undefined),
+  setCookieWithDuration: vi.fn().mockResolvedValue(undefined),
 }));
 
 vi.mock("../../../../lib/token.js", () => ({
   getDecodedToken: vi.fn().mockReturnValue(null),
 }));
 
-import { setCookie } from "../../../../lib/utils.js";
+import { setCookie, setCookieWithDuration } from "../../../../lib/utils.js";
 import { useOnboardingFlow } from "../useOnboardingFlow.js";
 
 describe("useOnboardingFlow — phone picker routing", () => {
@@ -211,11 +212,12 @@ describe("useOnboardingFlow — handleLeadSuccess persiste token en cookie", () 
       });
     });
 
-    expect(setCookie).toHaveBeenCalledWith(
+    expect(setCookieWithDuration).toHaveBeenCalledWith(
       "leadToken",
       "jwt-mock-token-abc",
       expect.any(Number),
     );
+    expect(setCookie).not.toHaveBeenCalled();
     expect(result.current.onboardingStep).toBe("PHONE_VALIDATION");
   });
 
@@ -236,6 +238,7 @@ describe("useOnboardingFlow — handleLeadSuccess persiste token en cookie", () 
     });
 
     expect(setCookie).not.toHaveBeenCalled();
+    expect(setCookieWithDuration).not.toHaveBeenCalled();
     expect(result.current.onboardingStep).toBe("IDENTITY_SELECTION");
   });
 });

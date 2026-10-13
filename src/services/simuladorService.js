@@ -1,9 +1,9 @@
-import { LANDING_BACKEND_URL, LANDING_BACKEND_API_KEY } from "../config";
+import { LANDING_BACKEND_API_KEY, LANDING_BACKEND_URL } from "../config";
 import { HTTP_METHOD } from "../constants/HTTP_METHODS.js";
-import { HttpApi } from "../lib/http.js";
-import { parseErrorResponse } from "../lib/http-error.js";
-import { getCookie, setCookie } from "../lib/utils";
 import { COOKIE_SIMULADOR_TOKEN_CONFIG } from "../constants/LOAN_SIM.js";
+import { parseErrorResponse } from "../lib/http-error.js";
+import { HttpApi } from "../lib/http.js";
+import { getCookie, setCookieWithDuration } from "../lib/utils";
 
 export default class SimuladorService {
   static async calcularPlanes(
@@ -72,7 +72,7 @@ export default class SimuladorService {
       // jsonResponse.cause y mostrar la pantalla de rechazo — no debe
       // haber un cookie con valor undefined persistido.
       if (jsonResponse.success && jsonResponse.data?.token) {
-        await setCookie(
+        await setCookieWithDuration(
           COOKIE_SIMULADOR_TOKEN_CONFIG.NAME,
           jsonResponse.data.token,
           COOKIE_SIMULADOR_TOKEN_CONFIG.EXPIRY_MS,

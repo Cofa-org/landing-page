@@ -1,8 +1,8 @@
-import { useState, useCallback, useEffect } from "react";
-import LeadRegistrationService from "../../../services/leadRegistrationService";
+import { useCallback, useEffect, useState } from "react";
 import { ERROR_CAUSE, ERROR_MESSAGE } from "../../../constants/error";
-import { setCookie } from "../../../lib/utils";
 import { COOKIE_LEAD_TOKEN_CONFIG, SITUACION_LABORAL_OPTIONS } from "../../../constants/LOAN_SIM.js";
+import { setCookieWithDuration } from "../../../lib/utils";
+import LeadRegistrationService from "../../../services/leadRegistrationService";
 
 const DNI_REGEX = /^\d{7,8}$/;
 const CELULAR_REGEX = /^\d{10}$/;
@@ -269,7 +269,7 @@ export const useLeadRegistration = (turnstileToken) => {
         }
 
         if (response.success && response.data) {
-          await setCookie(
+          await setCookieWithDuration(
             COOKIE_LEAD_TOKEN_CONFIG.NAME,
             response.data.token,
             COOKIE_LEAD_TOKEN_CONFIG.EXPIRY_MS,

@@ -38,7 +38,7 @@
     gap: var(--spacing-sm);
   }
   .rightColumn {
-    padding: 0 5vw var(--spacing-md);
+    padding: 0;
   }
 }
 
