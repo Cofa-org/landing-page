@@ -21,6 +21,11 @@ export const LOAN_SIM_STEPS = {
   // renderiza el mismo `OTPValidation` con `destinationType: email` apuntando
   // al `cliente.Email` de SB.
   EMAIL_OTP_VALIDATION: "EMAIL_OTP_VALIDATION",
+  // Plan 2026-10-09 (email pre-pick advisor gate): cliente COFA con
+  // email inválido en SB. El step renderiza el mensaje "comunicate
+  // con un asesor" + botón Callbell. Recarga → re-check → si email
+  // ahora válido, transición a PHONE_PICKER.
+  EMAIL_PENDING_ADVISOR: "EMAIL_PENDING_ADVISOR",
 };
 
 export const OTP_CONFIG = {
@@ -97,6 +102,7 @@ export const ONBOARDING_STATES = {
   EN_ANALISIS: "EN_ANALISIS",
   CELULAR_VALIDADO: "CELULAR_VALIDADO",
   PHONE_PICKER: "PHONE_PICKER",
+  EMAIL_PENDING_ADVISOR: "EMAIL_PENDING_ADVISOR",
 };
 
 export const PEP_TIPO = Object.freeze({

@@ -14,6 +14,7 @@ import styles from "./OnboardingFlow.module.css";
 import RejectedStep from "./components/RejectedStep/RejectedStep.jsx";
 import TestPersonasPanel from "./components/TestPersonasPanel/TestPersonasPanel.jsx";
 import { useEmailOTP } from "./hooks/useEmailOTP.js";
+import { useEmailPendingAdvisor } from "./hooks/useEmailPendingAdvisor.js";
 import { useOnboardingFlow } from "./hooks/useOnboardingFlow.js";
 import { usePhoneOTP } from "./hooks/usePhoneOTP.js";
 import { usePhonePicker } from "./hooks/usePhonePicker.js";
@@ -32,6 +33,13 @@ const IdentitySelectionStep = React.lazy(
 );
 const PhonePickerStep = React.lazy(
   () => import("./components/PhonePickerStep/PhonePickerStep.jsx"),
+);
+// Plan 2026-10-09 (email pre-pick advisor gate): cliente COFA con email
+// inválido en SB. El step renderiza el mensaje "comunicate con un asesor"
+// + botón Callbell. Recarga → re-check → si email ahora válido, transición
+// a PHONE_PICKER.
+const EmailPendingAdvisorStep = React.lazy(
+  () => import("./components/EmailPendingAdvisorStep/EmailPendingAdvisorStep.jsx"),
 );
 
 const OnboardingFlowScreen = () => {
@@ -78,6 +86,10 @@ const OnboardingFlowScreen = () => {
   // Plan 2026-09-29 (cliente email OTP): handlers para EMAIL_OTP_VALIDATION.
   const { verificarOTPEmail, reenviarOTPEmail, validating: validatingEmail, error: errorEmail } = useEmailOTP(getLeadId);
   const { submitPick, submitting: pickerLoading, error: pickerError } = usePhonePicker();
+  // Plan 2026-10-09 (email pre-pick advisor gate): único side-effect es
+  // abrir el chat de Callbell cuando el cliente clickea el botón. El hook
+  // memoiza la referencia para no romper el `memo` del componente puro.
+  const { handleContactAdvisor } = useEmailPendingAdvisor();
 
   const handlePrevStep = navigateToPrev;
 
@@ -165,10 +177,19 @@ const OnboardingFlowScreen = () => {
     async (codigo) => {
       const result = await verificarOTP(codigo);
 
+      // Plan 2026-10-09 (email pre-pick advisor gate): el back hace el
+      // upfront email check ANTES del picker (es el primero en la cadena
+      // de gates). Si el email del cliente COFA es inválido, navegamos
+      // al step EMAIL_PENDING_ADVISOR sin disparar el picker.
+      if (result?.requiresAdvisorContact === true) {
+        setOnboardingStep(LOAN_SIM_STEPS.EMAIL_PENDING_ADVISOR);
+        return;
+      }
+
       // Phone picker trigger: el back devolvió el shape `requiresPhonePicker`
       // en lugar de `success: true`. Persistimos el contexto (options + target)
       // y navegamos al step PHONE_PICKER. La presentación queda en PhonePickerStep.
-     
+
       if (result?.requiresPhonePicker) {
         handlePickerTriggered({
           options: result.options ?? [],
@@ -323,6 +344,16 @@ const OnboardingFlowScreen = () => {
             onPick={handlePickerPick}
             loading={pickerLoading}
             error={pickerError}
+          />
+        );
+      // Plan 2026-10-09 (email pre-pick advisor gate): el back nos puso
+      // en este step cuando el email del cliente COFA es inválido en SB.
+      // El componente es puro presentacional — el side-effect (abrir
+      // Callbell) vive en el hook useEmailPendingAdvisor.
+      case LOAN_SIM_STEPS.EMAIL_PENDING_ADVISOR:
+        return (
+          <EmailPendingAdvisorStep
+            onContactAdvisor={handleContactAdvisor}
           />
         );
       default:
