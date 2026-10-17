@@ -1,6 +1,6 @@
 import React, { memo } from "react";
 import PropTypes from "prop-types";
-import GenericButton from "../../../../components/buttons/GenericButton/GenericButton.jsx";
+import GenericButton from "../../../../Components/buttons/GenericButton/GenericButton.jsx";
 import styles from "./EmailPendingAdvisorStep.module.css";
 
 const TITLE_ID = "email-pending-advisor-title";
