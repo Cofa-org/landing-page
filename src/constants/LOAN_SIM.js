@@ -26,6 +26,12 @@ export const LOAN_SIM_STEPS = {
   // con un asesor" + botón Callbell. Recarga → re-check → si email
   // ahora válido, transición a PHONE_PICKER.
   EMAIL_PENDING_ADVISOR: "EMAIL_PENDING_ADVISOR",
+  // Plan 2026-10-20 (gate de validación manual de CBU): lead cliente
+  // COFA que pasó por el gate de asesor por email y que cambia su
+  // CBU/CVU. La simulación queda esperando la validación de un asesor.
+  // El string DEBE coincidir con ESTADO_SIMULACION.PENDING_CBU_VALIDATION
+  // del back (el front hace setStep(LOAN_SIM_STEPS[existingState])).
+  PENDING_CBU_VALIDATION: "PENDING_CBU_VALIDATION",
 };
 
 export const OTP_CONFIG = {
@@ -146,6 +152,19 @@ export const REJECTION_CONFIG = {
     primaryAction: {
       label: "Comunicarme con un asesor",
       href: "https://wa.me/5491137570853?text=Hola!!%20Necesito%20ayuda%20para%20simular%20mi%20préstamo!",
+      target: "_blank",
+    },
+  },
+  CBU_REJECTED: {
+    cause: "CBU_REJECTED",
+    title: "No pudimos validar tu cuenta bancaria",
+    description:
+      "Un asesor revisó el CBU/CVU que ingresaste y no pudo validarlo. " +
+      "Ponete en contacto con un operador para más información.",
+    illustration: null, // RejectedStep renderiza MdWarning de react-icons cuando illustration es null; no usa imagen.
+    primaryAction: {
+      label: "Comunicarme con un asesor",
+      href: "https://wa.me/5491137570853?text=Hola!!%20Necesito%20ayuda%20con%20la%20validación%20de%20mi%20CBU",
       target: "_blank",
     },
   },

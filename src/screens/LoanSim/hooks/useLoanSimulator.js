@@ -338,6 +338,15 @@ export const useLoanSimulator = () => {
             if (existingState !== LOAN_SIM_STEPS.DISPOSITIVO_RECHAZADO) {
               setStep(LOAN_SIM_STEPS[existingState]);
             }
+            // Plan 2026-10-20: si la simulación quedó rechazada por la
+            // validación manual del CBU, el motivo lo distingue de los
+            // otros rechazos para mostrar el mensaje correcto.
+            if (existingState === LOAN_SIM_STEPS.RECHAZADO) {
+              const motivo = newData?.existingSimulation?.motivo;
+              if (motivo === "CBU_RECHAZADO_POR_ASESOR") {
+                setRejectionReason("CBU_REJECTED");
+              }
+            }
             if (newData?.existingSimulation?.email) {
               setEmail(newData.existingSimulation.email);
             }
@@ -414,6 +423,23 @@ export const useLoanSimulator = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedAmount, scoringData.scoringId]);
+
+  /**
+   * Re-consulta el estado de la simulación (Plan 2026-10-20).
+   *
+   * Lo usa el botón "Verificar estado" de la pantalla
+   * PENDING_CBU_VALIDATION para saber si el asesor ya validó (CBU) o
+   * rechazó (RECHAZADO) el cambio de cuenta.
+   *
+   * El routing no está explícito acá a propósito: `fetchSimulation`
+   * ya resuelve el step a partir de `existingSimulation.estado`
+   * (`setStep(LOAN_SIM_STEPS[existingState])`) y el bloque de restore
+   * setea `rejectionReason` cuando el motivo es
+   * `CBU_RECHAZADO_POR_ASESOR`.
+   */
+  const verificarEstadoCBU = useCallback(async () => {
+    await fetchSimulationRef.current(0, false);
+  }, []);
 
   const handleAmountChange = (newAmount, discountInstallmentRounded) => {
     if (newAmount <= discountInstallmentRounded) {
@@ -621,6 +647,15 @@ export const useLoanSimulator = () => {
           `${cbuResponse.message} 😕` ||
             "¡Lo sentimos! No pudimos validar tu CBU. Revisá los datos e intentá nuevamente 😕",
         );
+        return;
+      }
+
+      // Plan 2026-10-20 (gate de validación manual de CBU): el back
+      // parked la simulación en PENDING_CBU_VALIDATION. NO seguimos con
+      // `aceptarTerminos` — el préstamo no se puede crear hasta que un
+      // asesor valide el cambio de cuenta.
+      if (cbuResponse.pending === true) {
+        setStep(LOAN_SIM_STEPS.PENDING_CBU_VALIDATION);
         return;
       }
 
@@ -847,6 +882,7 @@ export const useLoanSimulator = () => {
     verificarOTP,
     guardarCompliance,
     validarCBU,
+    verificarEstadoCBU,
     validarCodigoBancoHandler,
     handleInfoPrestamo,
     setStep,
