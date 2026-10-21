@@ -37,18 +37,20 @@ describe("constantes del gate de validación de CBU (Plan 2026-10-20)", () => {
     expect(cfg.cause).toBe("CBU_REJECTED");
     expect(typeof cfg.title).toBe("string");
     expect(typeof cfg.description).toBe("string");
-    expect(cfg.primaryAction.label).toBeTruthy();
-    expect(cfg.primaryAction.href).toBeTruthy();
+    expect(cfg.illustration).toBeTruthy();
   });
 
-  it("el texto de la configuración usa voseo (español rioplatense)", () => {
+  it("el rechazo de CBU no tiene descripción ni botón (el cliente ya habló con un operador)", () => {
+    const cfg = REJECTION_CONFIG.CBU_REJECTED;
+    // Sin descripción ni CTA: el cliente ya se comunicó con un operador antes
+    // de caer en esta pantalla → pedirle que vuelva a hablar es redundante.
+    expect(cfg.description).toBe("");
+    expect(cfg.primaryAction).toBeUndefined();
+  });
+
+  it('el copy no usa formas de "usted"', () => {
     const text = `${REJECTION_CONFIG.CBU_REJECTED.title} ${REJECTION_CONFIG.CBU_REJECTED.description}`;
-    // Marcadores de voseo reales. Antes se usaba /valid|Valid/ como proxy, pero
-    // eso solo pasaba porque el copy viejo decía "No pudimos validar tu cuenta
-    // bancaria" — el "validar" no era el marcador de voseo, era casualidad.
-    expect(text).toMatch(/ponate|podés|necesitás|pedís|escribinos/i);
-    // Y nada de "usted".
-    expect(text).not.toMatch(/\busted\b|\bvalida el\b|\bpuedes\b|\bnecesitas\b/i);
+    expect(text).not.toMatch(/\busted\b|\bvalida el\b|\bpuedes\b|\bnecesitas\b|\bpuede\b/i);
   });
 
   it("el copy del rechazo es genérico: no revela la revisión manual ni el motivo", () => {

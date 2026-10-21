@@ -271,11 +271,10 @@ describe("LoanSimScreen — rechazo por CBU (Plan 2026-10-20)", () => {
     expect(
       await screen.findByText("En este momento no podemos avanzar con tu simulación."),
     ).toBeTruthy();
-    // El título es compartido con PHONE_NOT_VALIDATED → la descripción es lo
-    // que prueba que se renderizó la config de CBU y no la otra.
-    expect(
-      screen.getByText("Ponate en contacto con un operador para más información."),
-    ).toBeTruthy();
+    // El cliente ya habló con un operador antes de llegar acá → esta pantalla
+    // no tiene descripción ni botón de WhatsApp.
+    expect(screen.queryByText(/Ponate en contacto/i)).toBeNull();
+    expect(screen.queryByText("Comunicarme con un asesor")).toBeNull();
     expect(screen.queryByText("Dispositivo diferente detectado")).toBeNull();
     // Y tampoco aparece el detalle interno del rechazo.
     expect(screen.queryByText(/Un asesor revisó/i)).toBeNull();

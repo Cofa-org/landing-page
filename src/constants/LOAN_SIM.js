@@ -161,14 +161,11 @@ export const REJECTION_CONFIG = {
     // saber que hubo una revisión manual ni por qué falló. Reusa el mensaje
     // que la app ya usa cuando no puede validar el celular.
     title: "En este momento no podemos avanzar con tu simulación.",
-    description: "Ponate en contacto con un operador para más información.",
+    // Sin descripción ni botón: el cliente ya habló con un operador antes de
+    // llegar a esta pantalla, así que pedirle que vuelva a hablar sería
+    // redundante. `RejectedStep` no renderiza el <p> si la descripción es
+    // vacía, y el botón solo se dibuja si hay `primaryAction`.
+    description: "",
     illustration: "/img/rejected_empathy.webp",
-    primaryAction: {
-      label: "Comunicarme con un asesor",
-      // El texto pre-cargado sí menciona el CBU a propósito: es lo que el
-      // cliente le manda al operador, y el operador necesita el contexto.
-      href: "https://wa.me/5491137570853?text=Hola!!%20Necesito%20ayuda%20con%20la%20validación%20de%20mi%20CBU",
-      target: "_blank",
-    },
   },
 };
