@@ -296,6 +296,7 @@ export default class LeadRegistrationService {
         signal,
       );
       const data = await response.json();
+      
       if (!response.ok) {
         throw new Error(data.message || "Error al verificar OTP de celular");
       }

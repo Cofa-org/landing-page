@@ -180,6 +180,19 @@ export const useOnboardingFlow = (resumeShortId = null) => {
             setPickerContext(null);
             setEmailOtpDestination(response.data.emailOtpDestination);
           }
+          // Plan 2026-10-09 (email pre-pick advisor gate): si el back
+          // reporta que el lead requiere contacto con asesor (email
+          // inválido en SB), forzamos el step a EMAIL_PENDING_ADVISOR.
+          // Override gana sobre emailOtpDestination (advisor gate es
+          // anterior al email OTP en el flow) y sobre PHONE_PICKER
+          // (porque el email es el blocker para llegar al picker).
+          // Strict === true: requiere el field presente Y en true;
+          // back legacy sin la propiedad no dispara el override.
+          if (response.data.requiresAdvisorContact === true) {
+            targetStep = LOAN_SIM_STEPS.EMAIL_PENDING_ADVISOR;
+            setPickerContext(null);
+            setEmailOtpDestination(null);
+          }
           // Patch 2026-08-31 (OTP resend fix): la condición original
           // `if (leadData?.celular)` estaba invertida — sólo sobrescribía
           // `leadData` cuando YA tenía celular, dejando `leadData.celular`

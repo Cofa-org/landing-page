@@ -4,7 +4,7 @@
   left: 250px;
   z-index: 9999;
   min-width: 375px;
-  max-width: calc(100vw - 40px);
+  max-width: 550px;
   padding: 16px 16px 14px;
   border-radius: var(--border-radius-md, 15px);
   background: #ffffff;
@@ -21,7 +21,11 @@
   line-height: 1.4;
   border: 1px solid rgba(36, 149, 87, 0.12);
 }
-
+@media (max-width: 1275px) {
+ .panel {
+  max-width: 400px;
+ }
+}
 .header {
   display: flex;
   flex-direction: column;
@@ -106,7 +110,7 @@
 @media (max-width: 1460px) {
   .panel {
     position: absolute;
-    top: 300px;
+    top: 100px;
     left: 3%;
     min-width: 0;
   }

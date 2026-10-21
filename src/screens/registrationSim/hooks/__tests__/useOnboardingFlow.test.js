@@ -455,3 +455,164 @@ describe("useOnboardingFlow — EMAIL_OTP_VALIDATION navigation", () => {
     });
   });
 });
+
+// Plan 2026-10-09 (email pre-pick advisor gate): cuando el back reporta
+// `requiresAdvisorContact: true`, el restore debe forzar el step a
+// EMAIL_PENDING_ADVISOR (cliente COFA con email inválido en SB → debe
+// contactarse con un asesor antes de llegar al picker). El override gana
+// sobre `emailOtpDestination` y sobre PHONE_PICKER porque es el primer
+// gate (pre-pick) del flujo. Restore override añadido después del bloque
+// emailOtpDestination (precedencia por orden de checks).
+describe("useOnboardingFlow.restoreOnboardingState — requiresAdvisorContact override (Plan 2026-10-09)", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    // Default: el lead tiene un token válido → el restore effect corre.
+    getCookie.mockResolvedValue("valid.jwt.token");
+    getDecodedToken.mockReturnValue({ leadId: 30 });
+  });
+
+  it("requiresAdvisorContact=true → restaura a EMAIL_PENDING_ADVISOR", async () => {
+    LeadRegistrationService.obtenerEstadoOnboarding = vi.fn().mockResolvedValue({
+      success: true,
+      data: {
+        estado_onboarding: "PHONE_VALIDATION",
+        es_cliente: true,
+        celular: "1144456677",
+        requiresAdvisorContact: true,
+      },
+    });
+
+    const { result } = renderHook(() => useOnboardingFlow());
+
+    await waitFor(() => {
+      expect(result.current.restoringOnboarding).toBe(false);
+    });
+
+    expect(result.current.onboardingStep).toBe(LOAN_SIM_STEPS.EMAIL_PENDING_ADVISOR);
+    // pickerContext debe quedar null (es stale; el usuario nunca llegó al picker).
+    expect(result.current.pickerContext).toBeNull();
+    // emailOtpDestination debe quedar null (override limpia el destination
+    // pendiente del EMAIL_OTP_VALIDATION anterior).
+    expect(result.current.emailOtpDestination).toBeNull();
+  });
+
+  it("requiresAdvisorContact=true + emailOtpDestination='cliente@example.com' → EMAIL_PENDING_ADVISOR gana (override)", async () => {
+    LeadRegistrationService.obtenerEstadoOnboarding = vi.fn().mockResolvedValue({
+      success: true,
+      data: {
+        estado_onboarding: "PHONE_PICKER",
+        es_cliente: true,
+        celular: "1144456677",
+        // Ambas flags presentes: el override gana porque el advisor gate
+        // es anterior al email OTP en el flow.
+        emailOtpDestination: "cliente@example.com",
+        requiresAdvisorContact: true,
+        pickerContext: { options: ["1", "2", "3", "4"], target: "1144450000" },
+      },
+    });
+
+    const { result } = renderHook(() => useOnboardingFlow());
+
+    await waitFor(() => {
+      expect(result.current.restoringOnboarding).toBe(false);
+    });
+
+    expect(result.current.onboardingStep).toBe(LOAN_SIM_STEPS.EMAIL_PENDING_ADVISOR);
+    expect(result.current.onboardingStep).not.toBe(LOAN_SIM_STEPS.EMAIL_OTP_VALIDATION);
+    expect(result.current.pickerContext).toBeNull();
+    expect(result.current.emailOtpDestination).toBeNull();
+  });
+
+  it("requiresAdvisorContact=false + emailOtpDestination=null + pickerContext existe → PHONE_PICKER (regresión)", async () => {
+    // Verifica que el override NO se dispara cuando la flag no está presente,
+    // preservando el comportamiento previo (override es strict === true).
+    LeadRegistrationService.obtenerEstadoOnboarding = vi.fn().mockResolvedValue({
+      success: true,
+      data: {
+        estado_onboarding: "PHONE_PICKER",
+        es_cliente: true,
+        celular: "1144456677",
+        emailOtpDestination: null,
+        requiresAdvisorContact: false,
+        pickerContext: { options: ["1", "2", "3", "4"], target: "1144450000" },
+      },
+    });
+
+    const { result } = renderHook(() => useOnboardingFlow());
+
+    await waitFor(() => {
+      expect(result.current.restoringOnboarding).toBe(false);
+    });
+
+    expect(result.current.onboardingStep).toBe(LOAN_SIM_STEPS.PHONE_PICKER);
+    expect(result.current.pickerContext).not.toBeNull();
+    expect(result.current.emailOtpDestination).toBeNull();
+  });
+
+  it("requiresAdvisorContact ausente (back legacy) → comportamiento previo preservado (PHONE_VALIDATION)", async () => {
+    // Si el back no incluye la propiedad, el restore debe comportarse como
+    // antes del plan 2026-10-09 (strict === true: cualquier valor distinto
+    // a true no dispara el override).
+    LeadRegistrationService.obtenerEstadoOnboarding = vi.fn().mockResolvedValue({
+      success: true,
+      data: {
+        estado_onboarding: "LEAD_CREADO",
+        es_cliente: true,
+        celular: "1144456677",
+        // requiresAdvisorContact: undefined (back legacy / pre-2026-10-09)
+      },
+    });
+
+    const { result } = renderHook(() => useOnboardingFlow());
+
+    await waitFor(() => {
+      expect(result.current.restoringOnboarding).toBe(false);
+    });
+
+    expect(result.current.onboardingStep).toBe(LOAN_SIM_STEPS.PHONE_VALIDATION);
+    expect(result.current.onboardingStep).not.toBe(LOAN_SIM_STEPS.EMAIL_PENDING_ADVISOR);
+  });
+});
+
+// Plan 2026-10-09 (email pre-pick advisor gate): back-button guard.
+// EMAIL_PENDING_ADVISOR no debe estar en PREV_STEP_MAP (no back from the
+// advisor step) ni en BACK_BUTTON_STEPS (no back button visible).
+describe("useOnboardingFlow — EMAIL_PENDING_ADVISOR back-button guard (Plan 2026-10-09)", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("navigateToPrev desde EMAIL_PENDING_ADVISOR → no navega (PREV_STEP_MAP no incluye el step)", async () => {
+    const { result } = renderHook(() => useOnboardingFlow());
+
+    await waitFor(() => {
+      expect(result.current.restoringOnboarding).toBe(false);
+    });
+
+    await act(async () => {
+      result.current.setOnboardingStep(LOAN_SIM_STEPS.EMAIL_PENDING_ADVISOR);
+    });
+    await waitFor(() => {
+      expect(result.current.onboardingStep).toBe(LOAN_SIM_STEPS.EMAIL_PENDING_ADVISOR);
+    });
+
+    await act(async () => {
+      await result.current.navigateToPrev();
+    });
+
+    // Step no debe cambiar (PREV_STEP_MAP[EMAIL_PENDING_ADVISOR] === undefined
+    // → navigateToPrev no asigna nada).
+    expect(result.current.onboardingStep).toBe(LOAN_SIM_STEPS.EMAIL_PENDING_ADVISOR);
+  });
+
+  it("shouldShowBackButton desde EMAIL_PENDING_ADVISOR → false (BACK_BUTTON_STEPS no lo incluye)", () => {
+    const { result } = renderHook(() => useOnboardingFlow());
+
+    act(() => {
+      result.current.setOnboardingStep(LOAN_SIM_STEPS.EMAIL_PENDING_ADVISOR);
+    });
+
+    expect(result.current.shouldShowBackButton()).toBe(false);
+  });
+});
+
