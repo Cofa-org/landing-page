@@ -11,9 +11,11 @@ describe("PendingCbuValidation (Plan 2026-10-20)", () => {
   it("renderiza el título de la pantalla", () => {
     render(<PendingCbuValidation onContactAdvisor={vi.fn()} onVerificarEstado={vi.fn()} />);
     expect(screen.getByTestId("pending-cbu-validation")).toBeInTheDocument();
-    // ⚠️ NO usar /asesor/i: matchea el <p> del subtítulo Y el botón
+    // ⚠️ NO usar /asesor/i: matchea el <h2>, el <p> del subtítulo Y el botón
     // "Comunicarse con un asesor" → getByText tira "Found multiple elements".
-    expect(screen.getByText(/Un asesor está revisando/i)).toBeInTheDocument();
+    // Por eso se asserta sobre fragmentos que son únicos de cada elemento.
+    expect(screen.getByText(/necesitamos validar tu cuenta/i)).toBeInTheDocument();
+    expect(screen.getByText(/Hablá con un asesor para continuar/i)).toBeInTheDocument();
   });
 
   it("renderiza el botón de comunicación con el asesor", () => {

@@ -19,18 +19,26 @@ const PendingCbuValidation = ({ onContactAdvisor, onVerificarEstado, loading, er
       className={styles.container}
       aria-labelledby={TITLE_ID}
       aria-describedby={SUBTITLE_ID}
-      data-testid="pending-cbu-validation"
+      data-testid='pending-cbu-validation'
     >
       <header className={styles.header}>
-        <span className={styles.eyebrow} aria-hidden="true">
+        <span
+          className={styles.eyebrow}
+          aria-hidden='true'
+        >
           Validación en curso
         </span>
-        <h2 id={TITLE_ID} className={styles.title}>
-          Estamos validando tu cuenta bancaria
+        <h2
+          id={TITLE_ID}
+          className={styles.title}
+        >
+          Hablá con un asesor para continuar
         </h2>
-        <p id={SUBTITLE_ID} className={styles.subtitle}>
-          Un asesor está revisando el CBU/CVU que ingresaste. Apenas termine la
-          validación vas a poder continuar con tu simulación.
+        <p
+          id={SUBTITLE_ID}
+          className={styles.subtitle}
+        >
+          Para continuar, necesitamos validar tu cuenta. Hablá con un asesor.
         </p>
       </header>
 
@@ -41,8 +49,8 @@ const PendingCbuValidation = ({ onContactAdvisor, onVerificarEstado, loading, er
       {error && (
         <p
           className={styles.errorText}
-          role="alert"
-          data-testid="pending-cbu-error"
+          role='alert'
+          data-testid='pending-cbu-error'
         >
           {error}
         </p>
@@ -50,23 +58,23 @@ const PendingCbuValidation = ({ onContactAdvisor, onVerificarEstado, loading, er
 
       <div className={styles.actionContainer}>
         <GenericButton
-          variant="primary"
+          variant='primary'
           onClick={onContactAdvisor}
-          data-testid="pending-cbu-contact-button"
+          data-testid='pending-cbu-contact-button'
         >
           Comunicarse con un asesor
         </GenericButton>
         <GenericButton
-          variant="secondary"
+          variant='secondary'
           onClick={onVerificarEstado}
           loading={loading}
           // `GenericButton` reemplaza el children por un spinner `aria-hidden`
           // cuando entra en loading → el botón quedaría sin nombre accesible.
           // El `aria-label` mantiene el nombre y el `aria-busy` expone el
           // estado "ocupado" (además sirve de hook para el CSS del spinner).
-          aria-label="Verificar estado"
+          aria-label='Verificar estado'
           aria-busy={loading || undefined}
-          data-testid="pending-cbu-verificar-button"
+          data-testid='pending-cbu-verificar-button'
         >
           Verificar estado
         </GenericButton>
