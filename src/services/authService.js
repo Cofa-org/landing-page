@@ -20,6 +20,7 @@ async function authRequest(path, { method = HTTP_METHOD.POST, body, signal } = {
     if (!response.ok || data.success === false) {
       const err = new Error(data.message || "Error de autenticación");
       if (data.cause) err.cause = data.cause;
+      if (data.data) err.data = data.data;
       throw err;
     }
 

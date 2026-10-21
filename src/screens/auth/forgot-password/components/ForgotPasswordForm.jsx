@@ -20,7 +20,7 @@ const ForgotPasswordForm = ({
 }) => (
   <AuthSplitLayout
     title="Seguridad ante todo"
-    sub="Tu información está protegida. El link de recuperación expira en 15 minutos."
+    sub="Tu información está protegida. El link de recuperación expira en 20 minutos."
     image="/img/security-bank-encryption.webp"
   >
     <GenericForm

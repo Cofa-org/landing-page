@@ -6,7 +6,7 @@ import styles from "../../auth.module.css";
 const ForgotPasswordSent = () => (
   <AuthSplitLayout
     title="Seguridad ante todo"
-    sub="Tu información está protegida. El link de recuperación expira en 15 minutos."
+    sub="Tu información está protegida. El link de recuperación expira en 20 minutos."
     image="/img/security-bank-encryption.webp"
   >
     <GenericForm title="Revisá tu bandeja de entrada">
@@ -16,7 +16,7 @@ const ForgotPasswordSent = () => (
         Si ya está verificada, un link para restablecer la contraseña.
         <br />
         <br />
-        El mail vence en <strong>15 minutos</strong>.
+        El mail vence en <strong>20 minutos</strong>.
       </p>
       <p className={`${styles.auxLink} ${styles.alertSpaced}`}>
         <Link to="/ingresar">Volver a ingresar</Link>

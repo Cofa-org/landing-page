@@ -15,6 +15,7 @@ const OTPValidation = ({
   destination = "",
   destinationType = "email",
   startCooldownOnMount = false,
+  cooldownSeconds = OTP_CONFIG.COOLDOWN_DURATION,
   children,
 }) => {
   const otpLength =
@@ -33,7 +34,14 @@ const OTPValidation = ({
     handlePaste,
     handleSubmit,
     handleResendClick,
-  } = useOTPValidation({ destination, onValidate, onResend, otpLength, startCooldownOnMount });
+  } = useOTPValidation({
+    destination,
+    onValidate,
+    onResend,
+    otpLength,
+    startCooldownOnMount,
+    cooldownSeconds,
+  });
 
   const title =
     destinationType === OTP_CONFIG.DESTINATION_TYPE.PHONE ? "Verificá tu celular" : "Verificá tu email";
@@ -115,6 +123,7 @@ OTPValidation.propTypes = {
   destination: PropTypes.string,
   destinationType: PropTypes.oneOf(["phone", "email"]),
   startCooldownOnMount: PropTypes.bool,
+  cooldownSeconds: PropTypes.number,
   children: PropTypes.node,
 };
 

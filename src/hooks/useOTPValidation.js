@@ -7,6 +7,7 @@ export const useOTPValidation = ({
   onResend,
   otpLength = OTP_CONFIG.OTP_EMAIL_LENGTH,
   startCooldownOnMount = false,
+  cooldownSeconds = OTP_CONFIG.COOLDOWN_DURATION,
 }) => {
   const [otp, setOtp] = useState(() => new Array(otpLength).fill(""));
   const inputRefs = useRef([]);
@@ -27,11 +28,11 @@ export const useOTPValidation = ({
       localStorage.removeItem("otp_cooldown_expiry");
     }
     if (startCooldownOnMount) {
-      const expiry = Date.now() + OTP_CONFIG.COOLDOWN_DURATION * 1000;
+      const expiry = Date.now() + cooldownSeconds * 1000;
       localStorage.setItem("otp_cooldown_expiry", expiry.toString());
-      setCooldown(OTP_CONFIG.COOLDOWN_DURATION);
+      setCooldown(cooldownSeconds);
     }
-  }, [startCooldownOnMount]);
+  }, [startCooldownOnMount, cooldownSeconds]);
 
   useEffect(() => {
     if (cooldown <= 0) return;
@@ -91,9 +92,9 @@ export const useOTPValidation = ({
   
     if (onResend) {
       await onResend(destination);
-      const expiry = Date.now() + OTP_CONFIG.COOLDOWN_DURATION * 1000;
+      const expiry = Date.now() + cooldownSeconds * 1000;
       localStorage.setItem("otp_cooldown_expiry", expiry.toString());
-      setCooldown(OTP_CONFIG.COOLDOWN_DURATION);
+      setCooldown(cooldownSeconds);
     }
   };
 
