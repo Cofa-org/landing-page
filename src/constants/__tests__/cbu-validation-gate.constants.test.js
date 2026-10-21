@@ -43,7 +43,16 @@ describe("constantes del gate de validación de CBU (Plan 2026-10-20)", () => {
 
   it("el texto de la configuración usa voseo (español rioplatense)", () => {
     const text = `${REJECTION_CONFIG.CBU_REJECTED.title} ${REJECTION_CONFIG.CBU_REJECTED.description}`;
-    expect(text).toMatch(/valid|Valid/);
-    expect(text).not.toMatch(/\busted\b|\bvalida el\b/);
+    // Marcadores de voseo reales. Antes se usaba /valid|Valid/ como proxy, pero
+    // eso solo pasaba porque el copy viejo decía "No pudimos validar tu cuenta
+    // bancaria" — el "validar" no era el marcador de voseo, era casualidad.
+    expect(text).toMatch(/ponate|podés|necesitás|pedís|escribinos/i);
+    // Y nada de "usted".
+    expect(text).not.toMatch(/\busted\b|\bvalida el\b|\bpuedes\b|\bnecesitas\b/i);
+  });
+
+  it("el copy del rechazo es genérico: no revela la revisión manual ni el motivo", () => {
+    const text = `${REJECTION_CONFIG.CBU_REJECTED.title} ${REJECTION_CONFIG.CBU_REJECTED.description}`;
+    expect(text).not.toMatch(/asesor revisó|no pudo validar|validar tu cuenta/i);
   });
 });

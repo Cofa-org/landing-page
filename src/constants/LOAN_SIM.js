@@ -157,13 +157,16 @@ export const REJECTION_CONFIG = {
   },
   CBU_REJECTED: {
     cause: "CBU_REJECTED",
-    title: "No pudimos validar tu cuenta bancaria",
-    description:
-      "Un asesor revisó el CBU/CVU que ingresaste y no pudo validarlo. " +
-      "Ponete en contacto con un operador para más información.",
-    illustration: null, // RejectedStep renderiza MdWarning de react-icons cuando illustration es null; no usa imagen.
+    // Copy genérico (pedido del usuario el 2026-10-21): el cliente no debe
+    // saber que hubo una revisión manual ni por qué falló. Reusa el mensaje
+    // que la app ya usa cuando no puede validar el celular.
+    title: "En este momento no podemos avanzar con tu simulación.",
+    description: "Ponate en contacto con un operador para más información.",
+    illustration: "/img/rejected_empathy.webp",
     primaryAction: {
       label: "Comunicarme con un asesor",
+      // El texto pre-cargado sí menciona el CBU a propósito: es lo que el
+      // cliente le manda al operador, y el operador necesita el contexto.
       href: "https://wa.me/5491137570853?text=Hola!!%20Necesito%20ayuda%20con%20la%20validación%20de%20mi%20CBU",
       target: "_blank",
     },

@@ -265,9 +265,19 @@ describe("LoanSimScreen — rechazo por CBU (Plan 2026-10-20)", () => {
     renderScreen();
 
     // Async: `RejectedStep` se registra con React.lazy.
+    // El copy del rechazo de CBU es genérico (reusa el título de "no podemos
+    // avanzar" de PHONE_NOT_VALIDATED) → no revela que hubo una revisión
+    // manual ni por qué falló.
     expect(
-      await screen.findByText("No pudimos validar tu cuenta bancaria"),
+      await screen.findByText("En este momento no podemos avanzar con tu simulación."),
+    ).toBeTruthy();
+    // El título es compartido con PHONE_NOT_VALIDATED → la descripción es lo
+    // que prueba que se renderizó la config de CBU y no la otra.
+    expect(
+      screen.getByText("Ponate en contacto con un operador para más información."),
     ).toBeTruthy();
     expect(screen.queryByText("Dispositivo diferente detectado")).toBeNull();
+    // Y tampoco aparece el detalle interno del rechazo.
+    expect(screen.queryByText(/Un asesor revisó/i)).toBeNull();
   });
 });
