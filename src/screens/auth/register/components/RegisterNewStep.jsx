@@ -7,6 +7,11 @@ import Turnstile from "../../../../Components/Turnstile/Turnstile.jsx";
 import { TURNSTILE_SITE_KEY } from "../../../../config.js";
 import HoneypotField from "../../HoneypotField.jsx";
 import AuthSplitLayout from "../../AuthSplitLayout.jsx";
+import {
+  PASSWORD_HELPER_TEXT,
+  getPasswordPolicyError,
+  isPasswordPolicyValid,
+} from "../../passwordPolicy.js";
 import styles from "../../auth.module.css";
 
 const RegisterNewStep = ({
@@ -46,12 +51,8 @@ const RegisterNewStep = ({
         autoComplete="new-password"
         required
         minLength={8}
-        helperText="Al menos 8 caracteres. No hace falta mayúsculas ni símbolos."
-        error={
-          password.length > 0 && Array.from(password).length < 8
-            ? "La contraseña tiene que tener al menos 8 caracteres."
-            : ""
-        }
+        helperText={PASSWORD_HELPER_TEXT}
+        error={password.length > 0 ? getPasswordPolicyError(password) : ""}
       />
       <HoneypotField value={honeypot} onChange={(e) => setHoneypot(e.target.value)} />
       <div className={styles.turnstileWrapper}>
@@ -69,7 +70,7 @@ const RegisterNewStep = ({
           type="submit"
           loading={loading}
           disabled={
-            loading || !turnstile.token || !email.trim() || Array.from(password).length < 8
+            loading || !turnstile.token || !email.trim() || !isPasswordPolicyValid(password)
           }
         >
           Crear cuenta

@@ -181,7 +181,7 @@ describe("RegisterScreen — honeypot", () => {
 
     // 2. Rellenar email, contraseña y honeypot
     fillByName(container, "email", "nuevo@test.com");
-    fillByName(container, "password", "password123");
+    fillByName(container, "password", "password123!");
     fillHoneypot(container);
 
     fireEvent.click(screen.getByRole("button", { name: /crear cuenta/i }));
@@ -200,14 +200,14 @@ describe("RegisterScreen — honeypot", () => {
 
     // 2. Rellenar email y contraseña (sin honeypot)
     fillByName(container, "email", "nuevo@test.com");
-    fillByName(container, "password", "password123");
+    fillByName(container, "password", "password123!");
 
     fireEvent.click(screen.getByRole("button", { name: /crear cuenta/i }));
 
     await waitFor(() => {
       expect(authService.register).toHaveBeenCalledWith(
         "nuevo@test.com",
-        "password123",
+        "password123!",
         "fake-turnstile-token",
         "20301234568", // cuit del paso DNI
       );
@@ -271,8 +271,8 @@ describe("ResetPasswordScreen — honeypot", () => {
   it("no llama a resetPassword si el honeypot está relleno", async () => {
     const { container } = renderInRouter(<ResetPasswordScreen />, { route: "/?token=valid-token-12345" });
 
-    fillByName(container, "newPassword", "nuevaPass123");
-    fillByName(container, "confirmPassword", "nuevaPass123");
+    fillByName(container, "newPassword", "nuevaPass123!");
+    fillByName(container, "confirmPassword", "nuevaPass123!");
     fillHoneypot(container);
 
     fireEvent.click(screen.getByRole("button", { name: /cambiar contraseña/i }));

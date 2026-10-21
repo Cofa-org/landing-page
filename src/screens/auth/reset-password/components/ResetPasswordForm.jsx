@@ -6,6 +6,11 @@ import Turnstile from "../../../../Components/Turnstile/Turnstile.jsx";
 import { TURNSTILE_SITE_KEY } from "../../../../config.js";
 import HoneypotField from "../../HoneypotField.jsx";
 import AuthSplitLayout from "../../AuthSplitLayout.jsx";
+import {
+  PASSWORD_HELPER_TEXT,
+  getPasswordPolicyError,
+  isPasswordPolicyValid,
+} from "../../passwordPolicy.js";
 import { RESET_LAYOUT } from "../hooks/useResetPassword.js";
 import styles from "../../auth.module.css";
 
@@ -35,12 +40,8 @@ const ResetPasswordForm = ({
         autoComplete="new-password"
         required
         minLength={8}
-        helperText="Al menos 8 caracteres. No hace falta mayúsculas ni símbolos."
-        error={
-          newPassword.length > 0 && Array.from(newPassword).length < 8
-            ? "La contraseña tiene que tener al menos 8 caracteres."
-            : ""
-        }
+        helperText={PASSWORD_HELPER_TEXT}
+        error={newPassword.length > 0 ? getPasswordPolicyError(newPassword) : ""}
       />
 
       <PasswordInput
@@ -79,7 +80,7 @@ const ResetPasswordForm = ({
           disabled={
             loading ||
             !turnstile.token ||
-            Array.from(newPassword).length < 8 ||
+            !isPasswordPolicyValid(newPassword) ||
             !confirmPassword ||
             newPassword !== confirmPassword
           }

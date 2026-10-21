@@ -6,6 +6,11 @@ import PasswordInput from "../../Components/Forms/GenericInput/PasswordInput.jsx
 import GenericInput from "../../Components/Forms/GenericInput/GenericInput.jsx";
 import { useAuth } from "../../context/index.js";
 import authService from "../../services/authService.js";
+import {
+  PASSWORD_HELPER_TEXT,
+  getPasswordPolicyError,
+  isPasswordPolicyValid,
+} from "../auth/passwordPolicy.js";
 import PerfilTabs from "./PerfilTabs.jsx";
 import styles from "./MiPerfilScreen.module.css";
 
@@ -20,7 +25,7 @@ function CambiarContrasena() {
   const canSubmit =
     !loading &&
     currentPassword.length > 0 &&
-    newPassword.length >= 8 &&
+    isPasswordPolicyValid(newPassword) &&
     newPassword === confirmPassword;
 
   const handleSubmit = async (e) => {
@@ -63,12 +68,8 @@ function CambiarContrasena() {
             autoComplete="new-password"
             required
             minLength={8}
-            helperText="Al menos 8 caracteres. No hace falta mayúsculas ni símbolos."
-            error={
-              newPassword.length > 0 && Array.from(newPassword).length < 8
-                ? "La contraseña tiene que tener al menos 8 caracteres."
-                : ""
-            }
+            helperText={PASSWORD_HELPER_TEXT}
+            error={newPassword.length > 0 ? getPasswordPolicyError(newPassword) : ""}
           />
           <PasswordInput
             label="Confirmar nueva contraseña"
