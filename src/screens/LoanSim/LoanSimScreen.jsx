@@ -342,6 +342,9 @@ const LoanSimScreen = () => {
           loading={testPanel.loading}
           onSelectPersona={testPanel.selectPersona}
           onReset={testPanel.resetSession}
+          onAprobarCbu={testPanel.aprobarCbu}
+          approvingCbu={testPanel.approvingCbu}
+          cbuAprobadoPara={testPanel.cbuAprobadoPara}
         />
       )}
       <Header />

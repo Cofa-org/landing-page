@@ -84,6 +84,32 @@ El back **no re-gatea**: `cbu_validado_por` ya está seteado.
   (`src/constants/LOAN_SIM.js`): la causa la setea el restore cuando
   `existingSimulation.motivo === "CBU_RECHAZADO_POR_ASESOR"`.
 
+### Caso de QA — panel de test personas (2026-10-21)
+
+El simulador de dev tiene un caso de test persona que permite ver la pantalla de
+espera del CBU **sin caminar el flujo** (un click): la persona `SIM_CBU_PENDING` del
+catálogo del back.
+
+- `src/screens/LoanSim/hooks/useTestSimuladorPanel.js` — expone `aprobarCbu(id)`,
+  `approvingCbu` y `cbuAprobadoPara`, y el set `PERSONAS_CON_APROBAR_CBU` (qué
+  personas tienen botón). Al elegir la persona del caso, el hook **resetea el
+  escenario** y navega con **full reload** (`window.location.href`): `navigate()`
+  a la misma URL no re-dispara el init del simulador, y sin el reset el caso no
+  sería repetible. El reload **preserva el `?testMode=1`** (sin él, el panel se
+  cerraría y el botón desaparecería).
+- `src/screens/LoanSim/components/TestSimuladorPanel/TestSimuladorPanel.jsx` —
+  renderiza el botón "✅ Validar CBU" (hermano del botón de persona, nunca
+  anidado). Con `loading`, `GenericButton` reemplaza los children por un spinner
+  `aria-hidden` → el `aria-label` es obligatorio para no perder el nombre
+  accesible, y tiene que **contener el texto visible** (WCAG 2.5.3).
+- El approve **responde HTTP 200 en los dos casos** (aprobó / no había nada
+  pendiente) → el panel mira `result.success` y `result.message`, no una
+  excepción.
+
+> El panel sólo se ve con `VITE_DEV=true` o `?testMode=1`: el gate es
+> `isTestPersonasVisible()` = `parseBool(import.meta.env.VITE_DEV) || ?testMode=1`
+> — **no** `import.meta.env.DEV`.
+
 Back, spec y runbook: `landing-page-backend/modules/simulador-prestamos/simulador-prestamos.md`,
 `docs/superpowers/specs/2026-10-20-pending-cbu-validation-design.md` y
 `docs/superpowers/execution/2026-10-20-deploy-gate-cbu.md`.
