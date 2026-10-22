@@ -1,6 +1,7 @@
 import { LANDING_BACKEND_URL, LANDING_BACKEND_API_KEY } from "../config";
 import { HTTP_METHOD } from "../constants/HTTP_METHODS.js";
 import { HttpApi } from "../lib/http.js";
+import { parseErrorResponse } from "../lib/http-error.js";
 import { getCookie } from "../lib/utils";
 import { COOKIE_LEAD_TOKEN_CONFIG } from "../constants/LOAN_SIM.js";
 
@@ -174,9 +175,19 @@ export default class LeadRegistrationService {
         signal,
       );
 
-      const data = await response.json();
       if (!response.ok) {
-        throw new Error(data.message || "Error al obtener el estado del lead");
+        const failure = await parseErrorResponse(response);
+        throw Object.assign(new Error(failure.message || "Error al obtener el estado del lead"), {
+          status: failure.status,
+          cause: failure.cause,
+        });
+      }
+      const data = await response.json();
+      if (data.success === false) {
+        throw Object.assign(new Error(data.message || "Error al obtener el estado del lead"), {
+          status: data.status,
+          cause: data.cause,
+        });
       }
       return data;
     } catch (error) {

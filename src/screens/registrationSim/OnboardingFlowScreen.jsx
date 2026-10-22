@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import Loader from "../../Components/Loader/Loader.jsx";
 import OTPValidation from "../../Components/OTPValidation/OTPValidation.jsx";
 import BackButton from "../../Components/buttons/backbutton/BackButton.jsx";
+import GenericButton from "../../Components/buttons/GenericButton/GenericButton.jsx";
 import { Footer, Header } from "../../Components/index.js";
 import { HeroLoanSim } from "../../Sections/index.js";
 import { COOKIE_LEAD_TOKEN_CONFIG, LOAN_SIM_STEPS, ONBOARDING_STATES, OTP_CONFIG } from "../../constants/LOAN_SIM.js";
@@ -79,6 +80,8 @@ const OnboardingFlowScreen = () => {
     setLeadToken,
     setOnboardingStep,
     restoringOnboarding,
+    restoreError,
+    retryRestore,
     emailOtpDestination,
   } = useOnboardingFlow(resumeShortId);
 
@@ -390,7 +393,7 @@ const OnboardingFlowScreen = () => {
         <Header />
         <div className={styles.homeCalculator_calculatorBox}>
           <div className={styles.calculatorContainer}>
-            <div className={styles.loaderContainer}>
+            <div className={styles.loaderContainer} role="status">
               <Loader />
               <p className={styles.loadingText}>Preparando tu onboarding...</p>
             </div>
@@ -411,7 +414,7 @@ const OnboardingFlowScreen = () => {
           </div>
           <div className={`${styles.homeCalculator_calculatorBox} ${styles.rightColumn}`}>
             <div className={styles.calculatorContainer}>
-              {shouldShowBackButton() && (
+              {!restoreError && shouldShowBackButton() && (
                 <BackButton
                   onClick={navigateToPrev}
                   style={{
@@ -427,7 +430,17 @@ const OnboardingFlowScreen = () => {
                   </div>
                 }
               >
-                {renderStep()}
+                {restoreError && !resumeShortId ? (
+                  <div className={styles.restoreError}>
+                    <div role="alert">
+                      <h2>No pudimos recuperar tu solicitud</h2>
+                      <p>Hubo un problema temporal al consultar tus datos. Volvé a intentarlo.</p>
+                    </div>
+                    <GenericButton onClick={retryRestore} disabled={restoringOnboarding}>
+                      Reintentar
+                    </GenericButton>
+                  </div>
+                ) : renderStep()}
               </Suspense>
             </div>
           </div>

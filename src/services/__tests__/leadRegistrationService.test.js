@@ -2,6 +2,36 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import LeadRegistrationService from "../leadRegistrationService";
 
+describe("LeadRegistrationService.obtenerEstadoOnboarding errors", () => {
+  beforeEach(() => { vi.restoreAllMocks(); global.fetch = vi.fn(); });
+
+  it("rejects HTTP 200 success:false preserving the logical status and cause", async () => {
+    global.fetch.mockResolvedValue(new Response(JSON.stringify({
+      success: false, status: 503, cause: "ERP_LOOKUP_FAILED", message: "Intentá nuevamente",
+    }), { headers: { "content-type": "application/json" } }));
+    await expect(LeadRegistrationService.obtenerEstadoOnboarding(42)).rejects.toMatchObject({
+      status: 503, cause: "ERP_LOOKUP_FAILED", message: "Intentá nuevamente",
+    });
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it("preserves an HTTP JSON error", async () => {
+    global.fetch.mockResolvedValue(new Response(JSON.stringify({
+      cause: "ERP_LOOKUP_FAILED", message: "Temporalmente no disponible",
+    }), { status: 503, headers: { "content-type": "application/json" } }));
+    await expect(LeadRegistrationService.obtenerEstadoOnboarding(42)).rejects.toMatchObject({
+      status: 503, cause: "ERP_LOOKUP_FAILED",
+    });
+  });
+
+  it("handles a proxy error without requiring JSON", async () => {
+    global.fetch.mockResolvedValue(new Response("Gateway timeout", { status: 504 }));
+    await expect(LeadRegistrationService.obtenerEstadoOnboarding(42)).rejects.toMatchObject({
+      status: 504, message: "Gateway timeout",
+    });
+  });
+});
+
 describe("LeadRegistrationService.phonePickerPick", () => {
   beforeEach(() => {
     vi.restoreAllMocks();

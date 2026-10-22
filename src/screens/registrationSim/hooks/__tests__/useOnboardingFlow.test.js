@@ -26,6 +26,56 @@ import LeadRegistrationService from "../../../../services/leadRegistrationServic
 import { getCookie } from "../../../../lib/utils.js";
 import { getDecodedToken } from "../../../../lib/token.js";
 
+describe("useOnboardingFlow manual restore recovery", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    getCookie.mockResolvedValue("existing-token");
+    getDecodedToken.mockReturnValue({ leadId: 42 });
+    LeadRegistrationService.obtenerEstadoOnboarding.mockReset();
+  });
+
+  it("exposes a restore error and retries only on request, preventing duplicate requests", async () => {
+    const failure = Object.assign(new Error("ERP unavailable"), { cause: "ERP_LOOKUP_FAILED", status: 503 });
+    LeadRegistrationService.obtenerEstadoOnboarding.mockRejectedValueOnce(failure);
+    const { result } = renderHook(() => useOnboardingFlow());
+    await waitFor(() => expect(result.current.restoringOnboarding).toBe(false));
+    expect(result.current.restoreError).toBe(failure);
+    expect(LeadRegistrationService.obtenerEstadoOnboarding).toHaveBeenCalledTimes(1);
+
+    let complete;
+    LeadRegistrationService.obtenerEstadoOnboarding.mockImplementationOnce(() => new Promise(resolve => { complete = resolve; }));
+    act(() => { result.current.retryRestore(); result.current.retryRestore(); });
+    await waitFor(() => expect(LeadRegistrationService.obtenerEstadoOnboarding).toHaveBeenCalledTimes(2));
+    expect(result.current.restoringOnboarding).toBe(true);
+    await act(async () => { complete({ success: true, data: { estado_onboarding: "PHONE_PICKER", pickerContext: { options: ["11", "22", "33", "44"] } } }); });
+    expect(result.current.restoreError).toBeNull();
+    expect(result.current.onboardingStep).toBe(LOAN_SIM_STEPS.PHONE_PICKER);
+    expect(result.current.leadToken).toBe("existing-token");
+  });
+
+  it("ignores a stale result after switching to resume mode", async () => {
+    let complete;
+    LeadRegistrationService.obtenerEstadoOnboarding.mockImplementationOnce(() => new Promise(resolve => { complete = resolve; }));
+    const { result, rerender } = renderHook(({ shortId }) => useOnboardingFlow(shortId), { initialProps: { shortId: null } });
+    await waitFor(() => expect(LeadRegistrationService.obtenerEstadoOnboarding).toHaveBeenCalledTimes(1));
+    rerender({ shortId: "resume-link" });
+    act(() => result.current.setOnboardingStep(LOAN_SIM_STEPS.RECIBO_UPLOAD));
+    await act(async () => { complete({ success: true, data: { estado_onboarding: "PHONE_PICKER" } }); });
+    expect(result.current.onboardingStep).toBe(LOAN_SIM_STEPS.RECIBO_UPLOAD);
+    expect(result.current.restoreError).toBeNull();
+    expect(LeadRegistrationService.obtenerEstadoOnboarding.mock.calls[0][1].aborted).toBe(true);
+  });
+
+  it("aborts restoration on unmount", async () => {
+    LeadRegistrationService.obtenerEstadoOnboarding.mockReturnValue(new Promise(() => {}));
+    const { unmount } = renderHook(() => useOnboardingFlow());
+    await waitFor(() => expect(LeadRegistrationService.obtenerEstadoOnboarding).toHaveBeenCalledTimes(1));
+    const signal = LeadRegistrationService.obtenerEstadoOnboarding.mock.calls[0][1];
+    unmount();
+    expect(signal.aborted).toBe(true);
+  });
+});
+
 describe("useOnboardingFlow.handlePickerPick — retry branch (2nd-attempt)", () => {
   beforeEach(() => {
     vi.clearAllMocks();

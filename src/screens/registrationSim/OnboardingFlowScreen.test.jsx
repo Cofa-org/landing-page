@@ -6,7 +6,7 @@
 // (initial restoringOnboarding=true) y OnboardingFlowScreen.jsx (early
 // return con Loader full-screen).
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent, act } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 
 // vi.mock es hoisted — declarar ANTES del import del Screen.
@@ -137,6 +137,27 @@ const renderScreen = (search = "/") =>
       <OnboardingFlowScreen />
     </MemoryRouter>,
   );
+
+it("offers manual recovery after ERP failure and restores the picker", async () => {
+  const { getCookie } = await import("../../lib/utils.js");
+  const { getDecodedToken } = await import("../../lib/token.js");
+  const service = (await import("../../services/leadRegistrationService.js")).default;
+  getCookie.mockResolvedValue("existing-token");
+  getDecodedToken.mockReturnValue({ leadId: 42 });
+  service.obtenerEstadoOnboarding.mockRejectedValueOnce(new Error("ERP unavailable"));
+  renderScreen();
+  expect(await screen.findByRole("alert")).toHaveTextContent("No pudimos recuperar tu solicitud");
+  expect(screen.queryByTestId("lead-registration-step")).toBeNull();
+  let complete;
+  service.obtenerEstadoOnboarding.mockImplementationOnce(() => new Promise(resolve => { complete = resolve; }));
+  fireEvent.click(screen.getByRole("button", { name: "Reintentar" }));
+  await waitFor(() => expect(complete).toBeTypeOf("function"));
+  expect(screen.getByRole("status")).toHaveTextContent("Preparando tu onboarding");
+  expect(screen.queryByRole("button", { name: "Reintentar" })).toBeNull();
+  await act(async () => { complete({ success: true, data: { estado_onboarding: "PHONE_PICKER" } }); });
+  await waitFor(() => expect(screen.queryByTestId("phone-picker-step")).not.toBeNull());
+  expect(screen.queryByRole("alert")).toBeNull();
+});
 
 describe("OnboardingFlowScreen — flash-of-step gate (flash fix 2026-09-11)", () => {
   beforeEach(() => {

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ERROR_CAUSE } from "../../../constants/error.js";
 import { COOKIE_LEAD_TOKEN_CONFIG, LOAN_SIM_STEPS, ONBOARDING_STATES } from "../../../constants/LOAN_SIM.js";
 import { getDecodedToken } from "../../../lib/token.js";
@@ -63,6 +63,9 @@ export const useOnboardingFlow = (resumeShortId = null) => {
   // (`initialSimulationResolved`) con polaridad "in-flight" en vez de "resolved".
   // Ver memoria loan-sim-initial-loading-race-2026-07-30.
   const [restoringOnboarding, setRestoringOnboarding] = useState(true);
+  const [restoreError, setRestoreError] = useState(null);
+  const [restoreAttempt, setRestoreAttempt] = useState(0);
+  const restoreInFlight = useRef(true);
   const [pendingIdentities, setPendingIdentities] = useState(null);
   const [pendingDni, setPendingDni] = useState(null);
   const [pendingCelular, setPendingCelular] = useState(null);
@@ -83,7 +86,17 @@ export const useOnboardingFlow = (resumeShortId = null) => {
     return null;
   }, [leadData, leadToken]);
 
+  const retryRestore = useCallback(() => {
+    if (resumeShortId || restoreInFlight.current) return;
+    restoreInFlight.current = true;
+    setRestoringOnboarding(true);
+    setRestoreAttempt((attempt) => attempt + 1);
+  }, [resumeShortId]);
+
   useEffect(() => {
+    const controller = new AbortController();
+    restoreInFlight.current = true;
+    setRestoreError(null);
     const restoreOnboardingState = async () => {
       // Si hay un shortId en la URL, el resume effect del screen es
       // autoritativo — consumeLink + iniciarSesionResume van a setear el
@@ -94,12 +107,14 @@ export const useOnboardingFlow = (resumeShortId = null) => {
       // el restore para que el resume sea el único que toca el step.
       // Ver memoria race-condition-restore-resume-2026-09-11.
       if (resumeShortId) {
+        restoreInFlight.current = false;
         setRestoringOnboarding(false);
         return;
       }
       setRestoringOnboarding(true);
       try {
         const leadTokenValue = await getCookie(COOKIE_LEAD_TOKEN_CONFIG.NAME);
+        if (controller.signal.aborted) return;
 
         if (!leadTokenValue) {
           setOnboardingStep(LOAN_SIM_STEPS.LEAD_REGISTRATION);
@@ -120,8 +135,8 @@ export const useOnboardingFlow = (resumeShortId = null) => {
           return;
         }
 
-        const response = await LeadRegistrationService.obtenerEstadoOnboarding(leadId);
-        console.log(response);
+        const response = await LeadRegistrationService.obtenerEstadoOnboarding(leadId, controller.signal);
+        if (controller.signal.aborted) return;
         if (response.success && response.data) {
           const estadoOnboarding = response.data.estado_onboarding;
 
@@ -210,14 +225,22 @@ export const useOnboardingFlow = (resumeShortId = null) => {
           setOnboardingStep(targetStep);
         }
       } catch (err) {
+        if (controller.signal.aborted) return;
         console.error("RESTORE_ONBOARDING_ERROR:", err);
-        // Continue normally if restoration fails
+        setRestoreError(err);
       } finally {
-        setRestoringOnboarding(false);
+        if (!controller.signal.aborted) {
+          restoreInFlight.current = false;
+          setRestoringOnboarding(false);
+        }
       }
     };
     restoreOnboardingState();
-  }, [resumeShortId]);
+    return () => {
+      controller.abort();
+      restoreInFlight.current = false;
+    };
+  }, [resumeShortId, restoreAttempt]);
 
   const BACK_BUTTON_STEPS = [
     LOAN_SIM_STEPS.IDENTITY_SELECTION,
@@ -569,6 +592,8 @@ export const useOnboardingFlow = (resumeShortId = null) => {
     leadToken,
     onboardingStep,
     restoringOnboarding,
+    restoreError,
+    retryRestore,
     pendingIdentities,
     rejectedFechaExpiracionBloqueo,
     pickerContext,
