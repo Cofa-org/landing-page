@@ -27,6 +27,8 @@ describe("CBUValidation — CBU ya validado por el asesor (Plan 2026-10-20)", ()
       />,
     );
     expect(screen.getByTestId("cbu-validation-approved")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Tu cuenta fue validada." })).toBeInTheDocument();
+    expect(screen.getByText("Confirmamos el CBU/CVU que ingresaste. Presioná “Continuar” para seguir con tu solicitud.")).toBeInTheDocument();
     expect(screen.getByText("CBU_DEL_CLIENTE")).toBeInTheDocument();
     // El CBU del ERP no debe aparecer: el asesor validó el que ingressó el cliente.
     expect(screen.queryByText("CBU_DEL_ERP")).toBeNull();

@@ -43,16 +43,18 @@ const CBUValidation = ({
   // para continuar. `onValidate` re-valida contra el ERP, pero el back ya no
   // re-gatea la cuenta porque `cbu_validado_por` quedó seteado.
   if (cbuValidado && pendingCbu) {
-    const approvedAccountLabel = pendingAccountType === "cvu" ? "CVU" : "CBU";
 
     return (
       <GenericForm
-        title={`Validación de tu ${approvedAccountLabel}`}
-        description="Tu cuenta bancaria fue validada por un asesor."
+        title={`Tu cuenta fue validada.`}
+        description='Confirmamos el CBU/CVU que ingresaste. Presioná “Continuar” para seguir con tu solicitud.'
         onSubmit={handleSubmit}
         className={styles.formOverride}
       >
-        <div className={styles.clientContainer} data-testid="cbu-validation-approved">
+        <div
+          className={styles.clientContainer}
+          data-testid='cbu-validation-approved'
+        >
           <div className={styles.cbuBox}>{pendingCbu}</div>
           {error && <span className={styles.errorText}>{error}</span>}
           <GenericButton
@@ -60,17 +62,17 @@ const CBUValidation = ({
             // `<form onSubmit={handleSubmit}>` de `GenericForm` → con
             // `type="submit"` el click dispara el `onClick` Y el submit del
             // form, y `onValidate` se llama DOS veces.
-            type="button"
-            variant="primary"
+            type='button'
+            variant='primary'
             onClick={handleSubmit}
             loading={loading}
             // `GenericButton` reemplaza el children por un spinner `aria-hidden`
             // cuando entra en loading → el botón quedaría sin nombre accesible.
             // El `aria-label` mantiene el nombre y el `aria-busy` expone el
             // estado "ocupado".
-            aria-label="Continuar"
+            aria-label='Continuar'
             aria-busy={loading || undefined}
-            data-testid="cbu-validation-approved-submit"
+            data-testid='cbu-validation-approved-submit'
           >
             Continuar
           </GenericButton>

@@ -160,12 +160,12 @@ export const REJECTION_CONFIG = {
     // Copy genérico (pedido del usuario el 2026-10-21): el cliente no debe
     // saber que hubo una revisión manual ni por qué falló. Reusa el mensaje
     // que la app ya usa cuando no puede validar el celular.
-    title: "En este momento no podemos avanzar con tu simulación.",
+    title: "En este momento no podemos continuar con tu solicitud.",
     // Sin descripción ni botón: el cliente ya habló con un operador antes de
     // llegar a esta pantalla, así que pedirle que vuelva a hablar sería
     // redundante. `RejectedStep` no renderiza el <p> si la descripción es
     // vacía, y el botón solo se dibuja si hay `primaryAction`.
-    description: "",
+    description: "Te invitamos a intentarlo nuevamente más adelante. Gracias por tu comprensión",
     illustration: "/img/rejected_empathy.webp",
   },
 };

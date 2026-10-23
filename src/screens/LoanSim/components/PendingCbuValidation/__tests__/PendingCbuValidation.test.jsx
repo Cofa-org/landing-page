@@ -11,11 +11,8 @@ describe("PendingCbuValidation (Plan 2026-10-20)", () => {
   it("renderiza el título de la pantalla", () => {
     render(<PendingCbuValidation onContactAdvisor={vi.fn()} onVerificarEstado={vi.fn()} />);
     expect(screen.getByTestId("pending-cbu-validation")).toBeInTheDocument();
-    // ⚠️ NO usar /asesor/i: matchea el <h2>, el <p> del subtítulo Y el botón
-    // "Comunicarse con un asesor" → getByText tira "Found multiple elements".
-    // Por eso se asserta sobre fragmentos que son únicos de cada elemento.
-    expect(screen.getByText(/necesitamos validar tu cuenta/i)).toBeInTheDocument();
-    expect(screen.getByText(/Hablá con un asesor para continuar/i)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Necesitamos revisar tu nueva cuenta" })).toBeInTheDocument();
+    expect(screen.getByText("Hablá con un asesor para revisar el CBU/CVU que ingresaste. Cuando te confirme que podés continuar, presioná “Verificar estado”")).toBeInTheDocument();
   });
 
   it("renderiza el botón de comunicación con el asesor", () => {
@@ -23,6 +20,7 @@ describe("PendingCbuValidation (Plan 2026-10-20)", () => {
     render(<PendingCbuValidation onContactAdvisor={onContactAdvisor} onVerificarEstado={vi.fn()} />);
     const btn = screen.getByTestId("pending-cbu-contact-button");
     expect(btn).toBeInTheDocument();
+    expect(btn).toHaveAccessibleName("Hablar con un asesor");
     btn.click();
     expect(onContactAdvisor).toHaveBeenCalledTimes(1);
   });

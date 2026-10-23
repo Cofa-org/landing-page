@@ -233,7 +233,7 @@ describe("LoanSimScreen — derivación de la cuenta validada por el asesor (Pla
     renderScreen();
 
     expect(await screen.findByTestId("cbu-validation-approved")).toBeTruthy();
-    expect(screen.getByText("Validación de tu CBU")).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Tu cuenta fue validada." })).toBeTruthy();
     expect(screen.getByText(CBU_USUARIO)).toBeTruthy();
     expect(screen.queryByText(CVU_USUARIO)).toBeNull();
   });
@@ -252,7 +252,7 @@ describe("LoanSimScreen — derivación de la cuenta validada por el asesor (Pla
     renderScreen();
 
     expect(await screen.findByTestId("cbu-validation-approved")).toBeTruthy();
-    expect(screen.getByText("Validación de tu CVU")).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Tu cuenta fue validada." })).toBeTruthy();
     expect(screen.getByText(CVU_USUARIO)).toBeTruthy();
   });
 });
@@ -265,14 +265,12 @@ describe("LoanSimScreen — rechazo por CBU (Plan 2026-10-20)", () => {
     renderScreen();
 
     // Async: `RejectedStep` se registra con React.lazy.
-    // El copy del rechazo de CBU es genérico (reusa el título de "no podemos
-    // avanzar" de PHONE_NOT_VALIDATED) → no revela que hubo una revisión
-    // manual ni por qué falló.
+    // El copy es genérico: no revela la revisión manual ni por qué falló.
     expect(
-      await screen.findByText("En este momento no podemos avanzar con tu simulación."),
+      await screen.findByText("En este momento no podemos continuar con tu solicitud."),
     ).toBeTruthy();
-    // El cliente ya habló con un operador antes de llegar acá → esta pantalla
-    // no tiene descripción ni botón de WhatsApp.
+    expect(screen.getByText("Te invitamos a intentarlo nuevamente más adelante. Gracias por tu comprensión")).toBeTruthy();
+    // El cliente ya habló con un operador: no se ofrece otro contacto.
     expect(screen.queryByText(/Ponate en contacto/i)).toBeNull();
     expect(screen.queryByText("Comunicarme con un asesor")).toBeNull();
     expect(screen.queryByText("Dispositivo diferente detectado")).toBeNull();

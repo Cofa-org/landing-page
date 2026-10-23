@@ -32,13 +32,14 @@ const PendingCbuValidation = ({ onContactAdvisor, onVerificarEstado, loading, er
           id={TITLE_ID}
           className={styles.title}
         >
-          Hablá con un asesor para continuar
+          Necesitamos revisar tu nueva cuenta
         </h2>
         <p
           id={SUBTITLE_ID}
           className={styles.subtitle}
         >
-          Para continuar, necesitamos validar tu cuenta. Hablá con un asesor.
+          Hablá con un asesor para revisar el CBU/CVU que ingresaste. Cuando te confirme que podés
+          continuar, presioná “Verificar estado”
         </p>
       </header>
 
@@ -62,7 +63,7 @@ const PendingCbuValidation = ({ onContactAdvisor, onVerificarEstado, loading, er
           onClick={onContactAdvisor}
           data-testid='pending-cbu-contact-button'
         >
-          Comunicarse con un asesor
+          Hablar con un asesor
         </GenericButton>
         <GenericButton
           variant='secondary'
