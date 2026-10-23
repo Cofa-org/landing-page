@@ -231,14 +231,10 @@ describe("LeadRegistrationService.email OTP — preserva cause en errores 4xx", 
   });
 
   it("verificarOTPEmail: error 400 + data.cause=OTP_MAX_FAIL_ATTEMPTS_EXCEEDED → el throw preserva err.cause", async () => {
-    global.fetch.mockResolvedValue({
-      ok: false,
-      json: () =>
-        Promise.resolve({
-          message: "Alcanzaste el máximo de intentos fallidos",
-          cause: "OTP_MAX_FAIL_ATTEMPTS_EXCEEDED",
-        }),
-    });
+    global.fetch.mockResolvedValue(new Response(JSON.stringify({
+      message: "Alcanzaste el máximo de intentos fallidos",
+      cause: "OTP_MAX_FAIL_ATTEMPTS_EXCEEDED",
+    }), { status: 400, headers: { "content-type": "application/json" } }));
 
     let caught;
     try {
@@ -253,14 +249,10 @@ describe("LeadRegistrationService.email OTP — preserva cause en errores 4xx", 
   });
 
   it("verificarOTPEmail: error 400 + data.cause=OTP_INVALID → el throw preserva err.cause (recoverable)", async () => {
-    global.fetch.mockResolvedValue({
-      ok: false,
-      json: () =>
-        Promise.resolve({
-          message: "El código que ingresaste no es correcto",
-          cause: "OTP_INVALID",
-        }),
-    });
+    global.fetch.mockResolvedValue(new Response(JSON.stringify({
+      message: "El código que ingresaste no es correcto",
+      cause: "OTP_INVALID",
+    }), { status: 400, headers: { "content-type": "application/json" } }));
 
     let caught;
     try {
@@ -273,14 +265,10 @@ describe("LeadRegistrationService.email OTP — preserva cause en errores 4xx", 
   });
 
   it("verificarOTPEmail: error 400 sin cause → throw normal sin .cause (no rompe)", async () => {
-    global.fetch.mockResolvedValue({
-      ok: false,
-      json: () =>
-        Promise.resolve({
-          message: "Algo salió mal",
-          // sin cause
-        }),
-    });
+    global.fetch.mockResolvedValue(new Response(JSON.stringify({
+      message: "Algo salió mal",
+      // sin cause
+    }), { status: 400, headers: { "content-type": "application/json" } }));
 
     let caught;
     try {
@@ -294,14 +282,10 @@ describe("LeadRegistrationService.email OTP — preserva cause en errores 4xx", 
   });
 
   it("solicitarOTPEmail: error 400 + data.cause=CELULAR_SIN_EMAIL_EN_SB → el throw preserva err.cause", async () => {
-    global.fetch.mockResolvedValue({
-      ok: false,
-      json: () =>
-        Promise.resolve({
-          message: "Tu cuenta en SB no tiene un email registrado",
-          cause: "CELULAR_SIN_EMAIL_EN_SB",
-        }),
-    });
+    global.fetch.mockResolvedValue(new Response(JSON.stringify({
+      message: "Tu cuenta en SB no tiene un email registrado",
+      cause: "CELULAR_SIN_EMAIL_EN_SB",
+    }), { status: 400, headers: { "content-type": "application/json" } }));
 
     let caught;
     try {
@@ -311,5 +295,63 @@ describe("LeadRegistrationService.email OTP — preserva cause en errores 4xx", 
     }
 
     expect(caught.cause).toBe("CELULAR_SIN_EMAIL_EN_SB");
+  });
+});
+
+describe.each([
+  ["solicitarOTPEmail", { leadId: 999 }, {}, "Error al solicitar OTP de email"],
+  ["verificarOTPEmail", { codigo: "123456", leadId: 999 }, { codigo: "123456" }, "Error al verificar OTP de email"],
+])("LeadRegistrationService.%s error adapter", (method, args, payload, fallback) => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+    global.fetch = vi.fn();
+  });
+
+  it.each([
+    [403, "EMAIL_OTP_FLOW_NOT_ALLOWED", "Phone validation required"],
+    [503, "EMAIL_OTP_CONTEXT_UNAVAILABLE", "Request context unavailable"],
+  ])("rejects logical %s with message and cause", async (status, cause, message) => {
+    global.fetch.mockResolvedValue(new Response(JSON.stringify({ success: false, status, cause, message }), {
+      headers: { "content-type": "application/json" },
+    }));
+    await expect(LeadRegistrationService[method](args)).rejects.toMatchObject({ status, cause, message });
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it("preserves HTTP 403 JSON errors", async () => {
+    const cause = "EMAIL_OTP_FLOW_NOT_ALLOWED";
+    const message = "Phone validation required";
+    global.fetch.mockResolvedValue(new Response(JSON.stringify({ cause, message }), {
+      status: 403, headers: { "content-type": "application/json" },
+    }));
+    await expect(LeadRegistrationService[method](args)).rejects.toMatchObject({ status: 403, cause, message });
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it.each([503, 504])("preserves HTTP %s text without a parser error or retry", async (status) => {
+    const message = "Gateway unavailable";
+    global.fetch.mockResolvedValue(new Response(message, { status }));
+    await expect(LeadRegistrationService[method](args)).rejects.toMatchObject({ status, message });
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it.each([200, 503])("keeps the method fallback for an empty message on HTTP %s", async (status) => {
+    global.fetch.mockResolvedValue(new Response(JSON.stringify({ success: false, status: 503 }), {
+      status, headers: { "content-type": "application/json" },
+    }));
+    await expect(LeadRegistrationService[method](args)).rejects.toMatchObject({ status: 503, message: fallback });
+  });
+
+  it("preserves success, POST payload and abort signal without trusting leadId", async () => {
+    const success = { success: true, data: { estado_onboarding: "CELULAR_VALIDADO" } };
+    const signal = new AbortController().signal;
+    global.fetch.mockResolvedValue(new Response(JSON.stringify(success), {
+      headers: { "content-type": "application/json" },
+    }));
+    await expect(LeadRegistrationService[method](args, signal)).resolves.toEqual(success);
+    expect(global.fetch).toHaveBeenCalledExactlyOnceWith(
+      expect.stringContaining(method === "solicitarOTPEmail" ? "/solicitar-otp-email" : "/verificar-otp-email"),
+      expect.objectContaining({ method: "POST", body: JSON.stringify(payload), signal }),
+    );
   });
 });
