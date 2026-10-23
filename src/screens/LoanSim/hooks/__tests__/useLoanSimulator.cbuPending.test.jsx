@@ -18,6 +18,7 @@ vi.mock("../../../../services/simuladorService.js", () => ({
     validarCBU: vi.fn(),
     aceptarTerminos: vi.fn(),
     obtenerInfoPrestamo: vi.fn(),
+    actualizarEstado: vi.fn().mockResolvedValue({ success: true }),
   },
 }));
 
@@ -121,6 +122,34 @@ describe("useLoanSimulator — gate de validación de CBU (Plan 2026-10-20)", ()
 
   afterEach(() => {
     sessionStorage.clear();
+  });
+
+  it("blocks back navigation and state updates after CBU approval", async () => {
+    SimuladorService.calcularPlanes.mockResolvedValue(buildCalcularResponse({
+      estado: LOAN_SIM_STEPS.CBU_VALIDATION,
+      cbu_validado_por: "asesor",
+      cbu_usuario: CBU_VALUE,
+    }));
+    const { result } = renderUseLoanSimulator(SHORT_ID);
+    await waitFor(() => expect(result.current.initialSimulationResolved).toBe(true));
+    await act(async () => { await result.current.handlePrevStep(); });
+    expect(result.current.step).toBe(LOAN_SIM_STEPS.CBU_VALIDATION);
+    expect(SimuladorService.actualizarEstado).not.toHaveBeenCalled();
+  });
+
+  it("allows back navigation before CBU approval", async () => {
+    SimuladorService.calcularPlanes.mockResolvedValue(buildCalcularResponse({
+      estado: LOAN_SIM_STEPS.CBU_VALIDATION,
+      cbu_validado_por: null,
+    }));
+    const { result } = renderUseLoanSimulator(SHORT_ID);
+    await waitFor(() => expect(result.current.initialSimulationResolved).toBe(true));
+    await act(async () => { await result.current.handlePrevStep(); });
+    expect(result.current.step).toBe(LOAN_SIM_STEPS.SIMULACION);
+    expect(SimuladorService.actualizarEstado).toHaveBeenCalledWith({
+      scoringId: SCORING_ID,
+      estado: LOAN_SIM_STEPS.SIMULACION,
+    });
   });
 
   it("validarCBU con pending:true → setStep(PENDING_CBU_VALIDATION) y NO llama aceptarTerminos", async () => {

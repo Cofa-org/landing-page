@@ -36,6 +36,7 @@ vi.mock("../hooks/useLoanSimulator.js", () => ({
     amount: 100000,
     installment: 12,
     simulationData: mockState.simulationData,
+    cbuValidado: !!mockState.simulationData?.existingSimulation?.cbu_validado_por,
     loading: mockState.loading,
     validating: mockState.validating,
     error: mockState.error,
@@ -160,6 +161,30 @@ const renderScreen = () =>
       <LoanSimScreen />
     </MemoryRouter>,
   );
+
+describe("CBU back navigation", () => {
+  it.each(["cbu_usuario", "cvu_usuario"])("hides back after approval of %s", async (accountField) => {
+    mockState.step = LOAN_SIM_STEPS.CBU_VALIDATION;
+    mockState.simulationData = {
+      existingSimulation: {
+        [accountField]: CBU_USUARIO,
+        cbu_validado_por: "asesor",
+      },
+    };
+    const { container } = renderScreen();
+    expect(await screen.findByRole("heading", { name: "Tu cuenta fue validada." })).toBeTruthy();
+    expect(container.querySelector("button[class*='back']")).toBeNull();
+    expect(screen.getByRole("button", { name: "Continuar" })).toBeEnabled();
+  });
+
+  it("keeps back available before approval", async () => {
+    mockState.step = LOAN_SIM_STEPS.CBU_VALIDATION;
+    mockState.simulationData = { existingSimulation: { cbu_validado_por: null } };
+    const { container } = renderScreen();
+    await screen.findByRole("heading", { name: "Validá tu CBU" });
+    expect(container.querySelector("button[class*='back']")).not.toBeNull();
+  });
+});
 
 beforeEach(() => {
   mockState.step = LOAN_SIM_STEPS.PENDING_CBU_VALIDATION;

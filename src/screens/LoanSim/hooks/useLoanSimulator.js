@@ -23,6 +23,7 @@ export const useLoanSimulator = () => {
   const [amount, setAmount] = useState(0);
   const [installment, setInstallment] = useState(null);
   const [simulationData, setSimulationData] = useState(null);
+  const cbuValidado = !!simulationData?.existingSimulation?.cbu_validado_por;
   const [loading, setLoading] = useState(false);
   const [validating, setValidating] = useState(false);
   const [error, setError] = useState(null);
@@ -540,6 +541,8 @@ export const useLoanSimulator = () => {
   };
 
   const handlePrevStep = async () => {
+    if (step === LOAN_SIM_STEPS.CBU_VALIDATION && cbuValidado) return;
+
     let nextStep = null;
     if (step === LOAN_SIM_STEPS.EMAIL_VALIDATION) nextStep = LOAN_SIM_STEPS.SIMULACION;
     else if (step === LOAN_SIM_STEPS.OTP_VALIDATION) nextStep = LOAN_SIM_STEPS.EMAIL_VALIDATION;
@@ -868,6 +871,7 @@ export const useLoanSimulator = () => {
     amount,
     installment,
     simulationData,
+    cbuValidado,
     loading,
     validating,
     error,

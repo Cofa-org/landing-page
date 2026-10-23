@@ -40,6 +40,7 @@ const LoanSimScreen = () => {
     amount,
     installment,
     simulationData,
+    cbuValidado,
     loading,
     validating,
     error,
@@ -220,7 +221,7 @@ const LoanSimScreen = () => {
             pendingAccountType={
               simulationData?.existingSimulation?.cbu_usuario ? "cbu" : "cvu"
             }
-            cbuValidado={!!simulationData?.existingSimulation?.cbu_validado_por}
+            cbuValidado={cbuValidado}
             bancoEncontrado={bancoEncontrado}
             codigoBancoError={codigoBancoError}
             validandoBanco={validandoBanco}
@@ -275,6 +276,8 @@ const LoanSimScreen = () => {
   };
 
   const renderBackButton = () => {
+    if (step === LOAN_SIM_STEPS.CBU_VALIDATION && cbuValidado) return null;
+
     if (
       step !== LOAN_SIM_STEPS.COMPLIANCE &&
       step !== LOAN_SIM_STEPS.SIMULACION &&
