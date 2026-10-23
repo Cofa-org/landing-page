@@ -64,8 +64,12 @@ export const useOnboardingFlow = (resumeShortId = null) => {
   // Ver memoria loan-sim-initial-loading-race-2026-07-30.
   const [restoringOnboarding, setRestoringOnboarding] = useState(true);
   const [restoreError, setRestoreError] = useState(null);
+  const [checkingEmailPendingAdvisor, setCheckingEmailPendingAdvisor] = useState(false);
+  const [emailPendingAdvisorError, setEmailPendingAdvisorError] = useState(null);
+  const [emailPendingAdvisorStatus, setEmailPendingAdvisorStatus] = useState(null);
   const [restoreAttempt, setRestoreAttempt] = useState(0);
   const restoreInFlight = useRef(true);
+  const emailPendingAdvisorController = useRef(null);
   const [pendingIdentities, setPendingIdentities] = useState(null);
   const [pendingDni, setPendingDni] = useState(null);
   const [pendingCelular, setPendingCelular] = useState(null);
@@ -86,12 +90,122 @@ export const useOnboardingFlow = (resumeShortId = null) => {
     return null;
   }, [leadData, leadToken]);
 
+  const currentLeadId = getLeadId();
+  useEffect(() => {
+    setCheckingEmailPendingAdvisor(false);
+    setEmailPendingAdvisorError(null);
+    setEmailPendingAdvisorStatus(null);
+    return () => {
+      emailPendingAdvisorController.current?.abort();
+      emailPendingAdvisorController.current = null;
+    };
+  }, [currentLeadId, leadToken, resumeShortId, onboardingStep]);
+
   const retryRestore = useCallback(() => {
     if (resumeShortId || restoreInFlight.current) return;
     restoreInFlight.current = true;
     setRestoringOnboarding(true);
     setRestoreAttempt((attempt) => attempt + 1);
   }, [resumeShortId]);
+
+  const applyOnboardingState = useCallback((data) => {
+    const estadoOnboarding = data.estado_onboarding;
+
+    // Map onboarding state to loan sim step
+    let targetStep = LOAN_SIM_STEPS.LEAD_REGISTRATION;
+    if (estadoOnboarding === ONBOARDING_STATES.CELULAR_VALIDADO) {
+      targetStep = LOAN_SIM_STEPS.DNI_UPLOAD;
+    } else if (estadoOnboarding === ONBOARDING_STATES.LEAD_CREADO) {
+      targetStep = LOAN_SIM_STEPS.PHONE_VALIDATION;
+    } else if (estadoOnboarding === ONBOARDING_STATES.DNI_SUBIDO) {
+      targetStep = LOAN_SIM_STEPS.RECIBO_UPLOAD;
+    } else if (
+      estadoOnboarding === ONBOARDING_STATES.RECIBO_SUBIDO ||
+      estadoOnboarding === ONBOARDING_STATES.ONBOARDING_COMPLETO
+    ) {
+      targetStep = LOAN_SIM_STEPS.WELCOME;
+    } else if (estadoOnboarding === ONBOARDING_STATES.RECHAZADO) {
+      targetStep = LOAN_SIM_STEPS.RECHAZADO;
+    } else if (estadoOnboarding === ONBOARDING_STATES.EN_ANALISIS) {
+      targetStep = LOAN_SIM_STEPS.EN_ANALISIS;
+    } else if (estadoOnboarding === ONBOARDING_STATES.PHONE_PICKER) {
+      targetStep = LOAN_SIM_STEPS.PHONE_PICKER;
+    }
+
+    if (data.emailOtpDestination) {
+      targetStep = LOAN_SIM_STEPS.EMAIL_OTP_VALIDATION;
+    }
+    // The advisor gate takes precedence over OTP and the general state.
+    if (data.requiresAdvisorContact === true) {
+      targetStep = LOAN_SIM_STEPS.EMAIL_PENDING_ADVISOR;
+    }
+
+    setPickerContext(targetStep === LOAN_SIM_STEPS.PHONE_PICKER ? data.pickerContext ?? null : null);
+    setEmailOtpDestination(targetStep === LOAN_SIM_STEPS.EMAIL_OTP_VALIDATION ? data.emailOtpDestination : null);
+    setLeadData((prev) => ({
+      ...(prev || {}),
+      ...(data.celular !== undefined && {
+        celular: data.celular,
+      }),
+      ...(data.es_cliente !== undefined && {
+        es_cliente: data.es_cliente,
+      }),
+    }));
+    setOnboardingStep(targetStep);
+  }, []);
+
+  const verificarEstadoEmailPendingAdvisor = useCallback(async () => {
+    if (onboardingStep !== LOAN_SIM_STEPS.EMAIL_PENDING_ADVISOR || emailPendingAdvisorController.current) return;
+
+    setEmailPendingAdvisorError(null);
+    setEmailPendingAdvisorStatus(null);
+    const leadId = getLeadId();
+    if (!leadId) {
+      setEmailPendingAdvisorError("No pudimos recuperar tu sesión. Volvé a iniciar tu solicitud.");
+      return;
+    }
+
+    const fallbackError = "No pudimos verificar el estado de tu solicitud. Volvé a intentarlo.";
+    const controller = new AbortController();
+    emailPendingAdvisorController.current = controller;
+    const isActiveRequest = () => !controller.signal.aborted && emailPendingAdvisorController.current === controller;
+    setCheckingEmailPendingAdvisor(true);
+    try {
+      const response = await LeadRegistrationService.obtenerEstadoOnboarding(leadId, controller.signal);
+      if (!isActiveRequest()) return;
+      const onboardingState = response?.data;
+      const hasKnownState = onboardingState !== null &&
+        typeof onboardingState === "object" &&
+        !Array.isArray(onboardingState) &&
+        Object.values(ONBOARDING_STATES).includes(onboardingState.estado_onboarding);
+      const hasIncompleteAdvisorState = onboardingState?.estado_onboarding === ONBOARDING_STATES.EMAIL_PENDING_ADVISOR &&
+        onboardingState.requiresAdvisorContact !== true;
+      const resolvesToPicker = onboardingState?.estado_onboarding === ONBOARDING_STATES.PHONE_PICKER &&
+        onboardingState.requiresAdvisorContact !== true && !onboardingState.emailOtpDestination;
+      const pickerOptions = onboardingState?.pickerContext?.options;
+      const hasIncompletePickerState = resolvesToPicker && (
+        !Array.isArray(pickerOptions) || pickerOptions.length !== 4 ||
+        !pickerOptions.every((option) => typeof option === "string")
+      );
+      if (response?.success !== true || !hasKnownState || hasIncompleteAdvisorState || hasIncompletePickerState) {
+        setEmailPendingAdvisorError(response?.message || fallbackError);
+        return;
+      }
+
+      applyOnboardingState(onboardingState);
+      if (onboardingState.requiresAdvisorContact === true) {
+        setEmailPendingAdvisorStatus("Tu correo todavía está pendiente de actualización. Hablá con un asesor para continuar.");
+      }
+    } catch (error) {
+      if (!isActiveRequest()) return;
+      setEmailPendingAdvisorError(error?.message || fallbackError);
+    } finally {
+      if (isActiveRequest()) {
+        emailPendingAdvisorController.current = null;
+        setCheckingEmailPendingAdvisor(false);
+      }
+    }
+  }, [onboardingStep, getLeadId, applyOnboardingState]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -138,91 +252,8 @@ export const useOnboardingFlow = (resumeShortId = null) => {
         const response = await LeadRegistrationService.obtenerEstadoOnboarding(leadId, controller.signal);
         if (controller.signal.aborted) return;
         if (response.success && response.data) {
-          const estadoOnboarding = response.data.estado_onboarding;
-
-          // Map onboarding state to loan sim step
-          let targetStep = LOAN_SIM_STEPS.LEAD_REGISTRATION;
-          if (estadoOnboarding === ONBOARDING_STATES.CELULAR_VALIDADO) {
-            targetStep = LOAN_SIM_STEPS.DNI_UPLOAD;
-          } else if (estadoOnboarding === ONBOARDING_STATES.LEAD_CREADO) {
-            targetStep = LOAN_SIM_STEPS.PHONE_VALIDATION;
-          } else if (estadoOnboarding === ONBOARDING_STATES.DNI_SUBIDO) {
-            targetStep = LOAN_SIM_STEPS.RECIBO_UPLOAD;
-          } else if (
-            estadoOnboarding === ONBOARDING_STATES.RECIBO_SUBIDO ||
-            estadoOnboarding === ONBOARDING_STATES.ONBOARDING_COMPLETO
-          ) {
-            targetStep = LOAN_SIM_STEPS.WELCOME;
-          } else if (estadoOnboarding === ONBOARDING_STATES.RECHAZADO) {
-            targetStep = LOAN_SIM_STEPS.RECHAZADO;
-          } else if (estadoOnboarding === ONBOARDING_STATES.EN_ANALISIS) {
-            targetStep = LOAN_SIM_STEPS.EN_ANALISIS;
-          } else if (estadoOnboarding === ONBOARDING_STATES.PHONE_PICKER) {
-            targetStep = LOAN_SIM_STEPS.PHONE_PICKER;
-            // PATCH 2026-08-20 (fix bug scoring-sync + restore): cuando el operador
-            // ejecuta scoring manual desde el backoffice y el celular del lead no
-            // matchea los teléfonos declarados, scoring-sync (`Scoring_Backend`)
-            // persiste la fila `webapp_sim_leads_validacion_telefonica` con
-            // `origen='SCORING'` + UPDATE `estado_onboarding='PHONE_PICKER'`.
-            // El cliente, al recargar la página (token aún activo), cae en este
-            // branch del restore. Sin este fix, `pickerContext` quedaba en null
-            // y `PhonePickerStep` retornaba `null` ("pantalla vacía") porque
-            // `options.length !== 4`. El back ya devuelve `pickerContext` con
-            // `options` + `target` cuando scoring dispara el picker (ver
-            // `obtenerEstadoOnboarding` líneas 1058-1101); el restore solo
-            // necesitaba propagarlo al state. Tests en
-            // `__tests__/useOnboardingFlow.test.js` cubren el caso (1 RED, 2
-            // pre-existentes que cubren null y missing).
-            if (response.data.pickerContext) {
-              setPickerContext(response.data.pickerContext);
-            }
-          }
-
-          // Plan 2026-09-30 (email OTP validation restore): si el back
-          // reportó que hay un OTP EMAIL activo (emailOtpDestination
-          // presente), forzamos el step a EMAIL_OTP_VALIDATION y
-          // limpiamos el pickerContext (es stale — el usuario ya pickeó,
-          // está esperando verificar el código de email). Sin este
-          // override, el restore caía a PHONE_PICKER y el usuario
-          // re-pickeaba, generando una segunda fila basura en
-          // webapp_sim_2fa.
-          if (response.data.emailOtpDestination) {
-            targetStep = LOAN_SIM_STEPS.EMAIL_OTP_VALIDATION;
-            setPickerContext(null);
-            setEmailOtpDestination(response.data.emailOtpDestination);
-          }
-          // Plan 2026-10-09 (email pre-pick advisor gate): si el back
-          // reporta que el lead requiere contacto con asesor (email
-          // inválido en SB), forzamos el step a EMAIL_PENDING_ADVISOR.
-          // Override gana sobre emailOtpDestination (advisor gate es
-          // anterior al email OTP en el flow) y sobre PHONE_PICKER
-          // (porque el email es el blocker para llegar al picker).
-          // Strict === true: requiere el field presente Y en true;
-          // back legacy sin la propiedad no dispara el override.
-          if (response.data.requiresAdvisorContact === true) {
-            targetStep = LOAN_SIM_STEPS.EMAIL_PENDING_ADVISOR;
-            setPickerContext(null);
-            setEmailOtpDestination(null);
-          }
-          // Patch 2026-08-31 (OTP resend fix): la condición original
-          // `if (leadData?.celular)` estaba invertida — sólo sobrescribía
-          // `leadData` cuando YA tenía celular, dejando `leadData.celular`
-          // undefined en el primer restore tras reload. Resultado:
-          // `OTPValidation.destination` era undefined y
-          // `usePhoneOTP.reenviarOTP` retornaba silencioso (timer sin
-          // reenvío). Reemplazamos por un merge explícito de los campos
-          // que el front necesita persistir entre sesiones.
-          setLeadData((prev) => ({
-            ...(prev || {}),
-            ...(response.data.celular !== undefined && {
-              celular: response.data.celular,
-            }),
-            ...(response.data.es_cliente !== undefined && {
-              es_cliente: response.data.es_cliente,
-            }),
-          }));
+          applyOnboardingState(response.data);
           setLeadToken(leadTokenValue);
-          setOnboardingStep(targetStep);
         }
       } catch (err) {
         if (controller.signal.aborted) return;
@@ -240,7 +271,7 @@ export const useOnboardingFlow = (resumeShortId = null) => {
       controller.abort();
       restoreInFlight.current = false;
     };
-  }, [resumeShortId, restoreAttempt]);
+  }, [resumeShortId, restoreAttempt, applyOnboardingState]);
 
   const BACK_BUTTON_STEPS = [
     LOAN_SIM_STEPS.IDENTITY_SELECTION,
@@ -593,6 +624,10 @@ export const useOnboardingFlow = (resumeShortId = null) => {
     onboardingStep,
     restoringOnboarding,
     restoreError,
+    checkingEmailPendingAdvisor,
+    emailPendingAdvisorError,
+    emailPendingAdvisorStatus,
+    verificarEstadoEmailPendingAdvisor,
     retryRestore,
     pendingIdentities,
     rejectedFechaExpiracionBloqueo,

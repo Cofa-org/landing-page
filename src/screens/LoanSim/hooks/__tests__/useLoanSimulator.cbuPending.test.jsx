@@ -46,6 +46,8 @@ import { getCookie, setCookie, setCookieWithDuration } from "../../../../lib/uti
 import { LOAN_SIM_STEPS } from "../../../../constants/LOAN_SIM.js";
 import { useLoanSimulator } from "../useLoanSimulator";
 
+const PENDING_STATUS = "Tu CBU/CVU todavía está pendiente de validación. Hablá con un asesor para continuar.";
+
 const SHORT_ID = "abc123";
 const SCORING_ID = "999";
 const CUIT = "20123456789";
@@ -182,6 +184,7 @@ describe("useLoanSimulator — gate de validación de CBU (Plan 2026-10-20)", ()
     const { result } = renderUseLoanSimulator(SHORT_ID);
 
     await waitFor(() => {
+      expect(result.current.cbuPendingStatus).toBeNull();
       expect(result.current.rejectionReason).toBe("CBU_REJECTED");
     });
 
@@ -206,6 +209,7 @@ describe("useLoanSimulator — gate de validación de CBU (Plan 2026-10-20)", ()
     });
 
     expect(result.current.step).toBe(LOAN_SIM_STEPS.RECHAZADO);
+    expect(result.current.cbuPendingStatus).toBeNull();
     expect(result.current.rejectionReason).not.toBe("CBU_REJECTED");
   });
 
@@ -223,11 +227,14 @@ describe("useLoanSimulator — gate de validación de CBU (Plan 2026-10-20)", ()
       expect(result.current.step).toBe(LOAN_SIM_STEPS.PENDING_CBU_VALIDATION);
     });
 
+    expect(result.current.cbuPendingStatus).toBeNull();
+
     await act(async () => {
       await result.current.verificarEstadoCBU();
     });
 
-    // El refresh re-consultó la simulación (1 llamada inicial + 1 refresh).
+    expect(result.current.cbuPendingStatus).toBe(PENDING_STATUS);
+
     expect(SimuladorService.calcularPlanes).toHaveBeenCalledTimes(2);
     expect(result.current.step).toBe(LOAN_SIM_STEPS.PENDING_CBU_VALIDATION);
   });
@@ -253,6 +260,8 @@ describe("useLoanSimulator — gate de validación de CBU (Plan 2026-10-20)", ()
     await waitFor(() => {
       expect(result.current.step).toBe(LOAN_SIM_STEPS.PENDING_CBU_VALIDATION);
     });
+
+    expect(result.current.cbuPendingStatus).toBeNull();
 
     await act(async () => {
       await result.current.verificarEstadoCBU();
@@ -283,11 +292,56 @@ describe("useLoanSimulator — gate de validación de CBU (Plan 2026-10-20)", ()
       expect(result.current.step).toBe(LOAN_SIM_STEPS.PENDING_CBU_VALIDATION);
     });
 
+    expect(result.current.cbuPendingStatus).toBeNull();
+
     await act(async () => {
       await result.current.verificarEstadoCBU();
     });
 
     expect(result.current.step).toBe(LOAN_SIM_STEPS.CBU_VALIDATION);
+    expect(result.current.cbuPendingStatus).toBeNull();
+  });
+
+  it("clears the pending notice during retry and after leaving the pending step", async () => {
+    SimuladorService.calcularPlanes.mockResolvedValue(buildCalcularResponse({ estado: LOAN_SIM_STEPS.PENDING_CBU_VALIDATION }));
+    const { result } = renderUseLoanSimulator(SHORT_ID);
+    await waitFor(() => expect(result.current.initialSimulationResolved).toBe(true));
+    expect(result.current.cbuPendingStatus).toBeNull();
+    await act(async () => {
+      await result.current.verificarEstadoCBU();
+    });
+    expect(result.current.cbuPendingStatus).toBe(PENDING_STATUS);
+    let resolveRetry;
+    SimuladorService.calcularPlanes.mockImplementationOnce(
+      () => new Promise((resolve) => { resolveRetry = resolve; }),
+    );
+    let retry;
+    act(() => { retry = result.current.verificarEstadoCBU(); });
+    expect(result.current.loading).toBe(true);
+    expect(result.current.cbuPendingStatus).toBeNull();
+    await act(async () => {
+      resolveRetry(buildCalcularResponse({ estado: LOAN_SIM_STEPS.PENDING_CBU_VALIDATION }));
+      await retry;
+    });
+    expect(result.current.cbuPendingStatus).toBe(PENDING_STATUS);
+    act(() => { result.current.setStep(LOAN_SIM_STEPS.CBU_VALIDATION); });
+    expect(result.current.cbuPendingStatus).toBeNull();
+  });
+
+  it.each([
+    ["unsuccessful response", () => Promise.resolve({ success: false, message: "No disponible" })],
+    ["aborted request", () => Promise.reject(Object.assign(new Error("Cancelled"), { name: "AbortError" }))],
+    ["success without pending state", () => Promise.resolve(buildCalcularResponse(null))],
+  ])("does not reuse a previous pending result after %s", async (_, respond) => {
+    SimuladorService.calcularPlanes.mockResolvedValue(buildCalcularResponse({ estado: LOAN_SIM_STEPS.PENDING_CBU_VALIDATION }));
+    const { result } = renderUseLoanSimulator(SHORT_ID);
+    await waitFor(() => expect(result.current.initialSimulationResolved).toBe(true));
+    await act(async () => { await result.current.verificarEstadoCBU(); });
+    expect(result.current.cbuPendingStatus).toBe(PENDING_STATUS);
+    SimuladorService.calcularPlanes.mockImplementationOnce(respond);
+    await act(async () => { await result.current.verificarEstadoCBU(); });
+    expect(result.current.cbuPendingStatus).toBeNull();
+    expect(result.current.step).toBe(LOAN_SIM_STEPS.PENDING_CBU_VALIDATION);
   });
 
   // Drift guard del mensaje de error (fix final de rama).
@@ -321,11 +375,14 @@ describe("useLoanSimulator — gate de validación de CBU (Plan 2026-10-20)", ()
       expect(result.current.step).toBe(LOAN_SIM_STEPS.PENDING_CBU_VALIDATION);
     });
 
+    expect(result.current.cbuPendingStatus).toBeNull();
+
     await act(async () => {
       await result.current.verificarEstadoCBU();
     });
 
     // Lo que ve el usuario es el `message` user-facing del back...
+    expect(result.current.cbuPendingStatus).toBeNull();
     expect(result.current.error).toContain("Tu solicitud anterior expiró");
     // ...y nunca el `cause` técnico.
     expect(result.current.error).not.toContain("SIMULADOR_PRESTAMOS_SERVICE_SIMULATION_EXPIRED");

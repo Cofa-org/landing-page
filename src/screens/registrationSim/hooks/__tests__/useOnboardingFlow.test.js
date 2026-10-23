@@ -34,6 +34,44 @@ describe("useOnboardingFlow manual restore recovery", () => {
     LeadRegistrationService.obtenerEstadoOnboarding.mockReset();
   });
 
+  it("restores four picker options after OTP and clears the previous email destination", async () => {
+    const pickerContext = { options: ["11", "22", "33", "44"], target: "22" };
+    LeadRegistrationService.obtenerEstadoOnboarding
+      .mockResolvedValueOnce({ success: true, data: { estado_onboarding: "PHONE_PICKER", emailOtpDestination: "cliente@example.com" } })
+      .mockResolvedValueOnce({ success: true, data: { estado_onboarding: "PHONE_PICKER", pickerContext } });
+    const { result } = renderHook(() => useOnboardingFlow());
+    await waitFor(() => expect(result.current.restoringOnboarding).toBe(false));
+    expect(result.current.emailOtpDestination).toBe("cliente@example.com");
+
+    act(() => result.current.retryRestore());
+    await waitFor(() => expect(result.current.restoringOnboarding).toBe(false));
+
+    expect(result.current.onboardingStep).toBe(LOAN_SIM_STEPS.PHONE_PICKER);
+    expect(result.current.pickerContext).toEqual(pickerContext);
+    expect(result.current.emailOtpDestination).toBeNull();
+  });
+
+  it("restores advisor pending after OTP with precedence over both response contexts", async () => {
+    LeadRegistrationService.obtenerEstadoOnboarding
+      .mockResolvedValueOnce({ success: true, data: { estado_onboarding: "PHONE_PICKER", emailOtpDestination: "cliente@example.com" } })
+      .mockResolvedValueOnce({ success: true, data: {
+        estado_onboarding: "PHONE_PICKER",
+        requiresAdvisorContact: true,
+        emailOtpDestination: "otro@example.com",
+        pickerContext: { options: ["11", "22", "33", "44"], target: "22" },
+      } });
+    const { result } = renderHook(() => useOnboardingFlow());
+    await waitFor(() => expect(result.current.restoringOnboarding).toBe(false));
+    expect(result.current.emailOtpDestination).toBe("cliente@example.com");
+
+    act(() => result.current.retryRestore());
+    await waitFor(() => expect(result.current.restoringOnboarding).toBe(false));
+
+    expect(result.current.onboardingStep).toBe(LOAN_SIM_STEPS.EMAIL_PENDING_ADVISOR);
+    expect(result.current.pickerContext).toBeNull();
+    expect(result.current.emailOtpDestination).toBeNull();
+  });
+
   it("exposes a restore error and retries only on request, preventing duplicate requests", async () => {
     const failure = Object.assign(new Error("ERP unavailable"), { cause: "ERP_LOOKUP_FAILED", status: 503 });
     LeadRegistrationService.obtenerEstadoOnboarding.mockRejectedValueOnce(failure);
@@ -666,3 +704,190 @@ describe("useOnboardingFlow — EMAIL_PENDING_ADVISOR back-button guard (Plan 20
   });
 });
 
+
+describe("useOnboardingFlow manual advisor status", () => {
+  const pending = { success: true, data: { estado_onboarding: "EMAIL_PENDING_ADVISOR", requiresAdvisorContact: true } };
+  const fallback = "No pudimos verificar el estado de tu solicitud. Volvé a intentarlo.";
+  const status = "Tu correo todavía está pendiente de actualización. Hablá con un asesor para continuar.";
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    getCookie.mockResolvedValue("advisor-token");
+    getDecodedToken.mockReturnValue({ leadId: 42 });
+    LeadRegistrationService.obtenerEstadoOnboarding = vi.fn().mockResolvedValueOnce(pending);
+  });
+
+  async function renderPending() {
+    const hook = renderHook(() => useOnboardingFlow());
+    await waitFor(() => expect(hook.result.current.restoringOnboarding).toBe(false));
+    return hook;
+  }
+
+  it("keeps the pending screen during the request and sends the current lead and AbortSignal", async () => {
+    let resolveRequest;
+    LeadRegistrationService.obtenerEstadoOnboarding.mockImplementationOnce(() => new Promise((resolve) => { resolveRequest = resolve; }));
+    const { result } = await renderPending();
+    act(() => result.current.setLeadData({ leadId: 99 }));
+    let request;
+    act(() => { request = result.current.verificarEstadoEmailPendingAdvisor(); });
+    expect(result.current.checkingEmailPendingAdvisor).toBe(true);
+    expect(result.current.restoringOnboarding).toBe(false);
+    expect(result.current.onboardingStep).toBe(LOAN_SIM_STEPS.EMAIL_PENDING_ADVISOR);
+    expect(LeadRegistrationService.obtenerEstadoOnboarding).toHaveBeenNthCalledWith(2, 99, expect.any(AbortSignal));
+    await act(async () => { resolveRequest(pending); await request; });
+    expect(result.current.checkingEmailPendingAdvisor).toBe(false);
+    expect(result.current.emailPendingAdvisorStatus).toBe(status);
+    expect(result.current.restoreError).toBeNull();
+    expect(LeadRegistrationService.obtenerEstadoOnboarding).toHaveBeenCalledTimes(2);
+  });
+
+  it.each([
+    [{ estado_onboarding: "PHONE_PICKER", pickerContext: { options: ["11", "22", "33", "44"], target: "22" } }, LOAN_SIM_STEPS.PHONE_PICKER],
+    [{ estado_onboarding: "PHONE_PICKER", emailOtpDestination: "cliente@example.com" }, LOAN_SIM_STEPS.EMAIL_OTP_VALIDATION],
+    [{ estado_onboarding: "PHONE_PICKER", pickerContext: null, emailOtpDestination: "cliente@example.com", requiresAdvisorContact: "true" }, LOAN_SIM_STEPS.EMAIL_OTP_VALIDATION],
+    [{ estado_onboarding: "PHONE_PICKER", pickerContext: null, requiresAdvisorContact: true }, LOAN_SIM_STEPS.EMAIL_PENDING_ADVISOR],
+    [{ estado_onboarding: "PHONE_PICKER", pickerContext: null, emailOtpDestination: "cliente@example.com", requiresAdvisorContact: true }, LOAN_SIM_STEPS.EMAIL_PENDING_ADVISOR],
+    [{ estado_onboarding: "RECHAZADO" }, LOAN_SIM_STEPS.RECHAZADO],
+    [{ estado_onboarding: "PHONE_PICKER", emailOtpDestination: "cliente@example.com", requiresAdvisorContact: true }, LOAN_SIM_STEPS.EMAIL_PENDING_ADVISOR],
+  ])("applies the resolved state %j", async (data, expectedStep) => {
+    LeadRegistrationService.obtenerEstadoOnboarding.mockResolvedValueOnce({ success: true, data });
+    const { result } = await renderPending();
+    await act(async () => result.current.verificarEstadoEmailPendingAdvisor());
+    expect(result.current.onboardingStep).toBe(expectedStep);
+    expect(result.current.pickerContext).toEqual(data.pickerContext ?? null);
+    expect(result.current.emailOtpDestination).toBe(expectedStep === LOAN_SIM_STEPS.EMAIL_OTP_VALIDATION ? "cliente@example.com" : null);
+    expect(result.current.emailPendingAdvisorStatus).toBe(data.requiresAdvisorContact === true ? status : null);
+  });
+
+  it.each([
+    [null, fallback],
+    [{ success: true, data: { estado_onboarding: "PHONE_PICKER" } }, fallback],
+    [{ success: true, data: { estado_onboarding: "PHONE_PICKER", pickerContext: null } }, fallback],
+    [{ success: true, data: { estado_onboarding: "PHONE_PICKER", pickerContext: {} } }, fallback],
+    [{ success: true, data: { estado_onboarding: "PHONE_PICKER", pickerContext: { options: null } } }, fallback],
+    [{ success: true, data: { estado_onboarding: "PHONE_PICKER", pickerContext: { options: "1234" } } }, fallback],
+    [{ success: true, data: { estado_onboarding: "PHONE_PICKER", pickerContext: { options: ["1", "2", "3"] } } }, fallback],
+    [{ success: true, data: { estado_onboarding: "PHONE_PICKER", pickerContext: { options: ["1", "2", "3", "4", "5"] } } }, fallback],
+    [{ success: true, data: { estado_onboarding: "PHONE_PICKER", requiresAdvisorContact: "true", pickerContext: { options: ["1", "2", "3", 4] } } }, fallback],
+    [{ success: true, message: "Selector incompleto", data: { estado_onboarding: "PHONE_PICKER", pickerContext: null } }, "Selector incompleto"],
+    [{ success: false, message: "Servicio no disponible" }, "Servicio no disponible"],
+    [{ success: 1, data: { estado_onboarding: "PHONE_PICKER" } }, fallback],
+    [{ success: true }, fallback],
+    [{ success: true, data: [] }, fallback],
+    [{ success: true, data: { estado_onboarding: "UNKNOWN" } }, fallback],
+    [{ success: true, data: { estado_onboarding: "EMAIL_PENDING_ADVISOR", requiresAdvisorContact: false } }, fallback],
+  ])("preserves the pending screen for invalid response %j", async (response, expectedError) => {
+    LeadRegistrationService.obtenerEstadoOnboarding.mockResolvedValueOnce(response);
+    const { result } = await renderPending();
+    await act(async () => result.current.verificarEstadoEmailPendingAdvisor());
+    expect(result.current.onboardingStep).toBe(LOAN_SIM_STEPS.EMAIL_PENDING_ADVISOR);
+    expect(result.current.emailPendingAdvisorError).toBe(expectedError);
+    expect(result.current.emailPendingAdvisorStatus).toBeNull();
+    expect(result.current.checkingEmailPendingAdvisor).toBe(false);
+    expect(result.current.restoreError).toBeNull();
+  });
+
+  it.each([new Error("Sin conexión"), new Error()])("shows a recoverable request error and clears it on retry", async (error) => {
+    LeadRegistrationService.obtenerEstadoOnboarding.mockRejectedValueOnce(error).mockResolvedValueOnce(pending);
+    const { result } = await renderPending();
+    await act(async () => result.current.verificarEstadoEmailPendingAdvisor());
+    expect(result.current.emailPendingAdvisorError).toBe(error.message || fallback);
+    expect(result.current.onboardingStep).toBe(LOAN_SIM_STEPS.EMAIL_PENDING_ADVISOR);
+    expect(result.current.checkingEmailPendingAdvisor).toBe(false);
+    await act(async () => result.current.verificarEstadoEmailPendingAdvisor());
+    expect(result.current.emailPendingAdvisorError).toBeNull();
+    expect(result.current.emailPendingAdvisorStatus).toBe(status);
+    expect(result.current.restoreError).toBeNull();
+  });
+
+  it("does not request without a session lead", async () => {
+    const { result } = await renderPending();
+    act(() => result.current.setLeadToken(null));
+    await act(async () => result.current.verificarEstadoEmailPendingAdvisor());
+    expect(LeadRegistrationService.obtenerEstadoOnboarding).toHaveBeenCalledTimes(1);
+    expect(result.current.emailPendingAdvisorError).toBe("No pudimos recuperar tu sesión. Volvé a iniciar tu solicitud.");
+  });
+
+  it("does not request outside the advisor step", async () => {
+    const { result } = await renderPending();
+    act(() => result.current.setOnboardingStep(LOAN_SIM_STEPS.PHONE_PICKER));
+    await act(async () => result.current.verificarEstadoEmailPendingAdvisor());
+    expect(LeadRegistrationService.obtenerEstadoOnboarding).toHaveBeenCalledTimes(1);
+  });
+
+  it("deduplicates two calls in the same act", async () => {
+    let resolve;
+    LeadRegistrationService.obtenerEstadoOnboarding.mockImplementationOnce(() => new Promise((done) => { resolve = done; }));
+    const { result } = await renderPending();
+    let request;
+    act(() => {
+      request = result.current.verificarEstadoEmailPendingAdvisor();
+      result.current.verificarEstadoEmailPendingAdvisor();
+    });
+    expect(LeadRegistrationService.obtenerEstadoOnboarding).toHaveBeenCalledTimes(2);
+    await act(async () => { resolve(pending); await request; });
+  });
+
+  it("aborts the pending request on unmount", async () => {
+    LeadRegistrationService.obtenerEstadoOnboarding.mockImplementationOnce(() => new Promise(() => {}));
+    const { result, unmount } = await renderPending();
+    act(() => { result.current.verificarEstadoEmailPendingAdvisor(); });
+    const signal = LeadRegistrationService.obtenerEstadoOnboarding.mock.calls[1][1];
+    unmount();
+    expect(signal.aborted).toBe(true);
+  });
+
+  it.each(["resume", "step", "lead", "token"])("ignores stale success and error after changing %s", async (change) => {
+    let resolve;
+    let reject;
+    LeadRegistrationService.obtenerEstadoOnboarding.mockImplementationOnce(() => new Promise((done, fail) => { resolve = done; reject = fail; }));
+    const hook = renderHook(({ resume }) => useOnboardingFlow(resume), { initialProps: { resume: null } });
+    await waitFor(() => expect(hook.result.current.restoringOnboarding).toBe(false));
+    let request;
+    act(() => { request = hook.result.current.verificarEstadoEmailPendingAdvisor(); });
+    const signal = LeadRegistrationService.obtenerEstadoOnboarding.mock.calls[1][1];
+    if (change === "resume") hook.rerender({ resume: "new-resume" });
+    if (change === "step") act(() => hook.result.current.setOnboardingStep(LOAN_SIM_STEPS.RECIBO_UPLOAD));
+    if (change === "lead") act(() => hook.result.current.setLeadData({ leadId: 99 }));
+    if (change === "token") act(() => hook.result.current.setLeadToken("new-token"));
+    expect(signal.aborted).toBe(true);
+    expect(hook.result.current.checkingEmailPendingAdvisor).toBe(false);
+    const step = hook.result.current.onboardingStep;
+    await act(async () => {
+      if (change === "token" || change === "resume") reject(new Error("stale error"));
+      else resolve({ success: true, data: { estado_onboarding: "RECHAZADO" } });
+      await request;
+    });
+    expect(hook.result.current.onboardingStep).toBe(step);
+    expect(hook.result.current.emailPendingAdvisorError).toBeNull();
+    expect(hook.result.current.emailPendingAdvisorStatus).toBeNull();
+  });
+
+  it.each(["success", "error"])("does not let stale %s release a newer request", async (outcome) => {
+    let resolveOld;
+    let rejectOld;
+    let resolveNew;
+    LeadRegistrationService.obtenerEstadoOnboarding
+      .mockImplementationOnce(() => new Promise((resolve, reject) => { resolveOld = resolve; rejectOld = reject; }))
+      .mockImplementationOnce(() => new Promise((resolve) => { resolveNew = resolve; }));
+    const { result } = await renderPending();
+    let oldRequest;
+    let newRequest;
+    act(() => { oldRequest = result.current.verificarEstadoEmailPendingAdvisor(); });
+    act(() => result.current.setLeadData({ leadId: 99 }));
+    act(() => { newRequest = result.current.verificarEstadoEmailPendingAdvisor(); });
+    await act(async () => {
+      if (outcome === "success") resolveOld({ success: true, data: { estado_onboarding: "RECHAZADO" } });
+      else rejectOld(new Error("stale error"));
+      await oldRequest;
+    });
+    expect(result.current.checkingEmailPendingAdvisor).toBe(true);
+    expect(result.current.onboardingStep).toBe(LOAN_SIM_STEPS.EMAIL_PENDING_ADVISOR);
+    expect(result.current.emailPendingAdvisorError).toBeNull();
+    await act(async () => result.current.verificarEstadoEmailPendingAdvisor());
+    expect(LeadRegistrationService.obtenerEstadoOnboarding).toHaveBeenCalledTimes(3);
+    await act(async () => { resolveNew(pending); await newRequest; });
+    expect(result.current.checkingEmailPendingAdvisor).toBe(false);
+    expect(result.current.emailPendingAdvisorStatus).toBe(status);
+  });
+});

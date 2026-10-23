@@ -69,3 +69,14 @@ describe("PendingCbuValidation (Plan 2026-10-20)", () => {
     expect(screen.queryByRole("alert")).toBeNull();
   });
 });
+
+it("announces the supplied pending status and removes it when cleared", () => {
+  const status = "Tu CBU/CVU todavía está pendiente de validación. Hablá con un asesor para continuar.";
+  const props = { onContactAdvisor: vi.fn(), onVerificarEstado: vi.fn() };
+  const { rerender } = render(<PendingCbuValidation {...props} />);
+  expect(screen.queryByRole("status")).toBeNull();
+  rerender(<PendingCbuValidation {...props} status={status} />);
+  expect(screen.getByRole("status")).toHaveTextContent(status);
+  rerender(<PendingCbuValidation {...props} status={null} />);
+  expect(screen.queryByRole("status")).toBeNull();
+});

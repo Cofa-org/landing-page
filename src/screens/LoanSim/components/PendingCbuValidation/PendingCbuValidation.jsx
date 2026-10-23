@@ -13,7 +13,7 @@ const SUBTITLE_ID = "pending-cbu-validation-subtitle";
  * Componente 100% presentacional: toda la lógica vive en
  * `useLoanSimulator` / `usePendingCbuValidation`.
  */
-const PendingCbuValidation = ({ onContactAdvisor, onVerificarEstado, loading, error }) => {
+const PendingCbuValidation = ({ onContactAdvisor, onVerificarEstado, loading, error, status = null }) => {
   return (
     <section
       className={styles.container}
@@ -57,6 +57,12 @@ const PendingCbuValidation = ({ onContactAdvisor, onVerificarEstado, loading, er
         </p>
       )}
 
+      {status && (
+        <p className={styles.statusText} role='status'>
+          {status}
+        </p>
+      )}
+
       <div className={styles.actionContainer}>
         <GenericButton
           variant='primary'
@@ -91,6 +97,7 @@ PendingCbuValidation.propTypes = {
   // Mensaje de error que llega desde `useLoanSimulator` (ya formateado y
   // legible para el usuario). `null` = sin error.
   error: PropTypes.string,
+  status: PropTypes.string,
 };
 
 PendingCbuValidation.defaultProps = {

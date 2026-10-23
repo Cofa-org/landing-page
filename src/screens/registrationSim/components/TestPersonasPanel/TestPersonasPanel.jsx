@@ -1,22 +1,12 @@
 import { useTestPersonasPanel, PERSONAS_CON_AGREGAR_EMAIL } from "../../hooks/useTestPersonasPanel.js";
 import GenericButton from "../../../../Components/buttons/GenericButton/GenericButton.jsx";
 import { isTestPersonasVisible } from "../../../../config.js";
-import { setPersonaEmail } from "../../../../services/testPersonasService.js";
 import styles from "./TestPersonasPanel.module.css";
 
 const TestPersonasPanel = () => {
   if (!isTestPersonasVisible()) return null;
 
-  const { collapsed, setCollapsed, personas, activePersonaId, selectPersona, resetSession } = useTestPersonasPanel();
-
-  const handleAgregarEmail = async (personaId) => {
-    try {
-      await setPersonaEmail(personaId);
-      window.location.reload();
-    } catch (err) {
-      window.alert(`No se pudo agregar el email: ${err.message}`);
-    }
-  };
+  const { collapsed, setCollapsed, personas, activePersonaId, selectPersona, resetSession, addEmail, emailStatusByPersona } = useTestPersonasPanel();
 
   return (
     <div className={styles.panel} data-testid="test-personas-panel">
@@ -40,10 +30,14 @@ const TestPersonasPanel = () => {
                   <GenericButton
                     variant="secondary"
                     size="small"
-                    onClick={() => handleAgregarEmail(p.id)}
+                    onClick={() => addEmail(p.id)}
+                    loading={emailStatusByPersona[p.id] === "loading"}
+                    disabled={emailStatusByPersona[p.id] === "added"}
+                    aria-busy={emailStatusByPersona[p.id] === "loading"}
+                    aria-label={emailStatusByPersona[p.id] === "loading" ? "Agregando email" : undefined}
                     data-testid="test-personas-add-email-button"
                   >
-                    ✉️ Agregar email
+                    {emailStatusByPersona[p.id] === "added" ? "Email agregado" : "✉️ Agregar email"}
                   </GenericButton>
                 )}
               </li>

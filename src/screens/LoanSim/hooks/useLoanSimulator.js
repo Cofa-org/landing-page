@@ -26,6 +26,7 @@ export const useLoanSimulator = () => {
   const [loading, setLoading] = useState(false);
   const [validating, setValidating] = useState(false);
   const [error, setError] = useState(null);
+  const [cbuPendingStatus, setCbuPendingStatus] = useState(null);
   const [scoringData, setScoringData] = useState({ scoringId: null, cuit: null });
   const [step, setStep] = useState(LOAN_SIM_STEPS.LEAD_REGISTRATION);
   const [email, setEmail] = useState("");
@@ -370,6 +371,7 @@ export const useLoanSimulator = () => {
               plazosDisponibles.includes(prev) ? prev : (Math.max(...plazosDisponibles) ?? null),
             );
           }
+          return newData;
         } else {
           if (response.cause === ERROR_CAUSE.DEVICE_FINGERPRINT_MISMATCH) {
             setStep(LOAN_SIM_STEPS.DISPOSITIVO_RECHAZADO);
@@ -424,6 +426,12 @@ export const useLoanSimulator = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedAmount, scoringData.scoringId]);
 
+  useEffect(() => {
+    if (step !== LOAN_SIM_STEPS.PENDING_CBU_VALIDATION) {
+      setCbuPendingStatus(null);
+    }
+  }, [step]);
+
   /**
    * Re-consulta el estado de la simulación (Plan 2026-10-20).
    *
@@ -438,7 +446,13 @@ export const useLoanSimulator = () => {
    * `CBU_RECHAZADO_POR_ASESOR`.
    */
   const verificarEstadoCBU = useCallback(async () => {
-    await fetchSimulationRef.current(0, false);
+    setCbuPendingStatus(null);
+    const refreshedSimulation = await fetchSimulationRef.current(0, false);
+    if (refreshedSimulation?.existingSimulation?.estado === LOAN_SIM_STEPS.PENDING_CBU_VALIDATION) {
+      setCbuPendingStatus(
+        "Tu CBU/CVU todavía está pendiente de validación. Hablá con un asesor para continuar.",
+      );
+    }
   }, []);
 
   const handleAmountChange = (newAmount, discountInstallmentRounded) => {
@@ -883,6 +897,7 @@ export const useLoanSimulator = () => {
     guardarCompliance,
     validarCBU,
     verificarEstadoCBU,
+    cbuPendingStatus,
     validarCodigoBancoHandler,
     handleInfoPrestamo,
     setStep,

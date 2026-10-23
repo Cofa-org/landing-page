@@ -72,6 +72,7 @@ const LoanSimScreen = () => {
     // "Verificar estado" de la pantalla PENDING_CBU_VALIDATION. Sin esta
     // prop, el click revienta con `onVerificarEstado is not a function`.
     verificarEstadoCBU,
+    cbuPendingStatus,
   } = useLoanSimulator();
 
   // Plan 2026-10-20: el step PENDING_CBU_VALIDATION delega la apertura del
@@ -229,6 +230,7 @@ const LoanSimScreen = () => {
           <PendingCbuValidation
             onContactAdvisor={handleContactAdvisor}
             onVerificarEstado={verificarEstadoCBU}
+            status={cbuPendingStatus}
             // `verificarEstadoCBU` refresca la simulación y ese refresh setea
             // `loading` (no `validating`) → con `validating` solo, el spinner
             // del botón "Verificar estado" nunca giraba.

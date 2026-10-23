@@ -39,6 +39,7 @@ vi.mock("../hooks/useLoanSimulator.js", () => ({
     loading: mockState.loading,
     validating: mockState.validating,
     error: mockState.error,
+    cbuPendingStatus: mockState.cbuPendingStatus,
     nombreCompleto: "",
     scoringId: null,
     step: mockState.step,
@@ -167,6 +168,7 @@ beforeEach(() => {
   mockState.loading = false;
   mockState.validating = false;
   mockState.error = null;
+  mockState.cbuPendingStatus = null;
 });
 
 describe("LoanSimScreen — step PENDING_CBU_VALIDATION (Plan 2026-10-20)", () => {
@@ -277,4 +279,10 @@ describe("LoanSimScreen — rechazo por CBU (Plan 2026-10-20)", () => {
     // Y tampoco aparece el detalle interno del rechazo.
     expect(screen.queryByText(/Un asesor revisó/i)).toBeNull();
   });
+});
+
+it("passes the manual verification status to the real pending screen", async () => {
+  mockState.cbuPendingStatus = "Tu CBU/CVU todavía está pendiente de validación. Hablá con un asesor para continuar.";
+  renderScreen();
+  expect(await screen.findByRole("status")).toHaveTextContent(mockState.cbuPendingStatus);
 });

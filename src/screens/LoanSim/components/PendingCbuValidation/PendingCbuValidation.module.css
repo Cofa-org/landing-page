@@ -121,3 +121,12 @@
     font-size: 0.95rem;
   }
 }
+
+.statusText {
+  margin: 0;
+  max-width: 30rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  color: #1a6a3d;
+}

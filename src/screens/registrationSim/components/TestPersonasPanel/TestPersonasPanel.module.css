@@ -67,7 +67,7 @@
 
 .active button {
   background: var(--primary-color-10, #1a6a3d) !important;
-  color: #ffffff !important;
+  color: var(--primary-color, #1a6a3d) !important;
   border-color: var(--primary-color, #1a6a3d) !important;
   outline: none;
 }

@@ -37,8 +37,7 @@ const PhonePickerStep = React.lazy(
 );
 // Plan 2026-10-09 (email pre-pick advisor gate): cliente COFA con email
 // inválido en SB. El step renderiza el mensaje "comunicate con un asesor"
-// + botón Callbell. Recarga → re-check → si email ahora válido, transición
-// a PHONE_PICKER.
+// + botón Callbell y consulta manual para continuar cuando se actualice.
 const EmailPendingAdvisorStep = React.lazy(
   () => import("./components/EmailPendingAdvisorStep/EmailPendingAdvisorStep.jsx"),
 );
@@ -83,14 +82,17 @@ const OnboardingFlowScreen = () => {
     restoreError,
     retryRestore,
     emailOtpDestination,
+    verificarEstadoEmailPendingAdvisor,
+    checkingEmailPendingAdvisor,
+    emailPendingAdvisorError,
+    emailPendingAdvisorStatus,
   } = useOnboardingFlow(resumeShortId);
 
   const { verificarOTP, reenviarOTP, validating, error } = usePhoneOTP(getLeadId);
   // Plan 2026-09-29 (cliente email OTP): handlers para EMAIL_OTP_VALIDATION.
   const { verificarOTPEmail, reenviarOTPEmail, validating: validatingEmail, error: errorEmail } = useEmailOTP(getLeadId);
   const { submitPick, submitting: pickerLoading, error: pickerError } = usePhonePicker();
-  // Plan 2026-10-09 (email pre-pick advisor gate): único side-effect es
-  // abrir el chat de Callbell cuando el cliente clickea el botón. El hook
+  // El hook de contacto abre Callbell cuando el cliente clickea el botón y
   // memoiza la referencia para no romper el `memo` del componente puro.
   const { handleContactAdvisor } = useEmailPendingAdvisor();
 
@@ -351,12 +353,16 @@ const OnboardingFlowScreen = () => {
         );
       // Plan 2026-10-09 (email pre-pick advisor gate): el back nos puso
       // en este step cuando el email del cliente COFA es inválido en SB.
-      // El componente es puro presentacional — el side-effect (abrir
-      // Callbell) vive en el hook useEmailPendingAdvisor.
+      // El componente presenta las acciones de contacto y consulta manual;
+      // ambos handlers y sus estados viven en hooks.
       case LOAN_SIM_STEPS.EMAIL_PENDING_ADVISOR:
         return (
           <EmailPendingAdvisorStep
             onContactAdvisor={handleContactAdvisor}
+            onVerificarEstado={verificarEstadoEmailPendingAdvisor}
+            loading={checkingEmailPendingAdvisor}
+            error={emailPendingAdvisorError}
+            status={emailPendingAdvisorStatus}
           />
         );
       default:
