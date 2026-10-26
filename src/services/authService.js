@@ -1,6 +1,7 @@
 import { LANDING_BACKEND_URL, LANDING_BACKEND_API_KEY } from "../config";
 import { HTTP_METHOD } from "../constants/HTTP_METHODS.js";
 import { HttpApi } from "../lib/http.js";
+import { AUTH_SESSION_ERROR_CAUSES, AUTH_SESSION_EVENT } from "../constants/AUTH.js";
 
 const BASE = `${LANDING_BACKEND_URL}/api/auth`;
 
@@ -21,9 +22,13 @@ async function authRequest(path, { method = HTTP_METHOD.POST, body, signal } = {
       const err = new Error(data.message || "Error de autenticación");
       if (data.cause) err.cause = data.cause;
       if (data.data) err.data = data.data;
+      if (AUTH_SESSION_ERROR_CAUSES.includes(data.cause)) {
+        window.dispatchEvent(new Event(AUTH_SESSION_EVENT.EXPIRED));
+      }
       throw err;
     }
 
+    window.dispatchEvent(new Event(AUTH_SESSION_EVENT.ACTIVITY));
     return data;
   } catch (err) {
     console.error("AUTH_SERVICE_ERROR:", err.cause || err.message);
