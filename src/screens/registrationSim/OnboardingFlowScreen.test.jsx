@@ -6,7 +6,7 @@
 // (initial restoringOnboarding=true) y OnboardingFlowScreen.jsx (early
 // return con Loader full-screen).
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent, act } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 
 // vi.mock es hoisted — declarar ANTES del import del Screen.
@@ -125,11 +125,18 @@ vi.mock("./components/RejectedStep/RejectedStep.jsx", () => ({
 vi.mock("./components/IdentitySelectionStep/IdentitySelectionStep.jsx", () => ({
   default: () => <div data-testid="identity-selection-step" />,
 }));
-vi.mock("./components/PhonePickerStep/PhonePickerStep.jsx", () => ({
-  default: () => <div data-testid="phone-picker-step" />,
-}));
 
 import OnboardingFlowScreen from "./OnboardingFlowScreen.jsx";
+
+beforeEach(async () => {
+  vi.clearAllMocks();
+  const { getCookie } = await import("../../lib/utils.js");
+  const { getDecodedToken } = await import("../../lib/token.js");
+  const service = (await import("../../services/leadRegistrationService.js")).default;
+  getCookie.mockReset().mockResolvedValue(null);
+  getDecodedToken.mockReset().mockReturnValue(null);
+  service.obtenerEstadoOnboarding.mockReset().mockResolvedValue({ success: false });
+});
 
 const renderScreen = (search = "/") =>
   render(
@@ -137,6 +144,114 @@ const renderScreen = (search = "/") =>
       <OnboardingFlowScreen />
     </MemoryRouter>,
   );
+
+describe("OnboardingFlowScreen — manual advisor status check", () => {
+  const pendingState = {
+    success: true,
+    data: { estado_onboarding: "EMAIL_PENDING_ADVISOR", requiresAdvisorContact: true, es_cliente: true },
+  };
+  let service;
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    const { getCookie } = await import("../../lib/utils.js");
+    const { getDecodedToken } = await import("../../lib/token.js");
+    service = (await import("../../services/leadRegistrationService.js")).default;
+    getCookie.mockResolvedValue("advisor-token");
+    getDecodedToken.mockReturnValue({ leadId: 42 });
+    service.obtenerEstadoOnboarding.mockResolvedValue({ success: false });
+    service.obtenerEstadoOnboarding.mockResolvedValueOnce(pendingState);
+  });
+
+  it("keeps the advisor card visible while checking, then passes all four picker options", async () => {
+    let resolveCheck;
+    service.obtenerEstadoOnboarding.mockImplementationOnce(() => new Promise(resolve => { resolveCheck = resolve; }));
+    renderScreen();
+    const verifyButton = await screen.findByRole("button", { name: "Verificar estado" });
+    fireEvent.click(verifyButton);
+    await waitFor(() => expect(verifyButton).toHaveAttribute("aria-busy", "true"));
+    expect(verifyButton).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Hablar con un asesor" })).toBeEnabled();
+    expect(screen.getByRole("heading", { name: "Hablá con un asesor para continuar" })).toBeVisible();
+    expect(screen.queryByText("Preparando tu onboarding...")).toBeNull();
+    await act(async () => resolveCheck({ success: true, data: {
+      estado_onboarding: "PHONE_PICKER",
+      pickerContext: { options: ["1111111111", "2222222222", "3333333333", "0111111111"], target: "1111111111" },
+    } }));
+    expect(await screen.findByText("1111111111")).toBeVisible();
+    expect(screen.getByText("2222222222")).toBeVisible();
+    expect(screen.getByText("3333333333")).toBeVisible();
+    expect(screen.getByText("0111111111")).toBeVisible();
+    expect(screen.queryByRole("button", { name: "Verificar estado" })).toBeNull();
+  });
+
+  it("shows a local pending message and permits another check", async () => {
+    service.obtenerEstadoOnboarding.mockResolvedValueOnce(pendingState);
+    renderScreen();
+    fireEvent.click(await screen.findByRole("button", { name: "Verificar estado" }));
+    expect(await screen.findByRole("status")).toHaveTextContent("Tu correo todavía está pendiente de actualización");
+    expect(screen.getByRole("button", { name: "Verificar estado" })).toBeEnabled();
+    expect(screen.queryByText("Preparando tu onboarding...")).toBeNull();
+  });
+
+  it("shows a local error and clears it when retrying successfully", async () => {
+    service.obtenerEstadoOnboarding.mockRejectedValueOnce(new Error("No pudimos consultar. Volvé a intentarlo."));
+    service.obtenerEstadoOnboarding.mockResolvedValueOnce(pendingState);
+    renderScreen();
+    fireEvent.click(await screen.findByRole("button", { name: "Verificar estado" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("No pudimos consultar. Volvé a intentarlo.");
+    expect(screen.queryByText("No pudimos recuperar tu solicitud")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Verificar estado" }));
+    expect(await screen.findByRole("status")).toHaveTextContent("Tu correo todavía está pendiente de actualización");
+    expect(screen.queryByRole("alert")).toBeNull();
+    expect(screen.getByRole("button", { name: "Verificar estado" })).toBeEnabled();
+  });
+
+  it("retains the advisor card and enables retry after an incomplete picker response", async () => {
+    service.obtenerEstadoOnboarding.mockResolvedValueOnce({
+      success: true,
+      message: "Selector incompleto",
+      data: { estado_onboarding: "PHONE_PICKER", pickerContext: null, requiresAdvisorContact: false },
+    }).mockResolvedValueOnce(pendingState);
+    renderScreen();
+    fireEvent.click(await screen.findByRole("button", { name: "Verificar estado" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("Selector incompleto");
+    expect(screen.getByRole("button", { name: "Hablar con un asesor" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Verificar estado" })).toBeEnabled();
+    fireEvent.click(screen.getByRole("button", { name: "Verificar estado" }));
+    expect(await screen.findByRole("status")).toHaveTextContent("Tu correo");
+    expect(screen.queryByRole("alert")).toBeNull();
+    expect(service.obtenerEstadoOnboarding).toHaveBeenCalledTimes(3);
+  });
+
+  it("keeps the advisor action opening Callbell", async () => {
+    const { openCallbellWebchat } = await import("../../utils/callbellHelpers.js");
+    renderScreen();
+    fireEvent.click(await screen.findByRole("button", { name: "Hablar con un asesor" }));
+    expect(openCallbellWebchat).toHaveBeenCalledExactlyOnceWith();
+  });
+});
+
+it("offers manual recovery after ERP failure and restores the picker", async () => {
+  const { getCookie } = await import("../../lib/utils.js");
+  const { getDecodedToken } = await import("../../lib/token.js");
+  const service = (await import("../../services/leadRegistrationService.js")).default;
+  getCookie.mockResolvedValue("existing-token");
+  getDecodedToken.mockReturnValue({ leadId: 42 });
+  service.obtenerEstadoOnboarding.mockRejectedValueOnce(new Error("ERP unavailable"));
+  renderScreen();
+  expect(await screen.findByRole("alert")).toHaveTextContent("No pudimos recuperar tu solicitud");
+  expect(screen.queryByTestId("lead-registration-step")).toBeNull();
+  let complete;
+  service.obtenerEstadoOnboarding.mockImplementationOnce(() => new Promise(resolve => { complete = resolve; }));
+  fireEvent.click(screen.getByRole("button", { name: "Reintentar" }));
+  await waitFor(() => expect(complete).toBeTypeOf("function"));
+  expect(screen.getByRole("status")).toHaveTextContent("Preparando tu onboarding");
+  expect(screen.queryByRole("button", { name: "Reintentar" })).toBeNull();
+  await act(async () => { complete({ success: true, data: { estado_onboarding: "PHONE_PICKER", pickerContext: { options: ["1111111111", "2222222222", "3333333333", "0111111111"], target: "1111111111" } } }); });
+  expect(await screen.findByRole("button", { name: "Opción 1: 1111111111" })).toBeVisible();
+  expect(screen.queryByRole("alert")).toBeNull();
+});
 
 describe("OnboardingFlowScreen — flash-of-step gate (flash fix 2026-09-11)", () => {
   beforeEach(() => {

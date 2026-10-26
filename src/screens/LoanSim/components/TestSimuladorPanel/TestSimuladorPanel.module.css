@@ -66,6 +66,30 @@
   gap: 8px;
 }
 
+.personaItem {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.approveCbuButton {
+  width: 100% !important;
+  font-size: 12px !important;
+  padding: 6px 10px !important;
+  color: #ffffff !important;
+  background: var(--primary-color, #1a6a3d) !important;
+  border-radius: var(--border-radius-sm, 6px) !important;
+}
+
+.approveCbuButton:hover {
+  background: #14522f !important;
+}
+
+.approveCbuButton:disabled {
+  opacity: 0.75 !important;
+  cursor: default !important;
+}
+
 .personaButton {
   /* GenericButton variant=outline, customized to use the COFA palette.
      Override the default generic styles with a more tactile look. */

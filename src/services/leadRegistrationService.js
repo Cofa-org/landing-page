@@ -1,6 +1,7 @@
 import { LANDING_BACKEND_URL, LANDING_BACKEND_API_KEY } from "../config";
 import { HTTP_METHOD } from "../constants/HTTP_METHODS.js";
 import { HttpApi } from "../lib/http.js";
+import { parseErrorResponse } from "../lib/http-error.js";
 import { getCookie } from "../lib/utils";
 import { COOKIE_LEAD_TOKEN_CONFIG } from "../constants/LOAN_SIM.js";
 
@@ -175,9 +176,19 @@ export default class LeadRegistrationService {
         signal,
       );
 
-      const data = await response.json();
       if (!response.ok) {
-        throw new Error(data.message || "Error al obtener el estado del lead");
+        const failure = await parseErrorResponse(response);
+        throw Object.assign(new Error(failure.message || "Error al obtener el estado del lead"), {
+          status: failure.status,
+          cause: failure.cause,
+        });
+      }
+      const data = await response.json();
+      if (data.success === false) {
+        throw Object.assign(new Error(data.message || "Error al obtener el estado del lead"), {
+          status: data.status,
+          cause: data.cause,
+        });
       }
       return data;
     } catch (error) {
@@ -322,16 +333,19 @@ export default class LeadRegistrationService {
         token,
         signal,
       );
-      const data = await response.json();
       if (!response.ok) {
-        // Whole-branch review BLOCKER #1 (plan 2026-09-29): preservar
-        // `data.cause` para que `useEmailOTP.verificarOTPEmail` y
-        // `handleVerificarEmailOTP` puedan distinguir entre
-        // OTP_INVALID (recoverable) y OTP_MAX_FAIL_ATTEMPTS_EXCEEDED
-        // (terminal → handleRejected → RECHAZADO step).
-        const err = new Error(data.message || "Error al solicitar OTP de email");
-        if (data.cause) err.cause = data.cause;
-        throw err;
+        const failure = await parseErrorResponse(response);
+        throw Object.assign(new Error(failure.message || "Error al solicitar OTP de email"), {
+          status: failure.status,
+          cause: failure.cause ?? undefined,
+        });
+      }
+      const data = await response.json();
+      if (data.success === false) {
+        throw Object.assign(new Error(data.message || "Error al solicitar OTP de email"), {
+          status: data.status,
+          cause: data.cause,
+        });
       }
       return data;
     } catch (error) {
@@ -356,13 +370,19 @@ export default class LeadRegistrationService {
         token,
         signal,
       );
-      const data = await response.json();
       if (!response.ok) {
-        // Ver BLOCKER #1 arriba: `data.cause` es la señal que el hook usa
-        // para decidir si navegar a RECHAZADO.
-        const err = new Error(data.message || "Error al verificar OTP de email");
-        if (data.cause) err.cause = data.cause;
-        throw err;
+        const failure = await parseErrorResponse(response);
+        throw Object.assign(new Error(failure.message || "Error al verificar OTP de email"), {
+          status: failure.status,
+          cause: failure.cause ?? undefined,
+        });
+      }
+      const data = await response.json();
+      if (data.success === false) {
+        throw Object.assign(new Error(data.message || "Error al verificar OTP de email"), {
+          status: data.status,
+          cause: data.cause,
+        });
       }
       return data;
     } catch (error) {

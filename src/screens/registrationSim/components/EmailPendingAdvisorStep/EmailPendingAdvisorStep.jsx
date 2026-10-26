@@ -6,7 +6,13 @@ import styles from "./EmailPendingAdvisorStep.module.css";
 const TITLE_ID = "email-pending-advisor-title";
 const SUBTITLE_ID = "email-pending-advisor-subtitle";
 
-const EmailPendingAdvisorStep = ({ onContactAdvisor }) => {
+const EmailPendingAdvisorStep = ({
+  onContactAdvisor,
+  onVerificarEstado,
+  loading = false,
+  error = null,
+  status = null,
+}) => {
   return (
     <section
       className={styles.container}
@@ -30,9 +36,21 @@ const EmailPendingAdvisorStep = ({ onContactAdvisor }) => {
           id={SUBTITLE_ID}
           className={styles.subtitle}
         >
-          Para continuar, necesitamos actualizar tu correo electrónico. Hablá con un asesor.
+          Para continuar, necesitamos actualizar tu correo electrónico. Hablá con un asesor. Cuando te
+          confirme que podés continuar, presioná <b>Verificar estado</b>.
         </p>
       </header>
+
+      {error && (
+        <p className={styles.errorText} role='alert'>
+          {error}
+        </p>
+      )}
+      {status && (
+        <p className={styles.statusText} role='status'>
+          {status}
+        </p>
+      )}
 
       <div className={styles.actionContainer}>
         <GenericButton
@@ -40,7 +58,17 @@ const EmailPendingAdvisorStep = ({ onContactAdvisor }) => {
           onClick={onContactAdvisor}
           data-testid='email-pending-advisor-contact-button'
         >
-          Comunicarse con un asesor
+          Hablar con un asesor
+        </GenericButton>
+        <GenericButton
+          variant='secondary'
+          onClick={onVerificarEstado}
+          loading={loading}
+          aria-label='Verificar estado'
+          aria-busy={loading || undefined}
+          data-testid='email-pending-advisor-verificar-button'
+        >
+          Verificar estado
         </GenericButton>
       </div>
     </section>
@@ -49,6 +77,10 @@ const EmailPendingAdvisorStep = ({ onContactAdvisor }) => {
 
 EmailPendingAdvisorStep.propTypes = {
   onContactAdvisor: PropTypes.func.isRequired,
+  onVerificarEstado: PropTypes.func.isRequired,
+  loading: PropTypes.bool,
+  error: PropTypes.string,
+  status: PropTypes.string,
 };
 
 export default memo(EmailPendingAdvisorStep);

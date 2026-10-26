@@ -18,6 +18,9 @@ const EmailValidation = lazy(() => import("./components/EmailValidation/EmailVal
 const OTPValidation = lazy(() => import("../../Components/OTPValidation/OTPValidation.jsx"));
 const ComplianceStep = lazy(() => import("./components/ComplianceStep/ComplianceStep"));
 const CBUValidation = lazy(() => import("./components/CBUValidation/CBUValidation"));
+const PendingCbuValidation = lazy(
+  () => import("./components/PendingCbuValidation/PendingCbuValidation"),
+);
 const SuccessStep = lazy(() => import("./components/SuccessStep/SuccessStep"));
 const MobbexSubscriptionStep = lazy(
   () => import("./components/MobbexSubscriptionStep/MobbexSubscriptionStep"),
@@ -25,6 +28,7 @@ const MobbexSubscriptionStep = lazy(
 const RejectedStep = lazy(() => import("./components/RejectedStep/RejectedStep"));
 import { useLoanSimulator } from "./hooks/useLoanSimulator";
 import { useComplianceForm } from "./hooks/useComplianceForm";
+import { usePendingCbuValidation } from "./hooks/usePendingCbuValidation";
 import { useTestSimuladorPanel } from "./hooks/useTestSimuladorPanel";
 import TestSimuladorPanel from "./components/TestSimuladorPanel/TestSimuladorPanel.jsx";
 import styles from "./LoanSimScreen.module.css";
@@ -36,6 +40,7 @@ const LoanSimScreen = () => {
     amount,
     installment,
     simulationData,
+    cbuValidado,
     loading,
     validating,
     error,
@@ -64,7 +69,19 @@ const LoanSimScreen = () => {
     existingCompliance,
     verificarComplianceExistente,
     setStep,
+    // Plan 2026-10-20: re-consulta el estado de la simulación para el botón
+    // "Verificar estado" de la pantalla PENDING_CBU_VALIDATION. Sin esta
+    // prop, el click revienta con `onVerificarEstado is not a function`.
+    verificarEstadoCBU,
+    cbuPendingStatus,
   } = useLoanSimulator();
+
+  // Plan 2026-10-20: el step PENDING_CBU_VALIDATION delega la apertura del
+  // chat de Callbell a este hook. El "verificar estado" NO vive acá: el
+  // routing (PENDING → sigue, RECHAZADO → pantalla de rechazo,
+  // CBU_VALIDATION → sigue el flujo) lo hace `verificarEstadoCBU`, que es el
+  // que tiene `setStep` y el refresh de la simulación.
+  const { handleContactAdvisor } = usePendingCbuValidation();
 
   // Bloquear render hasta que la primera respuesta de calcularPlanes sea
   // procesada. Antes se usaba `!scoringId && step === SIMULACION`, lo que
@@ -189,9 +206,42 @@ const LoanSimScreen = () => {
             onBack={handlePrevStep}
             isClient={!!simulationData?.existingSimulation?.id_cliente}
             existingCbu={simulationData?.existingSimulation?.cbu}
+            // ⚠️ El valor y el tipo tienen que derivarse de la MISMA fuente.
+            // El back escribe SOLO la columna del accountType del submit y nunca
+            // limpia la otra → si el cliente cambió de CBU a CVU (o al revés),
+            // quedan AMBAS pobladas. Con `pendingCbu = cbu_usuario || cvu_usuario`
+            // y `pendingAccountType = cvu_usuario ? "cvu" : "cbu"` se emparejaría
+            // el CBU viejo con el tipo "cvu" → el back escribiría un CBU en
+            // `cvu_usuario` (exactamente la corrupción que la feature evita).
+            pendingCbu={
+              simulationData?.existingSimulation?.cbu_usuario ||
+              simulationData?.existingSimulation?.cvu_usuario ||
+              null
+            }
+            pendingAccountType={
+              simulationData?.existingSimulation?.cbu_usuario ? "cbu" : "cvu"
+            }
+            cbuValidado={cbuValidado}
             bancoEncontrado={bancoEncontrado}
             codigoBancoError={codigoBancoError}
             validandoBanco={validandoBanco}
+          />
+        )}
+        {step === LOAN_SIM_STEPS.PENDING_CBU_VALIDATION && (
+          <PendingCbuValidation
+            onContactAdvisor={handleContactAdvisor}
+            onVerificarEstado={verificarEstadoCBU}
+            status={cbuPendingStatus}
+            // `verificarEstadoCBU` refresca la simulación y ese refresh setea
+            // `loading` (no `validating`) → con `validating` solo, el spinner
+            // del botón "Verificar estado" nunca giraba.
+            loading={loading || validating}
+            // Esta pantalla es un dead-end: la única superficie de error del
+            // screen (`error && !simulationData && step === SIMULACION`) no
+            // puede dispararse en este step → sin esta prop, un refresh
+            // fallido (ej. `SIMULADOR_SIMULATION_EXPIRED` a las 24h) sería
+            // totalmente mudo.
+            error={error}
           />
         )}
         {step === LOAN_SIM_STEPS.MOBBEX_SUBSCRIPTION && (
@@ -212,9 +262,11 @@ const LoanSimScreen = () => {
         {step === LOAN_SIM_STEPS.RECHAZADO && (
           <RejectedStep
             rejection={
-              rejectionReason === "PHONE_NOT_VALIDATED"
-                ? REJECTION_CONFIG.PHONE_NOT_VALIDATED
-                : REJECTION_CONFIG.SIM_RECHAZADO
+              rejectionReason === "CBU_REJECTED"
+                ? REJECTION_CONFIG.CBU_REJECTED
+                : rejectionReason === "PHONE_NOT_VALIDATED"
+                  ? REJECTION_CONFIG.PHONE_NOT_VALIDATED
+                  : REJECTION_CONFIG.SIM_RECHAZADO
             }
           />
         )}
@@ -226,13 +278,18 @@ const LoanSimScreen = () => {
   };
 
   const renderBackButton = () => {
+    if (step === LOAN_SIM_STEPS.CBU_VALIDATION && cbuValidado) return null;
+
     if (
       step !== LOAN_SIM_STEPS.COMPLIANCE &&
       step !== LOAN_SIM_STEPS.SIMULACION &&
       step !== LOAN_SIM_STEPS.COMPLETADO &&
       step !== LOAN_SIM_STEPS.RECHAZADO &&
       step !== LOAN_SIM_STEPS.DISPOSITIVO_RECHAZADO &&
-      step !== LOAN_SIM_STEPS.MOBBEX_SUBSCRIPTION
+      step !== LOAN_SIM_STEPS.MOBBEX_SUBSCRIPTION &&
+      // Plan 2026-10-20: mientras un asesor revisa el CBU/CVU, "atrás" es un
+      // callejón sin salida (el back no puede volver del step estacionado).
+      step !== LOAN_SIM_STEPS.PENDING_CBU_VALIDATION
     )
       return <BackButton onClick={handlePrevStep} />;
     return null;
@@ -292,6 +349,9 @@ const LoanSimScreen = () => {
           loading={testPanel.loading}
           onSelectPersona={testPanel.selectPersona}
           onReset={testPanel.resetSession}
+          onAprobarCbu={testPanel.aprobarCbu}
+          approvingCbu={testPanel.approvingCbu}
+          cbuAprobadoPara={testPanel.cbuAprobadoPara}
         />
       )}
       <Header />

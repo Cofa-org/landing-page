@@ -73,6 +73,22 @@
   pointer-events: none;
 }
 
+.restoreError {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  color: var(--text-color);
+}
+
+.restoreError h2 {
+  margin: 0 0 var(--spacing-md);
+  text-wrap: balance;
+}
+
+.restoreError p {
+  margin: 0;
+}
+
 @media (max-width: 480px) {
   .calculatorContainer {
     padding: var(--spacing-md);

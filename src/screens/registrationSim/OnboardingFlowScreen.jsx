@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import Loader from "../../Components/Loader/Loader.jsx";
 import OTPValidation from "../../Components/OTPValidation/OTPValidation.jsx";
 import BackButton from "../../Components/buttons/backbutton/BackButton.jsx";
+import GenericButton from "../../Components/buttons/GenericButton/GenericButton.jsx";
 import { Footer, Header } from "../../Components/index.js";
 import { HeroLoanSim } from "../../Sections/index.js";
 import { COOKIE_LEAD_TOKEN_CONFIG, LOAN_SIM_STEPS, ONBOARDING_STATES, OTP_CONFIG } from "../../constants/LOAN_SIM.js";
@@ -36,8 +37,7 @@ const PhonePickerStep = React.lazy(
 );
 // Plan 2026-10-09 (email pre-pick advisor gate): cliente COFA con email
 // inválido en SB. El step renderiza el mensaje "comunicate con un asesor"
-// + botón Callbell. Recarga → re-check → si email ahora válido, transición
-// a PHONE_PICKER.
+// + botón Callbell y consulta manual para continuar cuando se actualice.
 const EmailPendingAdvisorStep = React.lazy(
   () => import("./components/EmailPendingAdvisorStep/EmailPendingAdvisorStep.jsx"),
 );
@@ -79,15 +79,20 @@ const OnboardingFlowScreen = () => {
     setLeadToken,
     setOnboardingStep,
     restoringOnboarding,
+    restoreError,
+    retryRestore,
     emailOtpDestination,
+    verificarEstadoEmailPendingAdvisor,
+    checkingEmailPendingAdvisor,
+    emailPendingAdvisorError,
+    emailPendingAdvisorStatus,
   } = useOnboardingFlow(resumeShortId);
 
   const { verificarOTP, reenviarOTP, validating, error } = usePhoneOTP(getLeadId);
   // Plan 2026-09-29 (cliente email OTP): handlers para EMAIL_OTP_VALIDATION.
   const { verificarOTPEmail, reenviarOTPEmail, validating: validatingEmail, error: errorEmail } = useEmailOTP(getLeadId);
   const { submitPick, submitting: pickerLoading, error: pickerError } = usePhonePicker();
-  // Plan 2026-10-09 (email pre-pick advisor gate): único side-effect es
-  // abrir el chat de Callbell cuando el cliente clickea el botón. El hook
+  // El hook de contacto abre Callbell cuando el cliente clickea el botón y
   // memoiza la referencia para no romper el `memo` del componente puro.
   const { handleContactAdvisor } = useEmailPendingAdvisor();
 
@@ -348,12 +353,16 @@ const OnboardingFlowScreen = () => {
         );
       // Plan 2026-10-09 (email pre-pick advisor gate): el back nos puso
       // en este step cuando el email del cliente COFA es inválido en SB.
-      // El componente es puro presentacional — el side-effect (abrir
-      // Callbell) vive en el hook useEmailPendingAdvisor.
+      // El componente presenta las acciones de contacto y consulta manual;
+      // ambos handlers y sus estados viven en hooks.
       case LOAN_SIM_STEPS.EMAIL_PENDING_ADVISOR:
         return (
           <EmailPendingAdvisorStep
             onContactAdvisor={handleContactAdvisor}
+            onVerificarEstado={verificarEstadoEmailPendingAdvisor}
+            loading={checkingEmailPendingAdvisor}
+            error={emailPendingAdvisorError}
+            status={emailPendingAdvisorStatus}
           />
         );
       default:
@@ -390,7 +399,7 @@ const OnboardingFlowScreen = () => {
         <Header />
         <div className={styles.homeCalculator_calculatorBox}>
           <div className={styles.calculatorContainer}>
-            <div className={styles.loaderContainer}>
+            <div className={styles.loaderContainer} role="status">
               <Loader />
               <p className={styles.loadingText}>Preparando tu onboarding...</p>
             </div>
@@ -411,7 +420,7 @@ const OnboardingFlowScreen = () => {
           </div>
           <div className={`${styles.homeCalculator_calculatorBox} ${styles.rightColumn}`}>
             <div className={styles.calculatorContainer}>
-              {shouldShowBackButton() && (
+              {!restoreError && shouldShowBackButton() && (
                 <BackButton
                   onClick={navigateToPrev}
                   style={{
@@ -427,7 +436,17 @@ const OnboardingFlowScreen = () => {
                   </div>
                 }
               >
-                {renderStep()}
+                {restoreError && !resumeShortId ? (
+                  <div className={styles.restoreError}>
+                    <div role="alert">
+                      <h2>No pudimos recuperar tu solicitud</h2>
+                      <p>Hubo un problema temporal al consultar tus datos. Volvé a intentarlo.</p>
+                    </div>
+                    <GenericButton onClick={retryRestore} disabled={restoringOnboarding}>
+                      Reintentar
+                    </GenericButton>
+                  </div>
+                ) : renderStep()}
               </Suspense>
             </div>
           </div>

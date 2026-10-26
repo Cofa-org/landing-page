@@ -1,157 +1,57 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
-
-// Mockeamos el hook Y el service ANTES de importar el componente bajo test.
-// (vi.mock se eleva por hoist del bundler, así que la importación del
-// componente más abajo siempre encuentra los mocks.)
-vi.mock("../../../hooks/useTestPersonasPanel.js", () => ({
-  useTestPersonasPanel: vi.fn(),
-  // El componente también importa `PERSONAS_CON_AGREGAR_EMAIL` para decidir
-  // qué botón renderizar. Devolvemos el Set real (no lo mockeamos: el test
-  // lo necesita truthy para que el botón "Agregar email" aparezca).
-  PERSONAS_CON_AGREGAR_EMAIL: new Set(["CARLOS_NO_EMAIL"]),
-}));
-
-vi.mock("../../../../../services/testPersonasService.js", () => ({
-  setPersonaEmail: vi.fn(),
-  resetPersonaEmail: vi.fn(),
-}));
-
-// Forzamos que el panel sea visible (gate: DEV || ?testMode=1).
-// En Vitest DEV=true siempre, así que el panel se ve sin tocar search.
-vi.mock("../../../../../config.js", () => ({
-  isTestPersonasVisible: vi.fn(() => true),
-}));
-
-import { useTestPersonasPanel } from "../../../hooks/useTestPersonasPanel.js";
-import { setPersonaEmail, resetPersonaEmail } from "../../../../../services/testPersonasService.js";
+import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
+import { MemoryRouter, useLocation } from "react-router-dom";
+vi.mock("../../../../../services/testPersonasService.js", () => ({ fetchTestPersonas: vi.fn(), setPersonaEmail: vi.fn(), resetPersonaEmail: vi.fn() }));
+vi.mock("../../../../../config.js", () => ({ isTestPersonasVisible: () => true }));
+import { fetchTestPersonas, setPersonaEmail } from "../../../../../services/testPersonasService.js";
 import TestPersonasPanel from "../TestPersonasPanel.jsx";
-
-const renderWithRouter = (ui, initialUrl = "/registro") =>
-  render(<MemoryRouter initialEntries={[initialUrl]}>{ui}</MemoryRouter>);
-
-const baseHookReturn = (overrides = {}) => ({
-  collapsed: false,
-  setCollapsed: vi.fn(),
-  personas: [],
-  activePersonaId: null,
-  selectPersona: vi.fn(),
-  resetSession: vi.fn(),
-  ...overrides,
-});
-
-describe("TestPersonasPanel — botón 'Agregar email'", () => {
+const Location = () => { const location = useLocation(); return <output data-testid="location">{location.pathname}{location.search}</output>; };
+const renderPanel = () => render(<MemoryRouter initialEntries={["/registro?testPersona=CARLOS_NO_EMAIL"]}><TestPersonasPanel /><Location /></MemoryRouter>);
+describe("TestPersonasPanel add email", () => {
   let reloadSpy;
-  let alertSpy;
-
   beforeEach(() => {
     vi.clearAllMocks();
-    // Evitar que window.location.reload dispare el jsdom navigation.
+    fetchTestPersonas.mockResolvedValue([{ id: "CARLOS_NO_EMAIL", label: "Carlos sin email", useCases: ["registro"] }, { id: "REG_HAPPY", label: "Registro Happy", useCases: ["registro"] }]);
     reloadSpy = vi.fn();
-    Object.defineProperty(window, "location", {
-      configurable: true,
-      value: { ...window.location, reload: reloadSpy },
-    });
-    alertSpy = vi.spyOn(window, "alert").mockImplementation(() => {});
+    Object.defineProperty(window, "location", { configurable: true, value: { ...window.location, reload: reloadSpy } });
+    vi.spyOn(window, "alert").mockImplementation(() => {});
   });
-
-  afterEach(() => {
-    alertSpy.mockRestore();
-  });
-
-  it("renderiza el botón '✉️ Agregar email' SOLO para CARLOS_NO_EMAIL, no para otras personas", () => {
-    useTestPersonasPanel.mockReturnValue(
-      baseHookReturn({
-        personas: [
-          { id: "REG_HAPPY", label: "Registro Happy", descripcion: "Flow completo" },
-          { id: "CARLOS_NO_EMAIL", label: "Carlos sin email", descripcion: "Sin email" },
-          { id: "OTRO", label: "Otro", descripcion: "Otro flow" },
-        ],
-      }),
-    );
-
-    renderWithRouter(<TestPersonasPanel />);
-
-    const addEmailButtons = screen.getAllByTestId("test-personas-add-email-button");
-    expect(addEmailButtons).toHaveLength(1);
-    expect(addEmailButtons[0]).toHaveTextContent(/agregar email/i);
-
-    // El botón debe estar dentro del <li> de CARLOS_NO_EMAIL — verificamos
-    // buscando por el nombre de la persona.
-    const carlosItem = screen.getByText(/carlos sin email/i).closest("li");
-    expect(carlosItem).not.toBeNull();
-    expect(carlosItem.querySelector('[data-testid="test-personas-add-email-button"]')).not.toBeNull();
-
-    // REG_HAPPY y OTRO NO deben tener el botón dentro de su <li>.
-    const regHappyItem = screen.getByText(/registro happy/i).closest("li");
-    expect(regHappyItem.querySelector('[data-testid="test-personas-add-email-button"]')).toBeNull();
-    const otroItem = screen.getByText(/^otro$/i).closest("li");
-    expect(otroItem.querySelector('[data-testid="test-personas-add-email-button"]')).toBeNull();
-  });
-
-  it("click en 'Agregar email' → llama setPersonaEmail con el personaId y recarga la página", async () => {
-    setPersonaEmail.mockResolvedValueOnce({ success: true });
-
-    useTestPersonasPanel.mockReturnValue(
-      baseHookReturn({
-        personas: [
-          { id: "CARLOS_NO_EMAIL", label: "Carlos sin email", descripcion: "Sin email" },
-        ],
-      }),
-    );
-
-    renderWithRouter(<TestPersonasPanel />);
-
-    const addEmailBtn = screen.getByTestId("test-personas-add-email-button");
-    fireEvent.click(addEmailBtn);
-
-    await waitFor(() => {
-      expect(setPersonaEmail).toHaveBeenCalledTimes(1);
-    });
-    expect(setPersonaEmail).toHaveBeenCalledWith("CARLOS_NO_EMAIL");
-    expect(reloadSpy).toHaveBeenCalledTimes(1);
-  });
-
-  it("click con error → alert con el mensaje y NO recarga", async () => {
-    setPersonaEmail.mockRejectedValueOnce(new Error("network down"));
-
-    useTestPersonasPanel.mockReturnValue(
-      baseHookReturn({
-        personas: [
-          { id: "CARLOS_NO_EMAIL", label: "Carlos sin email", descripcion: "Sin email" },
-        ],
-      }),
-    );
-
-    renderWithRouter(<TestPersonasPanel />);
-
-    const addEmailBtn = screen.getByTestId("test-personas-add-email-button");
-    fireEvent.click(addEmailBtn);
-
-    await waitFor(() => {
-      expect(setPersonaEmail).toHaveBeenCalledTimes(1);
-    });
-    expect(alertSpy).toHaveBeenCalledTimes(1);
-    expect(alertSpy).toHaveBeenCalledWith(expect.stringMatching(/network down/));
-    expect(reloadSpy).not.toHaveBeenCalled();
-  });
-
-  it("panel colapsado → no renderiza el botón 'Agregar email'", () => {
-    useTestPersonasPanel.mockReturnValue(
-      baseHookReturn({
-        collapsed: true,
-        personas: [
-          { id: "CARLOS_NO_EMAIL", label: "Carlos sin email", descripcion: "Sin email" },
-        ],
-      }),
-    );
-
-    renderWithRouter(<TestPersonasPanel />);
-
-    // El panel sigue visible (data-testid existe) pero la lista está colapsada.
-    expect(screen.getByTestId("test-personas-panel")).toBeInTheDocument();
+  afterEach(() => vi.restoreAllMocks());
+  it("shows add email only on supported personas and hides it when collapsed", async () => {
+    renderPanel();
+    const button = await screen.findByRole("button", { name: /agregar email/i });
+    expect(screen.getAllByTestId("test-personas-add-email-button")).toHaveLength(1);
+    expect(button.closest("li")).toHaveTextContent("Carlos sin email");
+    fireEvent.click(screen.getByRole("button", { name: "Ocultar" }));
     expect(screen.queryByTestId("test-personas-add-email-button")).toBeNull();
+  });
+  it("keeps the current route while loading, then shows disabled Email agregado", async () => {
+    let resolveEmail;
+    setPersonaEmail.mockReturnValue(new Promise(resolve => { resolveEmail = resolve; }));
+    renderPanel();
+    const button = await screen.findByRole("button", { name: /agregar email/i });
+    fireEvent.click(button);
+    expect(button).toBeDisabled();
+    expect(button).toHaveAttribute("aria-busy", "true");
+    fireEvent.click(button);
+    expect(setPersonaEmail).toHaveBeenCalledExactlyOnceWith("CARLOS_NO_EMAIL");
+    await act(async () => { resolveEmail({ success: true, personaId: "CARLOS_NO_EMAIL", email: "carlos@test.com" }); });
+    expect(screen.getByRole("button", { name: "Email agregado" })).toBeDisabled();
+    fireEvent.click(button);
+    expect(setPersonaEmail).toHaveBeenCalledTimes(1);
+    expect(reloadSpy).not.toHaveBeenCalled();
+    expect(screen.getByTestId("location")).toHaveTextContent("/registro?testPersona=CARLOS_NO_EMAIL");
+  });
+  it("shows errors and enables retry", async () => {
+    setPersonaEmail.mockRejectedValueOnce(new Error("network down")).mockResolvedValueOnce({ success: true });
+    renderPanel();
+    fireEvent.click(await screen.findByRole("button", { name: /agregar email/i }));
+    await waitFor(() => expect(window.alert).toHaveBeenCalledWith(expect.stringContaining("network down")));
+    const retry = screen.getByRole("button", { name: /agregar email/i });
+    expect(retry).toBeEnabled();
+    fireEvent.click(retry);
+    expect(await screen.findByRole("button", { name: "Email agregado" })).toBeDisabled();
+    expect(reloadSpy).not.toHaveBeenCalled();
   });
 });

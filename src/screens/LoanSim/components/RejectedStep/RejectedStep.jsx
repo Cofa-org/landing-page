@@ -20,16 +20,21 @@ const RejectedStep = ({ rejection = REJECTION_CONFIG.DEVICE_MISMATCH }) => {
             <MdWarning size={64} color="#d32f2f" style={{ marginBottom: "16px" }} />
           )}
           <h2 className={styles.title}>{title}</h2>
-          <p
-            style={{
-              fontSize: "16px",
-              lineHeight: 1.5,
-              margin: "16px 0",
-              color: "#555",
-            }}
-          >
-            {description}
-          </p>
+          {/* La descripción es opcional: el rechazo de CBU no la tiene (el
+              cliente ya habló con un operador) y sin esta guarda quedaba un
+              <p> vacío con margen. */}
+          {description && (
+            <p
+              style={{
+                fontSize: "16px",
+                lineHeight: 1.5,
+                margin: "16px 0",
+                color: "#555",
+              }}
+            >
+              {description}
+            </p>
+          )}
           {primaryAction && (
             <a
               href={primaryAction.href}

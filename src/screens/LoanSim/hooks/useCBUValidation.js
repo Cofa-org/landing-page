@@ -2,7 +2,12 @@ import { useState, useEffect, useCallback } from "react";
 import SimuladorService from "../../../services/simuladorService";
 import { CBU_CONFIG } from "../../../constants/LOAN_SIM.js";
 
-export const useCBUValidation = (isClient, existingCbu, onValidate) => {
+export const useCBUValidation = (
+  isClient,
+  existingCbu,
+  onValidate,
+  { pendingCbu = null, cbuValidado = false, pendingAccountType = "cbu" } = {},
+) => {
   const [cbu, setCbu] = useState("");
   const [isUpdating, setIsUpdating] = useState(!isClient);
   const [accountType, setAccountType] = useState("cbu");
@@ -81,14 +86,29 @@ export const useCBUValidation = (isClient, existingCbu, onValidate) => {
     setCodigoBancoError(null);
   }, [accountType]);
 
+  // Plan 2026-10-20: cuando un asesor ya validó el cambio de cuenta, la
+  // cuenta a validar es la que ingressó el cliente (`pendingCbu`) y hay que
+  // preservar el tipo con el que la ingressó (`pendingAccountType`): si fue
+  // un CVU y se mandara como "cbu", el back lo escribiría en `cbu_usuario` y
+  // el payload de ERP mandaría el CVU en el campo de CBU.
+  //
+  // El gate es el PAR (`cbuValidado && pendingCbu`), igual que el del
+  // componente. Gatear por el flag solo desincroniza los dos gates: con
+  // `cbuValidado === true` y `pendingCbu == null` el componente cae al flujo
+  // normal pero el hook dejaría `cbuAValidar = cbu` (vacío) → `onValidate`
+  // nunca se llama y el botón queda como un no-op silencioso.
+  const isPendingApproved = Boolean(cbuValidado && pendingCbu);
+  const cbuAValidar = isPendingApproved ? pendingCbu : cbu;
+  const accountTypeAValidar = isPendingApproved ? pendingAccountType : accountType;
+
   const handleSubmit = useCallback((e) => {
     e.preventDefault();
-    if (isClient && !isUpdating) {
+    if (isClient && !isUpdating && !isPendingApproved) {
       onValidate(existingCbu, "cbu");
-    } else if (cbu) {
-      onValidate(cbu, accountType);
+    } else if (cbuAValidar) {
+      onValidate(cbuAValidar, accountTypeAValidar);
     }
-  }, [isClient, isUpdating, existingCbu, cbu, accountType, onValidate]);
+  }, [isClient, isUpdating, existingCbu, cbuAValidar, isPendingApproved, accountTypeAValidar, onValidate]);
 
   const handleToggleUpdate = useCallback(() => {
     setIsUpdating(true);
