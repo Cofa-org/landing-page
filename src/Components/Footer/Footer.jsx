@@ -25,19 +25,13 @@ const Footer = ({ hideWhatsAppBtn = false }) => {
           <div>
             <h3>CONTRATOS DE ADHESIÓN</h3>
             <a
-              href='/mod-contrato-electronica-03-2026.pdf'
+              href='/mod-contrato-electronica-sf-v1-1.pdf'
               target='_blank'
             >
               <p>Modelo contrato con suscripción electrónica</p>
             </a>
             <a
-              href='/mod-contrato-presencial.pdf'
-              target='_blank'
-            >
-              <p>Modelo contrato con suscripción presencial</p>
-            </a>
-            <a
-              href='/mod-contrato-refinanciacion-digital-03-2026.pdf'
+              href='/mod-contrato-refinanciacion-digital-sf-v1-1.pdf'
               target='_blank'
             >
               <p>Modelo contrato de refinanciación digital</p>
@@ -162,37 +156,49 @@ const Footer = ({ hideWhatsAppBtn = false }) => {
       <div className='footer-box-right'>
         <div>
           <p>
-            La{" "}
-            <span style={{ fontSize: "1.5em" }}>
-              Tasa Nominal Anual (TNA), la Tasa Efectiva Anual (TEA), el Costo
-              Financiero Total Anual (CFTA) y el Costo Financiero Total de la
-              operación (CFTO)
-            </span>{" "}
-            varían según el perfil crediticio del solicitante del préstamo, el plazo de
-            financiación elegido y la situación del mercado. En todos los casos, la{" "}
-            <span style={{ fontSize: "1.5em" }}>TNA, TEA, el CFTA y el CFTO</span>{" "} aplicables serán informados al
-            momento de ingresar la solicitud del préstamo y antes de su
-            otorgamiento. Tasa Nominal Anual (TNA): Mínima: 110% - Máxima
-            402,20% |{" "}
-            <span style={{ fontSize: "1.5em" }}>
-              Costo Financiero Total Anual (CFTA) con IVA: Mínimo: 160% -
-              Máximo 425%
-            </span>{" "}
-            Ejemplo de préstamo (*): Monto solicitado de $100.000 a 3 meses |{" "}
-            <span style={{ fontSize: "1.5em" }}>
-              TNA (sin IVA): 190,08% - TEA (sin IVA): 483,87% - CFTA (con IVA):
-              230% - CFTO (con IVA): 57,50%
-            </span>{" "}
-            | Cuota: $52.500 | Total a pagar: $157.500. Las cuotas del préstamo son mensuales, iguales, fijas
-            y consecutivas, y podrán ser abonadas mediante transferencia o
-            depósito bancario, débito intrabancario o en tarjeta de débito y/o a
-            través de los botones de pago habilitados. Período para devolver el
-            préstamo; mínimo 2 meses - máximo 18 meses.
+            Todos los préstamos son otorgados en pesos, a tasa fija y bajo el sistema francés de
+            amortización, con cuotas mensuales y consecutivas. Los intereses compensatorios se
+            calculan sobre el saldo de capital pendiente de cancelación en cada período y el IVA se
+            aplica exclusivamente sobre dichos intereses, de conformidad con la normativa vigente.
           </p>
-          <p>Sistema de amortización directo.</p>
-          <p>El otorgamiento del préstamo está sujeto a evaluación crediticia.</p>
           <p>
-            *Para cliente en situación 1 en la Central de deudores del BCRA, en relación de
+            En todos los casos, la Tasa Nominal Anual (TNA), la Tasa Efectiva Anual (TEA), el Costo
+            Financiero Total Nominal Mensual (CFTNM), el Costo Financiero Total Nominal Anual
+            (CFTNA), el Costo Financiero Total Efectivo Anual con IVA (CFTEA con IVA), el Costo
+            Financiero Total Efectivo Anual sin IVA (CFTEA sin IVA) y el Costo Financiero Total
+            Nominal de la Operación (CFTNO) serán informados al solicitante antes de la aceptación
+            de la oferta de préstamo.
+          </p>
+          <p>
+            La expresión del Costo Financiero Total Efectivo Anual (CFTEA) responde a la metodología
+            de cálculo prevista por la normativa del Banco Central de la República Argentina y
+            constituye la anualización del costo financiero correspondiente a la operación. Su
+            expresión anual no implica que el préstamo tenga una duración de un año ni que los
+            intereses se capitalicen durante dicho plazo, sino que permite la comparación homogénea
+            entre distintas alternativas de financiación.
+          </p>
+          <p>
+            Ejemplo ilustrativo de una operación de crédito*: préstamo de $100.000 otorgado en seis
+            (6) cuotas mensuales bajo sistema francés, con Tasa fija.{" "}
+            <span style={{ fontSize: "1.5em" }}>
+              Tasa Nominal Anual (TNA): 115,00% (sin IVA). Tasa Efectiva Anual (TEA): 199,80% (sin
+              IVA). Costo Financiero Total Nominal Mensual (CFTNM): 11,60% (IVA incluido). Costo
+              Financiero Total Nominal Anual (CFTNA): 139,15% (IVA incluido). Costo Financiero Total
+              Efectivo Anual (CFTEA): 273,40% (IVA incluido). Costo Financiero Total Efectivo Anual
+              sin IVA (CFTEA sin IVA): 199,80%. Costo Financiero Total Nominal de la Operación
+              (CFTNO): 69,58% (IVA incluido).
+            </span>{" "}
+            Cuota mensual: $ 24.044,80. Total a pagar: $ 144.268,80.
+          </p>
+          <p>
+            Las tasas informadas son fijadas al momento de la solicitud y podrán variar entre
+            operaciones según el perfil crediticio del solicitante, el monto solicitado, el plazo
+            elegido, la situación del mercado y las condiciones vigentes al momento de la
+            contratación. El otorgamiento del préstamo se encuentra sujeto a evaluación crediticia.
+          </p>
+          <p>Plazo de financiación: mínimo un (1) mes y máximo dieciocho (18) meses.</p>
+          <p>
+            * Para cliente en situación 1 en la Central de deudores del BCRA, en relación de
             dependencia con antigüedad mayor a 1 año y con antecedentes crediticios en la empresa.
           </p>
         </div>
