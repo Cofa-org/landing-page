@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../../context/index.js";
 import authService from "../../../../services/authService.js";
 import { useTurnstile } from "../../useTurnstile.js";
-import { consumeAuthFlash, writeAuthFlash } from "../../authFlash.js";
+import { consumeAuthFlash } from "../../authFlash.js";
 
 export function useLoginFlow() {
   const { login } = useAuth();
@@ -16,7 +16,7 @@ export function useLoginFlow() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [needsVerify, setNeedsVerify] = useState(false);
-  const [successMessage] = useState(
+  const [successMessage, setSuccessMessage] = useState(
     () => location.state?.successMessage || consumeAuthFlash(),
   );
 
@@ -36,6 +36,7 @@ export function useLoginFlow() {
       navigate("/mi-perfil", { replace: true });
     } catch (err) {
       if (err.cause === "AUTH_EMAIL_NOT_VERIFIED") {
+        turnstile.reset();
         setNeedsVerify(true);
         setError("");
         return;
@@ -56,8 +57,9 @@ export function useLoginFlow() {
     setLoading(true);
     try {
       await authService.verifyEmail(email.trim(), code, turnstileVerify.token);
-      writeAuthFlash("¡Email confirmado! Ya podés ingresar.");
-      navigate("/ingresar", { replace: true, state: { from: location.state?.from } });
+      // Ya estamos en /ingresar: navegar no remonta la pantalla y quedaría en el paso del código.
+      setNeedsVerify(false);
+      setSuccessMessage("¡Email confirmado! Ya podés ingresar.");
     } catch (err) {
       setError(err.message || "El código es inválido o expiró. Pedí uno nuevo.");
       turnstileVerify.reset();
@@ -97,6 +99,10 @@ export function useLoginFlow() {
     handleSubmit,
     handleVerify,
     handleResend,
-    goBackToForm: () => setNeedsVerify(false),
+    goBackToForm: () => {
+      turnstile.reset();
+      setError("");
+      setNeedsVerify(false);
+    },
   };
 }

@@ -22,6 +22,7 @@ vi.mock("react-router-dom", async (importOriginal) => {
   return { ...actual, useNavigate: () => mockNavigate };
 });
 
+import authService from "../../../../../services/authService.js";
 import { useLoginFlow } from "../useLoginFlow.js";
 
 const wrapper = ({ children }) => <MemoryRouter>{children}</MemoryRouter>;
@@ -73,6 +74,78 @@ describe("useLoginFlow", () => {
     });
     expect(mockNavigate).not.toHaveBeenCalled();
     expect(result.current.error).toBe("");
+  });
+
+  const goToVerifyStep = async (result) => {
+    const err = new Error("not verified");
+    err.cause = "AUTH_EMAIL_NOT_VERIFIED";
+    mockLogin.mockRejectedValueOnce(err);
+    act(() => {
+      result.current.setEmail("a@b.com");
+      result.current.setPassword("password1");
+      result.current.turnstile.onVerify("tok-login");
+    });
+    await act(async () => {
+      await result.current.handleSubmit();
+    });
+  };
+
+  it("pasar al código descarta el token de login ya usado", async () => {
+    const { result } = renderHook(() => useLoginFlow(), { wrapper });
+    await goToVerifyStep(result);
+
+    expect(result.current.needsVerify).toBe(true);
+    expect(result.current.turnstile.token).toBe("");
+  });
+
+  it("código verificado: vuelve al formulario con mensaje, sin navegar", async () => {
+    authService.verifyEmail.mockResolvedValue({ success: true });
+    const { result } = renderHook(() => useLoginFlow(), { wrapper });
+    await goToVerifyStep(result);
+
+    act(() => {
+      result.current.turnstileVerify.onVerify("tok-verify");
+    });
+    await act(async () => {
+      await result.current.handleVerify("123456");
+    });
+
+    expect(authService.verifyEmail).toHaveBeenCalledWith("a@b.com", "123456", "tok-verify");
+    expect(result.current.needsVerify).toBe(false);
+    expect(result.current.successMessage).toBe("¡Email confirmado! Ya podés ingresar.");
+    expect(result.current.error).toBe("");
+    expect(result.current.email).toBe("a@b.com");
+    expect(mockNavigate).not.toHaveBeenCalled();
+    expect(sessionStorage.getItem("cofa_auth_flash")).toBeNull();
+  });
+
+  it("código inválido: sigue en el paso del código con error", async () => {
+    authService.verifyEmail.mockRejectedValue(new Error("El código es inválido"));
+    const { result } = renderHook(() => useLoginFlow(), { wrapper });
+    await goToVerifyStep(result);
+
+    act(() => {
+      result.current.turnstileVerify.onVerify("tok-verify");
+    });
+    await act(async () => {
+      await result.current.handleVerify("000000");
+    });
+
+    expect(result.current.needsVerify).toBe(true);
+    expect(result.current.error).toBe("El código es inválido");
+  });
+
+  it("volver al formulario limpia error y token", async () => {
+    const { result } = renderHook(() => useLoginFlow(), { wrapper });
+    await goToVerifyStep(result);
+
+    act(() => {
+      result.current.turnstile.onVerify("tok-nuevo");
+      result.current.goBackToForm();
+    });
+
+    expect(result.current.needsVerify).toBe(false);
+    expect(result.current.turnstile.token).toBe("");
   });
 
   it("login ok navega a /mi-perfil", async () => {
