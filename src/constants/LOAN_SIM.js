@@ -16,6 +16,22 @@ export const LOAN_SIM_STEPS = {
   IDENTITY_SELECTION: "IDENTITY_SELECTION",
   DISPOSITIVO_RECHAZADO: "DISPOSITIVO_RECHAZADO",
   PHONE_PICKER: "PHONE_PICKER",
+  // Plan 2026-09-29 (cliente email OTP): cuando el cliente COFA elige la
+  // opción correcta del phone picker, el back pide OTP por email. Este step
+  // renderiza el mismo `OTPValidation` con `destinationType: email` apuntando
+  // al `cliente.Email` de SB.
+  EMAIL_OTP_VALIDATION: "EMAIL_OTP_VALIDATION",
+  // Plan 2026-10-09 (email pre-pick advisor gate): cliente COFA con
+  // email inválido en SB. El step renderiza el mensaje "comunicate
+  // con un asesor" + botón Callbell. Recarga → re-check → si email
+  // ahora válido, transición a PHONE_PICKER.
+  EMAIL_PENDING_ADVISOR: "EMAIL_PENDING_ADVISOR",
+  // Plan 2026-10-20 (gate de validación manual de CBU): lead cliente
+  // COFA que pasó por el gate de asesor por email y que cambia su
+  // CBU/CVU. La simulación queda esperando la validación de un asesor.
+  // El string DEBE coincidir con ESTADO_SIMULACION.PENDING_CBU_VALIDATION
+  // del back (el front hace setStep(LOAN_SIM_STEPS[existingState])).
+  PENDING_CBU_VALIDATION: "PENDING_CBU_VALIDATION",
 };
 
 export const OTP_CONFIG = {
@@ -92,6 +108,7 @@ export const ONBOARDING_STATES = {
   EN_ANALISIS: "EN_ANALISIS",
   CELULAR_VALIDADO: "CELULAR_VALIDADO",
   PHONE_PICKER: "PHONE_PICKER",
+  EMAIL_PENDING_ADVISOR: "EMAIL_PENDING_ADVISOR",
 };
 
 export const PEP_TIPO = Object.freeze({
@@ -137,5 +154,18 @@ export const REJECTION_CONFIG = {
       href: "https://wa.me/5491137570853?text=Hola!!%20Necesito%20ayuda%20para%20simular%20mi%20préstamo!",
       target: "_blank",
     },
+  },
+  CBU_REJECTED: {
+    cause: "CBU_REJECTED",
+    // Copy genérico (pedido del usuario el 2026-10-21): el cliente no debe
+    // saber que hubo una revisión manual ni por qué falló. Reusa el mensaje
+    // que la app ya usa cuando no puede validar el celular.
+    title: "En este momento no podemos continuar con tu solicitud.",
+    // Sin descripción ni botón: el cliente ya habló con un operador antes de
+    // llegar a esta pantalla, así que pedirle que vuelva a hablar sería
+    // redundante. `RejectedStep` no renderiza el <p> si la descripción es
+    // vacía, y el botón solo se dibuja si hay `primaryAction`.
+    description: "Te invitamos a intentarlo nuevamente más adelante. Gracias por tu comprensión",
+    illustration: "/img/rejected_empathy.webp",
   },
 };

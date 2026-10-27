@@ -77,3 +77,116 @@ export async function resetTestPersonaSimulation(id) {
   }
   return response.json();
 }
+
+/**
+ * Setea el email de la persona en el catálogo del back.
+ * (Plan 2026-10-17, advisor gate.) El panel del registro usa este método
+ * cuando el operador quiere pasar de `EmailPendingAdvisorStep` a la
+ * verificación de email OTP: el back muta `personas[i].email` in-memory,
+ * el operador recarga la página, el restore path (T6) lee la nueva
+ * `persona.email` (válida) y transiciona a PHONE_PICKER, y de ahí
+ * a EMAIL_OTP_VALIDATION vía el flujo normal de `procesarPhonePickerPick`
+ * (que también lee `persona.email` como destination).
+ *
+ * @param {string} id - Persona ID (formato `^[A-Z0-9_]+$`).
+ * @param {string} [email] - Email a setear. Default `test.advisor@cofa.local`.
+ * @returns {Promise<{success: true, personaId: string, email: string}>}
+ * @throws {Error} Si el id es inválido, si el back responde non-OK, o si la red falla.
+ */
+export async function setPersonaEmail(id, email = "test.advisor@cofa.local") {
+  if (!id || !VALID_ID.test(String(id).slice(0, 64)) || String(id).length > 64) {
+    throw new Error("id inválido");
+  }
+  const response = await fetch(
+    `${LANDING_BACKEND_URL}${PERSONAS_PATH}/${encodeURIComponent(id)}/set-email`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    },
+  );
+  if (!response.ok) {
+    let body = {};
+    try {
+      body = await response.json();
+    } catch {
+      // body no es JSON
+    }
+    const message =
+      body?.message ||
+      body?.error ||
+      `setPersonaEmail failed (HTTP ${response.status})`;
+    throw new Error(message);
+  }
+  return response.json();
+}
+
+/**
+ * Resetea el email de la persona en el catálogo al estado inicial (`""`).
+ * (Plan 2026-10-17, advisor gate.) El "🔄 Reset session" del panel llama
+ * este método para cada persona en `PERSONAS_CON_AGREGAR_EMAIL` antes
+ * de recargar — invariante: "al empezar el caso el email siempre debe
+ * estar vacío".
+ *
+ * @param {string} id - Persona ID.
+ * @returns {Promise<{success: true, personaId: string, email: ""}>}
+ * @throws {Error} Si el id es inválido o el back responde non-OK.
+ */
+export async function resetPersonaEmail(id) {
+  if (!id || !VALID_ID.test(String(id).slice(0, 64)) || String(id).length > 64) {
+    throw new Error("id inválido");
+  }
+  const response = await fetch(
+    `${LANDING_BACKEND_URL}${PERSONAS_PATH}/${encodeURIComponent(id)}/reset-email`,
+    { method: "POST" },
+  );
+  if (!response.ok) {
+    let body = {};
+    try {
+      body = await response.json();
+    } catch {
+      // body no es JSON
+    }
+    const message =
+      body?.message ||
+      body?.error ||
+      `resetPersonaEmail failed (HTTP ${response.status})`;
+    throw new Error(message);
+  }
+  return response.json();
+}
+
+/**
+ * Aprueba (como asesor) el CBU/CVU de la simulación estacionada en
+ * PENDING_CBU_VALIDATION de una persona del catálogo.
+ * (Plan 2026-10-21, caso de QA del gate de validación manual de CBU.)
+ *
+ * El backend hace el mismo compare-and-set que el backoffice: si la
+ * simulación no estaba pendiente, responde `success: false` con un mensaje
+ * explicativo. Ese caso también es HTTP 200, así que el body se devuelve
+ * tal cual y el panel tiene que mirar `success` (no sólo el status HTTP).
+ *
+ * @param {string} id - Persona ID (formato `^[A-Z0-9_]+$`).
+ * @returns {Promise<{success: boolean, message: string, data?: object}>}
+ * @throws {Error} Si el id es inválido, si el backend responde non-OK, o si la red falla.
+ */
+export async function aprobarCbuTestPersona(id) {
+  if (!id || !VALID_ID.test(String(id).slice(0, 64))) {
+    throw new Error("id inválido");
+  }
+  const response = await fetch(
+    `${LANDING_BACKEND_URL}${PERSONAS_PATH}/${encodeURIComponent(id)}/aprobar-cbu`,
+    { method: "POST" },
+  );
+  if (!response.ok) {
+    let body = {};
+    try {
+      body = await response.json();
+    } catch {
+      // body no es JSON
+    }
+    const message = body?.message || body?.error || `approve failed (HTTP ${response.status})`;
+    throw new Error(message);
+  }
+  return response.json();
+}

@@ -9,20 +9,47 @@ import { MemoryRouter } from "react-router-dom";
 vi.mock("../../../../services/testPersonasService.js", () => ({
   fetchTestPersonas: vi.fn(),
   fetchTestPersonaById: vi.fn(),
+  resetTestPersonaSimulation: vi.fn(),
+  aprobarCbuTestPersona: vi.fn(),
 }));
 
-import { fetchTestPersonas, fetchTestPersonaById } from "../../../../services/testPersonasService.js";
-import { useTestSimuladorPanel } from "../useTestSimuladorPanel";
+import {
+  fetchTestPersonas,
+  fetchTestPersonaById,
+  resetTestPersonaSimulation,
+  aprobarCbuTestPersona,
+} from "../../../../services/testPersonasService.js";
+import { useTestSimuladorPanel, PERSONAS_CON_APROBAR_CBU } from "../useTestSimuladorPanel";
 
-// IMPORTANTE — sobre import.meta.env.DEV:
-// Vite reemplaza `import.meta.env.DEV` por un literal `true`/`false` al
-// transformar el módulo. En Vitest ese modo es "test" → DEV=true SIEMPRE,
-// sin override runtime posible. Por eso el branch "DEV=false → no fetch"
-// NO es unit-testeable desde acá: es una garantía de build-time del plugin
-// de Vite. La cobertura real de ese gate sale del smoke test manual contra
-// `vite build` (production) — mismo patrón que TestSimuladorPanel.test.jsx.
+// IMPORTANTE — sobre el flag `DEV` del front:
+//
+// `DEV` (src/config.js) NO es `import.meta.env.DEV` (el de Vite, que en
+// Vitest es `true` siempre): es `parseBool(import.meta.env.VITE_DEV)`, y en
+// Vitest `VITE_DEV` viene `undefined` → `false` (`.env.development` no se
+// carga en modo "test"). Como los guards de seguridad del hook cortan los
+// POST state-changing cuando `!DEV`, este archivo MOCKEA `config.js` para
+// poder encender y apagar el flag según el test.
+//
+// `isTestPersonasVisible` NO se toca: sigue siendo la función real, que
+// lee el `DEV` REAL del módulo (false en Vitest) y la query string de la
+// URL — o sea que en estos tests la visibilidad la decide la URL:
+// `?testMode=1` la abre (ver el `beforeEach` y `setUrl`), sin ella queda
+// cerrada. Es lo mismo que el gate real: `DEV || ?testMode=1`.
+const devFlag = vi.hoisted(() => ({ current: true }));
+
+vi.mock("../../../../config.js", async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    get DEV() {
+      return devFlag.current;
+    },
+  };
+});
+
 // Estos tests cubren los behaviours runtime-testeables: el fetch+filter, la
-// selección con sessionStorage+navegación, y el reset.
+// selección con sessionStorage+navegación, el reset, y el caso del gate de
+// validación manual de CBU (Plan 2026-10-21).
 
 const STORAGE_KEY = "simuladorTestPersona";
 
@@ -36,17 +63,52 @@ const setUrl = (url) => {
   window.history.pushState({}, "", url);
 };
 
+// jsdom NO implementa la navegación: `window.location.href = "/ruta"` deja el
+// getter con el valor viejo y ensucia la salida con el "Not implemented:
+// navigation to another Document". Para poder observar la URL destino del
+// full-reload (y que el test sea determinístico) reemplazamos `window.location`
+// por un stub plano durante el test. La restauración se hace en el `afterEach`
+// (no al final del test) para que una aserción fallida no deje el stub puesto.
+//
+// El stub también expone `search`: es de ahí de donde el hook lee el
+// `testMode=1` que tiene que PRESERVAR en el reload (sin él el panel se
+// cerraría) y de donde `isTestPersonasVisible` decide si el panel está
+// visible. Por defecto espeja la query string real del documento —fiel al
+// navegador—; un test puede fijarla con `stubLocation("?testMode=1")` o
+// `stubLocation("")` (build sin el modo test).
+let restoreLocation = null;
+
+const stubLocation = (search = window.location.search) => {
+  if (restoreLocation) return;
+  const original = window.location;
+  delete window.location;
+  window.location = { href: "", search };
+  restoreLocation = () => {
+    delete window.location;
+    window.location = original;
+    restoreLocation = null;
+  };
+};
+
 describe("useTestSimuladorPanel", () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    // `vi.clearAllMocks()` NO vacía la cola de implementaciones `...Once`:
+    // un `mockResolvedValueOnce` que quedó sin consumir (p.ej. el mock de
+    // reset, que la persona normal nunca llama) se filtraría al test
+    // siguiente. Por eso reseteamos los mocks enteros.
+    vi.resetAllMocks();
     // Default mock: el hook llama a fetchTestPersonas en mount. Si un test
     // necesita otro comportamiento, lo sobrescribe con mockResolvedValueOnce.
     fetchTestPersonas.mockResolvedValue([]);
+    // Default: build de dev (los POST de los guards de seguridad corren).
+    // Los tests que verifican el guard `!DEV` lo apagan explícitamente.
+    devFlag.current = true;
     sessionStorage.clear();
     setUrl("/loan-sim?testMode=1");
   });
 
   afterEach(() => {
+    if (restoreLocation) restoreLocation();
     sessionStorage.clear();
   });
 
@@ -163,5 +225,317 @@ describe("useTestSimuladorPanel", () => {
 
     expect(result.current.selectPersona).toBe(selectRef);
     expect(result.current.resetSession).toBe(resetRef);
+  });
+
+  // ---------------------------------------------------------------------------
+  // Plan 2026-10-21 — caso de QA del gate de validación manual de CBU.
+  // ---------------------------------------------------------------------------
+
+  it("PERSONAS_CON_APROBAR_CBU contiene a la persona del escenario de CBU manual", () => {
+    expect(PERSONAS_CON_APROBAR_CBU.has("SIM_CBU_PENDING")).toBe(true);
+    expect(PERSONAS_CON_APROBAR_CBU.has("SIM_HAPPY")).toBe(false);
+  });
+
+  it("aprobarCbu(id) → llama al backend y deja la persona marcada como validada", async () => {
+    aprobarCbuTestPersona.mockResolvedValueOnce({ success: true });
+
+    const { result } = renderHook(() => useTestSimuladorPanel(), {
+      wrapper: makeWrapper(),
+    });
+
+    await act(async () => {
+      await result.current.aprobarCbu("SIM_CBU_PENDING");
+    });
+
+    expect(aprobarCbuTestPersona).toHaveBeenCalledWith("SIM_CBU_PENDING");
+    expect(result.current.cbuAprobadoPara).toBe("SIM_CBU_PENDING");
+  });
+
+  it("aprobarCbu(id) → si el backend falla, NO marca la persona como validada", async () => {
+    aprobarCbuTestPersona.mockRejectedValueOnce(new Error("no hay nada pendiente"));
+    const alertSpy = vi.spyOn(window, "alert").mockImplementation(() => {});
+
+    const { result } = renderHook(() => useTestSimuladorPanel(), {
+      wrapper: makeWrapper(),
+    });
+
+    await act(async () => {
+      await result.current.aprobarCbu("SIM_CBU_PENDING");
+    });
+
+    expect(result.current.cbuAprobadoPara).toBeNull();
+    expect(alertSpy).toHaveBeenCalled();
+    alertSpy.mockRestore();
+  });
+
+  it("aprobarCbu(id) → si el backend responde 200 con success:false, avisa y NO marca la persona como validada", async () => {
+    // El endpoint responde HTTP 200 en los DOS casos (aprobo / no había nada
+    // pendiente), así que el "no había nada pendiente" llega como body, no
+    // como excepción.
+    aprobarCbuTestPersona.mockResolvedValueOnce({
+      success: false,
+      message: "no había nada pendiente de aprobar",
+    });
+    const alertSpy = vi.spyOn(window, "alert").mockImplementation(() => {});
+
+    const { result } = renderHook(() => useTestSimuladorPanel(), {
+      wrapper: makeWrapper(),
+    });
+
+    await act(async () => {
+      await result.current.aprobarCbu("SIM_CBU_PENDING");
+    });
+
+    expect(result.current.cbuAprobadoPara).toBeNull();
+    expect(alertSpy).toHaveBeenCalledWith(
+      expect.stringContaining("no había nada pendiente de aprobar"),
+    );
+    alertSpy.mockRestore();
+  });
+
+  it("aprobarCbu(id) → deja approvingCbu en null al terminar (ok o error)", async () => {
+    aprobarCbuTestPersona.mockResolvedValueOnce({ success: true });
+    const alertSpy = vi.spyOn(window, "alert").mockImplementation(() => {});
+
+    const { result } = renderHook(() => useTestSimuladorPanel(), {
+      wrapper: makeWrapper(),
+    });
+
+    await act(async () => {
+      await result.current.aprobarCbu("SIM_CBU_PENDING");
+    });
+
+    expect(result.current.approvingCbu).toBeNull();
+    alertSpy.mockRestore();
+  });
+
+  it("selectPersona de una persona con el escenario de CBU → resetea el escenario antes de navegar", async () => {
+    stubLocation();
+    resetTestPersonaSimulation.mockResolvedValueOnce({ success: true });
+    fetchTestPersonaById.mockResolvedValueOnce({
+      id: "SIM_CBU_PENDING",
+      label: "Laura",
+      cuit: "20-99002003-3",
+      simuladorConfig: { scoringId: 99002003, pendingCbuValidation: true },
+    });
+
+    const { result } = renderHook(() => useTestSimuladorPanel(), {
+      wrapper: makeWrapper(),
+    });
+
+    await act(async () => {
+      await result.current.selectPersona("SIM_CBU_PENDING");
+    });
+
+    expect(resetTestPersonaSimulation).toHaveBeenCalledWith("SIM_CBU_PENDING");
+    expect(sessionStorage.getItem(STORAGE_KEY)).not.toBeNull();
+  });
+
+  it("selectPersona de una persona con el escenario de CBU → navega con full reload (window.location.href)", async () => {
+    // `navigate()` a la misma URL NO re-dispara el init del simulador → el
+    // re-arm del escenario no se aplicaría. Por eso esta persona navega con
+    // `window.location.href`.
+    //
+    // El reload REEMPLAZA la URL completa, así que tiene que preservar el
+    // `?testMode=1`: sin él el panel se cerraría (su gate es
+    // `DEV || ?testMode=1`) y el botón "Validar CBU" desaparecería. El
+    // `beforeEach` deja la URL real con `?testMode=1`.
+    stubLocation();
+    resetTestPersonaSimulation.mockResolvedValueOnce({ success: true });
+    fetchTestPersonaById.mockResolvedValueOnce({
+      id: "SIM_CBU_PENDING",
+      label: "Laura",
+      cuit: "20-99002003-3",
+      simuladorConfig: { scoringId: 99002003, pendingCbuValidation: true },
+    });
+
+    const { result } = renderHook(() => useTestSimuladorPanel(), {
+      wrapper: makeWrapper(),
+    });
+
+    await act(async () => {
+      await result.current.selectPersona("SIM_CBU_PENDING");
+    });
+
+    expect(window.location.href).toBe(
+      "/simulador?tp=SIM_CBU_PENDING&testMode=1",
+    );
+  });
+
+  it("selectPersona de una persona con el escenario de CBU → sin ?testMode=1 en la URL, el reload NO lo agrega", async () => {
+    // El `testMode=1` se PRESERVA, no se agrega: mandarlo siempre abriría
+    // el panel de personas-test en builds donde el operador no lo pidió.
+    stubLocation("");
+    resetTestPersonaSimulation.mockResolvedValueOnce({ success: true });
+    fetchTestPersonaById.mockResolvedValueOnce({
+      id: "SIM_CBU_PENDING",
+      label: "Laura",
+      cuit: "20-99002003-3",
+      simuladorConfig: { scoringId: 99002003, pendingCbuValidation: true },
+    });
+
+    const { result } = renderHook(() => useTestSimuladorPanel(), {
+      wrapper: makeWrapper(),
+    });
+
+    await act(async () => {
+      await result.current.selectPersona("SIM_CBU_PENDING");
+    });
+
+    expect(window.location.href).toBe("/simulador?tp=SIM_CBU_PENDING");
+  });
+
+  it("selectPersona de una persona normal → NO resetea el escenario", async () => {
+    resetTestPersonaSimulation.mockResolvedValueOnce({ success: true });
+    fetchTestPersonaById.mockResolvedValueOnce({
+      id: "SIM_HAPPY",
+      label: "Hugo",
+      cuit: "20-99002001-3",
+      simuladorConfig: { scoringId: 99002001 },
+    });
+
+    const { result } = renderHook(() => useTestSimuladorPanel(), {
+      wrapper: makeWrapper(),
+    });
+
+    await act(async () => {
+      await result.current.selectPersona("SIM_HAPPY");
+    });
+
+    expect(resetTestPersonaSimulation).not.toHaveBeenCalled();
+  });
+
+  it("selectPersona de una persona con el escenario de CBU → si el reset falla, avisa y NO navega", async () => {
+    resetTestPersonaSimulation.mockRejectedValueOnce(new Error("reset 500"));
+    fetchTestPersonaById.mockResolvedValueOnce({
+      id: "SIM_CBU_PENDING",
+      label: "Laura",
+      cuit: "20-99002003-3",
+      simuladorConfig: { scoringId: 99002003, pendingCbuValidation: true },
+    });
+    const alertSpy = vi.spyOn(window, "alert").mockImplementation(() => {});
+
+    const { result } = renderHook(() => useTestSimuladorPanel(), {
+      wrapper: makeWrapper(),
+    });
+
+    await act(async () => {
+      await result.current.selectPersona("SIM_CBU_PENDING");
+    });
+
+    expect(alertSpy).toHaveBeenCalled();
+    expect(sessionStorage.getItem(STORAGE_KEY)).toBeNull();
+    alertSpy.mockRestore();
+  });
+
+  // ---------------------------------------------------------------------------
+  // Guards de seguridad de las ramas de CBU.
+  //
+  // El caso de CBU sólo puede tocar la fila sintética de `SIM_CBU_PENDING`
+  // (el `scoringId` sale siempre del catálogo, nunca del request), así que
+  // el guard es `!DEV && !isTestPersonasVisible()`: habilitan el build de dev
+  // (`DEV`) o el modo explícito `?testMode=1` —que existe para operar el
+  // panel en un build de staging, donde `VITE_DEV` no está seteado—.
+  //
+  // La rama `realClient` de NORIEGA, que sí resetea datos de un cliente real,
+  // mantiene su guard estricto (`!DEV`).
+  // ---------------------------------------------------------------------------
+
+  it("sin DEV y sin ?testMode=1 → el reset del escenario de CBU NO se hace y NO navega", async () => {
+    devFlag.current = false;
+    // Sin `?testMode=1` en la URL el panel ni siquiera se muestra: el
+    // guard es la última línea de defensa.
+    stubLocation("");
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    resetTestPersonaSimulation.mockResolvedValueOnce({ success: true });
+    fetchTestPersonaById.mockResolvedValueOnce({
+      id: "SIM_CBU_PENDING",
+      label: "Laura",
+      cuit: "20-99002003-3",
+      simuladorConfig: { scoringId: 99002003, pendingCbuValidation: true },
+    });
+
+    const { result } = renderHook(() => useTestSimuladorPanel(), {
+      wrapper: makeWrapper(),
+    });
+
+    await act(async () => {
+      await result.current.selectPersona("SIM_CBU_PENDING");
+    });
+
+    expect(resetTestPersonaSimulation).not.toHaveBeenCalled();
+    // Sin reload: el `href` del stub queda en su valor inicial.
+    expect(window.location.href).toBe("");
+    expect(warnSpy).toHaveBeenCalledWith(
+      "CBU_RESET_BLOCKED_IN_PRODUCTION",
+      { personaId: "SIM_CBU_PENDING" },
+    );
+    warnSpy.mockRestore();
+  });
+
+  it("sin DEV y sin ?testMode=1 → el approve del CBU NO se hace y la persona NO queda marcada como validada", async () => {
+    devFlag.current = false;
+    setUrl("/loan-sim");
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    aprobarCbuTestPersona.mockResolvedValueOnce({ success: true });
+
+    const { result } = renderHook(() => useTestSimuladorPanel(), {
+      wrapper: makeWrapper(),
+    });
+
+    await act(async () => {
+      await result.current.aprobarCbu("SIM_CBU_PENDING");
+    });
+
+    expect(aprobarCbuTestPersona).not.toHaveBeenCalled();
+    expect(result.current.cbuAprobadoPara).toBeNull();
+    expect(result.current.approvingCbu).toBeNull();
+    expect(warnSpy).toHaveBeenCalledWith(
+      "CBU_APPROVE_BLOCKED_IN_PRODUCTION",
+      { personaId: "SIM_CBU_PENDING" },
+    );
+    warnSpy.mockRestore();
+  });
+
+  it("sin DEV pero con ?testMode=1 explícito → el reset del escenario de CBU SÍ se hace", async () => {
+    // El modo `?testMode=1` existe para operar el panel en un build de
+    // staging (donde `VITE_DEV` no está seteado): ahí los POST del caso de
+    // CBU tienen que poder correr.
+    devFlag.current = false;
+    stubLocation("?testMode=1");
+    resetTestPersonaSimulation.mockResolvedValueOnce({ success: true });
+    fetchTestPersonaById.mockResolvedValueOnce({
+      id: "SIM_CBU_PENDING",
+      label: "Laura",
+      cuit: "20-99002003-3",
+      simuladorConfig: { scoringId: 99002003, pendingCbuValidation: true },
+    });
+
+    const { result } = renderHook(() => useTestSimuladorPanel(), {
+      wrapper: makeWrapper(),
+    });
+
+    await act(async () => {
+      await result.current.selectPersona("SIM_CBU_PENDING");
+    });
+
+    expect(resetTestPersonaSimulation).toHaveBeenCalledWith("SIM_CBU_PENDING");
+  });
+
+  it("sin DEV pero con ?testMode=1 explícito → el approve del CBU SÍ se hace y la persona queda marcada", async () => {
+    devFlag.current = false;
+    setUrl("/loan-sim?testMode=1");
+    aprobarCbuTestPersona.mockResolvedValueOnce({ success: true });
+
+    const { result } = renderHook(() => useTestSimuladorPanel(), {
+      wrapper: makeWrapper(),
+    });
+
+    await act(async () => {
+      await result.current.aprobarCbu("SIM_CBU_PENDING");
+    });
+
+    expect(aprobarCbuTestPersona).toHaveBeenCalledWith("SIM_CBU_PENDING");
+    expect(result.current.cbuAprobadoPara).toBe("SIM_CBU_PENDING");
   });
 });

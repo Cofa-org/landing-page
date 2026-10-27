@@ -1,11 +1,27 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
-import { fetchTestPersonas } from "../../../services/testPersonasService.js";
+import { fetchTestPersonas, resetPersonaEmail, setPersonaEmail } from "../../../services/testPersonasService.js";
+
+/**
+ * Set de personas del catálogo que admiten el flujo "agregar email"
+ * desde el panel de test (botón "✉️ Agregar email"). El back muta
+ * `personas[i].email` in-memory; agregarlo no recarga ni avanza el flujo.
+ * El operador usa "Verificar estado" para consultar el nuevo estado.
+ *
+ * Single source of truth — el componente `TestPersonasPanel` lo importa
+ * para decidir qué botón renderizar, y el `resetSession` de este hook
+ * lo itera para limpiar el email de vuelta al estado inicial.
+ *
+ * (Plan 2026-10-17, advisor gate.)
+ */
+export const PERSONAS_CON_AGREGAR_EMAIL = new Set(["CARLOS_NO_EMAIL"]);
 
 export function useTestPersonasPanel() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [collapsed, setCollapsed] = useState(false);
   const [personas, setPersonas] = useState([]);
+  const [emailStatusByPersona, setEmailStatusByPersona] = useState({});
+  const blockedEmailPersonas = useRef(new Set());
   const activePersonaId = searchParams.get("testPersona");
 
   useEffect(() => {
@@ -37,12 +53,41 @@ export function useTestPersonasPanel() {
     );
   }, [setSearchParams]);
 
-  const resetSession = useCallback(() => {
+  const addEmail = useCallback(async (personaId) => {
+    if (blockedEmailPersonas.current.has(personaId)) return;
+    blockedEmailPersonas.current.add(personaId);
+    setEmailStatusByPersona((previous) => ({ ...previous, [personaId]: "loading" }));
+    try {
+      const response = await setPersonaEmail(personaId);
+      if (response?.success !== true) {
+        throw new Error("El servidor no confirmó que el email se haya agregado.");
+      }
+      setEmailStatusByPersona((previous) => ({ ...previous, [personaId]: "added" }));
+    } catch (error) {
+      blockedEmailPersonas.current.delete(personaId);
+      setEmailStatusByPersona((previous) => {
+        const next = { ...previous };
+        delete next[personaId];
+        return next;
+      });
+      window.alert(`No se pudo agregar el email: ${error.message}`);
+    }
+  }, []);
+
+  const resetSession = useCallback(async () => {
+    // Invariante: "al empezar el caso el email siempre debe estar vacío".
+    // Llamamos resetPersonaEmail para cada persona en PERSONAS_CON_AGREGAR_EMAIL
+    // antes de recargar — así el operador puede volver a CARLOS_NO_EMAIL y
+    // re-ejecutar el flow desde EmailPendingAdvisorStep con el catálogo
+    // en estado inicial.
+    await Promise.all(
+      Array.from(PERSONAS_CON_AGREGAR_EMAIL).map((id) => resetPersonaEmail(id)),
+    );
     // Clear leadToken cookie (same name + path as COOKIE_LEAD_TOKEN_CONFIG).
     document.cookie = "leadToken=; expires=Thu,01 Jan 1970 00:00:00 GMT; path=/";
     setSearchParams({});
     window.location.reload();
   }, [setSearchParams]);
 
-  return { collapsed, setCollapsed, personas, activePersonaId, selectPersona, resetSession };
+  return { collapsed, setCollapsed, personas, activePersonaId, selectPersona, resetSession, addEmail, emailStatusByPersona };
 }

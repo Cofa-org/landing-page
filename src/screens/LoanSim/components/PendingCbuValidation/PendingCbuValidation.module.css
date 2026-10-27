@@ -1,0 +1,132 @@
+/* Pantalla de espera de la validación manual del CBU/CVU (Plan 2026-10-20).
+   Reutiliza la estructura visual de
+   `src/screens/registrationSim/components/EmailPendingAdvisorStep/EmailPendingAdvisorStep.module.css`
+   (mismas clases: container, header, eyebrow, title, subtitle, actionContainer). */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.75rem;
+  padding: 2rem 1.5rem;
+  max-width: 36rem;
+  margin: 0 auto;
+  background-color: var(--color-background);
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  border-left: 4px solid var(--primary-color);
+  text-align: center;
+  color: var(--text-color);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.625rem;
+  max-width: 32rem;
+  height: 100% !important;
+}
+
+.eyebrow {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--primary-color);
+  background-color: var(--primary-color-10);
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  line-height: 1.2;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.25;
+  margin: 0;
+  color: #1a1a1a;
+  letter-spacing: -0.01em;
+}
+
+.subtitle {
+  font-size: 1rem;
+  line-height: 1.55;
+  margin: 0;
+  color: #555555;
+  max-width: 30rem;
+}
+
+/* Dos acciones: la principal (asesor) arriba y la secundaria (verificar
+   estado) abajo. `GenericButton` es `width: 100%`, así que en una fila
+   ambos botones se comprimen al 50% y los labels en mayúsculas se parten
+   en varias líneas. Apilados mantienen la jerarquía y el ancho completo
+   en cualquier viewport. */
+/* Error de la pantalla (mismo patrón que
+   `src/screens/LoanSim/components/CBUValidation/CBUValidation.module.css` →
+   `.errorText`, con el rojo de error de la app). Es un mensaje
+   standalone en un dead-end → además de rojo lleva un fondo/borde suave
+   para que no se pierda en el centro de la card. Contraste de #d32f2f
+   sobre blanco ≈ 4.9:1 (WCAG AA). */
+.errorText {
+  color: #d32f2f;
+  background-color: rgba(211, 47, 47, 0.08);
+  border: 1px solid rgba(211, 47, 47, 0.25);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.5;
+  margin: 0;
+  text-align: center;
+  max-width: 30rem;
+}
+
+.actionContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+/* El spinner de `GenericButton` usa bordes blancos (pensados para el
+   `variant="primary"`, de fondo lleno). Sobre el `variant="secondary"`
+   (fondo blanco) sería invisible → lo recoloreamos con el verde de la
+   marca mientras el botón está ocupado. */
+.actionContainer button[aria-busy='true'] span {
+  border-color: rgba(26, 106, 61, 0.25);
+  border-top-color: var(--primary-color);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Se frena la rotación pero se conserva el indicador de estado. */
+  .actionContainer button[aria-busy='true'] span {
+    animation: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 1.5rem 1rem;
+    border-left-width: 3px;
+    gap: 1.25rem;
+  }
+
+  .title {
+    font-size: 1.25rem;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+  }
+}
+
+.statusText {
+  margin: 0;
+  max-width: 30rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  color: #1a6a3d;
+}

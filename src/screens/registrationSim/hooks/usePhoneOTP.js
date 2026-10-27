@@ -33,12 +33,22 @@ export const usePhoneOTP = (getLeadId) => {
           huella_dispositivo: huellaData,
           requestId,
         });
-
+        
         // Phone picker trigger (knowledge-based auth fallback): el back indica
         // que el OTP no aplica y devuelve opciones para que el usuario confirme
         // cuál es su celular. Se surface sin tocar `error` para que el caller
         // (OnboardingFlowScreen) navegue a PHONE_PICKER.
         if (result?.requiresPhonePicker) {
+          return result;
+        }
+
+        // Plan 2026-10-09 (email pre-pick advisor gate): el back hace el
+        // upfront email check ANTES del picker. Si el email del cliente
+        // COFA es inválido, retorna este shape sin envolverlo en
+        // { success: true }. Se propaga sin tocar `error` para que el
+        // caller (OnboardingFlowScreen) navegue a EMAIL_PENDING_ADVISOR.
+        // Mismo patrón que requiresPhonePicker arriba.
+        if (result?.requiresAdvisorContact === true) {
           return result;
         }
 

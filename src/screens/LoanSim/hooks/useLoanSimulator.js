@@ -23,9 +23,11 @@ export const useLoanSimulator = () => {
   const [amount, setAmount] = useState(0);
   const [installment, setInstallment] = useState(null);
   const [simulationData, setSimulationData] = useState(null);
+  const cbuValidado = !!simulationData?.existingSimulation?.cbu_validado_por;
   const [loading, setLoading] = useState(false);
   const [validating, setValidating] = useState(false);
   const [error, setError] = useState(null);
+  const [cbuPendingStatus, setCbuPendingStatus] = useState(null);
   const [scoringData, setScoringData] = useState({ scoringId: null, cuit: null });
   const [step, setStep] = useState(LOAN_SIM_STEPS.LEAD_REGISTRATION);
   const [email, setEmail] = useState("");
@@ -338,6 +340,15 @@ export const useLoanSimulator = () => {
             if (existingState !== LOAN_SIM_STEPS.DISPOSITIVO_RECHAZADO) {
               setStep(LOAN_SIM_STEPS[existingState]);
             }
+            // Plan 2026-10-20: si la simulación quedó rechazada por la
+            // validación manual del CBU, el motivo lo distingue de los
+            // otros rechazos para mostrar el mensaje correcto.
+            if (existingState === LOAN_SIM_STEPS.RECHAZADO) {
+              const motivo = newData?.existingSimulation?.motivo;
+              if (motivo === "CBU_RECHAZADO_POR_ASESOR") {
+                setRejectionReason("CBU_REJECTED");
+              }
+            }
             if (newData?.existingSimulation?.email) {
               setEmail(newData.existingSimulation.email);
             }
@@ -361,6 +372,7 @@ export const useLoanSimulator = () => {
               plazosDisponibles.includes(prev) ? prev : (Math.max(...plazosDisponibles) ?? null),
             );
           }
+          return newData;
         } else {
           if (response.cause === ERROR_CAUSE.DEVICE_FINGERPRINT_MISMATCH) {
             setStep(LOAN_SIM_STEPS.DISPOSITIVO_RECHAZADO);
@@ -414,6 +426,35 @@ export const useLoanSimulator = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedAmount, scoringData.scoringId]);
+
+  useEffect(() => {
+    if (step !== LOAN_SIM_STEPS.PENDING_CBU_VALIDATION) {
+      setCbuPendingStatus(null);
+    }
+  }, [step]);
+
+  /**
+   * Re-consulta el estado de la simulación (Plan 2026-10-20).
+   *
+   * Lo usa el botón "Verificar estado" de la pantalla
+   * PENDING_CBU_VALIDATION para saber si el asesor ya validó (CBU) o
+   * rechazó (RECHAZADO) el cambio de cuenta.
+   *
+   * El routing no está explícito acá a propósito: `fetchSimulation`
+   * ya resuelve el step a partir de `existingSimulation.estado`
+   * (`setStep(LOAN_SIM_STEPS[existingState])`) y el bloque de restore
+   * setea `rejectionReason` cuando el motivo es
+   * `CBU_RECHAZADO_POR_ASESOR`.
+   */
+  const verificarEstadoCBU = useCallback(async () => {
+    setCbuPendingStatus(null);
+    const refreshedSimulation = await fetchSimulationRef.current(0, false);
+    if (refreshedSimulation?.existingSimulation?.estado === LOAN_SIM_STEPS.PENDING_CBU_VALIDATION) {
+      setCbuPendingStatus(
+        "Tu CBU/CVU todavía está pendiente de validación. Hablá con un asesor para continuar.",
+      );
+    }
+  }, []);
 
   const handleAmountChange = (newAmount, discountInstallmentRounded) => {
     if (newAmount <= discountInstallmentRounded) {
@@ -500,6 +541,8 @@ export const useLoanSimulator = () => {
   };
 
   const handlePrevStep = async () => {
+    if (step === LOAN_SIM_STEPS.CBU_VALIDATION && cbuValidado) return;
+
     let nextStep = null;
     if (step === LOAN_SIM_STEPS.EMAIL_VALIDATION) nextStep = LOAN_SIM_STEPS.SIMULACION;
     else if (step === LOAN_SIM_STEPS.OTP_VALIDATION) nextStep = LOAN_SIM_STEPS.EMAIL_VALIDATION;
@@ -621,6 +664,15 @@ export const useLoanSimulator = () => {
           `${cbuResponse.message} 😕` ||
             "¡Lo sentimos! No pudimos validar tu CBU. Revisá los datos e intentá nuevamente 😕",
         );
+        return;
+      }
+
+      // Plan 2026-10-20 (gate de validación manual de CBU): el back
+      // parked la simulación en PENDING_CBU_VALIDATION. NO seguimos con
+      // `aceptarTerminos` — el préstamo no se puede crear hasta que un
+      // asesor valide el cambio de cuenta.
+      if (cbuResponse.pending === true) {
+        setStep(LOAN_SIM_STEPS.PENDING_CBU_VALIDATION);
         return;
       }
 
@@ -819,6 +871,7 @@ export const useLoanSimulator = () => {
     amount,
     installment,
     simulationData,
+    cbuValidado,
     loading,
     validating,
     error,
@@ -847,6 +900,8 @@ export const useLoanSimulator = () => {
     verificarOTP,
     guardarCompliance,
     validarCBU,
+    verificarEstadoCBU,
+    cbuPendingStatus,
     validarCodigoBancoHandler,
     handleInfoPrestamo,
     setStep,

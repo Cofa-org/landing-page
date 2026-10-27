@@ -1,6 +1,7 @@
 import { LANDING_BACKEND_URL, LANDING_BACKEND_API_KEY } from "../config";
 import { HTTP_METHOD } from "../constants/HTTP_METHODS.js";
 import { HttpApi } from "../lib/http.js";
+import { parseErrorResponse } from "../lib/http-error.js";
 import { getCookie } from "../lib/utils";
 import { COOKIE_LEAD_TOKEN_CONFIG } from "../constants/LOAN_SIM.js";
 
@@ -174,9 +175,19 @@ export default class LeadRegistrationService {
         signal,
       );
 
-      const data = await response.json();
       if (!response.ok) {
-        throw new Error(data.message || "Error al obtener el estado del lead");
+        const failure = await parseErrorResponse(response);
+        throw Object.assign(new Error(failure.message || "Error al obtener el estado del lead"), {
+          status: failure.status,
+          cause: failure.cause,
+        });
+      }
+      const data = await response.json();
+      if (data.success === false) {
+        throw Object.assign(new Error(data.message || "Error al obtener el estado del lead"), {
+          status: data.status,
+          cause: data.cause,
+        });
       }
       return data;
     } catch (error) {
@@ -295,12 +306,86 @@ export default class LeadRegistrationService {
         signal,
       );
       const data = await response.json();
+      
       if (!response.ok) {
         throw new Error(data.message || "Error al verificar OTP de celular");
       }
       return data;
     } catch (error) {
       console.error("VERIFICAR_OTP_CELULAR_SERVICE_ERROR:", error);
+      throw error;
+    }
+  }
+
+  // Plan 2026-09-29 (cliente email OTP): re-envía un código OTP al email del
+  // cliente COFA (`cliente.Email` de SB). El `leadId` se lee del JWT (el back
+  // no lo necesita en el body). El email se resuelve internamente.
+  static async solicitarOTPEmail(_args = {}, signal = null) {
+    try {
+      const url = `${LANDING_BACKEND_URL}/api/lead-registration/solicitar-otp-email`;
+      const token = await getCookie(COOKIE_LEAD_TOKEN_CONFIG.NAME);
+      const response = await HttpApi(
+        url,
+        {},
+        HTTP_METHOD.POST,
+        LANDING_BACKEND_API_KEY,
+        token,
+        signal,
+      );
+      if (!response.ok) {
+        const failure = await parseErrorResponse(response);
+        throw Object.assign(new Error(failure.message || "Error al solicitar OTP de email"), {
+          status: failure.status,
+          cause: failure.cause ?? undefined,
+        });
+      }
+      const data = await response.json();
+      if (data.success === false) {
+        throw Object.assign(new Error(data.message || "Error al solicitar OTP de email"), {
+          status: data.status,
+          cause: data.cause,
+        });
+      }
+      return data;
+    } catch (error) {
+      console.error("SOLICITAR_OTP_EMAIL_SERVICE_ERROR:", error);
+      throw error;
+    }
+  }
+
+  // Plan 2026-09-29 (cliente email OTP): valida el código OTP tipeado por el
+  // usuario tras el post-pick del picker. Devuelve `data.estado_onboarding`
+  // (CELULAR_VALIDADO) en match.
+  static async verificarOTPEmail({ codigo }, signal = null) {
+    try {
+      const url = `${LANDING_BACKEND_URL}/api/lead-registration/verificar-otp-email`;
+      const token = await getCookie(COOKIE_LEAD_TOKEN_CONFIG.NAME);
+      const body = { codigo };
+      const response = await HttpApi(
+        url,
+        body,
+        HTTP_METHOD.POST,
+        LANDING_BACKEND_API_KEY,
+        token,
+        signal,
+      );
+      if (!response.ok) {
+        const failure = await parseErrorResponse(response);
+        throw Object.assign(new Error(failure.message || "Error al verificar OTP de email"), {
+          status: failure.status,
+          cause: failure.cause ?? undefined,
+        });
+      }
+      const data = await response.json();
+      if (data.success === false) {
+        throw Object.assign(new Error(data.message || "Error al verificar OTP de email"), {
+          status: data.status,
+          cause: data.cause,
+        });
+      }
+      return data;
+    } catch (error) {
+      console.error("VERIFICAR_OTP_EMAIL_SERVICE_ERROR:", error);
       throw error;
     }
   }

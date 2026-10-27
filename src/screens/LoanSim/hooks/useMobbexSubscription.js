@@ -3,9 +3,6 @@ import { useSearchParams } from "react-router-dom";
 import { DEV } from "../../../config.js";
 import SimuladorService from "../../../services/simuladorService";
 
-const MOBBEX_RETRY_MESSAGE =
-  "Lo sentimos, necesitamos que repitas la suscripción para poder confirmarla. Volvé a intentarlo para continuar.";
-
 /**
  * Maneja la lógica del paso de suscripción a Mobbex.
  *
@@ -55,16 +52,11 @@ export const useMobbexSubscription = (scoringId, onSubscriptionCompleted) => {
           status: mobbexStatus,
         });
         if (!response?.success) {
-          if (mobbexStatus === "410") {
-            setError(null);
-            setMessage(response?.message || MOBBEX_RETRY_MESSAGE);
-          } else {
-            setMessage(null);
-            setError(
-              `${response?.message} 😕` ||
-                "¡Lo sentimos! No pudimos confirmar tu suscripción. Intentá nuevamente 😕",
-            );
-          }
+          setMessage(null);
+          setError(
+            `${response?.message} 😕` ||
+              "¡Lo sentimos! No pudimos confirmar tu suscripción. Intentá nuevamente 😕",
+          );
           return;
         }
         // Catch defensivo: si onSubscriptionCompleted rompe su contrato
@@ -76,13 +68,8 @@ export const useMobbexSubscription = (scoringId, onSubscriptionCompleted) => {
           console.error("MOBBEX_COMPLETION_CALLBACK_ERROR:", err),
         );
       } catch (err) {
-        if (mobbexStatus === "410") {
-          setError(null);
-          setMessage(err.message || MOBBEX_RETRY_MESSAGE);
-        } else {
-          setMessage(null);
-          setError(err.message || "Error al confirmar la suscripción");
-        }
+        setMessage(null);
+        setError(err.message || "Error al confirmar la suscripción");
       } finally {
         setIsConfirming(false);
       }

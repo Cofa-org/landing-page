@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import Loader from "../../Components/Loader/Loader.jsx";
 import OTPValidation from "../../Components/OTPValidation/OTPValidation.jsx";
 import BackButton from "../../Components/buttons/backbutton/BackButton.jsx";
+import GenericButton from "../../Components/buttons/GenericButton/GenericButton.jsx";
 import { Footer, Header } from "../../Components/index.js";
 import { HeroLoanSim } from "../../Sections/index.js";
 import { COOKIE_LEAD_TOKEN_CONFIG, LOAN_SIM_STEPS, ONBOARDING_STATES, OTP_CONFIG } from "../../constants/LOAN_SIM.js";
@@ -13,6 +14,8 @@ import { toggleCallbellWebchat } from "../../utils/callbellHelpers";
 import styles from "./OnboardingFlow.module.css";
 import RejectedStep from "./components/RejectedStep/RejectedStep.jsx";
 import TestPersonasPanel from "./components/TestPersonasPanel/TestPersonasPanel.jsx";
+import { useEmailOTP } from "./hooks/useEmailOTP.js";
+import { useEmailPendingAdvisor } from "./hooks/useEmailPendingAdvisor.js";
 import { useOnboardingFlow } from "./hooks/useOnboardingFlow.js";
 import { usePhoneOTP } from "./hooks/usePhoneOTP.js";
 import { usePhonePicker } from "./hooks/usePhonePicker.js";
@@ -31,6 +34,12 @@ const IdentitySelectionStep = React.lazy(
 );
 const PhonePickerStep = React.lazy(
   () => import("./components/PhonePickerStep/PhonePickerStep.jsx"),
+);
+// Plan 2026-10-09 (email pre-pick advisor gate): cliente COFA con email
+// inválido en SB. El step renderiza el mensaje "comunicate con un asesor"
+// + botón Callbell y consulta manual para continuar cuando se actualice.
+const EmailPendingAdvisorStep = React.lazy(
+  () => import("./components/EmailPendingAdvisorStep/EmailPendingAdvisorStep.jsx"),
 );
 
 const OnboardingFlowScreen = () => {
@@ -70,10 +79,22 @@ const OnboardingFlowScreen = () => {
     setLeadToken,
     setOnboardingStep,
     restoringOnboarding,
+    restoreError,
+    retryRestore,
+    emailOtpDestination,
+    verificarEstadoEmailPendingAdvisor,
+    checkingEmailPendingAdvisor,
+    emailPendingAdvisorError,
+    emailPendingAdvisorStatus,
   } = useOnboardingFlow(resumeShortId);
 
   const { verificarOTP, reenviarOTP, validating, error } = usePhoneOTP(getLeadId);
+  // Plan 2026-09-29 (cliente email OTP): handlers para EMAIL_OTP_VALIDATION.
+  const { verificarOTPEmail, reenviarOTPEmail, validating: validatingEmail, error: errorEmail } = useEmailOTP(getLeadId);
   const { submitPick, submitting: pickerLoading, error: pickerError } = usePhonePicker();
+  // El hook de contacto abre Callbell cuando el cliente clickea el botón y
+  // memoiza la referencia para no romper el `memo` del componente puro.
+  const { handleContactAdvisor } = useEmailPendingAdvisor();
 
   const handlePrevStep = navigateToPrev;
 
@@ -161,10 +182,19 @@ const OnboardingFlowScreen = () => {
     async (codigo) => {
       const result = await verificarOTP(codigo);
 
+      // Plan 2026-10-09 (email pre-pick advisor gate): el back hace el
+      // upfront email check ANTES del picker (es el primero en la cadena
+      // de gates). Si el email del cliente COFA es inválido, navegamos
+      // al step EMAIL_PENDING_ADVISOR sin disparar el picker.
+      if (result?.requiresAdvisorContact === true) {
+        setOnboardingStep(LOAN_SIM_STEPS.EMAIL_PENDING_ADVISOR);
+        return;
+      }
+
       // Phone picker trigger: el back devolvió el shape `requiresPhonePicker`
       // en lugar de `success: true`. Persistimos el contexto (options + target)
       // y navegamos al step PHONE_PICKER. La presentación queda en PhonePickerStep.
-     
+
       if (result?.requiresPhonePicker) {
         handlePickerTriggered({
           options: result.options ?? [],
@@ -189,6 +219,38 @@ const OnboardingFlowScreen = () => {
       }
     },
     [verificarOTP, onboardingStep, leadData, handleRejected, navigateToNext, handlePickerTriggered],
+  );
+
+  // Plan 2026-09-29 (cliente email OTP): handler para el submit del OTP por
+  // email. Misma forma que `handleVerificarOTP` pero:
+  //   - No dispara picker (los clientes con pick exitoso van directo al email).
+  //   - En match, `result.data.estado_onboarding` viene como CELULAR_VALIDADO
+  //     (es el mismo flag que el OTP celular, plan unified state) y avanzamos
+  //     por la misma ruta (RECIBO_UPLOAD para clientes / DNI_UPLOAD para
+  //     no-clientes, vía `navigateToNext`).
+  //   - En max-fail-attempts exceeded, `useEmailOTP.verificarOTPEmail` re-throw
+  //     el error con `cause=OTP_MAX_FAIL_ATTEMPTS_EXCEEDED`. Lo capturamos y
+  //     navegamos a RECHAZADO (el back ya persistió el rechazo vía
+  //     `rechazarLead`).
+  const handleVerificarEmailOTP = useCallback(
+    async (codigo) => {
+      try {
+        const result = await verificarOTPEmail(codigo);
+        if (!result?.success) return;
+        navigateToNext(onboardingStep, {
+          esCliente: result.data?.es_cliente ?? leadData?.es_cliente,
+        });
+      } catch (err) {
+        const cause = err?.cause || err?.data?.cause;
+        if (cause === "OTP_MAX_FAIL_ATTEMPTS_EXCEEDED") {
+          handleRejected();
+          return;
+        }
+        // Otros errores (network, 5xx): el hook ya seteó `error` state, el
+        // OTPValidation lo muestra. No navegamos.
+      }
+    },
+    [verificarOTPEmail, onboardingStep, leadData, navigateToNext, handleRejected],
   );
 
   const handlePickerPick = useCallback(
@@ -241,6 +303,24 @@ const OnboardingFlowScreen = () => {
             error={error}
           />
         );
+      case LOAN_SIM_STEPS.EMAIL_OTP_VALIDATION:
+        // Plan 2026-09-29 (cliente email OTP): reutilizamos `OTPValidation`
+        // con `destinationType: email`. El destination es el email del
+        // cliente COFA resuelto por SB (persistido en `emailOtpDestination`
+        // al momento del pick exitoso). En match, el back devuelve
+        // estado_onboarding='CELULAR_VALIDADO' y avanzamos por el flujo
+        // normal post-OTP (RECIBO_UPLOAD o DNI_UPLOAD según esCliente).
+        return (
+          <OTPValidation
+            destination={emailOtpDestination}
+            destinationType={OTP_CONFIG.DESTINATION_TYPE.EMAIL}
+            onValidate={handleVerificarEmailOTP}
+            onResend={reenviarOTPEmail}
+            onBack={handlePrevStep}
+            loading={validatingEmail}
+            error={errorEmail}
+          />
+        );
       case LOAN_SIM_STEPS.WELCOME:
         return (
           <WelcomeStep
@@ -269,6 +349,20 @@ const OnboardingFlowScreen = () => {
             onPick={handlePickerPick}
             loading={pickerLoading}
             error={pickerError}
+          />
+        );
+      // Plan 2026-10-09 (email pre-pick advisor gate): el back nos puso
+      // en este step cuando el email del cliente COFA es inválido en SB.
+      // El componente presenta las acciones de contacto y consulta manual;
+      // ambos handlers y sus estados viven en hooks.
+      case LOAN_SIM_STEPS.EMAIL_PENDING_ADVISOR:
+        return (
+          <EmailPendingAdvisorStep
+            onContactAdvisor={handleContactAdvisor}
+            onVerificarEstado={verificarEstadoEmailPendingAdvisor}
+            loading={checkingEmailPendingAdvisor}
+            error={emailPendingAdvisorError}
+            status={emailPendingAdvisorStatus}
           />
         );
       default:
@@ -305,7 +399,7 @@ const OnboardingFlowScreen = () => {
         <Header />
         <div className={styles.homeCalculator_calculatorBox}>
           <div className={styles.calculatorContainer}>
-            <div className={styles.loaderContainer}>
+            <div className={styles.loaderContainer} role="status">
               <Loader />
               <p className={styles.loadingText}>Preparando tu onboarding...</p>
             </div>
@@ -326,7 +420,7 @@ const OnboardingFlowScreen = () => {
           </div>
           <div className={`${styles.homeCalculator_calculatorBox} ${styles.rightColumn}`}>
             <div className={styles.calculatorContainer}>
-              {shouldShowBackButton() && (
+              {!restoreError && shouldShowBackButton() && (
                 <BackButton
                   onClick={navigateToPrev}
                   style={{
@@ -342,7 +436,17 @@ const OnboardingFlowScreen = () => {
                   </div>
                 }
               >
-                {renderStep()}
+                {restoreError && !resumeShortId ? (
+                  <div className={styles.restoreError}>
+                    <div role="alert">
+                      <h2>No pudimos recuperar tu solicitud</h2>
+                      <p>Hubo un problema temporal al consultar tus datos. Volvé a intentarlo.</p>
+                    </div>
+                    <GenericButton onClick={retryRestore} disabled={restoringOnboarding}>
+                      Reintentar
+                    </GenericButton>
+                  </div>
+                ) : renderStep()}
               </Suspense>
             </div>
           </div>

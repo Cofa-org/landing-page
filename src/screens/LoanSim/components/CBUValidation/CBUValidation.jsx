@@ -6,7 +6,17 @@ import GenericButton from "../../../../Components/buttons/GenericButton/GenericB
 import { useCBUValidation } from "../../hooks/useCBUValidation";
 import styles from "./CBUValidation.module.css";
 
-const CBUValidation = ({ onValidate, loading, error, onBack, isClient, existingCbu }) => {
+const CBUValidation = ({
+  onValidate,
+  loading,
+  error,
+  onBack,
+  isClient,
+  existingCbu,
+  pendingCbu,
+  cbuValidado,
+  pendingAccountType,
+}) => {
   const {
     cbu,
     setCbu,
@@ -22,9 +32,55 @@ const CBUValidation = ({ onValidate, loading, error, onBack, isClient, existingC
     handleSubmit,
     handleToggleUpdate,
     CBU_LENGTH,
-  } = useCBUValidation(isClient, existingCbu, onValidate);
+  } = useCBUValidation(isClient, existingCbu, onValidate, {
+    pendingCbu,
+    cbuValidado,
+    pendingAccountType,
+  });
 
-  
+  // Plan 2026-10-20: el asesor ya validó el cambio de cuenta bancaria.
+  // Mostramos el CBU/CVU que ingressó el cliente (no el del ERP) y un botón
+  // para continuar. `onValidate` re-valida contra el ERP, pero el back ya no
+  // re-gatea la cuenta porque `cbu_validado_por` quedó seteado.
+  if (cbuValidado && pendingCbu) {
+
+    return (
+      <GenericForm
+        title={`Tu cuenta fue validada.`}
+        description='Confirmamos el CBU/CVU que ingresaste. Presioná “Continuar” para seguir con tu solicitud.'
+        onSubmit={handleSubmit}
+        className={styles.formOverride}
+      >
+        <div
+          className={styles.clientContainer}
+          data-testid='cbu-validation-approved'
+        >
+          <div className={styles.cbuBox}>{pendingCbu}</div>
+          {error && <span className={styles.errorText}>{error}</span>}
+          <GenericButton
+            // `type="button"` es OBLIGATORIO: este botón vive dentro del
+            // `<form onSubmit={handleSubmit}>` de `GenericForm` → con
+            // `type="submit"` el click dispara el `onClick` Y el submit del
+            // form, y `onValidate` se llama DOS veces.
+            type='button'
+            variant='primary'
+            onClick={handleSubmit}
+            loading={loading}
+            // `GenericButton` reemplaza el children por un spinner `aria-hidden`
+            // cuando entra en loading → el botón quedaría sin nombre accesible.
+            // El `aria-label` mantiene el nombre y el `aria-busy` expone el
+            // estado "ocupado".
+            aria-label='Continuar'
+            aria-busy={loading || undefined}
+            data-testid='cbu-validation-approved-submit'
+          >
+            Continuar
+          </GenericButton>
+        </div>
+      </GenericForm>
+    );
+  }
+
   const termsCheckbox = (
     <div className={styles.termsContainer}>
       <label className={styles.termsLabel}>
@@ -176,6 +232,16 @@ CBUValidation.propTypes = {
   error: PropTypes.string,
   isClient: PropTypes.bool,
   existingCbu: PropTypes.string,
+  // Plan 2026-10-20: cuenta que ingressó el cliente y validó el asesor.
+  pendingCbu: PropTypes.string,
+  cbuValidado: PropTypes.bool,
+  pendingAccountType: PropTypes.oneOf(["cbu", "cvu"]),
+};
+
+CBUValidation.defaultProps = {
+  pendingCbu: null,
+  cbuValidado: false,
+  pendingAccountType: "cbu",
 };
 
 export default memo(CBUValidation);

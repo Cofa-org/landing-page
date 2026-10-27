@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ERROR_CAUSE } from "../../../constants/error.js";
 import { COOKIE_LEAD_TOKEN_CONFIG, LOAN_SIM_STEPS, ONBOARDING_STATES } from "../../../constants/LOAN_SIM.js";
 import { getDecodedToken } from "../../../lib/token.js";
@@ -36,6 +36,9 @@ const PREV_STEP_MAP = {
   [LOAN_SIM_STEPS.WELCOME]: LOAN_SIM_STEPS.RECIBO_UPLOAD,
   [LOAN_SIM_STEPS.EN_ANALISIS]: LOAN_SIM_STEPS.RECIBO_UPLOAD,
   [LOAN_SIM_STEPS.PHONE_PICKER]: LOAN_SIM_STEPS.PHONE_VALIDATION,
+  // Plan 2026-09-29 (cliente email OTP): si el usuario vuelve desde
+  // EMAIL_OTP_VALIDATION, retornamos al picker para que pueda re-pickear.
+  [LOAN_SIM_STEPS.EMAIL_OTP_VALIDATION]: LOAN_SIM_STEPS.PHONE_PICKER,
 };
 
 /**
@@ -60,12 +63,23 @@ export const useOnboardingFlow = (resumeShortId = null) => {
   // (`initialSimulationResolved`) con polaridad "in-flight" en vez de "resolved".
   // Ver memoria loan-sim-initial-loading-race-2026-07-30.
   const [restoringOnboarding, setRestoringOnboarding] = useState(true);
+  const [restoreError, setRestoreError] = useState(null);
+  const [checkingEmailPendingAdvisor, setCheckingEmailPendingAdvisor] = useState(false);
+  const [emailPendingAdvisorError, setEmailPendingAdvisorError] = useState(null);
+  const [emailPendingAdvisorStatus, setEmailPendingAdvisorStatus] = useState(null);
+  const [restoreAttempt, setRestoreAttempt] = useState(0);
+  const restoreInFlight = useRef(true);
+  const emailPendingAdvisorController = useRef(null);
   const [pendingIdentities, setPendingIdentities] = useState(null);
   const [pendingDni, setPendingDni] = useState(null);
   const [pendingCelular, setPendingCelular] = useState(null);
   const [pendingSituacionLaboral, setPendingSituacionLaboral] = useState(null);
   const [rejectedFechaExpiracionBloqueo, setRejectedFechaExpiracionBloqueo] = useState(null);
   const [pickerContext, setPickerContext] = useState(null);
+  // Plan 2026-09-29 (cliente email OTP): email destino del OTP que el back
+  // envía tras el pick exitoso del picker. Lo lee `OnboardingFlowScreen`
+  // para pasar como `destination` a `OTPValidation destinationType="email"`.
+  const [emailOtpDestination, setEmailOtpDestination] = useState(null);
 
   const getLeadId = useCallback(() => {
     if (leadData?.leadId) return leadData.leadId;
@@ -76,7 +90,127 @@ export const useOnboardingFlow = (resumeShortId = null) => {
     return null;
   }, [leadData, leadToken]);
 
+  const currentLeadId = getLeadId();
   useEffect(() => {
+    setCheckingEmailPendingAdvisor(false);
+    setEmailPendingAdvisorError(null);
+    setEmailPendingAdvisorStatus(null);
+    return () => {
+      emailPendingAdvisorController.current?.abort();
+      emailPendingAdvisorController.current = null;
+    };
+  }, [currentLeadId, leadToken, resumeShortId, onboardingStep]);
+
+  const retryRestore = useCallback(() => {
+    if (resumeShortId || restoreInFlight.current) return;
+    restoreInFlight.current = true;
+    setRestoringOnboarding(true);
+    setRestoreAttempt((attempt) => attempt + 1);
+  }, [resumeShortId]);
+
+  const applyOnboardingState = useCallback((data) => {
+    const estadoOnboarding = data.estado_onboarding;
+
+    // Map onboarding state to loan sim step
+    let targetStep = LOAN_SIM_STEPS.LEAD_REGISTRATION;
+    if (estadoOnboarding === ONBOARDING_STATES.CELULAR_VALIDADO) {
+      targetStep = LOAN_SIM_STEPS.DNI_UPLOAD;
+    } else if (estadoOnboarding === ONBOARDING_STATES.LEAD_CREADO) {
+      targetStep = LOAN_SIM_STEPS.PHONE_VALIDATION;
+    } else if (estadoOnboarding === ONBOARDING_STATES.DNI_SUBIDO) {
+      targetStep = LOAN_SIM_STEPS.RECIBO_UPLOAD;
+    } else if (
+      estadoOnboarding === ONBOARDING_STATES.RECIBO_SUBIDO ||
+      estadoOnboarding === ONBOARDING_STATES.ONBOARDING_COMPLETO
+    ) {
+      targetStep = LOAN_SIM_STEPS.WELCOME;
+    } else if (estadoOnboarding === ONBOARDING_STATES.RECHAZADO) {
+      targetStep = LOAN_SIM_STEPS.RECHAZADO;
+    } else if (estadoOnboarding === ONBOARDING_STATES.EN_ANALISIS) {
+      targetStep = LOAN_SIM_STEPS.EN_ANALISIS;
+    } else if (estadoOnboarding === ONBOARDING_STATES.PHONE_PICKER) {
+      targetStep = LOAN_SIM_STEPS.PHONE_PICKER;
+    }
+
+    if (data.emailOtpDestination) {
+      targetStep = LOAN_SIM_STEPS.EMAIL_OTP_VALIDATION;
+    }
+    // The advisor gate takes precedence over OTP and the general state.
+    if (data.requiresAdvisorContact === true) {
+      targetStep = LOAN_SIM_STEPS.EMAIL_PENDING_ADVISOR;
+    }
+
+    setPickerContext(targetStep === LOAN_SIM_STEPS.PHONE_PICKER ? data.pickerContext ?? null : null);
+    setEmailOtpDestination(targetStep === LOAN_SIM_STEPS.EMAIL_OTP_VALIDATION ? data.emailOtpDestination : null);
+    setLeadData((prev) => ({
+      ...(prev || {}),
+      ...(data.celular !== undefined && {
+        celular: data.celular,
+      }),
+      ...(data.es_cliente !== undefined && {
+        es_cliente: data.es_cliente,
+      }),
+    }));
+    setOnboardingStep(targetStep);
+  }, []);
+
+  const verificarEstadoEmailPendingAdvisor = useCallback(async () => {
+    if (onboardingStep !== LOAN_SIM_STEPS.EMAIL_PENDING_ADVISOR || emailPendingAdvisorController.current) return;
+
+    setEmailPendingAdvisorError(null);
+    setEmailPendingAdvisorStatus(null);
+    const leadId = getLeadId();
+    if (!leadId) {
+      setEmailPendingAdvisorError("No pudimos recuperar tu sesión. Volvé a iniciar tu solicitud.");
+      return;
+    }
+
+    const fallbackError = "No pudimos verificar el estado de tu solicitud. Volvé a intentarlo.";
+    const controller = new AbortController();
+    emailPendingAdvisorController.current = controller;
+    const isActiveRequest = () => !controller.signal.aborted && emailPendingAdvisorController.current === controller;
+    setCheckingEmailPendingAdvisor(true);
+    try {
+      const response = await LeadRegistrationService.obtenerEstadoOnboarding(leadId, controller.signal);
+      if (!isActiveRequest()) return;
+      const onboardingState = response?.data;
+      const hasKnownState = onboardingState !== null &&
+        typeof onboardingState === "object" &&
+        !Array.isArray(onboardingState) &&
+        Object.values(ONBOARDING_STATES).includes(onboardingState.estado_onboarding);
+      const hasIncompleteAdvisorState = onboardingState?.estado_onboarding === ONBOARDING_STATES.EMAIL_PENDING_ADVISOR &&
+        onboardingState.requiresAdvisorContact !== true;
+      const resolvesToPicker = onboardingState?.estado_onboarding === ONBOARDING_STATES.PHONE_PICKER &&
+        onboardingState.requiresAdvisorContact !== true && !onboardingState.emailOtpDestination;
+      const pickerOptions = onboardingState?.pickerContext?.options;
+      const hasIncompletePickerState = resolvesToPicker && (
+        !Array.isArray(pickerOptions) || pickerOptions.length !== 4 ||
+        !pickerOptions.every((option) => typeof option === "string")
+      );
+      if (response?.success !== true || !hasKnownState || hasIncompleteAdvisorState || hasIncompletePickerState) {
+        setEmailPendingAdvisorError(response?.message || fallbackError);
+        return;
+      }
+
+      applyOnboardingState(onboardingState);
+      if (onboardingState.requiresAdvisorContact === true) {
+        setEmailPendingAdvisorStatus("Tu correo todavía está pendiente de actualización. Hablá con un asesor para continuar.");
+      }
+    } catch (error) {
+      if (!isActiveRequest()) return;
+      setEmailPendingAdvisorError(error?.message || fallbackError);
+    } finally {
+      if (isActiveRequest()) {
+        emailPendingAdvisorController.current = null;
+        setCheckingEmailPendingAdvisor(false);
+      }
+    }
+  }, [onboardingStep, getLeadId, applyOnboardingState]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    restoreInFlight.current = true;
+    setRestoreError(null);
     const restoreOnboardingState = async () => {
       // Si hay un shortId en la URL, el resume effect del screen es
       // autoritativo — consumeLink + iniciarSesionResume van a setear el
@@ -87,12 +221,14 @@ export const useOnboardingFlow = (resumeShortId = null) => {
       // el restore para que el resume sea el único que toca el step.
       // Ver memoria race-condition-restore-resume-2026-09-11.
       if (resumeShortId) {
+        restoreInFlight.current = false;
         setRestoringOnboarding(false);
         return;
       }
       setRestoringOnboarding(true);
       try {
         const leadTokenValue = await getCookie(COOKIE_LEAD_TOKEN_CONFIG.NAME);
+        if (controller.signal.aborted) return;
 
         if (!leadTokenValue) {
           setOnboardingStep(LOAN_SIM_STEPS.LEAD_REGISTRATION);
@@ -113,77 +249,29 @@ export const useOnboardingFlow = (resumeShortId = null) => {
           return;
         }
 
-        const response = await LeadRegistrationService.obtenerEstadoOnboarding(leadId);
-        
+        const response = await LeadRegistrationService.obtenerEstadoOnboarding(leadId, controller.signal);
+        if (controller.signal.aborted) return;
         if (response.success && response.data) {
-          const estadoOnboarding = response.data.estado_onboarding;
-
-          // Map onboarding state to loan sim step
-          let targetStep = LOAN_SIM_STEPS.LEAD_REGISTRATION;
-          if (estadoOnboarding === ONBOARDING_STATES.CELULAR_VALIDADO) {
-            targetStep = LOAN_SIM_STEPS.DNI_UPLOAD;
-          } else if (estadoOnboarding === ONBOARDING_STATES.LEAD_CREADO) {
-            targetStep = LOAN_SIM_STEPS.PHONE_VALIDATION;
-          } else if (estadoOnboarding === ONBOARDING_STATES.DNI_SUBIDO) {
-            targetStep = LOAN_SIM_STEPS.RECIBO_UPLOAD;
-          } else if (
-            estadoOnboarding === ONBOARDING_STATES.RECIBO_SUBIDO ||
-            estadoOnboarding === ONBOARDING_STATES.ONBOARDING_COMPLETO
-          ) {
-            targetStep = LOAN_SIM_STEPS.WELCOME;
-          } else if (estadoOnboarding === ONBOARDING_STATES.RECHAZADO) {
-            targetStep = LOAN_SIM_STEPS.RECHAZADO;
-          } else if (estadoOnboarding === ONBOARDING_STATES.EN_ANALISIS) {
-            targetStep = LOAN_SIM_STEPS.EN_ANALISIS;
-          } else if (estadoOnboarding === ONBOARDING_STATES.PHONE_PICKER) {
-            targetStep = LOAN_SIM_STEPS.PHONE_PICKER;
-            // PATCH 2026-08-20 (fix bug scoring-sync + restore): cuando el operador
-            // ejecuta scoring manual desde el backoffice y el celular del lead no
-            // matchea los teléfonos declarados, scoring-sync (`Scoring_Backend`)
-            // persiste la fila `webapp_sim_leads_validacion_telefonica` con
-            // `origen='SCORING'` + UPDATE `estado_onboarding='PHONE_PICKER'`.
-            // El cliente, al recargar la página (token aún activo), cae en este
-            // branch del restore. Sin este fix, `pickerContext` quedaba en null
-            // y `PhonePickerStep` retornaba `null` ("pantalla vacía") porque
-            // `options.length !== 4`. El back ya devuelve `pickerContext` con
-            // `options` + `target` cuando scoring dispara el picker (ver
-            // `obtenerEstadoOnboarding` líneas 1058-1101); el restore solo
-            // necesitaba propagarlo al state. Tests en
-            // `__tests__/useOnboardingFlow.test.js` cubren el caso (1 RED, 2
-            // pre-existentes que cubren null y missing).
-            if (response.data.pickerContext) {
-              setPickerContext(response.data.pickerContext);
-            }
-          }
-          // Patch 2026-08-31 (OTP resend fix): la condición original
-          // `if (leadData?.celular)` estaba invertida — sólo sobrescribía
-          // `leadData` cuando YA tenía celular, dejando `leadData.celular`
-          // undefined en el primer restore tras reload. Resultado:
-          // `OTPValidation.destination` era undefined y
-          // `usePhoneOTP.reenviarOTP` retornaba silencioso (timer sin
-          // reenvío). Reemplazamos por un merge explícito de los campos
-          // que el front necesita persistir entre sesiones.
-          setLeadData((prev) => ({
-            ...(prev || {}),
-            ...(response.data.celular !== undefined && {
-              celular: response.data.celular,
-            }),
-            ...(response.data.es_cliente !== undefined && {
-              es_cliente: response.data.es_cliente,
-            }),
-          }));
+          applyOnboardingState(response.data);
           setLeadToken(leadTokenValue);
-          setOnboardingStep(targetStep);
         }
       } catch (err) {
+        if (controller.signal.aborted) return;
         console.error("RESTORE_ONBOARDING_ERROR:", err);
-        // Continue normally if restoration fails
+        setRestoreError(err);
       } finally {
-        setRestoringOnboarding(false);
+        if (!controller.signal.aborted) {
+          restoreInFlight.current = false;
+          setRestoringOnboarding(false);
+        }
       }
     };
     restoreOnboardingState();
-  }, [resumeShortId]);
+    return () => {
+      controller.abort();
+      restoreInFlight.current = false;
+    };
+  }, [resumeShortId, restoreAttempt, applyOnboardingState]);
 
   const BACK_BUTTON_STEPS = [
     LOAN_SIM_STEPS.IDENTITY_SELECTION,
@@ -197,7 +285,15 @@ export const useOnboardingFlow = (resumeShortId = null) => {
 
   const navigateToNext = useCallback((currentStep, extras = {}) => {
     let next;
-    if (currentStep === LOAN_SIM_STEPS.PHONE_VALIDATION) {
+    // Plan 2026-09-29 (cliente email OTP): EMAIL_OTP_VALIDATION comparte el
+    // mismo routing dinámico que PHONE_VALIDATION — un cliente COFA que
+    // validó el OTP email avanza a RECIBO_UPLOAD (saltea DNI_UPLOAD).
+    // Sin esta rama, `NEXT_STEP_MAP[EMAIL_OTP_VALIDATION]` es undefined y el
+    // usuario queda atascado en la pantalla de validación (bug E2E lead 30).
+    if (
+      currentStep === LOAN_SIM_STEPS.PHONE_VALIDATION ||
+      currentStep === LOAN_SIM_STEPS.EMAIL_OTP_VALIDATION
+    ) {
       next = getNextStepAfterPhoneValidation(extras.esCliente);
     } else {
       next = NEXT_STEP_MAP[currentStep];
@@ -442,6 +538,25 @@ export const useOnboardingFlow = (resumeShortId = null) => {
 
       const decision = result.data?.decision;
 
+      // Plan 2026-09-29 (cliente email OTP): tras pick correcto del picker para
+      // cliente COFA, el back ya NO avanza directo a CELULAR_VALIDADO. En su
+      // lugar, devuelve `requiresEmailVerification: true` y `tipo: EMAIL`.
+      // Persistimos el email destino (viene en `result.data.destination` si el
+      // back lo incluye, sino lo derivamos de `leadData.email`) y navegamos a
+      // el step `EMAIL_OTP_VALIDATION` donde `OnboardingFlowScreen` renderiza
+      // `OTPValidation destinationType="email"`.
+      if (result.data?.requiresEmailVerification === true) {
+        const destination =
+          result.data.destination ??
+          result.data.email ??
+          leadData?.email ??
+          null;
+        setEmailOtpDestination(destination);
+        setPickerContext(null);
+        setOnboardingStep(LOAN_SIM_STEPS.EMAIL_OTP_VALIDATION);
+        return result;
+      }
+
       // 2nd-attempt: el back devolvió retryAvailable=true y mantiene al usuario
       // en el picker con un set de opciones/target actualizado. Re-disparamos
       // el picker en lugar de avanzar.
@@ -508,10 +623,17 @@ export const useOnboardingFlow = (resumeShortId = null) => {
     leadToken,
     onboardingStep,
     restoringOnboarding,
+    restoreError,
+    checkingEmailPendingAdvisor,
+    emailPendingAdvisorError,
+    emailPendingAdvisorStatus,
+    verificarEstadoEmailPendingAdvisor,
+    retryRestore,
     pendingIdentities,
     rejectedFechaExpiracionBloqueo,
     pickerContext,
     setPickerContext,
+    emailOtpDestination,
     // Setters expuestos para callers que necesitan plantar estado manualmente
     // (ej. OnboardingFlowScreen resume branch, spec "Recibo resubida operador"
     // 2026-09-07: consume link → setLeadData + setLeadToken + setOnboardingStep
