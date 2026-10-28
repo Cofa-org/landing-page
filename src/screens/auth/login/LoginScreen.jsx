@@ -28,6 +28,7 @@ const LoginScreen = () => {
       honeypot={flow.honeypot}
       setHoneypot={flow.setHoneypot}
       turnstile={flow.turnstile}
+      captchaMode={flow.captchaMode}
       loading={flow.loading}
       error={flow.error}
       successMessage={flow.successMessage}

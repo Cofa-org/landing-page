@@ -1,3 +1,5 @@
+export const AUTH_EMAIL_MAX_LENGTH = 254; // mismo valor que el back (§4 del requerimiento)
+
 // OTP de email de las pantallas de auth. Onboarding y simulador usan OTP_CONFIG de LOAN_SIM.js.
 export const AUTH_OTP_CONFIG = {
   RESEND_COOLDOWN_SECONDS: 60, // mismo valor que AUTH_OTP_CONFIG.RESEND_COOLDOWN_MS del back
@@ -20,3 +22,8 @@ export const AUTH_SESSION_CAUSE = {
 };
 
 export const AUTH_SESSION_ERROR_CAUSES = Object.values(AUTH_SESSION_CAUSE);
+
+export const AUTH_CAPTCHA_MODE = {
+  INVISIBLE: "invisible",
+  MANAGED: "managed",
+};

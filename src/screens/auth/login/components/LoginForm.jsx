@@ -4,10 +4,12 @@ import GenericInput from "../../../../Components/Forms/GenericInput/GenericInput
 import PasswordInput from "../../../../Components/Forms/GenericInput/PasswordInput.jsx";
 import GenericButton from "../../../../Components/buttons/GenericButton/GenericButton.jsx";
 import Turnstile from "../../../../Components/Turnstile/Turnstile.jsx";
-import { TURNSTILE_SITE_KEY } from "../../../../config.js";
+import { TURNSTILE_SITE_KEY, TURNSTILE_MANAGED_SITE_KEY } from "../../../../config.js";
+import { AUTH_CAPTCHA_MODE } from "../../../../constants/AUTH.js";
 import HoneypotField from "../../HoneypotField.jsx";
 import AuthSplitLayout from "../../AuthSplitLayout.jsx";
 import styles from "../../auth.module.css";
+import { AUTH_EMAIL_MAX_LENGTH } from "../../../../constants/AUTH.js";
 
 const LoginForm = ({
   email,
@@ -17,6 +19,7 @@ const LoginForm = ({
   honeypot,
   setHoneypot,
   turnstile,
+  captchaMode = AUTH_CAPTCHA_MODE.INVISIBLE,
   loading,
   error,
   successMessage,
@@ -39,6 +42,7 @@ const LoginForm = ({
         label="Email"
         name="email"
         type="email"
+        maxLength={AUTH_EMAIL_MAX_LENGTH}
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="tu@email.com"
@@ -63,8 +67,13 @@ const LoginForm = ({
 
       <div className={styles.turnstileWrapper}>
         <Turnstile
+          key={captchaMode}
           ref={turnstile.ref}
-          siteKey={TURNSTILE_SITE_KEY}
+          siteKey={
+            captchaMode === AUTH_CAPTCHA_MODE.MANAGED
+              ? TURNSTILE_MANAGED_SITE_KEY
+              : TURNSTILE_SITE_KEY
+          }
           onVerify={turnstile.onVerify}
           onExpire={turnstile.onClear}
           onError={turnstile.onClear}

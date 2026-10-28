@@ -13,6 +13,7 @@ import {
 } from "../auth/passwordPolicy.js";
 import PerfilTabs from "./PerfilTabs.jsx";
 import styles from "./MiPerfilScreen.module.css";
+import { AUTH_EMAIL_MAX_LENGTH } from "../../constants/AUTH.js";
 
 function CambiarContrasena() {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -195,6 +196,7 @@ function CambiarEmail({ onEmailChanged }) {
             label="Nuevo email"
             name="newEmail"
             type="email"
+            maxLength={AUTH_EMAIL_MAX_LENGTH}
             value={newEmail}
             onChange={(e) => setNewEmail(e.target.value)}
             placeholder="nuevo@email.com"

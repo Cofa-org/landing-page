@@ -7,6 +7,7 @@ import { TURNSTILE_SITE_KEY } from "../../../../config.js";
 import HoneypotField from "../../HoneypotField.jsx";
 import AuthSplitLayout from "../../AuthSplitLayout.jsx";
 import styles from "../../auth.module.css";
+import { AUTH_EMAIL_MAX_LENGTH } from "../../../../constants/AUTH.js";
 
 const ForgotPasswordForm = ({
   email,
@@ -32,6 +33,7 @@ const ForgotPasswordForm = ({
         label="Email"
         name="email"
         type="email"
+        maxLength={AUTH_EMAIL_MAX_LENGTH}
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="tu@email.com"

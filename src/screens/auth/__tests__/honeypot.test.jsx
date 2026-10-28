@@ -28,6 +28,7 @@ vi.mock("../../../Components/Turnstile/Turnstile.jsx", () => ({
 
 vi.mock("../../../config.js", () => ({
   TURNSTILE_SITE_KEY: "test-site-key",
+  TURNSTILE_MANAGED_SITE_KEY: "test-managed-key",
 }));
 
 // Context: conservamos todos los exports reales y sobreescribimos solo useAuth

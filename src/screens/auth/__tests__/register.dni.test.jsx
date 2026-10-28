@@ -27,7 +27,7 @@ vi.mock("../../../Components/Turnstile/Turnstile.jsx", () => ({
   }),
 }));
 
-vi.mock("../../../config.js", () => ({ TURNSTILE_SITE_KEY: "test-key" }));
+vi.mock("../../../config.js", () => ({ TURNSTILE_SITE_KEY: "test-key", TURNSTILE_MANAGED_SITE_KEY: "test-managed-key" }));
 
 // Stub de componentes con formulario propio para evitar dependencias
 vi.mock("../../Components/Forms/GenericForm/GenericForm.jsx", async () => ({

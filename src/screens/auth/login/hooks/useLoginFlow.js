@@ -4,6 +4,7 @@ import { useAuth } from "../../../../context/index.js";
 import authService from "../../../../services/authService.js";
 import { useTurnstile } from "../../useTurnstile.js";
 import { consumeAuthFlash } from "../../authFlash.js";
+import { AUTH_CAPTCHA_MODE } from "../../../../constants/AUTH.js";
 
 export function useLoginFlow() {
   const { login } = useAuth();
@@ -16,6 +17,7 @@ export function useLoginFlow() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [needsVerify, setNeedsVerify] = useState(false);
+  const [captchaMode, setCaptchaMode] = useState(AUTH_CAPTCHA_MODE.INVISIBLE);
   const [successMessage, setSuccessMessage] = useState(
     () => location.state?.successMessage || consumeAuthFlash(),
   );
@@ -35,6 +37,9 @@ export function useLoginFlow() {
       await login(email.trim(), password, turnstile.token);
       navigate("/mi-perfil", { replace: true });
     } catch (err) {
+      if (err.data?.captchaMode === AUTH_CAPTCHA_MODE.MANAGED) {
+        setCaptchaMode(AUTH_CAPTCHA_MODE.MANAGED);
+      }
       if (err.cause === "AUTH_EMAIL_NOT_VERIFIED") {
         turnstile.reset();
         setNeedsVerify(true);
@@ -92,6 +97,7 @@ export function useLoginFlow() {
     loading,
     error,
     needsVerify,
+    captchaMode,
     successMessage,
     turnstile,
     turnstileVerify,

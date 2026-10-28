@@ -13,6 +13,7 @@ import {
   isPasswordPolicyValid,
 } from "../../passwordPolicy.js";
 import styles from "../../auth.module.css";
+import { AUTH_EMAIL_MAX_LENGTH } from "../../../../constants/AUTH.js";
 
 const RegisterNewStep = ({
   email,
@@ -37,6 +38,7 @@ const RegisterNewStep = ({
         label="Email"
         name="email"
         type="email"
+        maxLength={AUTH_EMAIL_MAX_LENGTH}
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="tu@email.com"

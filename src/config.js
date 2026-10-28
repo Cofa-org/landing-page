@@ -13,6 +13,7 @@ const LANDING_BACKEND_API_KEY = import.meta.env.VITE_LANDING_BACKEND_API_KEY;
 const LRS_URL = import.meta.env.VITE_LRS_URL;
 const LRS_API_KEY = import.meta.env.VITE_LRS_API_KEY;
 const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY;
+const TURNSTILE_MANAGED_SITE_KEY = import.meta.env.VITE_TURNSTILE_MANAGED_SITE_KEY;
 const THUMBMARKJS_API_KEY = import.meta.env.VITE_THUMBMARKJS_API_KEY;
 // SISTEMA_FRANCES_ON: feature flag para el sistema francés nuevo.
 // Default false → comportamiento legacy pre-merge.
@@ -60,6 +61,7 @@ export {
   LRS_URL,
   LRS_API_KEY,
   TURNSTILE_SITE_KEY,
+  TURNSTILE_MANAGED_SITE_KEY,
   THUMBMARKJS_API_KEY,
   SISTEMA_FRANCES_ON,
   DEV,

@@ -148,6 +148,26 @@ describe("useLoginFlow", () => {
     expect(result.current.turnstile.token).toBe("");
   });
 
+  it("captchaMode managed: pasa a widget visible en el siguiente intento", async () => {
+    const err = new Error("fail");
+    err.cause = "AUTH_LOGIN_FAILED";
+    err.data = { captchaMode: "managed", bloqueado_hasta: null, delayMs: 0 };
+    mockLogin.mockRejectedValue(err);
+
+    const { result } = renderHook(() => useLoginFlow(), { wrapper });
+    act(() => {
+      result.current.setEmail("a@b.com");
+      result.current.setPassword("password1");
+      result.current.turnstile.onVerify("tok");
+    });
+    await act(async () => {
+      await result.current.handleSubmit();
+    });
+
+    expect(result.current.captchaMode).toBe("managed");
+    expect(result.current.turnstile.token).toBe("");
+  });
+
   it("login ok navega a /mi-perfil", async () => {
     mockLogin.mockResolvedValue({ email: "a@b.com" });
     const { result } = renderHook(() => useLoginFlow(), { wrapper });
