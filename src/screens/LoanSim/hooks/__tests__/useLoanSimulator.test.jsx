@@ -534,6 +534,27 @@ describe("useLoanSimulator - phone-not-validated gate", () => {
     expect(result.current.step).not.toBe(LOAN_SIM_STEPS.RECHAZADO);
     expect(result.current.rejectionReason).toBeNull();
   });
+
+  it("muestra el mensaje del backend y NO avanza a RECHAZADO cuando /init responde con cause=SIMULADOR_PRESTAMOS_SERVICE_NO_CLIENTE", async () => {
+    SimuladorService.iniciarSesion.mockResolvedValue({
+      success: false,
+      status: 404,
+      cause: "SIMULADOR_PRESTAMOS_SERVICE_NO_CLIENTE",
+      message: "No existe un cliente para esta simulación",
+    });
+
+    const { result } = renderHook(() => useLoanSimulator(), {
+      wrapper: ({ children }) => <MemoryRouter initialEntries={[`/simulador?id=${SHORT_ID}`]}>{children}</MemoryRouter>,
+    });
+
+    await waitFor(() => {
+      expect(result.current.initialSimulationResolved).toBe(true);
+    });
+
+    expect(result.current.error).toContain("No existe un cliente para esta simulación");
+    expect(result.current.step).not.toBe(LOAN_SIM_STEPS.RECHAZADO);
+    expect(result.current.rejectionReason).toBeNull();
+  });
 });
 
 describe("useLoanSimulator — sessionStorage simuladorTestPersona bypass", () => {
