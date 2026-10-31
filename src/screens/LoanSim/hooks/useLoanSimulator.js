@@ -198,12 +198,14 @@ export const useLoanSimulator = () => {
           // All setState calls below execute in the same synchronous chunk.
           // React 18 batches them into a single render → the initial fetch
           // effect runs exactly once with both scoringId and huellaData ready.
+          
           setScoringData({
             scoringId: String(response.data.scoringId),
             cuit: response.data.cuit || null,
             nombreCompleto: response.data.nombreCompleto || null,
             capitalMaximoOperador: response.data.capitalMaximoOperador || null,
             tasaOperador: response.data.tasaOperador || null,
+            tipoTasaOperador: response.data.tipoTasaOperador || null,
             plazoMaximoOperador: response.data.plazoMaximoOperador || null,
             cuotaADescontar: response.data.cuotaADescontar || null,
             nroCuota: response.data.nroCuota || null,
@@ -279,10 +281,14 @@ export const useLoanSimulator = () => {
         const params = {
           scoringId: scoringData.scoringId,
         };
-
+        
         if (scoringData.tasaOperador && scoringData.plazoMaximoOperador) {
           params.tasaOperador = scoringData.tasaOperador;
           params.plazoMaximoOperador = scoringData.plazoMaximoOperador;
+        }
+
+        if(scoringData.tipoTasaOperador) {
+          params.tipoTasaOperador = scoringData.tipoTasaOperador;
         }
 
         if (scoringData.capitalMaximoOperador) {
