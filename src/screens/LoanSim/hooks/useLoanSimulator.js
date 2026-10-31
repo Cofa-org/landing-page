@@ -514,6 +514,11 @@ export const useLoanSimulator = () => {
               : LOAN_SIM_STEPS.EMAIL_VALIDATION,
             ...simulationDataWithoutPlans,
             ...selectedPlan,
+            // 2026-10-31: tipo de tasa del operador (viene del scoring/LRS).
+            // Viaja DENTRO de plan para que el backend use el mismo valor en
+            // la recalculación de la cuota y en la persistencia del plan.
+            // Va después de los spreads para que ningún campo del plan lo pise.
+            tipoTasaOperador: scoringData.tipoTasaOperador ?? null,
           },
         };
 

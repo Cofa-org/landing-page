@@ -16,6 +16,7 @@ vi.mock("../../../../services/simuladorService.js", () => ({
     validarCBU: vi.fn(),
     aceptarTerminos: vi.fn(),
     obtenerInfoPrestamo: vi.fn(),
+    guardarPlan: vi.fn(),
   },
 }));
 
@@ -74,6 +75,18 @@ const calcularPlanesResponse = {
   data: {
     capital_maximo_a_ofrecer: 100000,
     planes_disponibles: [{ plazo: 12, valorCuota: 1000, tasaOp: 0.85 }],
+  },
+};
+
+// Fixture coherente con el guard de coherencia local de handleNextStep:
+// `valorCuota * installment >= amount` ⇒ 10000 * 12 >= 100000.
+// El fixture por defecto (valorCuota: 1000) NO pasa el guard: 1000 * 12 = 12000
+// < 100000 ⇒ el hook setea un error y vuelve antes de llegar al guardarPlan.
+const calcularPlanesCoherenteResponse = {
+  success: true,
+  data: {
+    capital_maximo_a_ofrecer: 100000,
+    planes_disponibles: [{ plazo: 12, valorCuota: 10000, tasaOp: 0.85 }],
   },
 };
 
@@ -673,5 +686,76 @@ describe("useLoanSimulator — sessionStorage simuladorTestPersona bypass", () =
       cuit: CUIT,
       shortId: SHORT_ID,
     });
+  });
+});
+
+describe("useLoanSimulator — payload de guardarPlan", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    sessionStorage.clear();
+    // Cada test debe fijar sus propias respuestas: `vi.clearAllMocks()` limpia
+    // las llamadas pero NO las implementaciones, así que sin esto el segundo
+    // test heredaría el `consumeLink` con tipoTasaOperador del primero.
+    LinkResolutionService.consumeLink.mockResolvedValue(consumeLinkResponse);
+    getFingerprint.mockResolvedValue(FINGERPRINT_RAW);
+    mapFingerprintToHuellaData.mockReturnValue(HUELLA_DATA);
+    SimuladorService.iniciarSesion.mockResolvedValue({ success: true, data: { token: "mock-jwt" } });
+    SimuladorService.calcularPlanes.mockResolvedValue(calcularPlanesCoherenteResponse);
+    SimuladorService.guardarPlan.mockResolvedValue({ success: true, data: {} });
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    sessionStorage.clear();
+  });
+
+  it("manda tipoTasaOperador dentro de plan al guardar el plan", async () => {
+    // El scoring (LRS) devuelve el tipo de tasa del operador.
+    LinkResolutionService.consumeLink.mockResolvedValue({
+      success: true,
+      data: { ...consumeLinkResponse.data, tipoTasaOperador: "TNA" },
+    });
+
+    const { result } = renderUseLoanSimulator(SHORT_ID);
+
+    await waitFor(() => {
+      expect(SimuladorService.calcularPlanes).toHaveBeenCalled();
+    });
+    await waitFor(() => {
+      expect(result.current.simulationData).toBeTruthy();
+    });
+
+    await act(async () => {
+      await result.current.handleNextStep();
+    });
+
+    await waitFor(() => {
+      expect(SimuladorService.guardarPlan).toHaveBeenCalled();
+    });
+
+    const payload = SimuladorService.guardarPlan.mock.calls[0][0];
+    expect(payload.plan.tipoTasaOperador).toBe("TNA");
+  });
+
+  it("manda tipoTasaOperador null cuando el scoring no lo devuelve", async () => {
+    const { result } = renderUseLoanSimulator(SHORT_ID);
+
+    await waitFor(() => {
+      expect(SimuladorService.calcularPlanes).toHaveBeenCalled();
+    });
+    await waitFor(() => {
+      expect(result.current.simulationData).toBeTruthy();
+    });
+
+    await act(async () => {
+      await result.current.handleNextStep();
+    });
+
+    await waitFor(() => {
+      expect(SimuladorService.guardarPlan).toHaveBeenCalled();
+    });
+
+    const payload = SimuladorService.guardarPlan.mock.calls[0][0];
+    expect(payload.plan.tipoTasaOperador).toBeNull();
   });
 });
