@@ -735,6 +735,12 @@ describe("useLoanSimulator — payload de guardarPlan", () => {
 
     const payload = SimuladorService.guardarPlan.mock.calls[0][0];
     expect(payload.plan.tipoTasaOperador).toBe("TNA");
+    // Contrato load-bearing: el valor viaja DENTRO de plan, nunca como campo
+    // top-level del body. El controller (simulador-prestamos.controller.js:154)
+    // sólo destructura { scoringId, plazoSeleccionado, capitalSeleccionado,
+    // plan, cuit, prevencion_fraudes } ⇒ un top-level sería descartado en
+    // silencio y el valor dejaría de llegar al backend.
+    expect(payload.tipoTasaOperador).toBeUndefined();
   });
 
   it("manda tipoTasaOperador null cuando el scoring no lo devuelve", async () => {
@@ -757,5 +763,7 @@ describe("useLoanSimulator — payload de guardarPlan", () => {
 
     const payload = SimuladorService.guardarPlan.mock.calls[0][0];
     expect(payload.plan.tipoTasaOperador).toBeNull();
+    // Mismo contrato que el caso "TNA": tampoco debe aparecer top-level.
+    expect(payload.tipoTasaOperador).toBeUndefined();
   });
 });
