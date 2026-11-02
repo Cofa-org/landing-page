@@ -11,6 +11,7 @@ import styles from "../../LoanSimScreen.module.css";
 import { useSimulationStep } from "../../hooks/useSimulationStep";
 import { FraudWarning } from "../../../../Components/index.js";
 import { roundToFiveHundreds } from "../../../../lib/utils.js";
+import { SISTEMA_FRANCES_ON } from "../../../../config.js";
 
 
 
@@ -209,8 +210,9 @@ const SimulationStep = ({
         <div className={styles.infoContainer}>
           <MdInfoOutline className={styles.infoIcon} />
           <div className={styles.tooltip}>
-            <p>CFTA: {cfta}%</p>
-            <p>CFTO: {cfto}%</p>
+            {/* En modo francés `cfta`/`cfto` son CFTNA/CFTNO (ver useSimulationStep). */}
+            <p>{SISTEMA_FRANCES_ON ? "CFTNA" : "CFTA"}: {cfta}%</p>
+            <p>{SISTEMA_FRANCES_ON ? "CFTNO" : "CFTO"}: {cfto}%</p>
             <p>TNA: {tna}%</p>
           </div>
         </div>
