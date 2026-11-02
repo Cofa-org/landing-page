@@ -62,14 +62,7 @@ const SuccessStep = ({ handleInfoPrestamo, loanInfo, loadingModal, simulationDat
         >
           INFORMACIÓN PRÉSTAMO
         </GenericButton>
-        {/* <GenericButton
-          type='button'
-          variant='secondary'
-          onClick={() => window.open("https://wa.me/5491137570853", "_blank", "noopener,noreferrer")}
-          style={{ flex: 1 }}
-        >
-          Comunicarse con un asesor
-        </GenericButton> */}
+
       </div>
       {showInfoModal && (
         <Suspense fallback={<div>Cargando detalle...</div>}>
