@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { fetchTestPersonas, resetPersonaEmail, setPersonaEmail } from "../../../services/testPersonasService.js";
+import { deleteCookie } from "../../../lib/utils.js";
+import { COOKIE_LEAD_TOKEN_CONFIG } from "../../../constants/LOAN_SIM.js";
 
 /**
  * Set de personas del catálogo que admiten el flujo "agregar email"
@@ -83,8 +85,8 @@ export function useTestPersonasPanel() {
     await Promise.all(
       Array.from(PERSONAS_CON_AGREGAR_EMAIL).map((id) => resetPersonaEmail(id)),
     );
-    // Clear leadToken cookie (same name + path as COOKIE_LEAD_TOKEN_CONFIG).
-    document.cookie = "leadToken=; expires=Thu,01 Jan 1970 00:00:00 GMT; path=/";
+    // Limpiar la cookie y su fallback en memoria antes de reiniciar el caso.
+    await deleteCookie(COOKIE_LEAD_TOKEN_CONFIG.NAME);
     setSearchParams({});
     window.location.reload();
   }, [setSearchParams]);
