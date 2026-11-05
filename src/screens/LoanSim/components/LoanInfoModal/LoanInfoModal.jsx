@@ -1,6 +1,12 @@
 import React from "react";
 import { usePDFExport } from "../../../../hooks/usePDFExport";
+import { SISTEMA_FRANCES_ON } from "../../../../config.js";
 import styles from "./LoanInfoModal.module.css";
+
+// Las keys del backend (CFTA/CFTO) son legacy: en modo francés transportan
+// CFTNA/CFTNO. Las labels del modal y del PDF siguen al flag del front.
+const CFTA_LABEL = SISTEMA_FRANCES_ON ? "CFTNA" : "CFTA";
+const CFTO_LABEL = SISTEMA_FRANCES_ON ? "CFTNO" : "CFTO";
 
 const LoanInfoModal = ({ loanInfo, closeModal, simulationData }) => {
   const usedCapital = simulationData?.capital_utilizado;
@@ -21,9 +27,9 @@ const LoanInfoModal = ({ loanInfo, closeModal, simulationData }) => {
     { label: "Total de intereses", value: loanInfo.TotalDeIntereses, type: "currency" },
     { label: "Cantidad de cuotas", value: loanInfo.CantidadDeCuotas, type: "text" },
     { label: "Monto cuota", value: loanInfo.MontoCuota, type: "currency" },
-    { label: "CFTO", value: loanInfo.CFTO, type: "percent" },
+    { label: CFTO_LABEL, value: loanInfo.CFTO, type: "percent" },
     { label: "TNA", value: loanInfo.TNA, type: "percent" },
-    { label: "CFTA", value: loanInfo.CFTA, type: "percent" },
+    { label: CFTA_LABEL, value: loanInfo.CFTA, type: "percent" },
   ];
 
   const { generatePDF } = usePDFExport({
@@ -70,13 +76,13 @@ const LoanInfoModal = ({ loanInfo, closeModal, simulationData }) => {
             <strong>Monto cuota:</strong> {loanInfo.MontoCuota}
           </li>
           <li>
-            <strong>CFTO:</strong> {loanInfo.CFTO}
+            <strong>{CFTO_LABEL}:</strong> {loanInfo.CFTO}
           </li>
           <li>
             <strong>TNA:</strong> {loanInfo.TNA}
           </li>
           <li>
-            <strong>CFTA:</strong> {loanInfo.CFTA}
+            <strong>{CFTA_LABEL}:</strong> {loanInfo.CFTA}
           </li>
         </ul>
 

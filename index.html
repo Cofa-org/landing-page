@@ -104,16 +104,38 @@
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
     j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-W3SD9ZQQ');</script>
+    })(window,document,'script','dataLayer','GTM-NKTF7GZQ');</script>
     <!-- End Google Tag Manager -->
     <!-- Start of Async Callbell Code -->
     <script>
-      let cbSessionId = localStorage.getItem('callbell_session_id');
+      // El acceso a localStorage puede ser denegado por el browser (cookies de
+      // terceros bloqueadas, "Bloquear todas las cookies y los datos de sitios",
+      // "Datos de sitios en el dispositivo" apagado para este origen, origen
+      // opaco). Sin esta guarda el throw aborta este script,
+      // `window.callbellSettings` queda sin definir y el loader de Callbell de
+      // abajo falla también.
+      //
+      // Cuando el storage está bloqueado el id se genera igual y se publica
+      // en `window.callbellSettings.extra_params.identifier` (línea de abajo):
+      // `http.js` lo lee de ahí, así que el header `x-callbell-session-id`
+      // sigue enviándose. Lo que se pierde es la persistencia entre
+      // recargas — y con ella la correlación chat<->lead si el usuario
+      // recarga entre el registro y el chat.
+      let cbSessionId = null;
+      try {
+        cbSessionId = localStorage.getItem('callbell_session_id');
+      } catch (storageBlocked) {
+        cbSessionId = null;
+      }
       if (!cbSessionId) {
         cbSessionId = crypto.randomUUID();
-        localStorage.setItem('callbell_session_id', cbSessionId);
+        try {
+          localStorage.setItem('callbell_session_id', cbSessionId);
+        } catch (storageBlocked) {
+          // Sin persistencia: el id vive sólo en esta carga de página.
+        }
       }
-      
+
       if (!window.callbellSettings) {
         window.callbellSettings = {}
       }

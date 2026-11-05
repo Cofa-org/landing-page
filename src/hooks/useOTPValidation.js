@@ -1,5 +1,10 @@
 import { useState, useRef, useEffect } from "react";
 import { OTP_CONFIG } from "../constants/LOAN_SIM.js";
+import {
+  safeGetLocalStorageItem,
+  safeRemoveLocalStorageItem,
+  safeSetLocalStorageItem,
+} from "../lib/safe-storage.js";
 
 export const useOTPValidation = ({
   destination,
@@ -18,18 +23,18 @@ export const useOTPValidation = ({
   }, []);
 
   useEffect(() => {
-    const savedExpiry = localStorage.getItem("otp_cooldown_expiry");
+    const savedExpiry = safeGetLocalStorageItem("otp_cooldown_expiry");
     if (savedExpiry) {
       const remaining = Math.ceil((parseInt(savedExpiry, 10) - Date.now()) / 1000);
       if (remaining > 0) {
         setCooldown(remaining);
         return;
       }
-      localStorage.removeItem("otp_cooldown_expiry");
+      safeRemoveLocalStorageItem("otp_cooldown_expiry");
     }
     if (startCooldownOnMount) {
       const expiry = Date.now() + cooldownSeconds * 1000;
-      localStorage.setItem("otp_cooldown_expiry", expiry.toString());
+      safeSetLocalStorageItem("otp_cooldown_expiry", expiry.toString());
       setCooldown(cooldownSeconds);
     }
   }, [startCooldownOnMount, cooldownSeconds]);
@@ -40,7 +45,7 @@ export const useOTPValidation = ({
       setCooldown((prev) => {
         const next = prev - 1;
         if (next <= 0) {
-          localStorage.removeItem("otp_cooldown_expiry");
+          safeRemoveLocalStorageItem("otp_cooldown_expiry");
           return 0;
         }
         return next;
@@ -93,7 +98,7 @@ export const useOTPValidation = ({
     if (onResend) {
       await onResend(destination);
       const expiry = Date.now() + cooldownSeconds * 1000;
-      localStorage.setItem("otp_cooldown_expiry", expiry.toString());
+      safeSetLocalStorageItem("otp_cooldown_expiry", expiry.toString());
       setCooldown(cooldownSeconds);
     }
   };

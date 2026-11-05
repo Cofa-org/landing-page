@@ -1,4 +1,5 @@
 import { NetworkError } from "./network-error";
+import { safeGetLocalStorageItem } from "./safe-storage.js";
 
 function isRetryableNetworkError(err) {
   if (err instanceof TypeError) return true;
@@ -49,7 +50,7 @@ export async function HttpApi(url, body, method, apiKey, token, signal = null, r
   const xhrRequest = () => new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open(method, url);
-    const cbSessionId = typeof window !== "undefined" ? localStorage.getItem("callbell_session_id") : null;
+    const cbSessionId = getCallbellSessionId();
     if (apiKey) xhr.setRequestHeader("x-api-key", apiKey);
     if (token) xhr.setRequestHeader("Authorization", `Bearer ${token}`);
     if (cbSessionId) xhr.setRequestHeader("x-callbell-session-id", cbSessionId);
@@ -87,7 +88,7 @@ export async function HttpApi(url, body, method, apiKey, token, signal = null, r
   });
 
   const buildOptions = () => {
-    const cbSessionId = typeof window !== "undefined" ? localStorage.getItem("callbell_session_id") : null;
+    const cbSessionId = getCallbellSessionId();
     return {
       credentials: "include",
       headers: {
@@ -124,4 +125,26 @@ export async function HttpApi(url, body, method, apiKey, token, signal = null, r
     }
   }
   throw shouldWrap ? new NetworkError(lastError) : lastError;
+}
+
+/**
+ * Resuelve el session id de Callbell que viaja en el header
+ * `x-callbell-session-id`.
+ *
+ * Fuente de verdad: `window.callbellSettings.extra_params.identifier`, que
+ * `index.html` publica en el `<head>` (línea 123) — siempre presente en el
+ * navegador, incluso cuando `localStorage` está bloqueado. Es el mismo
+ * valor que el widget de Callbell manda de vuelta en
+ * `contact.customFields.identifier`, así que usarlo garantiza que el header
+ * y el webhook hablen del mismo id.
+ *
+ * Fallback: `localStorage`, para cuando el global no existe (tests, o si el
+ * script inline del `<head>` no llegó a ejecutarse).
+ *
+ * @returns {string|null} El session id, o `null` si no hay ninguno.
+ */
+function getCallbellSessionId() {
+  const fromWidget = window.callbellSettings?.extra_params?.identifier;
+  if (fromWidget) return fromWidget;
+  return safeGetLocalStorageItem("callbell_session_id");
 }
