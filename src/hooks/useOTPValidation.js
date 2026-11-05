@@ -1,5 +1,10 @@
 import { useState, useRef, useEffect } from "react";
 import { OTP_CONFIG } from "../constants/LOAN_SIM.js";
+import {
+  safeGetLocalStorageItem,
+  safeRemoveLocalStorageItem,
+  safeSetLocalStorageItem,
+} from "../lib/safe-storage.js";
 
 export const useOTPValidation = ({ destination, onValidate, onResend, otpLength = OTP_CONFIG.OTP_EMAIL_LENGTH }) => {
   const [otp, setOtp] = useState(() => new Array(otpLength).fill(""));
@@ -11,11 +16,11 @@ export const useOTPValidation = ({ destination, onValidate, onResend, otpLength 
   }, []);
 
   useEffect(() => {
-    const savedExpiry = localStorage.getItem("otp_cooldown_expiry");
+    const savedExpiry = safeGetLocalStorageItem("otp_cooldown_expiry");
     if (savedExpiry) {
       const remaining = Math.ceil((parseInt(savedExpiry, 10) - Date.now()) / 1000);
       if (remaining > 0) setCooldown(remaining);
-      else localStorage.removeItem("otp_cooldown_expiry");
+      else safeRemoveLocalStorageItem("otp_cooldown_expiry");
     }
   }, []);
 
@@ -25,7 +30,7 @@ export const useOTPValidation = ({ destination, onValidate, onResend, otpLength 
       setCooldown((prev) => {
         const next = prev - 1;
         if (next <= 0) {
-          localStorage.removeItem("otp_cooldown_expiry");
+          safeRemoveLocalStorageItem("otp_cooldown_expiry");
           return 0;
         }
         return next;
@@ -78,7 +83,7 @@ export const useOTPValidation = ({ destination, onValidate, onResend, otpLength 
     if (onResend) {
       await onResend(destination);
       const expiry = Date.now() + OTP_CONFIG.COOLDOWN_DURATION * 1000;
-      localStorage.setItem("otp_cooldown_expiry", expiry.toString());
+      safeSetLocalStorageItem("otp_cooldown_expiry", expiry.toString());
       setCooldown(OTP_CONFIG.COOLDOWN_DURATION);
     }
   };
