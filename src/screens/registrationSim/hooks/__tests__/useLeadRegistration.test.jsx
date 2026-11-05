@@ -52,7 +52,9 @@ describe("useLeadRegistration - validación de celular", () => {
     });
 
     expect(r).toEqual({ success: false, validationFailed: true });
-    expect(result.current.errors.celular).toBe("Ingresá los 10 dígitos de tu celular");
+    expect(result.current.errors.celular).toBe(
+      "Te faltan 8 dígitos. Ingresá los 10 dígitos de tu celular.",
+    );
     expect(LeadRegistrationService.crearLead).not.toHaveBeenCalled();
   });
 
@@ -72,7 +74,9 @@ describe("useLeadRegistration - validación de celular", () => {
     });
 
     expect(r).toEqual({ success: false, validationFailed: true });
-    expect(result.current.errors.celular).toBe("Ingresá los 10 dígitos de tu celular");
+    expect(result.current.errors.celular).toBe(
+      "Te faltan 1 dígitos. Ingresá los 10 dígitos de tu celular.",
+    );
     expect(LeadRegistrationService.crearLead).not.toHaveBeenCalled();
   });
 

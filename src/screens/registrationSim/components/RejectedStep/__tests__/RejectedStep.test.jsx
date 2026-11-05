@@ -7,7 +7,7 @@ describe("RejectedStep", () => {
   it("renderiza el mensaje base sin línea de fecha si no se pasa prop", () => {
     render(<RejectedStep />);
     expect(
-      screen.getByText(/Pero seguiremos buscando alternativas/),
+      screen.getByText(/Podés volver a intentarlo más adelante\./),
     ).toBeInTheDocument();
     expect(
       screen.queryByText(/Podés volver a intentarlo a partir del/),
