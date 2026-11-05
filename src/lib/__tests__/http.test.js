@@ -78,6 +78,7 @@ describe("HttpApi", () => {
 
   afterEach(() => {
     vi.useRealTimers();
+    delete window.callbellSettings;
   });
 
   it("fetch first attempt success returns response", async () => {
@@ -405,4 +406,69 @@ describe("HttpApi", () => {
     const body = await result.json();
     expect(body).toEqual({ after_timeout: true });
   });
+  it("usa el identifier de window.callbellSettings como fuente del header", async () => {
+    window.callbellSettings = { extra_params: { identifier: "desde-el-widget" } };
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(buildResponse(200, { ok: true }));
+    global.fetch = fetchMock;
+
+    await HttpApi(
+      "https://example.com/api",
+      { foo: "bar" },
+      "POST",
+      "key",
+      "tok"
+    );
+
+    const [, options] = fetchMock.mock.calls[0];
+    expect(options.headers["x-callbell-session-id"]).toBe("desde-el-widget");
+    expect(global.localStorage.getItem).not.toHaveBeenCalled();
+  });
+
+  it("cae a localStorage cuando no hay identifier en window.callbellSettings", async () => {
+    global.localStorage.getItem.mockReturnValue("desde-localstorage");
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(buildResponse(200, { ok: true }));
+    global.fetch = fetchMock;
+
+    await HttpApi(
+      "https://example.com/api",
+      { foo: "bar" },
+      "POST",
+      "key",
+      "tok"
+    );
+
+    const [, options] = fetchMock.mock.calls[0];
+    expect(options.headers["x-callbell-session-id"]).toBe("desde-localstorage");
+  });
+
+  it("completa la request aunque el browser deniegue el acceso a localStorage", async () => {
+    vi.spyOn(window, "localStorage", "get").mockImplementation(() => {
+      throw new DOMException(
+        "Failed to read the 'localStorage' property from 'Window': Access is denied for this document.",
+        "SecurityError",
+      );
+    });
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(buildResponse(200, { ok: true }));
+    global.fetch = fetchMock;
+
+    const result = await HttpApi(
+      "https://example.com/api",
+      { foo: "bar" },
+      "POST",
+      "key",
+      "tok"
+    );
+
+    expect(result.status).toBe(200);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const [, options] = fetchMock.mock.calls[0];
+    expect(options.headers["x-callbell-session-id"]).toBeUndefined();
+  });
+
 });
