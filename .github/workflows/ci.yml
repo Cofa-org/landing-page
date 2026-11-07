@@ -1,0 +1,53 @@
+name: CI
+
+# Corre los tests del front en cada push y en cada PR hacia las ramas
+# que despliegan a Railway: `development` (staging/dev) y `main` (producción).
+on:
+  push:
+    branches:
+      - development
+      - main
+  pull_request:
+    branches:
+      - development
+      - main
+
+# Si se empuja otra vez sobre la misma rama, se cancela el run anterior.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  # El `name` del job es el nombre del status check que hay que marcar como
+  # "required" en la branch protection de GitHub (Settings → Branches).
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          # node-version mirrora `engines.node` de package.json ("22.x").
+          node-version: 22
+          # Cachea el ~/.npm usando package-lock.json como key.
+          cache: npm
+
+      - name: Subir npm a la versión declarada
+        # `engines.npm` pide >= 11.10.0 y el npm que trae Node 22 es 10.x.
+        run: npm install -g npm@11
+
+      - name: Instalar dependencias
+        # `npm ci` (y no `npm install`) para instalar exactamente lo que dice
+        # el lockfile y fallar si package.json y package-lock.json no coinciden.
+        run: npm ci
+
+      - name: Correr los tests
+        run: npm test
