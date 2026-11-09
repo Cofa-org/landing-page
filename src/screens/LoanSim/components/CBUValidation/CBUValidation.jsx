@@ -107,10 +107,10 @@ const CBUValidation = ({
 
   return (
     <GenericForm
-      title='Validá tu CBU'
+      title={isClient && !isUpdating ? "Validá tu CBU/CVU" : "Validá tu CBU"}
       description={
         isClient && !isUpdating
-          ? "Verificá que tu CBU sea el correcto para recibir el préstamo."
+          ? "Verificá que tu CBU/CVU sea el correcto para recibir el préstamo."
           : `Ingresá los ${CBU_LENGTH} dígitos de tu ${accountType.toUpperCase()} para validar tu cuenta bancaria.`
       }
       onSubmit={handleSubmit}
@@ -120,7 +120,7 @@ const CBUValidation = ({
       {isClient && !isUpdating ? (
         <div className={styles.clientContainer}>
           <div className={styles.cbuBox}>{existingCbu}</div>
-          <p className={styles.helperText}>¿Es este tu CBU correcto?</p>
+          <p className={styles.helperText}>¿Es este tu CBU/CVU correcto?</p>
           {termsCheckbox}
           <div className={styles.buttonGroup}>
             <GenericButton

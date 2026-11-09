@@ -114,6 +114,9 @@ describe("CBUValidation — CBU ya validado por el asesor (Plan 2026-10-20)", ()
       />,
     );
     expect(screen.queryByTestId("cbu-validation-approved")).toBeNull();
+    expect(screen.getByRole("heading", { name: "Validá tu CBU/CVU" })).toBeInTheDocument();
+    expect(screen.getByText("Verificá que tu CBU/CVU sea el correcto para recibir el préstamo.")).toBeInTheDocument();
+    expect(screen.getByText("¿Es este tu CBU/CVU correcto?")).toBeInTheDocument();
   });
 
   it("sin cbuValidado, el flujo normal sigue funcionando: 'Sí, es correcto' manda el CBU del ERP", () => {
