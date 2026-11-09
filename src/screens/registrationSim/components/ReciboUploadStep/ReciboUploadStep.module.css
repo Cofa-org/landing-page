@@ -339,8 +339,18 @@
 }
 
 .receiptHelp h4 {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
   margin: 0 0 var(--spacing-sm);
   font-size: 1rem;
+  color: var(--primary-color);
+}
+
+.receiptHelpIcon {
+  flex-shrink: 0;
+  font-size: 1.25em;
+  color: var(--primary-color);
 }
 
 .receiptHelp ul {

@@ -1,5 +1,6 @@
 import React, { memo } from "react";
 import PropTypes from "prop-types";
+import { FaInfoCircle } from "react-icons/fa";
 import GenericButton from "../../../../Components/buttons/GenericButton/GenericButton.jsx";
 import GenericForm from "../../../../Components/Forms/GenericForm/GenericForm.jsx";
 import { useReciboUploadStep } from "../../hooks/useReciboUploadStep.js";
@@ -22,8 +23,19 @@ const ReciboUploadForm = (props) => {
       className={styles.formTemplateContainer}
       children_className={styles.formTemplate}
     >
-      <section className={styles.receiptHelp} aria-labelledby='receipt-help-title'>
-        <h4 id='receipt-help-title'>Tené en cuenta</h4>
+      <section
+        className={styles.receiptHelp}
+        aria-labelledby='receipt-help-title'
+      >
+        <h4 id='receipt-help-title'>
+          <FaInfoCircle
+            fill='#1A6A3D'
+            className={styles.receiptHelpIcon}
+            aria-hidden='true'
+            focusable='false'
+          />
+          Tené en cuenta
+        </h4>
         <ul>
           <li>
             <strong>Cobro mensual: </strong>
@@ -31,7 +43,11 @@ const ReciboUploadForm = (props) => {
           </li>
           <li>
             <strong>Cobro quincenal: </strong>
-            <span>Adjuntá los recibos de la primera y segunda quincena del último mes completo. Cargá uno en el espacio disponible y presioná ‘Agregar otro recibo’ para adjuntar el segundo.</span>
+            <span>
+              Adjuntá los recibos de la primera y segunda quincena del último mes completo. Cargá
+              uno en el espacio disponible y presioná ‘Agregar otro recibo’ para adjuntar el
+              segundo.
+            </span>
           </li>
         </ul>
       </section>
@@ -45,10 +61,22 @@ const ReciboUploadForm = (props) => {
         aria-label='Recibos de sueldo'
       >
         {hydrating ? (
-          <div data-testid='hydration-skeleton' className={styles.skeletonSlot} aria-hidden='true' />
-        ) : visibleSlots.map(({ orden, slot }) => (
-          <ReciboSlotTile key={orden} orden={orden} slot={slot} onAddFile={addFileToSlot} onClear={clearSlot} />
-        ))}
+          <div
+            data-testid='hydration-skeleton'
+            className={styles.skeletonSlot}
+            aria-hidden='true'
+          />
+        ) : (
+          visibleSlots.map(({ orden, slot }) => (
+            <ReciboSlotTile
+              key={orden}
+              orden={orden}
+              slot={slot}
+              onAddFile={addFileToSlot}
+              onClear={clearSlot}
+            />
+          ))
+        )}
       </fieldset>
 
       <div className={styles.receiptActions}>
@@ -66,11 +94,35 @@ const ReciboUploadForm = (props) => {
         ) : null}
         <p className={styles.receiptLimit}>{limitMessage}</p>
       </div>
-      <p role='status' className={styles.screenReaderOnly}>{slotsAnnouncement}</p>
-      {displayError ? <p role='alert' className={styles.error}>{displayError}</p> : null}
+      <p
+        role='status'
+        className={styles.screenReaderOnly}
+      >
+        {slotsAnnouncement}
+      </p>
+      {displayError ? (
+        <p
+          role='alert'
+          className={styles.error}
+        >
+          {displayError}
+        </p>
+      ) : null}
 
-      <GenericButton type='submit' loading={isLoading} disabled={isContinueDisabled}>Continuar</GenericButton>
-      <GenericButton type='button' variant='secondary' onClick={handleContactAdvisor}>Comunicarse con un asesor</GenericButton>
+      <GenericButton
+        type='submit'
+        loading={isLoading}
+        disabled={isContinueDisabled}
+      >
+        Continuar
+      </GenericButton>
+      <GenericButton
+        type='button'
+        variant='secondary'
+        onClick={handleContactAdvisor}
+      >
+        Comunicarse con un asesor
+      </GenericButton>
     </GenericForm>
   );
 };
