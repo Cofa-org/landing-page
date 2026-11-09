@@ -6,6 +6,7 @@
 export const RESUME_ACCION = {
   RETOMAR_REGISTRO: "retomar_registro",
   CONTINUAR_SIMULACION: "continuar_simulacion",
+  VER_PRESTAMO: "ver_prestamo",
 };
 
 const SIM_EN_CURSO = new Set([
@@ -24,9 +25,62 @@ const ONBOARDING_INCOMPLETO = new Set([
   "DNI_SUBIDO",
   "RECIBO_SUBIDO",
   "PHONE_PICKER",
+  "EMAIL_PENDING_ADVISOR",
   "PENDIENTE",
   "REALIZADO",
 ]);
+
+const ONBOARDING_LABEL = {
+  LEAD_CREADO: "Solicitud iniciada",
+  PHONE_PICKER: "Selección de teléfono pendiente",
+  EMAIL_PENDING_ADVISOR: "Actualización de email pendiente",
+  CELULAR_VALIDADO: "Celular validado",
+  DNI_SUBIDO: "DNI cargado",
+  RECIBO_SUBIDO: "Recibo cargado",
+  ONBOARDING_COMPLETO: "Registro completo",
+  EN_ANALISIS: "En análisis",
+  RECHAZADO: "Solicitud no aprobada",
+  PENDIENTE: "Pendiente",
+  REALIZADO: "Realizado",
+};
+
+const SIM_EN_CURSO_VISTA = {
+  PENDIENTE: {
+    label: "Pendiente",
+    boton: "Continuar simulación",
+    descripcion: "Elegí el préstamo para continuar.",
+  },
+  SIMULACION: {
+    label: "Simulación disponible",
+    boton: "Continuar simulación",
+    descripcion: "Elegí el préstamo para continuar.",
+  },
+  EMAIL_VALIDATION: {
+    label: "Validación de email pendiente",
+    boton: "Validar email",
+    descripcion: "Validá el email para continuar.",
+  },
+  OTP_VALIDATION: {
+    label: "Código de validación pendiente",
+    boton: "Ingresar código OTP",
+    descripcion: "Ingresá el código OTP para continuar.",
+  },
+  COMPLIANCE: {
+    label: "Declaración PEP/SO pendiente",
+    boton: "Completar declaración",
+    descripcion: "Completá la declaración PEP/SO.",
+  },
+  CBU_VALIDATION: {
+    label: "Validación de CBU/CVU",
+    boton: "Ingresar o confirmar CBU/CVU",
+    descripcion: "Ingresá o confirmá tu CBU/CVU.",
+  },
+  MOBBEX_SUBSCRIPTION: {
+    label: "Suscripción pendiente",
+    boton: "Continuar o reintentar",
+    descripcion: "Continuá o reintentá la suscripción.",
+  },
+};
 
 export function addDays(iso, days) {
   if (!iso) return null;
@@ -35,7 +89,7 @@ export function addDays(iso, days) {
 
 function noAprobada(fechaRechazo) {
   return {
-    label: "No aprobada",
+    label: "Solicitud no aprobada",
     tipo: "danger",
     descripcion: null,
     accion: null,
@@ -54,32 +108,77 @@ function enAnalisis() {
 }
 
 function continuarSimulacion(simEstado) {
-  const detalle = {
-    PENDIENTE: "Elegí el préstamo para continuar.",
-    SIMULACION: "Elegí el préstamo para continuar.",
-    EMAIL_VALIDATION: "Falta validar el email de la simulación.",
-    OTP_VALIDATION: "Falta el código de la simulación.",
-    COMPLIANCE: "Falta completar la documentación.",
-    CBU_VALIDATION: "Falta validar el CBU.",
-    MOBBEX_SUBSCRIPTION: "Falta la firma y el débito.",
-  };
+  const vista = SIM_EN_CURSO_VISTA[simEstado];
   return {
-    label: "Solicitud incompleta",
+    label: vista?.label || "Simulación disponible",
     tipo: "neutral",
-    descripcion: detalle[simEstado] || "Continuá la simulación de tu préstamo.",
+    descripcion: vista?.descripcion || "Continuá la simulación de tu préstamo.",
     accion: RESUME_ACCION.CONTINUAR_SIMULACION,
+    boton: vista?.boton || "Continuá tu simulación →",
     retryDate: null,
   };
 }
 
-function retomarRegistro() {
+function retomarRegistro(onboarding) {
   return {
-    label: "Solicitud incompleta",
+    label: ONBOARDING_LABEL[onboarding] || "Solicitud incompleta",
     tipo: "neutral",
     descripcion: "Retomá tu registro donde lo dejaste.",
     accion: RESUME_ACCION.RETOMAR_REGISTRO,
     retryDate: null,
   };
+}
+
+function prestamoCompletado() {
+  return {
+    label: "Préstamo completado",
+    tipo: "success",
+    descripcion: "Tu préstamo fue procesado exitosamente.",
+    accion: RESUME_ACCION.VER_PRESTAMO,
+    boton: "Ver préstamo",
+    retryDate: null,
+  };
+}
+
+function registroCompleto() {
+  return {
+    label: "Registro completo",
+    tipo: "neutral",
+    descripcion: "Continuá la simulación de tu préstamo.",
+    accion: RESUME_ACCION.CONTINUAR_SIMULACION,
+    retryDate: null,
+  };
+}
+
+function vistaSimulacionSinContinuar(simEstado) {
+  if (simEstado === "PENDING_CBU_VALIDATION") {
+    return {
+      label: "CBU/CVU en revisión",
+      tipo: "warning",
+      descripcion: "Esperá la resolución de Operaciones.",
+      accion: null,
+      retryDate: null,
+    };
+  }
+  if (simEstado === "DISPOSITIVO_RECHAZADO") {
+    return {
+      label: "Dispositivo rechazado",
+      tipo: "danger",
+      descripcion: "No podés continuar con esta simulación.",
+      accion: null,
+      retryDate: null,
+    };
+  }
+  if (simEstado === "RECHAZADO") {
+    return {
+      label: "Operación no aprobada",
+      tipo: "danger",
+      descripcion: "Esta operación no fue aprobada.",
+      accion: null,
+      retryDate: null,
+    };
+  }
+  return null;
 }
 
 /**
@@ -94,9 +193,9 @@ function retomarRegistro() {
  * Prioridad:
  *  1. onboarding RECHAZADO / EN_ANALISIS
  *  2. onboarding incompleto → retomar registro (ignora gestión y préstamo SB)
- *  3. Préstamo SB → "Solicitud finalizada"
+ *  3. Préstamo SB → "Préstamo completado"
  *  4. sim en curso → continuar simulación
- *  5. ONBOARDING_COMPLETO → continuar sim, salvo gestión/sim terminales
+ *  5. ONBOARDING_COMPLETO → etiqueta de la simulación, sin continuar si está en revisión, rechazada o con dispositivo rechazado
  *  6. gestión ACEPTADO / RECHAZADO / ANALIZAR
  */
 export function resolveEstado(solicitud) {
@@ -122,21 +221,15 @@ export function resolveEstado(solicitud) {
   }
 
   if (ONBOARDING_INCOMPLETO.has(onboarding)) {
-    return retomarRegistro();
+    return retomarRegistro(onboarding);
   }
 
   if (prestamo?.idPrestamoDB) {
-    return {
-      label: "Solicitud finalizada",
-      tipo: "success",
-      descripcion: "Tu préstamo fue procesado exitosamente.",
-      accion: null,
-      retryDate: null,
-    };
+    return prestamoCompletado();
   }
 
   if (!onboarding) {
-    return retomarRegistro();
+    return retomarRegistro(onboarding);
   }
 
   if (simEstado && SIM_EN_CURSO.has(simEstado)) {
@@ -150,13 +243,7 @@ export function resolveEstado(solicitud) {
         return noAprobada(fechaRechazo);
       }
       if (gestion === "ACEPTADO") {
-        return {
-          label: "Aprobada",
-          tipo: "success",
-          descripcion: "Tu solicitud fue aprobada. Estamos gestionando tu préstamo.",
-          accion: null,
-          retryDate: null,
-        };
+        return prestamoCompletado();
       }
       return enAnalisis();
     }
@@ -164,11 +251,17 @@ export function resolveEstado(solicitud) {
       const fechaRechazo = fechaEstadoGestion ?? estadoOnboardingFecha ?? null;
       return noAprobada(fechaRechazo);
     }
+    const sinContinuar = vistaSimulacionSinContinuar(simEstado);
+    if (sinContinuar) return sinContinuar;
     if (gestion === "ANALIZAR") {
       return enAnalisis();
     }
+    if (!simEstado) return registroCompleto();
     return continuarSimulacion(simEstado);
   }
+
+  const sinContinuar = vistaSimulacionSinContinuar(simEstado);
+  if (sinContinuar) return sinContinuar;
 
   if (gestion === "ACEPTADO") {
     return {
@@ -189,5 +282,5 @@ export function resolveEstado(solicitud) {
     return enAnalisis();
   }
 
-  return retomarRegistro();
+  return retomarRegistro(onboarding);
 }

@@ -57,16 +57,22 @@ function SolicitudCard({ solicitud, onRetomar, retomando }) {
       {/* Descripción del estado */}
       {estado.tipo === "danger" ? (
         <p className={styles.estadoDesc}>
-          Tu solicitud no ha sido aprobada.{" "}
+          {estado.descripcion || "Tu solicitud no ha sido aprobada."}
           {estado.retryDate
-            ? `Podés volver a intentarlo a partir del ${formatDate(estado.retryDate.toISOString())}.`
-            : "Comunicarte con un asesor para más información."}
+            ? ` Podés volver a intentarlo a partir del ${formatDate(estado.retryDate.toISOString())}.`
+            : estado.descripcion
+              ? ""
+              : " Comunicarte con un asesor para más información."}
         </p>
       ) : estado.descripcion ? (
         <p className={styles.estadoDesc}>{estado.descripcion}</p>
       ) : null}
 
-      {estado.accion && onRetomar && (
+      {estado.accion === RESUME_ACCION.VER_PRESTAMO ? (
+        <Link to="/mi-perfil/prestamos" className={styles.retakeBtn}>
+          {estado.boton || "Ver préstamo"}
+        </Link>
+      ) : estado.accion && onRetomar ? (
         <button
           type="button"
           className={styles.retakeBtn}
@@ -75,11 +81,12 @@ function SolicitudCard({ solicitud, onRetomar, retomando }) {
         >
           {retomando
             ? "Cargando…"
-            : estado.accion === RESUME_ACCION.CONTINUAR_SIMULACION
-              ? "Continuá tu simulación →"
-              : "Retomá tu registro →"}
+            : estado.boton ||
+              (estado.accion === RESUME_ACCION.CONTINUAR_SIMULACION
+                ? "Continuá tu simulación →"
+                : "Retomá tu registro →")}
         </button>
-      )}
+      ) : null}
 
       {/* Detalle del préstamo (si existe) */}
       {prestamo &&

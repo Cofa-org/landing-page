@@ -124,7 +124,7 @@ describe("MisSolicitudesScreen — botón Retomar", () => {
       ],
     });
     renderScreen();
-    await screen.findByText("Aprobada");
+    await screen.findByText("Préstamo completado");
     expect(screen.queryByRole("button", { name: /retomá tu registro/i })).toBeNull();
   });
 
@@ -158,7 +158,7 @@ describe("MisSolicitudesScreen — botón Retomar", () => {
       solicitudes: [make({ estadoOnboarding: "RECHAZADO", estadoOnboardingFecha: "2026-07-01T00:00:00.000Z" })],
     });
     renderScreen();
-    await screen.findByText("No aprobada");
+    await screen.findByText("Solicitud no aprobada");
     expect(screen.queryByRole("button", { name: /retomá tu registro/i })).toBeNull();
   });
 
@@ -167,7 +167,7 @@ describe("MisSolicitudesScreen — botón Retomar", () => {
       solicitudes: [make({ prestamo: { idPrestamoDB: "SB-001", capitalSeleccionado: 50000 } })],
     });
     renderScreen();
-    await screen.findByText("Solicitud finalizada");
+    await screen.findByText("Préstamo completado");
     expect(screen.queryByRole("button", { name: /retomá tu registro/i })).toBeNull();
   });
 

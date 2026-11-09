@@ -29,30 +29,30 @@ const base = {
 /* ─────────────────────────────────────────────────────────────────── */
 
 describe("resolveEstado — 6 estados", () => {
-  it("ONBOARDING_COMPLETO con idPrestamoDB → Solicitud finalizada", () => {
+  it("ONBOARDING_COMPLETO con idPrestamoDB → Préstamo completado", () => {
     const r = resolveEstado({
       ...base,
       estadoOnboarding: "ONBOARDING_COMPLETO",
       prestamo: { idPrestamoDB: "SB-123" },
     });
-    expect(r.label).toBe("Solicitud finalizada");
-    expect(r.accion).toBeNull();
+    expect(r.label).toBe("Préstamo completado");
+    expect(r.accion).toBe("ver_prestamo");
   });
 
-  it("préstamo SB sin estado de onboarding → Solicitud finalizada", () => {
+  it("préstamo SB sin estado de onboarding → Préstamo completado", () => {
     const r = resolveEstado({ ...base, prestamo: { idPrestamoDB: "SB-123" } });
-    expect(r.label).toBe("Solicitud finalizada");
+    expect(r.label).toBe("Préstamo completado");
     expect(r.tipo).toBe("success");
     expect(r.retryDate).toBeNull();
   });
 
-  it("LEAD_CREADO con idPrestamoDB → Solicitud incompleta (onboarding manda)", () => {
+  it("LEAD_CREADO con idPrestamoDB → Solicitud iniciada (onboarding manda)", () => {
     const r = resolveEstado({
       ...base,
       estadoOnboarding: "LEAD_CREADO",
       prestamo: { idPrestamoDB: "SB-123" },
     });
-    expect(r.label).toBe("Solicitud incompleta");
+    expect(r.label).toBe("Solicitud iniciada");
     expect(r.accion).toBe("retomar_registro");
   });
 
@@ -65,16 +65,16 @@ describe("resolveEstado — 6 estados", () => {
     expect(r.accion).toBe("retomar_registro");
   });
 
-  it("2. gestión ACEPTADO + sim COMPLETADO → Aprobada", () => {
+  it("2. gestión ACEPTADO + sim COMPLETADO → Préstamo completado", () => {
     const r = resolveEstado({
       ...base,
       estadoOnboarding: "ONBOARDING_COMPLETO",
       estadoGestion: "ACEPTADO",
       prestamo: { estado: "COMPLETADO" },
     });
-    expect(r.label).toBe("Aprobada");
+    expect(r.label).toBe("Préstamo completado");
     expect(r.tipo).toBe("success");
-    expect(r.accion).toBeNull();
+    expect(r.accion).toBe("ver_prestamo");
   });
 
   it("2b. gestión ACEPTADO no pisa onboarding incompleto", () => {
@@ -83,7 +83,7 @@ describe("resolveEstado — 6 estados", () => {
       estadoOnboarding: "LEAD_CREADO",
       estadoGestion: "ACEPTADO",
     });
-    expect(r.label).toBe("Solicitud incompleta");
+    expect(r.label).toBe("Solicitud iniciada");
     expect(r.accion).toBe("retomar_registro");
   });
 
@@ -106,7 +106,7 @@ describe("resolveEstado — 6 estados", () => {
       fechaEstadoGestion: fechaGestion,
       estadoOnboardingFecha: hace(20), // fecha de onboarding más antigua
     });
-    expect(r.label).toBe("No aprobada");
+    expect(r.label).toBe("Solicitud no aprobada");
     expect(r.tipo).toBe("danger");
     // retryDate = fechaGestion + 45 días (≈ 35 días en el futuro)
     const expectedRetry = addDays(fechaGestion, 45);
@@ -128,7 +128,7 @@ describe("resolveEstado — 6 estados", () => {
       estadoOnboardingFecha: fechaRealRechazo, // ← fecha REAL del rechazo
     });
 
-    expect(r.label).toBe("No aprobada");
+    expect(r.label).toBe("Solicitud no aprobada");
     // retryDate debe basarse en fechaRealRechazo, NO en fechaTrigger
     // Si usara fechaTrigger: retry = hoy + 45 (dentro de 45 días)
     // Si usa fechaRealRechazo: retry = hace78días + 45 (hace 33 días, ya pasó)
@@ -145,7 +145,7 @@ describe("resolveEstado — 6 estados", () => {
       estadoGestion: "RECHAZADO",
       estadoOnboarding: "RECHAZADO",
     });
-    expect(r.label).toBe("No aprobada");
+    expect(r.label).toBe("Solicitud no aprobada");
     expect(r.retryDate).toBeNull();
   });
 
@@ -156,7 +156,7 @@ describe("resolveEstado — 6 estados", () => {
       estadoOnboarding: "RECHAZADO",
       estadoOnboardingFecha: fechaRechazo,
     });
-    expect(r.label).toBe("No aprobada");
+    expect(r.label).toBe("Solicitud no aprobada");
     const expectedRetry = addDays(fechaRechazo, 45);
     expect(r.retryDate.toISOString().slice(0, 10)).toBe(expectedRetry.toISOString().slice(0, 10));
   });
@@ -199,7 +199,7 @@ describe("resolveEstado — 6 estados", () => {
       estadoOnboarding: "RECIBO_SUBIDO",
       estadoGestion: "ANALIZAR",
     });
-    expect(r.label).toBe("Solicitud incompleta");
+    expect(r.label).toBe("Recibo cargado");
     expect(r.accion).toBe("retomar_registro");
   });
 
@@ -211,7 +211,7 @@ describe("resolveEstado — 6 estados", () => {
 
   it("5c. onboarding ONBOARDING_COMPLETO → continuar simulación", () => {
     const r = resolveEstado({ ...base, estadoOnboarding: "ONBOARDING_COMPLETO" });
-    expect(r.label).toBe("Solicitud incompleta");
+    expect(r.label).toBe("Registro completo");
     expect(r.accion).toBe("continuar_simulacion");
   });
 
@@ -241,14 +241,52 @@ describe("resolveEstado — 6 estados", () => {
     expect(r.retryDate).toBeNull();
   });
 
-  it("6b. LEAD_CREADO → Solicitud incompleta", () => {
+  it("6b. LEAD_CREADO → Solicitud iniciada", () => {
     const r = resolveEstado({ ...base, estadoOnboarding: "LEAD_CREADO" });
-    expect(r.label).toBe("Solicitud incompleta");
+    expect(r.label).toBe("Solicitud iniciada");
   });
 
-  it("6c. DNI_SUBIDO → Solicitud incompleta", () => {
+  it("6c. DNI_SUBIDO → DNI cargado", () => {
     const r = resolveEstado({ ...base, estadoOnboarding: "DNI_SUBIDO" });
-    expect(r.label).toBe("Solicitud incompleta");
+    expect(r.label).toBe("DNI cargado");
+  });
+
+  it("PHONE_PICKER y EMAIL_PENDING_ADVISOR se retoman con su etiqueta", () => {
+    const picker = resolveEstado({ ...base, estadoOnboarding: "PHONE_PICKER" });
+    expect(picker.label).toBe("Selección de teléfono pendiente");
+    expect(picker.accion).toBe("retomar_registro");
+
+    const email = resolveEstado({ ...base, estadoOnboarding: "EMAIL_PENDING_ADVISOR" });
+    expect(email.label).toBe("Actualización de email pendiente");
+    expect(email.accion).toBe("retomar_registro");
+  });
+
+  it("PENDING_CBU_VALIDATION no ofrece continuar", () => {
+    const r = resolveEstado({
+      ...base,
+      estadoOnboarding: "ONBOARDING_COMPLETO",
+      prestamo: { estado: "PENDING_CBU_VALIDATION" },
+    });
+    expect(r.label).toBe("CBU/CVU en revisión");
+    expect(r.accion).toBeNull();
+  });
+
+  it("DISPOSITIVO_RECHAZADO y sim RECHAZADO no ofrecen continuar", () => {
+    const dispositivo = resolveEstado({
+      ...base,
+      estadoOnboarding: "ONBOARDING_COMPLETO",
+      prestamo: { estado: "DISPOSITIVO_RECHAZADO" },
+    });
+    expect(dispositivo.label).toBe("Dispositivo rechazado");
+    expect(dispositivo.accion).toBeNull();
+
+    const rechazada = resolveEstado({
+      ...base,
+      estadoOnboarding: "ONBOARDING_COMPLETO",
+      prestamo: { estado: "RECHAZADO" },
+    });
+    expect(rechazada.label).toBe("Operación no aprobada");
+    expect(rechazada.accion).toBeNull();
   });
 
   it("retryDate = 45 días exactos desde la fecha de rechazo", () => {
@@ -269,7 +307,7 @@ describe("resolveEstado — 6 estados", () => {
       estadoGestion: "ACEPTADO",
       prestamo: { idPrestamoDB: null, estado: "COMPLETADO", capitalSeleccionado: 50000 },
     });
-    expect(r.label).toBe("Aprobada");
+    expect(r.label).toBe("Préstamo completado");
   });
 
   it("estado_scoring RECHAZAR solo no activa No aprobada (solo gestión y onboarding importan)", () => {
