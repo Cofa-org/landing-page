@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import React from "react";
 import fs from "fs";
 import path from "path";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
 
 // Mocks: declarados ANTES de importar el componente bajo test.
 vi.mock("../../../../../services/leadRegistrationService.js", () => ({
@@ -48,6 +48,20 @@ describe("ReciboUploadStep", () => {
   });
 
   describe("renderizado inicial", () => {
+    it("bloquea los espacios vacíos durante el envío para no perder una selección tardía", async () => {
+      let finishUpload;
+      LeadRegistrationService.subirRecibos.mockReturnValue(new Promise(resolve => { finishUpload = resolve; }));
+      render(<ReciboUploadStep leadId={42} />);
+      await screen.findByTestId("slot-1-input");
+      fireEvent.click(screen.getByRole("button", { name: "Agregar otro recibo" }));
+      const pdf = new File(["synthetic"], "recibo.pdf", { type: "application/pdf" });
+      fireEvent.change(screen.getByTestId("slot-1-input"), { target: { files: [pdf] } });
+      fireEvent.click(screen.getByRole("button", { name: "Continuar" }));
+      expect(screen.getByTestId("slot-2-input")).toBeDisabled();
+      await act(async () => finishUpload({ success: true, data: { recibos: [{ orden: 1, recibo_id: "new" }] } }));
+      expect(screen.getByTestId("slot-2-input")).toBeEnabled();
+    });
+
     it("muestra el texto aprobado y ambas indicaciones sin selector de modalidad", async () => {
       render(<ReciboUploadStep leadId={42} />);
       await screen.findByTestId("slot-1-input");

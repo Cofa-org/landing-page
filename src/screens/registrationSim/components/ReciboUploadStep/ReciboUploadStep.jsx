@@ -36,13 +36,20 @@ const ReciboUploadForm = (props) => {
         </ul>
       </section>
 
-      <div id='receipt-upload-slots' className={styles.uploadAreaWrapper} ref={receiptSlotsRef} aria-busy={hydrating}>
+      <fieldset
+        id='receipt-upload-slots'
+        className={styles.uploadAreaWrapper}
+        ref={receiptSlotsRef}
+        disabled={isAddReceiptDisabled}
+        aria-busy={isAddReceiptDisabled}
+        aria-label='Recibos de sueldo'
+      >
         {hydrating ? (
           <div data-testid='hydration-skeleton' className={styles.skeletonSlot} aria-hidden='true' />
         ) : visibleSlots.map(({ orden, slot }) => (
           <ReciboSlotTile key={orden} orden={orden} slot={slot} onAddFile={addFileToSlot} onClear={clearSlot} />
         ))}
-      </div>
+      </fieldset>
 
       <div className={styles.receiptActions}>
         {canAddReceipt ? (
