@@ -1,180 +1,81 @@
-import React, { memo, useEffect, useState } from "react";
+import React, { memo } from "react";
 import PropTypes from "prop-types";
 import GenericButton from "../../../../Components/buttons/GenericButton/GenericButton.jsx";
 import GenericForm from "../../../../Components/Forms/GenericForm/GenericForm.jsx";
-import { useReciboUpload } from "../../hooks/useReciboUpload.js";
-import LeadRegistrationService from "../../../../services/leadRegistrationService.js";
-import { ONBOARDING_STATES } from "../../../../constants/LOAN_SIM.js";
+import { useReciboUploadStep } from "../../hooks/useReciboUploadStep.js";
 import ReciboSlotTile from "./ReciboSlotTile.jsx";
 import styles from "./ReciboUploadStep.module.css";
-import { openCallbellWebchat } from "../../../../utils/callbellHelpers.js";
 
-const MAX_SLOTS_BASE = 3;
-
-/**
- * Extrae el filename original del `storage_path` de un recibo persistido.
- * Shape esperado: `lead-123/PENDIENTE/RECIBO/recibo.jpg` → `"recibo.jpg"`.
- * Si `storage_path` es null/undefined/vacío, retorna `null` para que el slot
- * se hidrate igual pero sin nombre visible (backward compat con filas legacy).
- */
-const extractFilenameFromStoragePath = (storagePath) => {
-  if (!storagePath || typeof storagePath !== "string") return null;
-  const segments = storagePath.split("/").filter(Boolean);
-  return segments.length > 0 ? segments[segments.length - 1] : null;
-};
-
-/**
- * ReciboUploadStep — pantalla multi-recibo (hasta `maxSlots`).
- *
- * Cambios vs versión anterior:
- *  - Rinde hasta `maxSlots` `ReciboSlotTile` (cada uno expone su "+ Agregar Recibo N").
- *  - Al montar, si tenemos `leadId`, consulta `getRecibosPendientes` y
- *    rehidrata los slots llamando `setSlotHydrated` por cada recibo
- *    persistido en el back. Esto permite volver a esta pantalla sin
- *    perder los recibos ya subidos.
- *  - Refactored to batch upload via `uploadAll`.
- *  - Mantiene el routing post-submit: si el back transiciona al lead a
- *    `EN_ANALISIS`, navega a la pantalla de análisis; si no, flujo normal.
- *
- * `maxSlots` viene como prop del padre (default 3). En el path de resubida
- * (OnboardingFlowScreen resume branch, spec 2026-09-07), el back puede
- * devolver un número mayor si el operador requirió más de 3 recibos.
- */
-const ReciboUploadStep = ({
-  leadId,
-  maxSlots: maxSlotsProp,
-  onSuccess,
-  onAnalysisAfterRecibo,
-  loading,
-  error: externalError,
-}) => {
-  const maxSlots = maxSlotsProp ?? MAX_SLOTS_BASE;
+const ReciboUploadForm = (props) => {
   const {
-    slots,
-    isUploading,
-    uploadError,
-    isFormValid,
-    addFileToSlot,
-    clearSlot,
-    uploadAll,
-    setSlotHydrated,
-  } = useReciboUpload({ maxSlots });
-
-  // `hydrating` cubre la ventana de RTT de `getRecibosPendientes` para
-  // evitar el flash de 3 slots vacíos antes de que el back responda
-  // (Task 6). Initializa desde `Boolean(leadId)` para que el primer paint
-  // refleje inmediatamente el caso "sin RTT" cuando no hay leadId: muestra
-  // los 3 placeholders, no skeletons. Cuando `leadId` existe, el default
-  // `true` hace que el primer paint muestre skeletons mientras llega
-  // `getRecibosPendientes`; el effect de rehydration baja `hydrating` a
-  // `false` en su `finally`.
-  // (I2 — whole-branch review 2026-08-31)
-  const [hydrating, setHydrating] = useState(Boolean(leadId));
-
-  // Rehydrate from server on mount.
-  useEffect(() => {
-    if (!leadId) {
-      setHydrating(false);
-      return undefined;
-    }
-    let cancelled = false;
-    (async () => {
-      try {
-        const existentes = await LeadRegistrationService.getRecibosPendientes(leadId);
-        
-        if (cancelled) return;
-        for (const r of existentes) {
-          setSlotHydrated(r.orden, {
-            reciboId: r.recibo_id,
-            url: r.url,
-            mime: r.mime,
-            size: r.size,
-            filename: extractFilenameFromStoragePath(r.storage_path),
-          });
-        }
-      } catch (e) {
-        // Rehydration es best-effort: si falla, el usuario puede volver a
-        // subir. Solo logueamos para no romper la UX con un toast de error.
-        console.warn("RECIBOS_REHYDRATE_FAILED:", e);
-      } finally {
-        if (!cancelled) setHydrating(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [leadId, setSlotHydrated]);
-
-  const isLoading = loading || isUploading;
-  const displayError = uploadError || externalError;
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const result = await uploadAll(leadId);
-    if (result.success) {
-      const estado = result.data?.estado_onboarding;
-      if (estado === ONBOARDING_STATES.EN_ANALISIS) {
-        if (onAnalysisAfterRecibo) onAnalysisAfterRecibo(result.data);
-      } else if (onSuccess) {
-        onSuccess();
-      }
-    }
-  };
-
-  const visibleSlots = slots.slice(0, maxSlots);
+    visibleSlots, hydrating, isLoading, displayError, canAddReceipt,
+    isAddReceiptDisabled, isContinueDisabled, limitMessage, slotsAnnouncement,
+    receiptSlotsRef, handleAddReceipt, handleSubmit, addFileToSlot, clearSlot,
+    handleContactAdvisor,
+  } = useReciboUploadStep(props);
 
   return (
     <GenericForm
       title='Subí tu recibo de sueldo'
-      description='Necesitamos al menos un recibo para verificar tu capacidad de pago. Si cobrás por quincena o tenés varios comprobantes, podés subir hasta 3.'
+      description='Subí tu último recibo de sueldo así te podemos ofrecer el mejor préstamo para vos.'
       onSubmit={handleSubmit}
       className={styles.formTemplateContainer}
       children_className={styles.formTemplate}
     >
-      <div className={styles.uploadAreaWrapper}>
-        {hydrating
-          ? Array.from({ length: maxSlots }, (_, idx) => (
-              <div
-                key={idx}
-                data-testid='hydration-skeleton'
-                className={styles.skeletonSlot}
-                aria-hidden='true'
-              />
-            ))
-          : visibleSlots.map((slot, idx) => (
-              <ReciboSlotTile
-                key={idx}
-                orden={idx + 1}
-                slot={slot}
-                onAddFile={addFileToSlot}
-                onClear={clearSlot}
-                maxSlots={maxSlots}
-              />
-            ))}
+      <section className={styles.receiptHelp} aria-labelledby='receipt-help-title'>
+        <h4 id='receipt-help-title'>Tené en cuenta</h4>
+        <ul>
+          <li>
+            <strong>Cobro mensual: </strong>
+            <span>Adjuntá el recibo de sueldo correspondiente a tu último cobro.</span>
+          </li>
+          <li>
+            <strong>Cobro quincenal: </strong>
+            <span>Adjuntá los recibos de la primera y segunda quincena del último mes completo. Cargá uno en el espacio disponible y presioná ‘Agregar otro recibo’ para adjuntar el segundo.</span>
+          </li>
+        </ul>
+      </section>
+
+      <div id='receipt-upload-slots' className={styles.uploadAreaWrapper} ref={receiptSlotsRef} aria-busy={hydrating}>
+        {hydrating ? (
+          <div data-testid='hydration-skeleton' className={styles.skeletonSlot} aria-hidden='true' />
+        ) : visibleSlots.map(({ orden, slot }) => (
+          <ReciboSlotTile key={orden} orden={orden} slot={slot} onAddFile={addFileToSlot} onClear={clearSlot} />
+        ))}
       </div>
 
-      {displayError && <p className={styles.error}>{displayError}</p>}
+      <div className={styles.receiptActions}>
+        {canAddReceipt ? (
+          <GenericButton
+            type='button'
+            variant='secondary'
+            className={styles.addReceiptButton}
+            onClick={handleAddReceipt}
+            disabled={isAddReceiptDisabled}
+            aria-controls='receipt-upload-slots'
+          >
+            Agregar otro recibo
+          </GenericButton>
+        ) : null}
+        <p className={styles.receiptLimit}>{limitMessage}</p>
+      </div>
+      <p role='status' className={styles.screenReaderOnly}>{slotsAnnouncement}</p>
+      {displayError ? <p role='alert' className={styles.error}>{displayError}</p> : null}
 
-      <GenericButton
-        type='submit'
-        loading={isLoading}
-        disabled={!isFormValid || isLoading}
-      >
-        Continuar
-      </GenericButton>
-
-      <GenericButton
-        type='button'
-        variant='secondary'
-        onClick={openCallbellWebchat}
-      >
-        Comunicarse con un asesor
-      </GenericButton>
+      <GenericButton type='submit' loading={isLoading} disabled={isContinueDisabled}>Continuar</GenericButton>
+      <GenericButton type='button' variant='secondary' onClick={handleContactAdvisor}>Comunicarse con un asesor</GenericButton>
     </GenericForm>
   );
 };
 
-ReciboUploadStep.propTypes = {
+// Reset all local file state when the lead or the authorized capacity changes.
+const ReciboUploadStep = ({ leadId, maxSlots, ...props }) => (
+  <React.Fragment key={leadId}>
+    <ReciboUploadForm key={maxSlots} leadId={leadId} maxSlots={maxSlots} {...props} />
+  </React.Fragment>
+);
+
+const receiptStepPropTypes = {
   leadId: PropTypes.number,
   maxSlots: PropTypes.number,
   onSuccess: PropTypes.func,
@@ -182,5 +83,7 @@ ReciboUploadStep.propTypes = {
   loading: PropTypes.bool,
   error: PropTypes.string,
 };
+ReciboUploadForm.propTypes = receiptStepPropTypes;
+ReciboUploadStep.propTypes = receiptStepPropTypes;
 
 export default memo(ReciboUploadStep);

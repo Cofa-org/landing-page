@@ -48,25 +48,99 @@ describe("ReciboUploadStep", () => {
   });
 
   describe("renderizado inicial", () => {
-    it("renderiza 3 slots por defecto", async () => {
+    it("muestra el texto aprobado y ambas indicaciones sin selector de modalidad", async () => {
+      render(<ReciboUploadStep leadId={42} />);
+      await screen.findByTestId("slot-1-input");
+      expect(screen.getByText("Subí tu último recibo de sueldo así te podemos ofrecer el mejor préstamo para vos.")).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "Tené en cuenta" })).toBeInTheDocument();
+      expect(screen.getByText("Adjuntá el recibo de sueldo correspondiente a tu último cobro.")).toBeInTheDocument();
+      expect(screen.getByText("Adjuntá los recibos de la primera y segunda quincena del último mes completo. Cargá uno en el espacio disponible y presioná ‘Agregar otro recibo’ para adjuntar el segundo.")).toBeInTheDocument();
+      expect(screen.queryByRole("radio")).not.toBeInTheDocument();
+      expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Agregar otro recibo" })).toHaveAttribute("type", "button");
+    });
+
+    it("permite enviar un PDF aunque se hayan abierto tres espacios", async () => {
+      const onSuccess = vi.fn();
+      LeadRegistrationService.subirRecibos.mockResolvedValue({
+        success: true, data: { recibos: [{ orden: 1, recibo_id: "pdf" }], estado_onboarding: "RECIBO_SUBIDO" },
+      });
+      render(<ReciboUploadStep leadId={42} onSuccess={onSuccess} />);
+      await screen.findByTestId("slot-1-input");
+      fireEvent.click(screen.getByRole("button", { name: "Agregar otro recibo" }));
+      fireEvent.click(screen.getByRole("button", { name: "Agregar otro recibo" }));
+      const pdf = new File(["synthetic pdf"], "recibo.pdf", { type: "application/pdf" });
+      fireEvent.change(screen.getByTestId("slot-1-input"), { target: { files: [pdf] } });
+      fireEvent.click(screen.getByRole("button", { name: "Continuar" }));
+      await waitFor(() => expect(onSuccess).toHaveBeenCalledOnce());
+      expect(LeadRegistrationService.subirRecibos.mock.calls[0][1]).toEqual({ 1: pdf });
+    });
+
+    it("recarga agrega progresivamente hasta seis y muestra el máximo autorizado", async () => {
+      const { container } = render(<ReciboUploadStep leadId={42} maxSlots={6} />);
+      await screen.findByTestId("slot-1-input");
+      expect(countFileInputs(container)).toBe(1);
+      for (let click = 0; click < 5; click += 1) {
+        fireEvent.click(screen.getByRole("button", { name: "Agregar otro recibo" }));
+      }
+      expect(countFileInputs(container)).toBe(6);
+      expect(screen.getByText("Podés adjuntar hasta 6 recibos.")).toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "Agregar otro recibo" })).not.toBeInTheDocument();
+    });
+
+    it("muestra pendientes con huecos y el sexto sin exigir clicks", async () => {
+      LeadRegistrationService.getRecibosPendientes.mockResolvedValue([
+        { orden: 6, recibo_id: "six", url: "https://example.test/six.pdf", mime: "application/pdf", size: 100 },
+        { orden: 1, recibo_id: "one", url: "https://example.test/one.pdf", mime: "application/pdf", size: 100 },
+        { orden: 3, recibo_id: "three", url: "https://example.test/three.pdf", mime: "application/pdf", size: 100 },
+      ]);
+      render(<ReciboUploadStep leadId={42} maxSlots={6} />);
+      await screen.findByText("Recibo 6");
+      expect(screen.getByText("Recibo 1")).toBeInTheDocument();
+      expect(screen.getByText("Recibo 3")).toBeInTheDocument();
+      expect(screen.getByTestId("slot-2-input")).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Continuar" })).toBeDisabled();
+    });
+
+    it.each([[43, 6], [42, 3]])("cambiar lead/capacidad a %s/%s descarta archivos locales", async (leadId, maxSlots) => {
+      const { rerender } = render(<ReciboUploadStep leadId={42} maxSlots={6} />);
+      await screen.findByTestId("slot-1-input");
+      const pdf = new File(["synthetic pdf"], "previous-session.pdf", { type: "application/pdf" });
+      fireEvent.change(screen.getByTestId("slot-1-input"), { target: { files: [pdf] } });
+      expect(screen.getAllByText(/previous-session.pdf/).length).toBeGreaterThan(0);
+      rerender(<ReciboUploadStep leadId={leadId} maxSlots={maxSlots} />);
+      await screen.findByTestId("slot-1-input");
+      expect(screen.queryAllByText(/previous-session.pdf/)).toHaveLength(0);
+      expect(screen.getByRole("button", { name: "Continuar" })).toBeDisabled();
+      expect(LeadRegistrationService.getRecibosPendientes).toHaveBeenLastCalledWith(leadId, expect.any(AbortSignal));
+    });
+
+    it("renderiza un único espacio por defecto", async () => {
       const { container } = render(<ReciboUploadStep leadId={1} />);
       // Task 6: durante el RTT de rehydration el componente muestra
-      // skeletons, no slots. Tras resolver `getRecibosPendientes` (mock
-      // `beforeEach` con `[]`), los 3 placeholders aparecen.
+      // skeleton, no inputs. Al resolver pendientes vacíos aparece un espacio.
       await waitFor(() => {
-        expect(countFileInputs(container)).toBe(3);
+        expect(countFileInputs(container)).toBe(1);
       });
     });
 
-    it("muestra '+ Subir Recibo N' en cada placeholder, con N = número de slot", async () => {
+    it("revela espacios numerados al pedir agregar otro recibo", async () => {
       render(<ReciboUploadStep leadId={1} />);
       // Task 6: esperar la salida del estado `hydrating` antes de
       // inspeccionar los labels de los placeholders.
       await waitFor(() => {
         expect(screen.getByText(/\+ Subir Recibo 1/i)).toBeInTheDocument();
       });
+      expect(screen.queryByText(/\+ Subir Recibo 2/i)).not.toBeInTheDocument();
+      fireEvent.click(screen.getByRole("button", { name: "Agregar otro recibo" }));
       expect(screen.getByText(/\+ Subir Recibo 2/i)).toBeInTheDocument();
+      expect(screen.getByTestId("slot-2-input")).toHaveFocus();
+      expect(screen.getByRole("status")).toHaveTextContent("Mostrando 2 de 3 espacios para recibos.");
+      fireEvent.click(screen.getByRole("button", { name: "Agregar otro recibo" }));
       expect(screen.getByText(/\+ Subir Recibo 3/i)).toBeInTheDocument();
+      expect(screen.getByTestId("slot-3-input")).toHaveFocus();
+      expect(screen.queryByRole("button", { name: "Agregar otro recibo" })).not.toBeInTheDocument();
+      expect(LeadRegistrationService.subirRecibos).not.toHaveBeenCalled();
       // No debe quedar ningún label de la convención vieja.
       expect(screen.queryByText(/\+ Agregar Recibo/i)).not.toBeInTheDocument();
       expect(screen.queryByText(/Tocar para subir/i)).not.toBeInTheDocument();
@@ -85,11 +159,14 @@ describe("ReciboUploadStep", () => {
         expect(screen.getByTestId("slot-1-input")).toBeInTheDocument();
       });
 
+      fireEvent.click(screen.getByRole("button", { name: "Agregar otro recibo" }));
+
       // Slot 1 (data-testid="slot-1-input") → fire change.
       const slot1Input = screen.getByTestId("slot-1-input");
       fireEvent.change(slot1Input, { target: { files: [makeFile("a.jpg")] } });
 
       const submitBtn = screen.getByRole("button", { name: /continuar/i });
+      await waitFor(() => expect(submitBtn).toBeEnabled());
       fireEvent.click(submitBtn);
 
       await waitFor(() => {
@@ -108,8 +185,10 @@ describe("ReciboUploadStep", () => {
 
       // Task 6: esperar fin de hydration antes de contar inputs.
       await waitFor(() => {
-        expect(countFileInputs(container)).toBe(3);
+        expect(countFileInputs(container)).toBe(1);
       });
+      fireEvent.click(screen.getByRole("button", { name: "Agregar otro recibo" }));
+      fireEvent.click(screen.getByRole("button", { name: "Agregar otro recibo" }));
 
       // Llenamos los 3 slots con archivos. El componente usa
       // `slots.slice(0, MAX_SLOTS)` con MAX_SLOTS=3 → no debe aparecer
@@ -165,11 +244,12 @@ describe("ReciboUploadStep", () => {
       const skeletons = container.querySelectorAll(
         '[data-testid="hydration-skeleton"]',
       );
-      expect(skeletons.length).toBe(3);
+      expect(skeletons.length).toBe(1);
+      expect(screen.getByRole("button", { name: "Agregar otro recibo" })).toBeDisabled();
     });
 
     it("replaces skeletons with real slots after getRecibosPendientes resolves", async () => {
-      // Resolves with an empty list so the 3 placeholder slots appear.
+      // Pendientes vacíos: aparece únicamente el primer espacio.
       LeadRegistrationService.getRecibosPendientes.mockResolvedValue([]);
 
       const { container } = render(<ReciboUploadStep leadId={1} />);
@@ -177,7 +257,7 @@ describe("ReciboUploadStep", () => {
       // After awaiting the resolution, the 3 slot inputs appear and the
       // skeletons are gone.
       await waitFor(() => {
-        expect(countFileInputs(container)).toBe(3);
+        expect(countFileInputs(container)).toBe(1);
       });
       expect(
         container.querySelectorAll('[data-testid="hydration-skeleton"]').length,
@@ -200,8 +280,8 @@ describe("ReciboUploadStep", () => {
       expect(
         container.querySelectorAll('[data-testid="hydration-skeleton"]').length,
       ).toBe(0);
-      // The 3 slot inputs (placeholders) must render on first paint.
-      expect(countFileInputs(container)).toBe(3);
+      // El primer espacio debe aparecer sin una skeleton intermedia.
+      expect(countFileInputs(container)).toBe(1);
     });
   });
 
@@ -320,7 +400,10 @@ describe("ReciboUploadStep", () => {
         target: { files: [makeFile("a.jpg")] },
       });
       const submitBtn = screen.getByRole("button", { name: /continuar/i });
+      await waitFor(() => expect(submitBtn).toBeEnabled());
       fireEvent.click(submitBtn);
+
+      await waitFor(() => expect(screen.getByText("Subido")).toBeInTheDocument());
 
       await waitFor(() => {
         // Tras upload exitoso: el slot 1 ahora es un tile en status='uploaded'.
@@ -386,14 +469,14 @@ describe("ReciboUploadStep", () => {
         expect(form).not.toBeNull();
         // Task 6: esperar fin de hydration antes de contar placeholders.
         await waitFor(() => {
-          expect(form.querySelectorAll('input[type="file"]').length).toBe(3);
+          expect(form.querySelectorAll('input[type="file"]').length).toBe(1);
         });
         // SlotTile wrappers sit inside the form (no horizontal-scroll-bearing
         // divs injected by the component).
         const slotTile = form.querySelector('[class*="slotTile"]');
         expect(slotTile).toBeNull(); // No file uploaded → no slotTile, only placeholders.
-        // Placeholders exist for all 3 slots.
-        expect(form.querySelectorAll('input[type="file"]').length).toBe(3);
+        // Solo se ofrece el primer espacio inicialmente.
+        expect(form.querySelectorAll('input[type="file"]').length).toBe(1);
       } finally {
         Object.defineProperty(window, "innerWidth", {
           value: original,
