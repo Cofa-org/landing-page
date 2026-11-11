@@ -79,7 +79,7 @@ export const openCallbellWebchat = () => {
     try {
       widgetHost = document.getElementById('callbell-livechat-host');
     } catch (e) {
-      console.error('Error querying Callbell host:', e);
+      console.error('Callbell host unavailable.');
       return;
     }
 
@@ -97,7 +97,7 @@ export const openCallbellWebchat = () => {
       try {
         launcherBtn.click();
       } catch (e) {
-        console.error('Error clicking Callbell launcher:', e);
+        console.error('Callbell launcher unavailable.');
       }
       return;
     }
@@ -105,16 +105,8 @@ export const openCallbellWebchat = () => {
     if (attempts < OPEN_POLL_MAX_ATTEMPTS) {
       setTimeout(tryClick, OPEN_POLL_INTERVAL_MS);
     } else {
-      // Log diagnóstico: ayuda a entender qué hay dentro del host
-      // si el selector falla. Útil para ajustar LAUNCHER_SELECTORS.
-      const childCount = widgetHost.children.length;
-      const hasShadow = Boolean(widgetHost.shadowRoot);
-      const tagPreview = widgetHost.innerHTML.slice(0, 200);
-      console.warn(
-        'Callbell Livechat launcher button not found after timeout. ' +
-          `host children=${childCount}, hasShadowRoot=${hasShadow}, ` +
-          `innerHTMLPreview=${JSON.stringify(tagPreview)}`,
-      );
+      // Fixed diagnostics only: the host may contain private conversation data.
+      console.warn('Callbell Livechat launcher unavailable after timeout.');
     }
   };
 

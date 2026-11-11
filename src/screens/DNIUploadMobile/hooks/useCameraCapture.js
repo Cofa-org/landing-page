@@ -1,22 +1,32 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { ERROR_MESSAGE } from "../../../constants/camera.constants.js";
-import { compressImageToBlob } from "../../../lib/imageCompression.js";
+import { captureFrame } from "../../../lib/dni-capture.js";
 
 export const useCameraCapture = () => {
   const [stream, setStream] = useState(null);
   const [isStarting, setIsStarting] = useState(false);
   const [error, setError] = useState("");
   const streamRef = useRef(null);
+  const generation = useRef(0);
+  const mounted = useRef(true);
 
   const stopCamera = useCallback(() => {
+    generation.current += 1;
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
-      setStream(null);
     }
+    if (mounted.current) { setStream(null); setIsStarting(false); }
   }, []);
 
+  useEffect(() => {
+    mounted.current = true;
+    return () => { mounted.current = false; stopCamera(); };
+  }, [stopCamera]);
+
   const startCamera = useCallback(async () => {
+    stopCamera();
+    const requestGeneration = generation.current;
     setIsStarting(true);
     setError("");
     try {
@@ -35,36 +45,28 @@ export const useCameraCapture = () => {
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: { ideal: "environment" },
-          width: { ideal: 1280, max: 1920 },
-          height: { ideal: 720, max: 1080 },
+          width: { ideal: 2000, max: 2560 },
+          height: { ideal: 1500, max: 1920 },
         },
         audio: false,
       });
 
+      if (!mounted.current || requestGeneration !== generation.current) {
+        mediaStream.getTracks().forEach(track => track.stop());
+        return null;
+      }
       streamRef.current = mediaStream;
       setStream(mediaStream);
       return mediaStream;
     } catch (err) {
+      if (!mounted.current || requestGeneration !== generation.current) return null;
       const errorMessage = mapCameraError(err);
       setError(errorMessage);
-      throw err;
+      throw new Error(errorMessage);
     } finally {
-      setIsStarting(false);
+      if (mounted.current && requestGeneration === generation.current) setIsStarting(false);
     }
-  }, []);
-
-  const captureFrame = useCallback((videoEl, canvasEl) => {
-    // Shared helper con `useReciboUpload` — fuente única de los parámetros
-    // de compresión (max-width 1280, JPEG q=0.85). Para un DNI capturado
-    // por cámara de 12MP, baja de 4032×3024 a 1280×960 (o similar).
-    // El texto del DNI queda 6-12px de alto en el preview — totalmente legible.
-    return compressImageToBlob(
-      videoEl,
-      videoEl.videoWidth,
-      videoEl.videoHeight,
-      canvasEl,
-    );
-  }, []);
+  }, [stopCamera]);
 
   return {
     stream,
@@ -90,5 +92,6 @@ function mapCameraError(err) {
   if (name === "OverconstrainedError") {
     return ERROR_MESSAGE.CAMERA_INSUFFICIENT_RESOLUTION;
   }
-  return err?.message || ERROR_MESSAGE.CAMERA_NOT_AVAILABLE;
+  if (err?.message === ERROR_MESSAGE.CAMERA_HTTPS_REQUIRED) return ERROR_MESSAGE.CAMERA_HTTPS_REQUIRED;
+  return ERROR_MESSAGE.CAMERA_NOT_AVAILABLE;
 }

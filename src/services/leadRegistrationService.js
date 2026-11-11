@@ -1,4 +1,6 @@
 import { LANDING_BACKEND_URL, LANDING_BACKEND_API_KEY } from "../config";
+import { DNI_ROTATIONS } from "../constants/dni.constants.js";
+import { assertDniPng, dniError, normalizeDniError, normalizeDniId, validDniContext, validDniUuid } from "../lib/dni-capture.js";
 import { HTTP_METHOD } from "../constants/HTTP_METHODS.js";
 import { HttpApi } from "../lib/http.js";
 import { parseErrorResponse } from "../lib/http-error.js";
@@ -46,61 +48,32 @@ export default class LeadRegistrationService {
     }
   }
 
-  static async subirDni({ leadId }, { dniFront, dniBack }, signal = null, retryConfig = null) {
+  static async obtenerContextoDni(leadId, { tokenOverride, signal = null } = {}) {
+    if (!normalizeDniId(leadId)) throw dniError("DNI_CAPTURE_INVALID_INPUT");
     try {
-      const url = `${LANDING_BACKEND_URL}/api/lead-registration/subir-dni/${leadId}`;
-      const token = await getCookie(COOKIE_LEAD_TOKEN_CONFIG.NAME);
-      const formData = new FormData();
-      formData.append("dniFront", dniFront);
-      formData.append("dniBack", dniBack);
+      const token = tokenOverride ?? await getCookie(COOKIE_LEAD_TOKEN_CONFIG.NAME);
       const response = await HttpApi(
-        url,
-        formData,
-        HTTP_METHOD.POST,
-        LANDING_BACKEND_API_KEY,
-        token,
-        signal,
-        retryConfig,
+        `${LANDING_BACKEND_URL}/api/lead-registration/dni-contexto/${leadId}`,
+        null, HTTP_METHOD.GET, LANDING_BACKEND_API_KEY, token, signal,
       );
-
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message || "Error al subir el DNI");
-      }
-      return data;
+      return await readDniResponse(response);
     } catch (error) {
-      console.error("SUBIR_DNI_SERVICE_ERROR:", error);
-      throw error;
+      throw normalizeDniError(error);
     }
   }
 
-  static async subirDniMobile({ leadId }, { dniFront, dniBack }, tokenOverride, signal = null, retryConfig = null) {
-    try {
-      const url = `${LANDING_BACKEND_URL}/api/lead-registration/subir-dni/${leadId}`;
-      const formData = new FormData();
-      formData.append("dniFront", dniFront);
-      formData.append("dniBack", dniBack);
-      const response = await HttpApi(
-        url,
-        formData,
-        HTTP_METHOD.POST,
-        LANDING_BACKEND_API_KEY,
-        tokenOverride,
-        signal,
-        retryConfig,
-      );
-
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message || "Error al subir el DNI");
-      }
-      return data;
-    } catch (error) {
-      console.error("SUBIR_DNI_MOBILE_SERVICE_ERROR:", error);
-      throw error;
-    }
+  static async subirDni({ leadId }, files, signal = null, retryConfig = null, options = {}) {
+    // Keep the legacy positional argument; DNI retries require an explicit action.
+    void retryConfig;
+    const token = options.tokenOverride ?? await getCookie(COOKIE_LEAD_TOKEN_CONFIG.NAME);
+    return uploadDni(leadId, files, token, signal, options);
   }
 
+  static async subirDniMobile({ leadId }, files, tokenOverride, signal = null, retryConfig = null, options = {}) {
+    // Keep the legacy positional argument; DNI retries require an explicit action.
+    void retryConfig;
+    return uploadDni(leadId, files, tokenOverride, signal, options);
+  }
   static async subirRecibos({ leadId }, filesByOrden, signal = null, retryConfig = null) {
     try {
       const url = `${LANDING_BACKEND_URL}/api/lead-registration/subir-recibos/${leadId}`;
@@ -457,5 +430,44 @@ export default class LeadRegistrationService {
       console.error("RESUME_INIT_SERVICE_ERROR:", error);
       throw error;
     }
+  }
+}
+
+async function readDniResponse(response) {
+  let body;
+  try { body = await response.json(); } catch { throw dniError("DNI_TECHNICAL_ERROR"); }
+  if (!response.ok || body?.success === false) {
+    const status = response.status === 200 && body?.success === false ? body.status : response.status;
+    if (!Number.isInteger(status) || status < 400 || status > 599) throw dniError("DNI_TECHNICAL_ERROR");
+    throw normalizeDniError({ cause: body?.cause, status, data: { side: body?.data?.side } });
+  }
+  if (body?.success !== true || !body.data || typeof body.data !== "object") throw dniError("DNI_TECHNICAL_ERROR");
+  return body;
+}
+
+async function uploadDni(leadId, { dniFront, dniBack }, token, signal, options) {
+  if (!validDniContext(options.context)) throw dniError("DNI_CAPTURE_CONTEXT_REQUIRED");
+  if (!normalizeDniId(leadId) || !validDniUuid(options.uploadId)
+    || !DNI_ROTATIONS.includes(options.rotationFront) || !DNI_ROTATIONS.includes(options.rotationBack)) {
+    throw dniError("DNI_CAPTURE_INVALID_INPUT");
+  }
+  assertDniPng(dniFront);
+  assertDniPng(dniBack);
+  const form = new FormData();
+  form.append("dniFront", dniFront, "dni-front.png");
+  form.append("dniBack", dniBack, "dni-back.png");
+  for (const field of ["solicitudId", "captureSessionId", "baseRevision"]) form.append(field, options.context[field]);
+  form.append("uploadId", options.uploadId);
+  form.append("rotationFront", String(options.rotationFront));
+  form.append("rotationBack", String(options.rotationBack));
+  try {
+    const response = await HttpApi(
+      `${LANDING_BACKEND_URL}/api/lead-registration/subir-dni/${leadId}`,
+      form, HTTP_METHOD.POST, LANDING_BACKEND_API_KEY, token, signal,
+      { retries: 0, timeoutMs: 90000 },
+    );
+    return await readDniResponse(response);
+  } catch (error) {
+    throw normalizeDniError(error);
   }
 }

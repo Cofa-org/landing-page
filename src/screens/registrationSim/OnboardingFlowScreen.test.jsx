@@ -114,7 +114,7 @@ vi.mock("./components/WelcomeStep/WelcomeStep.jsx", () => ({
   default: () => <div data-testid="welcome-step" />,
 }));
 vi.mock("./components/DNIUploadStep/DNIUploadStep.jsx", () => ({
-  default: () => <div data-testid="dni-upload-step" />,
+  default: ({onSuccess}) => <button data-testid="dni-upload-step" onClick={onSuccess}>Fotos recibidas</button>,
 }));
 vi.mock("./components/AnalysisStep/AnalysisStep.jsx", () => ({
   default: () => <div data-testid="analysis-step" />,
@@ -144,6 +144,21 @@ const renderScreen = (search = "/") =>
       <OnboardingFlowScreen />
     </MemoryRouter>,
   );
+
+it("DNI receipt refreshes current onboarding state rather than forcing receipt-upload", async () => {
+  const { getCookie } = await import("../../lib/utils.js");
+  const { getDecodedToken } = await import("../../lib/token.js");
+  const service = (await import("../../services/leadRegistrationService.js")).default;
+  getCookie.mockResolvedValue("synthetic");
+  getDecodedToken.mockReturnValue({leadId:"42"});
+  service.obtenerEstadoOnboarding.mockResolvedValueOnce({success:true,data:{estado_onboarding:"CELULAR_VALIDADO"}});
+  renderScreen();
+  const button=await screen.findByRole("button",{name:"Fotos recibidas"});
+  service.obtenerEstadoOnboarding.mockResolvedValueOnce({success:true,data:{estado_onboarding:"REALIZADO"}});
+  fireEvent.click(button);
+  expect(await screen.findByTestId("welcome-step")).toBeVisible();
+  expect(screen.queryByTestId("recibo-upload-step")).toBeNull();
+});
 
 describe("OnboardingFlowScreen — manual advisor status check", () => {
   const pendingState = {
