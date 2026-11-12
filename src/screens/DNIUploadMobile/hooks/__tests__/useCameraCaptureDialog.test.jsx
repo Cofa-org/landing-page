@@ -2,7 +2,7 @@ import { act, renderHook } from "@testing-library/react";
 import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 import { useCameraCaptureDialog } from "../useCameraCaptureDialog.js";
 
-const video = () => ({ readyState: 2, videoWidth: 1920, videoHeight: 1080, play: vi.fn(async () => {}), srcObject: null });
+const video = () => Object.assign(new EventTarget(), { readyState: 2, videoWidth: 1920, videoHeight: 1080, play: vi.fn(async () => {}), srcObject: null });
 let stop, original, encode;
 const setup = (overrides = {}) => {
   const props = { open: true, side: "front", onConfirm: vi.fn(), onCancel: vi.fn(), ...overrides };
@@ -90,15 +90,14 @@ describe("candidate lifecycle", () => {
     expect(props.onConfirm).not.toHaveBeenCalled();
     expect(URL.createObjectURL).not.toHaveBeenCalled();
   });
-  it("ignores delayed playback rejection after PNG preview without discarding the candidate or its URL", async () => {
+  it("ignores late video errors after PNG preview without discarding the candidate or its URL", async () => {
     const { result, props } = setup();
-    let rejectPlayback;
-    result.current.videoRef.current.play.mockImplementation(() => new Promise((_resolve, reject) => { rejectPlayback = reject; }));
+    const capturedVideo = result.current.videoRef.current;
     await takePhoto(result);
     const candidateUrl = result.current.previewUrl;
     expect(result.current.phase).toBe("preview");
     expect(URL.revokeObjectURL).not.toHaveBeenCalled();
-    await act(async () => { rejectPlayback(new DOMException("synthetic video detach", "AbortError")); });
+    act(() => { capturedVideo.dispatchEvent(new Event("error")); });
     expect(result.current.phase).toBe("preview");
     expect(result.current.previewUrl).toBe(candidateUrl);
     expect(URL.revokeObjectURL).not.toHaveBeenCalled();

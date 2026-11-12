@@ -50,7 +50,8 @@ for (const portrait of [false, true]) test(`actual preview geometry all rotation
   await installSyntheticCapture(page, { phone: true, width: portrait ? 1200 : 1600, height: portrait ? 1600 : 1200 });
   await openEntry(page); const opener = page.getByRole('button', { name: 'Sacar foto del frente', exact: true });
   await opener.click(); const dialog = page.getByRole('dialog'); const close = dialog.getByRole('button', { name: 'Cerrar cámara' });
-  await expect(close).toBeFocused(); await page.keyboard.press('Shift+Tab'); await expect(dialog.getByRole('button', { name: 'Hablar con un asesor', exact: true })).toBeFocused(); await page.keyboard.press('Tab'); await expect(close).toBeFocused();
+  await expect(dialog.getByRole('button', { name: 'Capturar', exact: true })).toBeVisible();
+  await expect(close).toBeFocused(); await page.keyboard.press('Shift+Tab'); await expect(dialog.getByRole('button', { name: 'Capturar', exact: true })).toBeFocused(); await page.keyboard.press('Tab'); await expect(close).toBeFocused();
   await dialog.getByRole('button', { name: 'Capturar', exact: true }).click();
   await expect(dialog.getByRole('img')).toBeVisible();
   await expect.poll(() => dialog.getByRole('img').evaluate(image => image.naturalWidth)).toBe(portrait ? 1200 : 1600);
@@ -93,19 +94,71 @@ for (const failure of ['network','html','legacy200']) test(`transport ${failure}
   const uploads=await page.evaluate(()=>window.__dni.uploads); expect(uploads[0].fields.uploadId).toBe(uploads[1].fields.uploadId);
 });
 
-test('permission late, no frame, null blob, late play rejection and cancelled retake release safely',async({page},info)=>{
+test('permission late, no frame, null blob, playback failure and cancelled retake release safely',async({page},info)=>{
   test.skip(!isPhone(info)); await installSyntheticCapture(page,{phone:true}); await openEntry(page);
   await page.evaluate(()=>window.__dni.late=true); await page.getByRole('button',{name:'Sacar foto del frente',exact:true}).click();
   await page.keyboard.press('Escape');
   await page.evaluate(()=>{ window.__dni.resolvePermission(); window.__dni.late=false; }); await expect.poll(()=>page.evaluate(()=>window.__dni.stopped)).toBe(1);
   for(const mode of ['noFrame','nullBlob']) {
-    await page.getByRole('button',{name:'Sacar foto del frente',exact:true}).click(); await page.evaluate(mode=>window.__dni[mode]=true,mode);
+    await page.getByRole('button',{name:'Sacar foto del frente',exact:true}).click();
+    await expect(page.getByRole('dialog').getByRole('button',{name:'Capturar',exact:true})).toBeVisible();
+    await page.evaluate(mode=>window.__dni[mode]=true,mode);
     await page.getByRole('dialog').getByRole('button',{name:'Capturar',exact:true}).click(); await expect(page.getByRole('dialog').getByRole('alert')).toBeVisible(); await page.keyboard.press('Escape'); await page.evaluate(mode=>window.__dni[mode]=false,mode);
   }
-  await page.evaluate(()=>window.__dni.latePlay=true); await takePhoto(page,'frente',{confirm:false}); await page.evaluate(()=>window.__dni.rejectPlay(new Error('synthetic late'))); await expect(page.getByRole('dialog').getByRole('img')).toBeVisible();
+  await page.evaluate(()=>window.__dni.latePlay=true);
+  await page.getByRole('button',{name:'Sacar foto del frente',exact:true}).click();
+  await expect(page.getByRole('dialog').getByRole('status')).toBeVisible();
+  await page.evaluate(()=>window.__dni.rejectPlay(new Error('synthetic playback')));
+  await expect(page.getByRole('dialog').getByRole('alert')).toBeVisible();
+  await page.evaluate(()=>window.__dni.latePlay=false);
+  await page.getByRole('dialog').getByRole('button',{name:'Reintentar cámara',exact:true}).click();
+  await page.getByRole('dialog').getByRole('button',{name:'Capturar',exact:true}).click();
+  await expect(page.getByRole('dialog').getByRole('img')).toBeVisible();
   await page.getByRole('dialog').getByRole('button',{name:'Usar esta foto',exact:true}).click();
   const url=await page.getByAltText('Frente del DNI',{exact:true}).getAttribute('src');
   await page.getByRole('button',{name:'Volver a sacar el frente',exact:true}).click(); await page.keyboard.press('Escape'); expect(await page.getByAltText('Frente del DNI',{exact:true}).getAttribute('src')).toBe(url);
+});
+
+for (const entry of ['mobile', 'inline']) test(`${entry} camera loader waits for a frame and shows advisor only on error`, async ({ page }, info) => {
+  test.skip(!isPhone(info));
+  if (entry === 'inline') await page.emulateMedia({ reducedMotion: 'reduce' });
+  const state = await installSyntheticCapture(page, { phone: true });
+  await openEntry(page, entry);
+  await page.evaluate(() => { window.__dni.late = true; window.__dni.noFrame = true; });
+  await page.getByRole('button', { name: 'Sacar foto del frente', exact: true }).click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog.getByRole('status')).toHaveText(/Abriendo cámara/);
+  const spinnerMoves = await dialog.getByRole('status').locator('div').evaluateAll(nodes => nodes.some(node => getComputedStyle(node).animationName !== 'none'));
+  expect(spinnerMoves).toBe(entry !== 'inline');
+  await expect(dialog.getByRole('button', { name: 'Capturar', exact: true })).toHaveCount(0);
+  await expect(dialog.getByRole('button', { name: 'Hablar con un asesor', exact: true })).toHaveCount(0);
+  await page.screenshot({ path: info.outputPath(`${entry}-camera-opening.png`), fullPage: true });
+  await page.evaluate(() => { window.__dni.late = false; window.__dni.resolvePermission(); });
+  await expect.poll(() => page.evaluate(() => !!window.__dni.rejectPlay)).toBe(true);
+  await expect(dialog.getByRole('status')).toBeVisible();
+  await expect(dialog.getByRole('button', { name: 'Capturar', exact: true })).toHaveCount(0);
+  await page.evaluate(() => {
+    window.__dni.noFrame = false;
+    document.querySelector('video').dispatchEvent(new Event('loadeddata'));
+  });
+  await expect(dialog.getByRole('button', { name: 'Capturar', exact: true })).toBeEnabled();
+  await expect(dialog.getByRole('status')).toHaveCount(0);
+  await expect(dialog.getByRole('button', { name: 'Hablar con un asesor', exact: true })).toHaveCount(0);
+  await page.evaluate(() => document.querySelector('video').dispatchEvent(new Event('error')));
+  await expect(dialog.getByRole('alert')).toContainText('No pudimos iniciar el video');
+  await expect(dialog.getByRole('button', { name: 'Hablar con un asesor', exact: true })).toBeVisible();
+  await page.screenshot({ path: info.outputPath(`${entry}-camera-error.png`), fullPage: true });
+  await expect.poll(() => page.evaluate(() => window.__dni.stopped)).toBe(1);
+  await dialog.getByRole('button', { name: 'Reintentar cámara', exact: true }).click();
+  await expect(dialog.getByRole('button', { name: 'Capturar', exact: true })).toBeEnabled();
+  await expect(dialog.getByRole('alert')).toHaveCount(0);
+  await expect(dialog.getByRole('button', { name: 'Hablar con un asesor', exact: true })).toHaveCount(0);
+  await dialog.getByRole('button', { name: 'Capturar', exact: true }).click();
+  await expect(dialog.getByRole('img')).toBeVisible();
+  await expect(dialog.getByRole('button', { name: 'Hablar con un asesor', exact: true })).toHaveCount(0);
+  await page.keyboard.press('Escape');
+  await expect.poll(() => page.evaluate(() => window.__dni.stopped)).toBe(2);
+  expect(state.uploads).toBe(0);
 });
 
 for(const error of ['NotAllowedError','NotFoundError','NotReadableError','OverconstrainedError','unsupported']) test(`camera ${error} safe alternatives without file input`,async({page},info)=>{

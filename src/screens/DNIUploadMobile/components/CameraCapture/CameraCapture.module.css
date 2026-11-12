@@ -36,6 +36,8 @@
 }
 .title { font-size: 1.2rem; font-weight: 700; color: #333; margin: 0; text-align: center; padding-inline: 36px; }
 .cameraRecovery { display: flex; flex-direction: column; align-items: center; gap: var(--spacing-md, 16px); padding-block: var(--spacing-md, 16px); }
+.opening { min-height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--spacing-sm, 12px); }
+.permissionHint { margin: 0; color: #444; line-height: 1.5; text-align: center; }
 .videoContainer { position: relative; width: 100%; background: #000; border-radius: 8px; overflow: hidden; }
 .video { width: 100%; height: auto; display: block; object-fit: contain; }
 .overlay { position: absolute; inset: 0; pointer-events: none; display: flex; align-items: center; justify-content: center; }
@@ -47,10 +49,9 @@
 .previewScroll { width: 100%; overflow: auto; background: #f2f2f2; border-radius: 8px; }
 .previewFrame { width: 100%; position: relative; }
 .previewScroll[data-expanded="true"] .previewFrame { width: 200%; }
-.help p { margin: 0; color: #444; line-height: 1.5; }
-.help { display: flex; flex-direction: column; gap: var(--spacing-sm, 12px); }
 .warning { color: #634800; line-height: 1.5; }
 .error { color: #a51f1f; font-size: 1rem; line-height: 1.5; margin: 0; }
 .modal button { min-height: 44px; }
 .modal button:focus-visible { outline: 3px solid #176a3d; outline-offset: 3px; }
 @media (max-width: 480px) { .modal { padding: var(--spacing-md, 16px); } .modalOverlay { padding: 8px; } }
+@media (prefers-reduced-motion: reduce) { .opening div div { animation: none; } }

@@ -19,7 +19,8 @@ export function useCameraCaptureDialog({ open, side: suppliedSide, tipoFoto, onC
   const [error, setError] = useState("");
   const [warning, setWarning] = useState(null);
   const [warningMessage, setWarningMessage] = useState("");
-  const { stream, isStarting, error: cameraError, startCamera, stopCamera, captureFrame } = useCameraCapture();
+  const [permissionHint, setPermissionHint] = useState(false);
+  const { stream, error: cameraError, startCamera, stopCamera, captureFrame } = useCameraCapture();
 
   const changePhase = useCallback(next => { lifecycle.current.phase = next; setPhase(next); }, []);
   const release = useCallback(() => {
@@ -37,24 +38,50 @@ export function useCameraCaptureDialog({ open, side: suppliedSide, tipoFoto, onC
 
   useEffect(() => {
     const video = videoRef.current;
-    if (!open || !stream || !video || phase !== "streaming") return;
+    if (!open || !stream || !video || lifecycle.current.phase !== "starting") return;
     const generation = lifecycle.current.generation;
-    video.srcObject = stream;
-    Promise.resolve(video.play()).catch(() => {
-      if (!lifecycle.current.active || generation !== lifecycle.current.generation || lifecycle.current.phase !== "streaming") return;
+    let disposed = false;
+    let playbackReady = false;
+    const isCurrent = () => !disposed && lifecycle.current.active && generation === lifecycle.current.generation;
+    const markReady = () => {
+      if (!isCurrent() || lifecycle.current.phase !== "starting" || !playbackReady) return;
+      if (video.readyState >= 2 && video.videoWidth > 0 && video.videoHeight > 0) changePhase("streaming");
+    };
+    const failPlayback = () => {
+      if (!isCurrent() || !["starting", "streaming"].includes(lifecycle.current.phase)) return;
       release();
       setError("No pudimos iniciar el video. Reintentá o usá otro navegador compatible en tu celular.");
       changePhase("error");
-    });
-  }, [stream, open, phase, release, changePhase]);
+    };
+    const readinessEvents = ["loadeddata", "canplay", "playing", "resize"];
+    readinessEvents.forEach(event => video.addEventListener(event, markReady));
+    video.addEventListener("error", failPlayback);
+    try {
+      video.srcObject = stream;
+      Promise.resolve(video.play()).then(() => { playbackReady = true; markReady(); }, failPlayback);
+    } catch {
+      failPlayback();
+    }
+    return () => {
+      disposed = true;
+      readinessEvents.forEach(event => video.removeEventListener(event, markReady));
+      video.removeEventListener("error", failPlayback);
+    };
+  }, [stream, open, release, changePhase]);
+
+  useEffect(() => {
+    setPermissionHint(false);
+    if (!open || phase !== "starting" || stream) return;
+    const timer = setTimeout(() => setPermissionHint(true), 5000);
+    return () => clearTimeout(timer);
+  }, [open, phase, stream]);
 
   const handleStart = useCallback(async () => {
     if (!lifecycle.current.active || ["starting", "streaming", "capturing", "preview"].includes(lifecycle.current.phase)) return;
     const generation = ++lifecycle.current.generation;
     setError(""); changePhase("starting");
     try {
-      const cameraStream = await startCamera();
-      if (cameraStream && lifecycle.current.active && generation === lifecycle.current.generation) changePhase("streaming");
+      await startCamera();
     } catch (failure) {
       if (lifecycle.current.active && generation === lifecycle.current.generation) {
         // useCameraCapture owns the closed, safe camera message.
@@ -161,12 +188,15 @@ export function useCameraCaptureDialog({ open, side: suppliedSide, tipoFoto, onC
     height: rotated ? `${candidate.height / candidate.width * 100}%` : "100%",
     transform: `translate(-50%, -50%) rotate(${rotation}deg)`,
   } : undefined;
-  return { videoRef, canvasRef, phase, previewUrl, rotation, error: error || cameraError, warning, warningMessage, isStarting,
+  return { videoRef, canvasRef, phase, previewUrl, rotation, error: error || cameraError, warning, warningMessage,
     modalRef, titleId, expanded, previewFrameStyle, previewImageStyle, handleZoom, handleContactAdvisor,
     title: `Sacar foto del ${side === "back" ? "dorso" : "frente"}`,
     previewAlt: `Foto del ${side === "back" ? "dorso" : "frente"}`,
     zoomLabel: expanded ? "Reducir foto" : "Ampliar foto",
-    showRetry: phase === "error", showStream: phase === "streaming" || phase === "capturing",
+    // Mount the video on opening, before a fast permission response can arrive.
+    showRetry: phase === "error", showStream: ["idle", "starting", "streaming", "capturing"].includes(phase),
+    isOpening: phase === "idle" || phase === "starting",
+    showPermissionHint: permissionHint && phase === "starting" && !stream,
     isCapturing: phase === "capturing",
     captureLabel: phase === "capturing" ? "Capturando…" : "Capturar",
     handleStart, handleCapture, handleRotate, handleRetry, handleConfirm, handleClose };

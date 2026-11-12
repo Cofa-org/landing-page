@@ -16,7 +16,7 @@ beforeEach(()=>{
  Object.defineProperty(navigator,"mediaDevices",{configurable:true,value:{getUserMedia:vi.fn()}});
  Service.obtenerContextoDni.mockResolvedValue({success:true,data:{...context,canCapture:true,estado_onboarding:"CELULAR_VALIDADO",dniReceivedForSession:false,receiptKind:"none",receivedUploadId:null}});
 });
-afterEach(cleanup);
+afterEach(()=>{cleanup();vi.restoreAllMocks();});
 it.each([
  ["old phone link",true,{leadId:"42",token:"synthetic"}],
  ["old desktop link",false,{leadId:"42",token:"synthetic"}],
@@ -96,6 +96,9 @@ const prepareRealCamera=()=>{
  const stop=vi.fn();
  navigator.mediaDevices.getUserMedia.mockResolvedValue({getTracks:()=>[{stop}]});
  vi.spyOn(HTMLMediaElement.prototype,"play").mockResolvedValue();
+ vi.spyOn(HTMLMediaElement.prototype,"readyState","get").mockReturnValue(4);
+ vi.spyOn(HTMLVideoElement.prototype,"videoWidth","get").mockReturnValue(1200);
+ vi.spyOn(HTMLVideoElement.prototype,"videoHeight","get").mockReturnValue(800);
  URL.createObjectURL=vi.fn(()=>`blob:binding-${URL.createObjectURL.mock.calls.length}`);
  URL.revokeObjectURL=vi.fn();
  return stop;

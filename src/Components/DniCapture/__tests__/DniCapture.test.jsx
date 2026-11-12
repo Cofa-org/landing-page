@@ -3,10 +3,8 @@ import React from "react";
 import { fireEvent, render, screen, cleanup, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import CameraCapture from "../../../screens/DNIUploadMobile/components/CameraCapture/CameraCapture.jsx";
-import { useCameraCapture } from "../../../screens/DNIUploadMobile/hooks/useCameraCapture.js";
 import DNIUploadStep from "../../../screens/registrationSim/components/DNIUploadStep/DNIUploadStep.jsx";
 import Service from "../../../services/leadRegistrationService.js";
-vi.mock("../../../screens/DNIUploadMobile/hooks/useCameraCapture.js", () => ({ useCameraCapture:vi.fn() }));
 vi.mock("../../../services/leadRegistrationService.js",()=>({default:{obtenerContextoDni:vi.fn(),subirDniMobile:vi.fn()}}));
 const context={solicitudId:"91",captureSessionId:"11111111-1111-4111-8111-111111111111",baseRevision:"a".repeat(64)};
 const snapshot=(extra={})=>({success:true,data:{...context,canCapture:true,estado_onboarding:"CELULAR_VALIDADO",dniReceivedForSession:false,receivedUploadId:null,receiptKind:"none",...extra}});
@@ -14,8 +12,13 @@ const capture = { blob:new Blob(["synthetic"],{type:"image/png"}),width:1200,hei
 beforeEach(()=>{
  vi.clearAllMocks();
  let counter=0;URL.createObjectURL=vi.fn(()=>`blob:synthetic-${++counter}`);URL.revokeObjectURL=vi.fn();
- HTMLMediaElement.prototype.play=vi.fn().mockResolvedValue();
- useCameraCapture.mockReturnValue({stream:null,isStarting:false,error:"",startCamera:vi.fn().mockResolvedValue({}),stopCamera:vi.fn(),captureFrame:vi.fn().mockResolvedValue(capture)});
+ vi.spyOn(HTMLMediaElement.prototype,"play").mockResolvedValue();
+ vi.spyOn(HTMLMediaElement.prototype,"readyState","get").mockReturnValue(4);
+ vi.spyOn(HTMLVideoElement.prototype,"videoWidth","get").mockReturnValue(1200);
+ vi.spyOn(HTMLVideoElement.prototype,"videoHeight","get").mockReturnValue(800);
+ vi.spyOn(HTMLCanvasElement.prototype,"getContext").mockReturnValue({drawImage:vi.fn()});
+ vi.spyOn(HTMLCanvasElement.prototype,"toBlob").mockImplementation(callback=>callback(capture.blob));
+ Object.defineProperty(navigator,"mediaDevices",{configurable:true,value:{getUserMedia:vi.fn(async()=>({getTracks:()=>[{stop:vi.fn()}]}))}});
  Service.obtenerContextoDni.mockResolvedValue(snapshot());
 });
 const confirmSide=async(name)=>{
@@ -82,16 +85,16 @@ it("explicit conflict refresh prepares preserved photos; separate Enviar creates
  const first=Service.subirDniMobile.mock.calls[0][5];const second=Service.subirDniMobile.mock.calls[1][5];
  expect(second.context.baseRevision).toBe("b".repeat(64));expect(second.uploadId).not.toBe(first.uploadId);
 });
-afterEach(cleanup);
+afterEach(()=>{cleanup();vi.restoreAllMocks();});
 it("names dialog, starts camera, traps focus and Escape returns focus",async()=>{
  const onCancel=vi.fn();const trigger=document.createElement("button");document.body.append(trigger);trigger.focus();
  const {rerender}=render(<CameraCapture open tipoFoto="frente" onCapture={vi.fn()} onCancel={onCancel}/>);
  const dialog=screen.getByRole("dialog",{name:"Sacar foto del frente"});
  expect(dialog).toContainElement(document.activeElement);
  await screen.findByRole("button",{name:"Capturar"});
- expect(useCameraCapture().startCamera).toHaveBeenCalledOnce();
+ expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledOnce();
  const close=screen.getByRole("button",{name:"Cerrar cámara"});close.focus();fireEvent.keyDown(dialog,{key:"Tab",shiftKey:true});
- expect(screen.getByRole("button",{name:"Hablar con un asesor"})).toHaveFocus();
+ expect(screen.getByRole("button",{name:"Capturar"})).toHaveFocus();
  expect(screen.queryAllByRole("link")).toHaveLength(0);
  fireEvent.keyDown(dialog,{key:"Escape"});expect(onCancel).toHaveBeenCalledOnce();
  rerender(<CameraCapture open={false} tipoFoto="frente" onCapture={vi.fn()} onCancel={onCancel}/>);
@@ -102,6 +105,7 @@ it("shows full frame, rotation and zoom then confirms once with no preview URL",
  await screen.findByRole("button",{name:"Capturar"});
  fireEvent.click(screen.getByRole("button",{name:"Capturar"}));
  const preview=await screen.findByAltText("Foto del dorso");
+ expect(screen.queryByRole("button",{name:"Hablar con un asesor"})).toBeNull();
  expect(preview.parentElement.style.aspectRatio).toBe("1.5 / 1");
  fireEvent.click(screen.getByRole("button",{name:"Girar 90°"}));
  expect(preview.style.transform).toContain("rotate(90deg)");
