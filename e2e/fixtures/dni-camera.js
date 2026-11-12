@@ -85,7 +85,8 @@ export async function openEntry(page, entry = 'mobile', context = contextSnapsho
 export async function takePhoto(page, side = 'frente', { confirm = true } = {}) {
   await page.getByRole('button', { name: `Sacar foto del ${side}`, exact: true }).click();
   const dialog = page.getByRole('dialog');
-  await dialog.getByRole('button', { name: 'Activar cámara', exact: true }).click();
+  await expect(dialog.getByText(/Sacá el DNI de la funda/)).toHaveCount(0);
+  await expect(dialog.getByRole('button', { name: 'Activar cámara', exact: true })).toHaveCount(0);
   await dialog.getByRole('button', { name: 'Capturar', exact: true }).click();
   await expect(dialog.getByRole('img')).toBeVisible();
   if (confirm) {

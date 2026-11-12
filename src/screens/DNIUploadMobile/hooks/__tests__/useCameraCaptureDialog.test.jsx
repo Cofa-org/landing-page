@@ -14,7 +14,7 @@ const setup = (overrides = {}) => {
   return { ...hook, props };
 };
 const takePhoto = async result => {
-  await act(async () => result.current.handleStart());
+  await act(async () => {});
   await act(async () => result.current.handleCapture());
 };
 
@@ -55,7 +55,7 @@ describe("candidate lifecycle", () => {
   it("rejects encode completing after close, without creating a URL or confirmation", async () => {
     let finish; encode.mockImplementation(callback => { finish = callback; });
     const { result, props } = setup();
-    await act(async () => result.current.handleStart());
+    await act(async () => {});
     let pending;
     act(() => { pending = result.current.handleCapture(); });
     act(() => result.current.handleClose());
@@ -67,19 +67,19 @@ describe("candidate lifecycle", () => {
   it("closing while permission pending stops late tracks and never resumes streaming", async () => {
     let permit; navigator.mediaDevices.getUserMedia.mockImplementation(() => new Promise(resolve => { permit = resolve; }));
     const { result, rerender, props } = setup();
-    let pending;
-    act(() => { pending = result.current.handleStart(); });
+
     rerender({ ...props, open: false });
-    await act(async () => { permit({ getTracks: () => [{ stop }] }); await pending; });
+    await act(async () => { permit({ getTracks: () => [{ stop }] }); });
     expect(result.current.phase).toBe("idle");
     expect(stop).toHaveBeenCalledTimes(1);
   });
   it("recapture releases only the modal URL and resets rotation", async () => {
     const { result } = setup(); await takePhoto(result);
-    act(() => { result.current.handleRotate(); result.current.handleRetry(); });
+    await act(async () => { result.current.handleRotate(); result.current.handleRetry(); });
     expect(result.current.rotation).toBe(0);
     expect(result.current.previewUrl).toBe("");
-    expect(result.current.phase).toBe("idle");
+    expect(result.current.phase).toBe("streaming");
+    expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledTimes(2);
     expect(URL.revokeObjectURL).toHaveBeenCalledExactlyOnceWith("blob:modal-1");
   });
   it("encoder errors expose safe guidance without confirming", async () => {
@@ -118,9 +118,24 @@ describe("candidate lifecycle", () => {
   });
   it("a side change clears the previous candidate and its URL", async () => {
     const { result, props, rerender } = setup(); await takePhoto(result);
-    rerender({ ...props, side: "back" });
+    await act(async () => { await act(async () => { rerender({ ...props, side: "back" }); }); });
     expect(result.current.previewUrl).toBe("");
-    expect(result.current.phase).toBe("idle");
+    expect(result.current.phase).toBe("streaming");
     expect(URL.revokeObjectURL).toHaveBeenCalledTimes(1);
   });
+});
+
+it("starts only when opened and avoids another start while streaming", async () => {
+ const {result,props,rerender,unmount}=setup({open:false});
+ expect(navigator.mediaDevices.getUserMedia).not.toHaveBeenCalled();
+ await act(async()=>{rerender({...props,open:true});});
+ expect(result.current.phase).toBe("streaming");
+ expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledOnce();
+ await act(async()=>result.current.handleStart());
+ expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledOnce();
+ await act(async()=>{rerender({...props,open:false});});
+ expect(stop).toHaveBeenCalledOnce();
+ await act(async()=>{rerender({...props,open:true});});
+ expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledTimes(2);
+ unmount();expect(stop).toHaveBeenCalledTimes(2);
 });

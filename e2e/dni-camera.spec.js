@@ -51,7 +51,7 @@ for (const portrait of [false, true]) test(`actual preview geometry all rotation
   await openEntry(page); const opener = page.getByRole('button', { name: 'Sacar foto del frente', exact: true });
   await opener.click(); const dialog = page.getByRole('dialog'); const close = dialog.getByRole('button', { name: 'Cerrar cámara' });
   await expect(close).toBeFocused(); await page.keyboard.press('Shift+Tab'); await expect(dialog.getByRole('button', { name: 'Hablar con un asesor', exact: true })).toBeFocused(); await page.keyboard.press('Tab'); await expect(close).toBeFocused();
-  await dialog.getByRole('button', { name: 'Activar cámara', exact: true }).click(); await dialog.getByRole('button', { name: 'Capturar', exact: true }).click();
+  await dialog.getByRole('button', { name: 'Capturar', exact: true }).click();
   await expect(dialog.getByRole('img')).toBeVisible();
   await expect.poll(() => dialog.getByRole('img').evaluate(image => image.naturalWidth)).toBe(portrait ? 1200 : 1600);
   const geometry = [];
@@ -95,12 +95,12 @@ for (const failure of ['network','html','legacy200']) test(`transport ${failure}
 
 test('permission late, no frame, null blob, late play rejection and cancelled retake release safely',async({page},info)=>{
   test.skip(!isPhone(info)); await installSyntheticCapture(page,{phone:true}); await openEntry(page);
-  await page.getByRole('button',{name:'Sacar foto del frente',exact:true}).click(); await page.evaluate(()=>window.__dni.late=true);
-  await page.getByRole('dialog').getByRole('button',{name:'Activar cámara',exact:true}).click(); await page.keyboard.press('Escape');
+  await page.evaluate(()=>window.__dni.late=true); await page.getByRole('button',{name:'Sacar foto del frente',exact:true}).click();
+  await page.keyboard.press('Escape');
   await page.evaluate(()=>{ window.__dni.resolvePermission(); window.__dni.late=false; }); await expect.poll(()=>page.evaluate(()=>window.__dni.stopped)).toBe(1);
   for(const mode of ['noFrame','nullBlob']) {
     await page.getByRole('button',{name:'Sacar foto del frente',exact:true}).click(); await page.evaluate(mode=>window.__dni[mode]=true,mode);
-    await page.getByRole('dialog').getByRole('button',{name:'Activar cámara',exact:true}).click(); await page.getByRole('dialog').getByRole('button',{name:'Capturar',exact:true}).click(); await expect(page.getByRole('dialog').getByRole('alert')).toBeVisible(); await page.keyboard.press('Escape'); await page.evaluate(mode=>window.__dni[mode]=false,mode);
+    await page.getByRole('dialog').getByRole('button',{name:'Capturar',exact:true}).click(); await expect(page.getByRole('dialog').getByRole('alert')).toBeVisible(); await page.keyboard.press('Escape'); await page.evaluate(mode=>window.__dni[mode]=false,mode);
   }
   await page.evaluate(()=>window.__dni.latePlay=true); await takePhoto(page,'frente',{confirm:false}); await page.evaluate(()=>window.__dni.rejectPlay(new Error('synthetic late'))); await expect(page.getByRole('dialog').getByRole('img')).toBeVisible();
   await page.getByRole('dialog').getByRole('button',{name:'Usar esta foto',exact:true}).click();
@@ -111,8 +111,7 @@ test('permission late, no frame, null blob, late play rejection and cancelled re
 for(const error of ['NotAllowedError','NotFoundError','NotReadableError','OverconstrainedError','unsupported']) test(`camera ${error} safe alternatives without file input`,async({page},info)=>{
   test.skip(!isPhone(info)); await installSyntheticCapture(page,{phone:true}); await openEntry(page);
   await page.evaluate(error=>{ if(error==='unsupported') Object.defineProperty(navigator,'mediaDevices',{value:{},configurable:true}); else window.__dni.error=error; },error);
-  await page.getByRole('button',{name:'Sacar foto del frente',exact:true}).click(); await page.getByRole('dialog').getByRole('button',{name:'Activar cámara',exact:true}).click();
-  await expect(page.getByRole('dialog').getByRole('alert')).toBeVisible(); await expect(page.getByRole('dialog').getByRole('button',{name:'Hablar con un asesor',exact:true})).toBeVisible(); await expect(page.locator('a')).toHaveCount(0); await expect(page.locator('input[type=file]')).toHaveCount(0);
+  await page.getByRole('button',{name:'Sacar foto del frente',exact:true}).click(); await expect(page.getByRole('dialog').getByRole('alert')).toBeVisible(); await expect(page.getByRole('dialog').getByRole('button',{name:'Hablar con un asesor',exact:true})).toBeVisible(); await expect(page.locator('a')).toHaveCount(0); await expect(page.locator('input[type=file]')).toHaveCount(0);
 });
 
 test('double submit and cancellation never auto-retry or clear photos',async({page},info)=>{
@@ -181,7 +180,6 @@ test('binding change while permission pending releases old work and requires a f
   const state = await installSyntheticCapture(page, { phone: true }); await openEntry(page);
   await page.evaluate(() => window.__dni.late = true);
   await page.getByRole('button', { name: 'Sacar foto del frente', exact: true }).click();
-  await page.getByRole('dialog').getByRole('button', { name: 'Activar cámara', exact: true }).click();
   state.context = { ...state.context, captureSessionId: 'c1234567-1234-4123-8123-123456789abc' };
   await page.evaluate(context => {
     const url = new URL(location.href); url.searchParams.set('captureSessionId', context.captureSessionId);
@@ -301,7 +299,6 @@ for (const portrait of [false, true]) test(`confirmed parent previews contain ev
     for (const side of ['frente', 'dorso']) {
       await page.getByRole('button', { name: new RegExp(`^(Sacar foto del|Volver a sacar el) ${side}$`) }).click();
       const dialog = page.getByRole('dialog');
-      await dialog.getByRole('button', { name: 'Activar cámara', exact: true }).click();
       await dialog.getByRole('button', { name: 'Capturar', exact: true }).click();
       await expect.poll(() => dialog.getByRole('img').evaluate(image => image.naturalWidth)).toBe(portrait ? 1200 : 1600);
       for (let turn = 0; turn < rotation / 90; turn++) await dialog.getByRole('button', { name: 'Girar 90°', exact: true }).click();

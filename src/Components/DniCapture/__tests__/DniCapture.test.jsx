@@ -21,7 +21,6 @@ beforeEach(()=>{
 const confirmSide=async(name)=>{
  const button=await screen.findByRole("button",{name:`Sacar foto del ${name}`});
  await waitFor(()=>expect(button).toBeEnabled());fireEvent.click(button);
- fireEvent.click(screen.getByRole("button",{name:"Activar cámara"}));
  fireEvent.click(await screen.findByRole("button",{name:"Capturar"}));
  fireEvent.click(await screen.findByRole("button",{name:"Usar esta foto"}));
 };
@@ -57,8 +56,7 @@ it("cancelled recapture preserves the parent confirmed photo and its URL",async(
  render(<DNIUploadStep leadId="42" leadToken="synthetic"/>);
  await confirmSide("frente");
  const originalUrl=screen.getByAltText("Frente del DNI").getAttribute("src");
- fireEvent.click(screen.getByRole("button",{name:"Volver a sacar el frente"}));
- fireEvent.click(screen.getByRole("button",{name:"Activar cámara"}));fireEvent.click(await screen.findByRole("button",{name:"Capturar"}));
+ fireEvent.click(screen.getByRole("button",{name:"Volver a sacar el frente"}));fireEvent.click(await screen.findByRole("button",{name:"Capturar"}));
  await screen.findByRole("button",{name:"Usar esta foto"});
  fireEvent.keyDown(screen.getByRole("dialog"),{key:"Escape"});
  expect(screen.getByAltText("Frente del DNI")).toHaveAttribute("src",originalUrl);
@@ -85,12 +83,13 @@ it("explicit conflict refresh prepares preserved photos; separate Enviar creates
  expect(second.context.baseRevision).toBe("b".repeat(64));expect(second.uploadId).not.toBe(first.uploadId);
 });
 afterEach(cleanup);
-it("names dialog, traps focus, Escape closes and returns focus without starting camera",()=>{
+it("names dialog, starts camera, traps focus and Escape returns focus",async()=>{
  const onCancel=vi.fn();const trigger=document.createElement("button");document.body.append(trigger);trigger.focus();
  const {rerender}=render(<CameraCapture open tipoFoto="frente" onCapture={vi.fn()} onCancel={onCancel}/>);
  const dialog=screen.getByRole("dialog",{name:"Sacar foto del frente"});
  expect(dialog).toContainElement(document.activeElement);
- expect(useCameraCapture().startCamera).not.toHaveBeenCalled();
+ await screen.findByRole("button",{name:"Capturar"});
+ expect(useCameraCapture().startCamera).toHaveBeenCalledOnce();
  const close=screen.getByRole("button",{name:"Cerrar cámara"});close.focus();fireEvent.keyDown(dialog,{key:"Tab",shiftKey:true});
  expect(screen.getByRole("button",{name:"Hablar con un asesor"})).toHaveFocus();
  expect(screen.queryAllByRole("link")).toHaveLength(0);
@@ -100,7 +99,6 @@ it("names dialog, traps focus, Escape closes and returns focus without starting 
 });
 it("shows full frame, rotation and zoom then confirms once with no preview URL",async()=>{
  const onCapture=vi.fn();render(<CameraCapture open tipoFoto="dorso" onCapture={onCapture} onCancel={vi.fn()}/>);
- fireEvent.click(screen.getByRole("button",{name:"Activar cámara"}));
  await screen.findByRole("button",{name:"Capturar"});
  fireEvent.click(screen.getByRole("button",{name:"Capturar"}));
  const preview=await screen.findByAltText("Foto del dorso");
@@ -113,11 +111,13 @@ it("shows full frame, rotation and zoom then confirms once with no preview URL",
  expect(onCapture).toHaveBeenCalledExactlyOnceWith({...capture,rotation:90});
 });
 
-it('explains removing the sleeve, readable codes and focus before and during capture', async () => {
+it('shows preparation guidance only on the initial screen and opens camera directly', async () => {
  Object.defineProperty(navigator, 'userAgentData', { configurable: true, value: { mobile: true } });
  render(<DNIUploadStep leadId="42" leadToken="synthetic" />);
  expect(screen.getByText(/Sacá el DNI de la funda/)).toHaveTextContent(/luz pareja.*cuatro esquinas.*datos y códigos.*bien enfocado/);
  const opener = await screen.findByRole('button', { name: 'Sacar foto del frente' });
  await waitFor(() => expect(opener).toBeEnabled()); fireEvent.click(opener);
- expect(screen.getByRole('dialog')).toHaveTextContent(/Sacá el DNI de la funda.*luz pareja.*cuatro esquinas.*datos y códigos.*bien enfocado/);
+ expect(screen.getByRole('dialog')).not.toHaveTextContent(/Sacá el DNI de la funda/);
+ await screen.findByRole('button', { name: 'Capturar' });
+ expect(screen.queryByRole('button', { name: 'Activar cámara' })).toBeNull();
 });

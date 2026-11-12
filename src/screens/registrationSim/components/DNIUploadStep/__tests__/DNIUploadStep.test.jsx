@@ -37,8 +37,8 @@ it("phone offers camera by action, no files even after denied permission", async
  navigator.mediaDevices.getUserMedia.mockRejectedValue(new DOMException("canary", "NotAllowedError"));
  const { container } = render(<DNIUploadStep leadId="42" leadToken="synthetic" />);
  fireEvent.click(await screen.findByRole("button", { name: "Sacar foto del frente" }));
- expect(navigator.mediaDevices.getUserMedia).not.toHaveBeenCalled();
- fireEvent.click(screen.getByRole("button", { name: "Activar cámara" }));
+ expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledOnce();
+
  await screen.findByRole("button", { name: "Reintentar cámara" });
  expect(container.querySelector('input[type="file"]')).toBeNull();
  expect(screen.getAllByRole("button", { name:"Hablar con un asesor" }).length).toBeGreaterThan(0);
@@ -74,5 +74,5 @@ it.each(['frente', 'dorso'])('returns focus to the %s invoker when pointer click
  fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' });
  await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
  expect(opener).toHaveFocus();
- expect(navigator.mediaDevices.getUserMedia).not.toHaveBeenCalled();
+ expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledOnce();
 });

@@ -61,7 +61,7 @@ it("phone route composes same camera, cancellation preserves existing capture fl
  Object.defineProperty(navigator,"userAgentData",{configurable:true,value:{mobile:true}});
  const {container}=renderScreen();fireEvent.click(await screen.findByRole("button",{name:"Sacar foto del dorso"}));
  expect(screen.getByRole("dialog",{name:"Sacar foto del dorso"})).toBeVisible();
- expect(navigator.mediaDevices.getUserMedia).not.toHaveBeenCalled();
+ expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledOnce();
  fireEvent.keyDown(screen.getByRole("dialog"),{key:"Escape"});expect(screen.queryByRole("dialog")).toBeNull();
  expect(container.querySelector('input[type="file"]')).toBeNull();
 });
@@ -70,7 +70,6 @@ it("phone route keeps only camera recovery after permission denial",async()=>{
  navigator.mediaDevices.getUserMedia.mockRejectedValue(new DOMException("PRIVATE-CANARY","NotAllowedError"));
  const {container}=renderScreen();
  fireEvent.click(await screen.findByRole("button",{name:"Sacar foto del frente"}));
- fireEvent.click(screen.getByRole("button",{name:"Activar cámara"}));
  await screen.findByRole("button",{name:"Reintentar cámara"});
  expect(container.querySelector('input[type="file"]')).toBeNull();
  expect(screen.queryByText("PRIVATE-CANARY")).toBeNull();
@@ -104,7 +103,6 @@ const prepareRealCamera=()=>{
 const openAndEncode=async(encode)=>{
  const open=await screen.findByRole("button",{name:"Sacar foto del frente"});
  await waitFor(()=>expect(open).toBeEnabled());fireEvent.click(open);
- fireEvent.click(screen.getByRole("button",{name:"Activar cámara"}));
  const shutter=await screen.findByRole("button",{name:"Capturar"});
  const video=document.querySelector("video");
  Object.defineProperties(video,{videoWidth:{value:1200},videoHeight:{value:800},readyState:{value:2}});
@@ -135,8 +133,8 @@ it.each([
  expect(screen.queryByAltText("Dorso del DNI")).toBeNull();
  expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledOnce();
  fireEvent.click(screen.getByRole("button",{name:"Sacar foto del frente"}));
- expect(screen.getByRole("button",{name:"Activar cámara"})).toBeVisible();
- expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledOnce();
+ await screen.findByRole("button",{name:"Capturar"});
+ expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledTimes(2);
 });
 it("invalidates a pending real frame across expected-revision rebind and releases its tracks",async()=>{
  const stop=prepareRealCamera();let finish;let current;
@@ -181,7 +179,7 @@ it("rejects a cancelled generation callback after reopening the same binding",as
  fireEvent.click(screen.getByRole("button",{name:"Sacar foto del frente"}));
  act(()=>oldConfirm(syntheticFrame));
  expect(screen.queryByAltText("Frente del DNI")).toBeNull();
- expect(screen.getByRole("button",{name:"Activar cámara"})).toBeVisible();
- expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledOnce();
+ await screen.findByRole("button",{name:"Capturar"});
+ expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledTimes(2);
  expect(URL.createObjectURL).toHaveBeenCalledOnce();
 });

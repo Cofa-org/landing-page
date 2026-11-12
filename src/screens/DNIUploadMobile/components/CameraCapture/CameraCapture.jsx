@@ -10,10 +10,8 @@ export default function CameraCapture({ open, onCapture, onCancel, tipoFoto }) {
       <div ref={dialog.modalRef} className={styles.modal} role="dialog" aria-modal="true" aria-labelledby={dialog.titleId} tabIndex={-1}>
         <button type="button" className={styles.closeBtn} aria-label="Cerrar cámara" onClick={dialog.handleClose}>×</button>
         <h3 className={styles.title} id={dialog.titleId}>{dialog.title}</h3>
-        <p className={styles.instructions}>Sacá el DNI de la funda. Apoyalo sobre una superficie lisa con luz pareja. Incluí las cuatro esquinas y acercate hasta que se lean los datos y códigos. Evitá reflejos y sombras sobre ellos. Revisá que esté bien enfocado. La guía no recorta la foto.</p>
-        {dialog.showStart ? <div className={styles.idleContainer}>
-          <p>Tocá el botón para permitir el acceso a la cámara de tu celular.</p>
-          <GenericButton onClick={dialog.handleStart}>{dialog.startLabel}</GenericButton>
+        {dialog.showRetry ? <div className={styles.cameraRecovery}>
+          <GenericButton onClick={dialog.handleStart}>Reintentar cámara</GenericButton>
         </div> : null}
         {dialog.showStream ? <>
           <div className={styles.videoContainer}>

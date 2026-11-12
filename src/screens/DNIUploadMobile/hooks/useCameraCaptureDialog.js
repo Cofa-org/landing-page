@@ -36,13 +36,6 @@ export function useCameraCaptureDialog({ open, side: suppliedSide, tipoFoto, onC
   }, [changePhase]);
 
   useEffect(() => {
-    const life = lifecycle.current;
-    life.active = open && (side === "front" || side === "back");
-    reset();
-    return () => { life.active = false; release(); };
-  }, [open, side, reset, release]);
-
-  useEffect(() => {
     const video = videoRef.current;
     if (!open || !stream || !video || phase !== "streaming") return;
     const generation = lifecycle.current.generation;
@@ -56,7 +49,7 @@ export function useCameraCaptureDialog({ open, side: suppliedSide, tipoFoto, onC
   }, [stream, open, phase, release, changePhase]);
 
   const handleStart = useCallback(async () => {
-    if (!lifecycle.current.active || ["starting", "capturing", "preview"].includes(lifecycle.current.phase)) return;
+    if (!lifecycle.current.active || ["starting", "streaming", "capturing", "preview"].includes(lifecycle.current.phase)) return;
     const generation = ++lifecycle.current.generation;
     setError(""); changePhase("starting");
     try {
@@ -69,6 +62,14 @@ export function useCameraCaptureDialog({ open, side: suppliedSide, tipoFoto, onC
       }
     }
   }, [startCamera, changePhase]);
+
+  useEffect(() => {
+    const life = lifecycle.current;
+    life.active = open && (side === "front" || side === "back");
+    reset();
+    if (life.active) void handleStart();
+    return () => { life.active = false; release(); };
+  }, [open, side, reset, release, handleStart]);
 
   const handleCapture = useCallback(async () => {
     if (!lifecycle.current.active || lifecycle.current.phase !== "streaming") return;
@@ -100,8 +101,8 @@ export function useCameraCaptureDialog({ open, side: suppliedSide, tipoFoto, onC
 
   const handleRetry = useCallback(() => {
     if (!lifecycle.current.active) return;
-    release(); reset();
-  }, [release, reset]);
+    release(); reset(); void handleStart();
+  }, [release, reset, handleStart]);
 
   const handleConfirm = useCallback(() => {
     const candidate = candidateRef.current;
@@ -165,8 +166,8 @@ export function useCameraCaptureDialog({ open, side: suppliedSide, tipoFoto, onC
     title: `Sacar foto del ${side === "back" ? "dorso" : "frente"}`,
     previewAlt: `Foto del ${side === "back" ? "dorso" : "frente"}`,
     zoomLabel: expanded ? "Reducir foto" : "Ampliar foto",
-    showStart: phase === "idle" || phase === "error", showStream: phase === "streaming" || phase === "capturing",
-    isCapturing: phase === "capturing", startLabel: phase === "error" ? "Reintentar cámara" : "Activar cámara",
+    showRetry: phase === "error", showStream: phase === "streaming" || phase === "capturing",
+    isCapturing: phase === "capturing",
     captureLabel: phase === "capturing" ? "Capturando…" : "Capturar",
     handleStart, handleCapture, handleRotate, handleRetry, handleConfirm, handleClose };
 }
