@@ -2,12 +2,10 @@
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import qrcodeReact from 'qrcode.react';
-import { mkdir, writeFile } from 'node:fs/promises';
-import { resolve } from 'node:path';
+import { writeFile } from 'node:fs/promises';
 import { contextSnapshot, installSyntheticCapture, openEntry, takePhoto, takePair } from './fixtures/dni-camera.js';
 
 const { QRCodeSVG } = qrcodeReact;
-const artifacts = resolve('../.superpowers/sdd/2026-11-11-captura-dni-segura/task-6-browser');
 const isPhone = info => info.project.name.endsWith('-phone');
 
 test.afterEach(async ({ page }) => { await expect(page.locator('a[href*="/subir-dni?"], a[href*="wa.me"]')).toHaveCount(0); await page.close(); await page.context().unrouteAll({ behavior: 'ignoreErrors' }); });
@@ -26,8 +24,8 @@ test('desktop touch/webcam only offers context-bound scannable QR', async ({ pag
   await expect(qr.locator('path').last()).toHaveAttribute('d', expectedPaths.at(-1)[1]);
   await expect(page.locator('input[type=file], video, [ondrop], [onpaste]')).toHaveCount(0);
   expect(await page.evaluate(() => window.__dni.calls)).toBe(0);
-  await mkdir(artifacts, { recursive: true });
-  await page.screenshot({ path: resolve(artifacts, `${info.project.name}-qr.png`), fullPage: true });
+
+  await page.screenshot({ path: info.outputPath(`${info.project.name}-qr.png`), fullPage: true });
 });
 
 for (const entry of ['mobile', 'inline']) test(`${entry} captures original PNG pair without persistent image data or console disclosure`, async ({ page }, info) => {
@@ -63,16 +61,16 @@ for (const portrait of [false, true]) test(`actual preview geometry all rotation
     expect(Math.abs(boxes.image.width-boxes.frame.width)).toBeLessThan(1);
     expect(Math.abs(boxes.image.height-boxes.frame.height)).toBeLessThan(1);
     expect(boxes.natural).toEqual(portrait ? [1200,1600] : [1600,1200]); geometry.push({ rotation, ...boxes });
-    await image.scrollIntoViewIfNeeded(); await mkdir(artifacts, { recursive: true });
-    await page.screenshot({ path: resolve(artifacts, `${info.project.name}-${portrait ? 'portrait' : 'landscape'}-${rotation}.png`), fullPage: true });
+    await image.scrollIntoViewIfNeeded();
+    await page.screenshot({ path: info.outputPath(`${info.project.name}-${portrait ? 'portrait' : 'landscape'}-${rotation}.png`), fullPage: true });
     await dialog.getByRole('button', { name: 'Ampliar foto', exact: true }).click();
     const scroll = dialog.locator('[data-expanded=true]');
     expect(await scroll.evaluate(el => el.scrollWidth > el.clientWidth)).toBe(true);
-    for (const corner of ['left','right']) { await scroll.evaluate((el,corner) => { el.scrollLeft = corner === 'left' ? 0 : el.scrollWidth; }, corner); await scroll.screenshot({ path: resolve(artifacts, `${info.project.name}-${portrait ? 'portrait' : 'landscape'}-${rotation}-zoom-${corner}.png`) }); }
+    for (const corner of ['left','right']) { await scroll.evaluate((el,corner) => { el.scrollLeft = corner === 'left' ? 0 : el.scrollWidth; }, corner); await scroll.screenshot({ path: info.outputPath(`${info.project.name}-${portrait ? 'portrait' : 'landscape'}-${rotation}-zoom-${corner}.png`) }); }
     await dialog.getByRole('button', { name: 'Reducir foto', exact: true }).click();
     await dialog.getByRole('button', { name: 'Girar 90°', exact: true }).click();
   }
-  await writeFile(resolve(artifacts, `${info.project.name}-${portrait ? 'portrait' : 'landscape'}-geometry.json`), JSON.stringify(geometry,null,2));
+  await writeFile(info.outputPath(`${info.project.name}-${portrait ? 'portrait' : 'landscape'}-geometry.json`), JSON.stringify(geometry,null,2));
   const targets = await dialog.locator('button,a').evaluateAll(nodes => nodes.filter(node=>node.getClientRects().length).map(node => ({ name:node.textContent, height:node.getBoundingClientRect().height, width:node.getBoundingClientRect().width })));
   expect(targets.every(target=>target.height>=44 && target.width>=44)).toBe(true);
   await page.keyboard.press('Escape'); await expect(dialog).toHaveCount(0); await expect(opener).toBeFocused();
@@ -148,12 +146,12 @@ test('environment artifacts include QR and confirmed entry, actual engine versio
   const phone = isPhone(info);
   const state = await installSyntheticCapture(page, { phone });
   await openEntry(page);
-  await mkdir(artifacts, { recursive: true });
+
   if (phone) await takePair(page);
   else await expect(page.getByRole('img', { name: 'Escaneá con tu celular' })).toBeVisible();
-  await page.screenshot({ path: resolve(artifacts, `${info.project.name}-entry.png`), fullPage: true });
-  if (!phone) await page.getByRole('img', { name: 'Escaneá con tu celular' }).screenshot({ path: resolve(artifacts, `${info.project.name}-qr-symbol.png`) });
-  await writeFile(resolve(artifacts, `${info.project.name}-environment.json`), JSON.stringify({ browser: browser.version(), viewport: page.viewportSize(), phoneSurface: phone, blockedExternalRequests: state.blocked.length, actualHardware: false, camera: await page.evaluate(() => ({ calls: window.__dni.calls, constraints: window.__dni.constraints, uaMobile: navigator.userAgentData.mobile })) }, null, 2));
+  await page.screenshot({ path: info.outputPath(`${info.project.name}-entry.png`), fullPage: true });
+  if (!phone) await page.getByRole('img', { name: 'Escaneá con tu celular' }).screenshot({ path: info.outputPath(`${info.project.name}-qr-symbol.png`) });
+  await writeFile(info.outputPath(`${info.project.name}-environment.json`), JSON.stringify({ browser: browser.version(), viewport: page.viewportSize(), phoneSurface: phone, blockedExternalRequests: state.blocked.length, actualHardware: false, camera: await page.evaluate(() => ({ calls: window.__dni.calls, constraints: window.__dni.constraints, uaMobile: navigator.userAgentData.mobile })) }, null, 2));
 });
 
 test('polling session change removes QR until explicit refresh', async ({ page }, info) => {
@@ -319,15 +317,15 @@ for (const portrait of [false, true]) test(`confirmed parent previews contain ev
       expect(geometry.slotScrollHeight).toBeLessThanOrEqual(geometry.slotClientHeight + 1);
       expect(Math.abs(geometry.image.width - geometry.frame.width)).toBeLessThan(1);
       expect(Math.abs(geometry.image.height - geometry.frame.height)).toBeLessThan(1);
-      await mkdir(artifacts, { recursive: true });
+
       const name = `${info.project.name}-parent-${portrait ? 'portrait' : 'landscape'}-${side}-${rotation}`;
-      await image.locator('..').screenshot({ path: resolve(artifacts, `${name}.png`) });
+      await image.locator('..').screenshot({ path: info.outputPath(`${name}.png`) });
       await page.getByRole('button', { name: `Ampliar ${side}`, exact: true }).click();
       const viewport = image.locator('../..');
       expect(await viewport.evaluate(node => node.scrollWidth > node.clientWidth)).toBe(true);
       for (const corner of ['left', 'right']) {
         await viewport.evaluate((node, corner) => { node.scrollLeft = corner === 'left' ? 0 : node.scrollWidth; }, corner);
-        await viewport.screenshot({ path: resolve(artifacts, `${name}-zoom-${corner}.png`) });
+        await viewport.screenshot({ path: info.outputPath(`${name}-zoom-${corner}.png`) });
       }
       await page.getByRole('button', { name: `Reducir ${side}`, exact: true }).click();
     }

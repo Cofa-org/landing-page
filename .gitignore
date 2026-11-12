@@ -35,3 +35,4 @@ CLAUDE.md
 vite.config.js.timestamp-*.mjs
 /test-results/
 /playwright-report/
+/coverage/
