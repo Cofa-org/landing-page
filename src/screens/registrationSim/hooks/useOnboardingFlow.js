@@ -309,7 +309,7 @@ export const useOnboardingFlow = (resumeShortId = null) => {
     LOAN_SIM_STEPS.IDENTITY_SELECTION,
     LOAN_SIM_STEPS.PHONE_VALIDATION,
     // LOAN_SIM_STEPS.DNI_UPLOAD,
-    ...(!leadData?.es_cliente ? [LOAN_SIM_STEPS.RECIBO_UPLOAD] : []),
+    // ...(!leadData?.es_cliente ? [LOAN_SIM_STEPS.RECIBO_UPLOAD] : []),
     LOAN_SIM_STEPS.WELCOME,
     LOAN_SIM_STEPS.EN_ANALISIS,
     // LOAN_SIM_STEPS.PHONE_PICKER,
