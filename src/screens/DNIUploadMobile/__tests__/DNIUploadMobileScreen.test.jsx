@@ -17,6 +17,20 @@ beforeEach(()=>{
  Service.obtenerContextoDni.mockResolvedValue({success:true,data:{...context,canCapture:true,estado_onboarding:"CELULAR_VALIDADO",dniReceivedForSession:false,receiptKind:"none",receivedUploadId:null}});
 });
 afterEach(()=>{cleanup();vi.restoreAllMocks();});
+it.each(['current_session','legacy'])("received %s link shows only confirmation and return-to-PC guidance",async receiptKind=>{
+ Object.defineProperty(navigator,"userAgentData",{configurable:true,value:{mobile:true}});
+ Service.obtenerContextoDni.mockResolvedValue({success:true,data:{...context,canCapture:false,
+  estado_onboarding:"DNI_SUBIDO",dniReceivedForSession:receiptKind==='current_session',receiptKind,
+  receivedUploadId:receiptKind==='current_session'?"22222222-2222-4222-8222-222222222222":null}});
+ renderScreen();
+ expect(await screen.findByRole("heading",{name:"Recibimos tus fotos"})).toBeVisible();
+ expect(screen.getByRole("status")).toHaveTextContent("Volvé a la PC para continuar con tu solicitud.");
+ expect(screen.queryByText(/Sacá una foto|Sacá el DNI|Necesitás ayuda/)).toBeNull();
+ expect(screen.queryAllByRole("button")).toHaveLength(0);
+ expect(screen.queryByRole("dialog")).toBeNull();
+ expect(navigator.mediaDevices.getUserMedia).not.toHaveBeenCalled();
+ expect(Service.subirDniMobile).not.toHaveBeenCalled();
+});
 it.each([
  ["old phone link",true,{leadId:"42",token:"synthetic"}],
  ["old desktop link",false,{leadId:"42",token:"synthetic"}],

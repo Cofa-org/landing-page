@@ -17,4 +17,6 @@
   min-height: 44px;
   margin-bottom: var(--spacing-md, 16px);
 }
+.confirmation { width: 100%; min-width: 0; margin: 0; padding: var(--spacing-lg, 24px); }
+.confirmation p { margin: 0; color: #444; line-height: 1.6; text-align: center; }
 .backButton:focus-visible { outline: 3px solid #176a3d; outline-offset: 3px; }

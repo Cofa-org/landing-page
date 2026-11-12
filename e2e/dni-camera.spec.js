@@ -71,6 +71,13 @@ for (const entry of ['mobile', 'inline']) test(`${entry} captures original PNG p
   await expect(page.locator('input[type=file], [ondrop], [onpaste]')).toHaveCount(0);
   await page.getByRole('button', { name: 'Enviar fotos', exact: true }).click();
   await expect(page.getByText(/Recibimos tus fotos/)).toBeVisible();
+  if (entry === 'mobile') {
+    await expect(page.getByRole('heading', { name: 'Recibimos tus fotos', exact: true })).toBeVisible();
+    await expect(page.getByRole('status')).toHaveText('Volvé a la PC para continuar con tu solicitud.');
+    await expect(page.getByRole('button')).toHaveCount(0);
+    await expect(page.getByText(/Sacá una foto|Sacá el DNI|Necesitás ayuda/)).toHaveCount(0);
+    await page.screenshot({path:info.outputPath('received-photos.png'),fullPage:true});
+  }
   const upload = await page.evaluate(() => window.__dni.uploads[0]);
   expect(upload.files).toHaveLength(2);
   for (const file of upload.files) { expect(file.type).toBe('image/png'); expect(file.bytes.slice(0, 8)).toEqual([137,80,78,71,13,10,26,10]); expect(Buffer.from(file.bytes).readUInt32BE(16)).toBe(1600); expect(Buffer.from(file.bytes).readUInt32BE(20)).toBe(1200); }
@@ -260,6 +267,9 @@ test('lost response normal refresh restores own receipt without reuploading', as
   // Reopen the same link: the context endpoint restores the committed own receipt before revision mismatch.
   await openEntry(page);
   await expect(page.getByText(/Recibimos tus fotos/)).toBeVisible(); expect(state.uploads).toBe(1);
+  await expect(page.getByRole('heading', {name:'Recibimos tus fotos',exact:true})).toBeVisible();
+  await expect(page.getByRole('status')).toHaveText('Volvé a la PC para continuar con tu solicitud.');
+  await expect(page.getByRole('button')).toHaveCount(0);
 });
 
 test('binding change while permission pending releases old work and requires a fresh camera action', async ({ page }, info) => {
