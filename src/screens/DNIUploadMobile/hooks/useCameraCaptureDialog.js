@@ -20,6 +20,7 @@ export function useCameraCaptureDialog({ open, side: suppliedSide, tipoFoto, onC
   const [warning, setWarning] = useState(null);
   const [warningMessage, setWarningMessage] = useState("");
   const [permissionHint, setPermissionHint] = useState(false);
+  const [videoAspectRatio, setVideoAspectRatio] = useState(4 / 3);
   const { stream, error: cameraError, startCamera, stopCamera, captureFrame } = useCameraCapture();
 
   const changePhase = useCallback(next => { lifecycle.current.phase = next; setPhase(next); }, []);
@@ -44,8 +45,11 @@ export function useCameraCaptureDialog({ open, side: suppliedSide, tipoFoto, onC
     let playbackReady = false;
     const isCurrent = () => !disposed && lifecycle.current.active && generation === lifecycle.current.generation;
     const markReady = () => {
-      if (!isCurrent() || lifecycle.current.phase !== "starting" || !playbackReady) return;
-      if (video.readyState >= 2 && video.videoWidth > 0 && video.videoHeight > 0) changePhase("streaming");
+      if (!isCurrent() || !["starting", "streaming"].includes(lifecycle.current.phase) || !playbackReady) return;
+      if (video.readyState >= 2 && video.videoWidth > 0 && video.videoHeight > 0) {
+        setVideoAspectRatio(video.videoWidth / video.videoHeight);
+        if (lifecycle.current.phase === "starting") changePhase("streaming");
+      }
     };
     const failPlayback = () => {
       if (!isCurrent() || !["starting", "streaming"].includes(lifecycle.current.phase)) return;
@@ -75,6 +79,12 @@ export function useCameraCaptureDialog({ open, side: suppliedSide, tipoFoto, onC
     const timer = setTimeout(() => setPermissionHint(true), 5000);
     return () => clearTimeout(timer);
   }, [open, phase, stream]);
+
+  useEffect(() => {
+    if (!open) return;
+    document.body.classList.add("dni-camera-open");
+    return () => document.body.classList.remove("dni-camera-open");
+  }, [open]);
 
   const handleStart = useCallback(async () => {
     if (!lifecycle.current.active || ["starting", "streaming", "capturing", "preview"].includes(lifecycle.current.phase)) return;
@@ -178,8 +188,10 @@ export function useCameraCaptureDialog({ open, side: suppliedSide, tipoFoto, onC
   }, [open]);
   const handleZoom = useCallback(() => setExpanded(previous => !previous), []);
   const handleContactAdvisor = useCallback(() => {
+    handleClose();
+    document.body.classList.remove("dni-camera-open");
     openCallbellWebchat();
-  }, []);
+  }, [handleClose]);
   const candidate = candidateRef.current;
   const rotated = rotation === 90 || rotation === 270;
   const previewFrameStyle = candidate ? { aspectRatio: rotated ? candidate.height / candidate.width : candidate.width / candidate.height } : undefined;
@@ -189,6 +201,7 @@ export function useCameraCaptureDialog({ open, side: suppliedSide, tipoFoto, onC
     transform: `translate(-50%, -50%) rotate(${rotation}deg)`,
   } : undefined;
   return { videoRef, canvasRef, phase, previewUrl, rotation, error: error || cameraError, warning, warningMessage,
+    videoFrameStyle: { "--camera-aspect": videoAspectRatio },
     modalRef, titleId, expanded, previewFrameStyle, previewImageStyle, handleZoom, handleContactAdvisor,
     title: `Sacar foto del ${side === "back" ? "dorso" : "frente"}`,
     previewAlt: `Foto del ${side === "back" ? "dorso" : "frente"}`,

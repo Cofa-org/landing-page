@@ -104,6 +104,37 @@ it("offers recovery and stops the camera when video playback fails", async () =>
   expect(stop).toHaveBeenCalledOnce();
 });
 
+it("closes the error dialog and restores chat access when requesting an advisor", async () => {
+  navigator.mediaDevices.getUserMedia.mockRejectedValue(new DOMException("synthetic", "NotAllowedError"));
+  const host = document.createElement("div");
+  host.id = "callbell-livechat-host";
+  const launcher = document.createElement("button");
+  launcher.setAttribute("aria-label", "Abrir chat");
+  const openChat = vi.fn();
+  launcher.addEventListener("click", openChat);
+  host.append(launcher);
+  document.body.append(host);
+  const onCancel = vi.fn();
+  try {
+    render(<CameraCapture {...props} onCancel={onCancel} />);
+    await act(async () => {});
+    fireEvent.click(screen.getByRole("button", { name: "Hablar con un asesor" }));
+    expect(onCancel).toHaveBeenCalledOnce();
+    expect(document.body.classList.contains("dni-camera-open")).toBe(false);
+    expect(openChat).toHaveBeenCalledOnce();
+  } finally { host.remove(); }
+});
+
+it("preserves another screen's chat visibility setting when the camera closes", async () => {
+  document.body.classList.add("hide-callbell");
+  try {
+    const { unmount } = await openCamera();
+    unmount();
+    expect(document.body.classList.contains("dni-camera-open")).toBe(false);
+    expect(document.body.classList.contains("hide-callbell")).toBe(true);
+  } finally { document.body.classList.remove("hide-callbell"); }
+});
+
 it("does not let old playback readiness change a reopened camera session", async () => {
   let finishOldPlayback;
   play.mockImplementationOnce(() => new Promise(resolve => { finishOldPlayback = resolve; }));

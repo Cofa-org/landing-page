@@ -28,6 +28,19 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllGlobals());
 
 describe("candidate lifecycle", () => {
+  it("updates live frame proportions on camera resize without restarting or rotating the capture", async () => {
+    const { result } = setup();
+    await act(async () => {});
+    const liveVideo = result.current.videoRef.current;
+    liveVideo.videoWidth = 1080;
+    liveVideo.videoHeight = 1920;
+    act(() => liveVideo.dispatchEvent(new Event("resize")));
+    expect(result.current.videoFrameStyle["--camera-aspect"]).toBe(1080 / 1920);
+    expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledOnce();
+    expect(result.current.rotation).toBe(0);
+    await takePhoto(result);
+    expect(result.current.phase).toBe("preview");
+  });
   it("keeps candidate local and confirms original plus rotation only on explicit click", async () => {
     const { result, props, unmount } = setup();
     await takePhoto(result);

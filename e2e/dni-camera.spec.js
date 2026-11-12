@@ -8,6 +8,40 @@ import { contextSnapshot, installSyntheticCapture, openEntry, takePhoto, takePai
 const { QRCodeSVG } = qrcodeReact;
 const isPhone = info => info.project.name.endsWith('-phone');
 
+for (const entry of ['mobile', 'inline']) for (const frame of [[1600,1200],[1200,1600]]) test(`${entry} short landscape camera contains frame and guide ${frame.join('x')}`, async ({page}, info) => {
+  test.skip(!isPhone(info));
+  await page.setViewportSize({width:844,height:300});
+  await installSyntheticCapture(page,{phone:true,width:frame[0],height:frame[1]});
+  await openEntry(page,entry);
+  await page.evaluate(()=>{const host=document.createElement('div');host.id='callbell-livechat-host';host.textContent='SYNTHETIC CHAT';document.body.append(host);});
+  await page.getByRole('button',{name:'Sacar foto del frente',exact:true}).click();
+  const dialog=page.getByRole('dialog');
+  const shutter=dialog.getByRole('button',{name:'Capturar',exact:true});
+  await expect(shutter).toBeVisible();
+  await expect(page.locator('#callbell-livechat-host')).toBeHidden();
+  for (const viewport of [{width:844,height:300},{width:740,height:260},{width:390,height:700},{width:844,height:300}]) {
+    await page.setViewportSize(viewport);
+    await expect.poll(()=>dialog.locator('video').evaluate(video=>{
+      const box=node=>{const r=node.getBoundingClientRect();return {x:r.x,y:r.y,right:r.right,bottom:r.bottom,width:r.width,height:r.height};};
+      const container=video.parentElement;
+      const guide=container.querySelector('[aria-hidden] > div');
+      const f=box(container),g=box(guide),v=box(video);
+      const inside=(a,b)=>a.x>=b.x-1&&a.y>=b.y-1&&a.right<=b.right+1&&a.bottom<=b.bottom+1;
+      return inside(g,f)&&inside(v,f)&&f.height>100&&Math.abs(f.width/f.height-video.videoWidth/video.videoHeight)<.02&&inside(f,{x:0,y:0,right:innerWidth,bottom:innerHeight});
+    })).toBe(true);
+    if (viewport.width>viewport.height) {
+      const f=await dialog.locator('video').boundingBox(),b=await shutter.boundingBox();
+      expect(b.x).toBeGreaterThanOrEqual(f.x+f.width);
+      expect(b.y+b.height).toBeLessThanOrEqual(viewport.height);
+    }
+  }
+  await page.screenshot({path:info.outputPath('landscape-camera.png'),fullPage:true});
+  await shutter.click();
+  await expect(dialog.getByRole('img')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#callbell-livechat-host')).toBeVisible();
+});
+
 test.afterEach(async ({ page }) => { await expect(page.locator('a[href*="/subir-dni?"], a[href*="wa.me"]')).toHaveCount(0); await page.close(); await page.context().unrouteAll({ behavior: 'ignoreErrors' }); });
 
 test('desktop touch/webcam only offers context-bound scannable QR', async ({ page }, info) => {
