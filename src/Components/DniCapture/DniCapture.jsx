@@ -19,7 +19,7 @@ export default function DniCapture({ viewModel }) {
                 {slot.previewUrl ? (
                   <div className={styles.previewScroll} data-expanded={slot.expanded}>
                     <div className={styles.previewFrame} style={slot.frameStyle}>
-                      <img src={slot.previewUrl} alt={slot.label} style={slot.imageStyle} />
+                      <img src={slot.previewUrl} alt={slot.label} />
                     </div>
                   </div>
                 ) : null}

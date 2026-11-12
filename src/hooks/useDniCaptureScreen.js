@@ -138,17 +138,11 @@ export function useDniCaptureScreen({ leadId, token, expectedContext, onSuccess,
 
   const slots = SIDES.map(definition => {
     const capture = model.captures[definition.side];
-    const rotated = capture?.rotation === 90 || capture?.rotation === 270;
-    const frameWidth = rotated ? capture?.height : capture?.width;
-    const frameHeight = rotated ? capture?.width : capture?.height;
     return {
       ...definition, previewUrl: capture?.previewUrl, expanded: zoomSide === definition.side,
       open: definition.side === "front" ? openFront : openBack,
       zoom: definition.side === "front" ? zoomFront : zoomBack,
-      frameStyle: capture ? { aspectRatio: frameWidth / frameHeight } : undefined,
-      imageStyle: capture ? { width: rotated ? `${capture.width / capture.height * 100}%` : "100%",
-        height: rotated ? `${capture.height / capture.width * 100}%` : "100%",
-        transform: `translate(-50%, -50%) rotate(${capture.rotation}deg)` } : undefined,
+      frameStyle: capture ? { aspectRatio: capture.width / capture.height } : undefined,
       disabled: !model.canCapture || model.isUploading || loading,
       actionLabel: capture ? `Volver a sacar el ${definition.name}` : `Sacar foto del ${definition.name}`,
       zoomLabel: zoomSide === definition.side ? `Reducir ${definition.name}` : `Ampliar ${definition.name}`,

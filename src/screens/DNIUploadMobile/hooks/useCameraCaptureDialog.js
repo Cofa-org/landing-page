@@ -14,7 +14,6 @@ export function useCameraCaptureDialog({ open, side: suppliedSide, tipoFoto, onC
   const lifecycle = useRef({ active: false, generation: 0, phase: "idle" });
   const [phase, setPhase] = useState("idle");
   const [previewUrl, setPreviewUrl] = useState("");
-  const [rotation, setRotation] = useState(0);
   const [expanded, setExpanded] = useState(false);
   const [error, setError] = useState("");
   const [warning, setWarning] = useState(null);
@@ -34,7 +33,7 @@ export function useCameraCaptureDialog({ open, side: suppliedSide, tipoFoto, onC
   }, [stopCamera]);
 
   const reset = useCallback(() => {
-    setPreviewUrl(""); setRotation(0); setExpanded(false); setError(""); setWarning(null); setWarningMessage(""); changePhase("idle");
+    setPreviewUrl(""); setExpanded(false); setError(""); setWarning(null); setWarningMessage(""); changePhase("idle");
   }, [changePhase]);
 
   useEffect(() => {
@@ -116,10 +115,10 @@ export function useCameraCaptureDialog({ open, side: suppliedSide, tipoFoto, onC
       const frame = await captureFrame(videoRef.current, canvasRef.current);
       if (!lifecycle.current.active || generation !== lifecycle.current.generation) return;
       const url = URL.createObjectURL(frame.blob);
-      candidateRef.current = { ...frame, rotation: 0, previewUrl: url };
+      candidateRef.current = { ...frame, previewUrl: url };
       const resolution = checkResolution({ videoWidth: frame.width, videoHeight: frame.height });
       setWarning(resolution.warning ?? null); setWarningMessage(resolution.message ?? "");
-      setPreviewUrl(url); setRotation(0); changePhase("preview");
+      setPreviewUrl(url); changePhase("preview");
       stopCamera();
       if (videoRef.current) videoRef.current.srcObject = null;
       if (canvasRef.current) { canvasRef.current.width = 0; canvasRef.current.height = 0; }
@@ -129,13 +128,6 @@ export function useCameraCaptureDialog({ open, side: suppliedSide, tipoFoto, onC
     }
   }, [captureFrame, stopCamera, changePhase]);
 
-  const handleRotate = useCallback(() => {
-    const candidate = candidateRef.current;
-    if (!lifecycle.current.active || lifecycle.current.phase !== "preview" || !candidate) return;
-    candidateRef.current = { ...candidate, rotation: (candidate.rotation + 90) % 360 };
-    setRotation(candidateRef.current.rotation);
-  }, []);
-
   const handleRetry = useCallback(() => {
     if (!lifecycle.current.active) return;
     release(); reset(); void handleStart();
@@ -144,7 +136,7 @@ export function useCameraCaptureDialog({ open, side: suppliedSide, tipoFoto, onC
   const handleConfirm = useCallback(() => {
     const candidate = candidateRef.current;
     if (!lifecycle.current.active || lifecycle.current.phase !== "preview" || !candidate) return;
-    const confirmed = { blob: candidate.blob, width: candidate.width, height: candidate.height, rotation: candidate.rotation };
+    const confirmed = { blob: candidate.blob, width: candidate.width, height: candidate.height, rotation: 0 };
     lifecycle.current.active = false;
     release(); reset();
     onConfirm(confirmed);
@@ -193,16 +185,10 @@ export function useCameraCaptureDialog({ open, side: suppliedSide, tipoFoto, onC
     openCallbellWebchat();
   }, [handleClose]);
   const candidate = candidateRef.current;
-  const rotated = rotation === 90 || rotation === 270;
-  const previewFrameStyle = candidate ? { aspectRatio: rotated ? candidate.height / candidate.width : candidate.width / candidate.height } : undefined;
-  const previewImageStyle = candidate ? {
-    width: rotated ? `${candidate.width / candidate.height * 100}%` : "100%",
-    height: rotated ? `${candidate.height / candidate.width * 100}%` : "100%",
-    transform: `translate(-50%, -50%) rotate(${rotation}deg)`,
-  } : undefined;
-  return { videoRef, canvasRef, phase, previewUrl, rotation, error: error || cameraError, warning, warningMessage,
+  const previewFrameStyle = candidate ? { aspectRatio: candidate.width / candidate.height } : undefined;
+  return { videoRef, canvasRef, phase, previewUrl, error: error || cameraError, warning, warningMessage,
     videoFrameStyle: { "--camera-aspect": videoAspectRatio },
-    modalRef, titleId, expanded, previewFrameStyle, previewImageStyle, handleZoom, handleContactAdvisor,
+    modalRef, titleId, expanded, previewFrameStyle, handleZoom, handleContactAdvisor,
     title: `Sacar foto del ${side === "back" ? "dorso" : "frente"}`,
     previewAlt: `Foto del ${side === "back" ? "dorso" : "frente"}`,
     zoomLabel: expanded ? "Reducir foto" : "Ampliar foto",
@@ -212,5 +198,5 @@ export function useCameraCaptureDialog({ open, side: suppliedSide, tipoFoto, onC
     showPermissionHint: permissionHint && phase === "starting" && !stream,
     isCapturing: phase === "capturing",
     captureLabel: phase === "capturing" ? "Capturando…" : "Capturar",
-    handleStart, handleCapture, handleRotate, handleRetry, handleConfirm, handleClose };
+    handleStart, handleCapture, handleRetry, handleConfirm, handleClose };
 }

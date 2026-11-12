@@ -37,20 +37,17 @@ describe("candidate lifecycle", () => {
     act(() => liveVideo.dispatchEvent(new Event("resize")));
     expect(result.current.videoFrameStyle["--camera-aspect"]).toBe(1080 / 1920);
     expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledOnce();
-    expect(result.current.rotation).toBe(0);
     await takePhoto(result);
     expect(result.current.phase).toBe("preview");
   });
-  it("keeps candidate local and confirms original plus rotation only on explicit click", async () => {
+  it("keeps candidate local and confirms the unchanged original only on explicit click", async () => {
     const { result, props, unmount } = setup();
     await takePhoto(result);
     expect(result.current.phase).toBe("preview");
     expect(props.onConfirm).not.toHaveBeenCalled();
-    act(() => result.current.handleRotate());
-    expect(result.current.rotation).toBe(90);
     expect(encode).toHaveBeenCalledTimes(1);
     act(() => { result.current.handleConfirm(); result.current.handleConfirm(); });
-    expect(props.onConfirm).toHaveBeenCalledExactlyOnceWith({ blob: original, width: 1920, height: 1080, rotation: 90 });
+    expect(props.onConfirm).toHaveBeenCalledExactlyOnceWith({ blob: original, width: 1920, height: 1080, rotation: 0 });
     expect(URL.revokeObjectURL).toHaveBeenCalledExactlyOnceWith("blob:modal-1");
     unmount();
     expect(URL.revokeObjectURL).toHaveBeenCalledTimes(1);
@@ -86,10 +83,9 @@ describe("candidate lifecycle", () => {
     expect(result.current.phase).toBe("idle");
     expect(stop).toHaveBeenCalledTimes(1);
   });
-  it("recapture releases only the modal URL and resets rotation", async () => {
+  it("recapture releases only the modal URL and starts the camera again", async () => {
     const { result } = setup(); await takePhoto(result);
-    await act(async () => { result.current.handleRotate(); result.current.handleRetry(); });
-    expect(result.current.rotation).toBe(0);
+    await act(async () => { result.current.handleRetry(); });
     expect(result.current.previewUrl).toBe("");
     expect(result.current.phase).toBe("streaming");
     expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledTimes(2);

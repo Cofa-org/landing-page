@@ -28,11 +28,10 @@ export default function CameraCapture({ open, onCapture, onCancel, tipoFoto }) {
         {dialog.phase === "preview" ? <div className={styles.previewContainer}>
           <div className={styles.previewScroll} data-expanded={dialog.expanded}>
             <div className={styles.previewFrame} style={dialog.previewFrameStyle}>
-              <img src={dialog.previewUrl} alt={dialog.previewAlt} className={styles.previewImage} style={dialog.previewImageStyle} />
+              <img src={dialog.previewUrl} alt={dialog.previewAlt} className={styles.previewImage} />
             </div>
           </div>
           <div className={styles.previewActions}>
-            <GenericButton variant="secondary" onClick={dialog.handleRotate}>Girar 90°</GenericButton>
             <GenericButton variant="secondary" onClick={dialog.handleZoom} aria-expanded={dialog.expanded}>{dialog.zoomLabel}</GenericButton>
           </div>
           <p>Revisá la foto completa antes de usarla.</p>

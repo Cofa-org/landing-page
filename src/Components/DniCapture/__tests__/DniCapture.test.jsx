@@ -100,19 +100,17 @@ it("names dialog, starts camera, traps focus and Escape returns focus",async()=>
  rerender(<CameraCapture open={false} tipoFoto="frente" onCapture={vi.fn()} onCancel={onCancel}/>);
  expect(trigger).toHaveFocus();trigger.remove();
 });
-it("shows full frame, rotation and zoom then confirms once with no preview URL",async()=>{
+it("shows the complete unrotated frame with zoom and confirms once",async()=>{
  const onCapture=vi.fn();render(<CameraCapture open tipoFoto="dorso" onCapture={onCapture} onCancel={vi.fn()}/>);
  await screen.findByRole("button",{name:"Capturar"});
  fireEvent.click(screen.getByRole("button",{name:"Capturar"}));
  const preview=await screen.findByAltText("Foto del dorso");
  expect(screen.queryByRole("button",{name:"Hablar con un asesor"})).toBeNull();
  expect(preview.parentElement.style.aspectRatio).toBe("1.5 / 1");
- fireEvent.click(screen.getByRole("button",{name:"Girar 90°"}));
- expect(preview.style.transform).toContain("rotate(90deg)");
- expect(preview.parentElement.style.aspectRatio).toBe("0.6666666666666666 / 1");
+ expect(screen.queryByRole("button",{name:/Girar/})).toBeNull();
  fireEvent.click(screen.getByRole("button",{name:"Ampliar foto"}));expect(screen.getByRole("button",{name:"Reducir foto"})).toHaveAttribute("aria-expanded","true");
  fireEvent.click(screen.getByRole("button",{name:"Usar esta foto"}));
- expect(onCapture).toHaveBeenCalledExactlyOnceWith({...capture,rotation:90});
+ expect(onCapture).toHaveBeenCalledExactlyOnceWith({...capture,rotation:0});
 });
 
 it('shows preparation guidance only on the initial screen and opens camera directly', async () => {

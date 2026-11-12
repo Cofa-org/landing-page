@@ -87,7 +87,7 @@ for (const entry of ['mobile', 'inline']) test(`${entry} captures original PNG p
   expect(consoleMessages.join('\n')).not.toMatch(/synthetic-token|PRIVATE-UPSTREAM|base64|blob:|a1234567/);
 });
 
-for (const portrait of [false, true]) test(`actual preview geometry all rotations, zoom, corners, focus (${portrait ? 'portrait' : 'landscape'})`, async ({ page }, info) => {
+for (const portrait of [false, true]) test(`actual preview geometry, original orientation, zoom, corners, focus (${portrait ? 'portrait' : 'landscape'})`, async ({ page }, info) => {
   await installSyntheticCapture(page, { phone: true, width: portrait ? 1200 : 1600, height: portrait ? 1600 : 1200 });
   await openEntry(page); const opener = page.getByRole('button', { name: 'Sacar foto del frente', exact: true });
   await opener.click(); const dialog = page.getByRole('dialog'); const close = dialog.getByRole('button', { name: 'Cerrar cámara' });
@@ -97,21 +97,19 @@ for (const portrait of [false, true]) test(`actual preview geometry all rotation
   await expect(dialog.getByRole('img')).toBeVisible();
   await expect.poll(() => dialog.getByRole('img').evaluate(image => image.naturalWidth)).toBe(portrait ? 1200 : 1600);
   const geometry = [];
-  for (const rotation of [0,90,180,270]) {
-    const image = dialog.getByRole('img');
-    const boxes = await image.evaluate(img => { const r=img.getBoundingClientRect(); const f=img.parentElement.getBoundingClientRect(); return { image: { x:r.x,y:r.y,width:r.width,height:r.height }, frame: { x:f.x,y:f.y,width:f.width,height:f.height }, natural: [img.naturalWidth,img.naturalHeight] }; });
-    expect(Math.abs(boxes.image.width-boxes.frame.width)).toBeLessThan(1);
-    expect(Math.abs(boxes.image.height-boxes.frame.height)).toBeLessThan(1);
-    expect(boxes.natural).toEqual(portrait ? [1200,1600] : [1600,1200]); geometry.push({ rotation, ...boxes });
-    await image.scrollIntoViewIfNeeded();
-    await page.screenshot({ path: info.outputPath(`${info.project.name}-${portrait ? 'portrait' : 'landscape'}-${rotation}.png`), fullPage: true });
-    await dialog.getByRole('button', { name: 'Ampliar foto', exact: true }).click();
-    const scroll = dialog.locator('[data-expanded=true]');
-    expect(await scroll.evaluate(el => el.scrollWidth > el.clientWidth)).toBe(true);
-    for (const corner of ['left','right']) { await scroll.evaluate((el,corner) => { el.scrollLeft = corner === 'left' ? 0 : el.scrollWidth; }, corner); await scroll.screenshot({ path: info.outputPath(`${info.project.name}-${portrait ? 'portrait' : 'landscape'}-${rotation}-zoom-${corner}.png`) }); }
-    await dialog.getByRole('button', { name: 'Reducir foto', exact: true }).click();
-    await dialog.getByRole('button', { name: 'Girar 90°', exact: true }).click();
-  }
+  await expect(dialog.getByRole('button', {name:/Girar/})).toHaveCount(0);
+  const image = dialog.getByRole('img');
+  const boxes = await image.evaluate(img => { const r=img.getBoundingClientRect(); const f=img.parentElement.getBoundingClientRect(); return { image: { x:r.x,y:r.y,width:r.width,height:r.height }, frame: { x:f.x,y:f.y,width:f.width,height:f.height }, natural: [img.naturalWidth,img.naturalHeight] }; });
+  expect(Math.abs(boxes.image.width-boxes.frame.width)).toBeLessThan(1);
+  expect(Math.abs(boxes.image.height-boxes.frame.height)).toBeLessThan(1);
+  expect(boxes.natural).toEqual(portrait ? [1200,1600] : [1600,1200]); geometry.push(boxes);
+  await image.scrollIntoViewIfNeeded();
+  await page.screenshot({ path: info.outputPath(`${info.project.name}-${portrait ? 'portrait' : 'landscape'}-original.png`), fullPage: true });
+  await dialog.getByRole('button', { name: 'Ampliar foto', exact: true }).click();
+  const scroll = dialog.locator('[data-expanded=true]');
+  expect(await scroll.evaluate(el => el.scrollWidth > el.clientWidth)).toBe(true);
+  for (const corner of ['left','right']) { await scroll.evaluate((el,corner) => { el.scrollLeft = corner === 'left' ? 0 : el.scrollWidth; }, corner); await scroll.screenshot({ path: info.outputPath(`${info.project.name}-${portrait ? 'portrait' : 'landscape'}-original-zoom-${corner}.png`) }); }
+  await dialog.getByRole('button', { name: 'Reducir foto', exact: true }).click();
   await writeFile(info.outputPath(`${info.project.name}-${portrait ? 'portrait' : 'landscape'}-geometry.json`), JSON.stringify(geometry,null,2));
   const targets = await dialog.locator('button,a').evaluateAll(nodes => nodes.filter(node=>node.getClientRects().length).map(node => ({ name:node.textContent, height:node.getBoundingClientRect().height, width:node.getBoundingClientRect().width })));
   expect(targets.every(target=>target.height>=44 && target.width>=44)).toBe(true);
@@ -392,37 +390,34 @@ for (const portrait of [false, true]) test(`confirmed parent previews contain ev
   test.setTimeout(70000);
   await installSyntheticCapture(page, { phone: true, width: portrait ? 1200 : 1600, height: portrait ? 1600 : 1200 });
   await openEntry(page);
-  for (const rotation of [0, 90, 180, 270]) {
-    for (const side of ['frente', 'dorso']) {
-      await page.getByRole('button', { name: new RegExp(`^(Sacar foto del|Volver a sacar el) ${side}$`) }).click();
-      const dialog = page.getByRole('dialog');
-      await dialog.getByRole('button', { name: 'Capturar', exact: true }).click();
-      await expect.poll(() => dialog.getByRole('img').evaluate(image => image.naturalWidth)).toBe(portrait ? 1200 : 1600);
-      for (let turn = 0; turn < rotation / 90; turn++) await dialog.getByRole('button', { name: 'Girar 90°', exact: true }).click();
-      await dialog.getByRole('button', { name: 'Usar esta foto', exact: true }).click();
-      const image = page.getByAltText(side === 'frente' ? 'Frente del DNI' : 'Dorso del DNI', { exact: true });
-      await expect.poll(() => image.evaluate(image => image.naturalWidth)).toBe(portrait ? 1200 : 1600);
-      const geometry = await image.evaluate(image => {
-        const frame = image.parentElement; const viewport = frame.parentElement; const slot = viewport.parentElement;
-        const bounds = node => { const box = node.getBoundingClientRect(); return { x: box.x, y: box.y, width: box.width, height: box.height }; };
-        return { image: bounds(image), frame: bounds(frame), viewport: bounds(viewport), slot: bounds(slot), slotScrollHeight: slot.scrollHeight, slotClientHeight: slot.clientHeight };
-      });
-      expect(geometry.viewport.height + 1).toBeGreaterThanOrEqual(geometry.frame.height);
-      expect(geometry.slotScrollHeight).toBeLessThanOrEqual(geometry.slotClientHeight + 1);
-      expect(Math.abs(geometry.image.width - geometry.frame.width)).toBeLessThan(1);
-      expect(Math.abs(geometry.image.height - geometry.frame.height)).toBeLessThan(1);
+  for (const side of ['frente', 'dorso']) {
+    await page.getByRole('button', { name: new RegExp(`^(Sacar foto del|Volver a sacar el) ${side}$`) }).click();
+    const dialog = page.getByRole('dialog');
+    await dialog.getByRole('button', { name: 'Capturar', exact: true }).click();
+    await expect.poll(() => dialog.getByRole('img').evaluate(image => image.naturalWidth)).toBe(portrait ? 1200 : 1600);
+    await dialog.getByRole('button', { name: 'Usar esta foto', exact: true }).click();
+    const image = page.getByAltText(side === 'frente' ? 'Frente del DNI' : 'Dorso del DNI', { exact: true });
+    await expect.poll(() => image.evaluate(image => image.naturalWidth)).toBe(portrait ? 1200 : 1600);
+    const geometry = await image.evaluate(image => {
+      const frame = image.parentElement; const viewport = frame.parentElement; const slot = viewport.parentElement;
+      const bounds = node => { const box = node.getBoundingClientRect(); return { x: box.x, y: box.y, width: box.width, height: box.height }; };
+      return { image: bounds(image), frame: bounds(frame), viewport: bounds(viewport), slot: bounds(slot), slotScrollHeight: slot.scrollHeight, slotClientHeight: slot.clientHeight };
+    });
+    expect(geometry.viewport.height + 1).toBeGreaterThanOrEqual(geometry.frame.height);
+    expect(geometry.slotScrollHeight).toBeLessThanOrEqual(geometry.slotClientHeight + 1);
+    expect(Math.abs(geometry.image.width - geometry.frame.width)).toBeLessThan(1);
+    expect(Math.abs(geometry.image.height - geometry.frame.height)).toBeLessThan(1);
 
-      const name = `${info.project.name}-parent-${portrait ? 'portrait' : 'landscape'}-${side}-${rotation}`;
-      await image.locator('..').screenshot({ path: info.outputPath(`${name}.png`) });
-      await page.getByRole('button', { name: `Ampliar ${side}`, exact: true }).click();
-      const viewport = image.locator('../..');
-      expect(await viewport.evaluate(node => node.scrollWidth > node.clientWidth)).toBe(true);
-      for (const corner of ['left', 'right']) {
-        await viewport.evaluate((node, corner) => { node.scrollLeft = corner === 'left' ? 0 : node.scrollWidth; }, corner);
-        await viewport.screenshot({ path: info.outputPath(`${name}-zoom-${corner}.png`) });
-      }
-      await page.getByRole('button', { name: `Reducir ${side}`, exact: true }).click();
+    const name = `${info.project.name}-parent-${portrait ? 'portrait' : 'landscape'}-${side}-original`;
+    await image.locator('..').screenshot({ path: info.outputPath(`${name}.png`) });
+    await page.getByRole('button', { name: `Ampliar ${side}`, exact: true }).click();
+    const viewport = image.locator('../..');
+    expect(await viewport.evaluate(node => node.scrollWidth > node.clientWidth)).toBe(true);
+    for (const corner of ['left', 'right']) {
+      await viewport.evaluate((node, corner) => { node.scrollLeft = corner === 'left' ? 0 : node.scrollWidth; }, corner);
+      await viewport.screenshot({ path: info.outputPath(`${name}-zoom-${corner}.png`) });
     }
+    await page.getByRole('button', { name: `Reducir ${side}`, exact: true }).click();
   }
   await expect(page.getByRole('button', { name: 'Enviar fotos', exact: true })).toBeEnabled();
   const slots = await page.locator('section[aria-label]').evaluateAll(slots => slots.map(slot => { const box = slot.getBoundingClientRect(); return { x: box.x, y: box.y, right: box.right, bottom: box.bottom }; }));
