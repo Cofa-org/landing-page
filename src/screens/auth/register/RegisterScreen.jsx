@@ -5,9 +5,29 @@ import RegisterNewStep from "./components/RegisterNewStep.jsx";
 import RegisterExistingStep from "./components/RegisterExistingStep.jsx";
 import RegisterAlreadyRegisteredStep from "./components/RegisterAlreadyRegisteredStep.jsx";
 import RegisterVerifyStep from "./components/RegisterVerifyStep.jsx";
+import RegisterPasswordStep from "./components/RegisterPasswordStep.jsx";
 
 const RegisterScreen = () => {
   const flow = useRegisterFlow();
+
+  if (flow.step === STEP.PASSWORD) {
+    return (
+      <RegisterPasswordStep
+        newPassword={flow.newPassword}
+        setNewPassword={flow.setNewPassword}
+        confirmPassword={flow.confirmPassword}
+        setConfirmPassword={flow.setConfirmPassword}
+        honeypot={flow.honeypot}
+        setHoneypot={flow.setHoneypot}
+        turnstile={flow.turnstilePassword}
+        loading={flow.loadingPassword}
+        error={flow.errorPassword}
+        expired={flow.registrationExpired}
+        onSubmit={flow.handleCompleteRegistration}
+        onRestart={flow.restartRegistration}
+      />
+    );
+  }
 
   if (flow.step === STEP.VERIFY) {
     return (
@@ -37,8 +57,6 @@ const RegisterScreen = () => {
     return (
       <RegisterExistingStep
         maskedEmail={flow.existingMaskedEmail}
-        password={flow.passwordExisting}
-        setPassword={flow.setPasswordExisting}
         honeypot={flow.honeypot}
         setHoneypot={flow.setHoneypot}
         turnstile={flow.turnstileExisting}
@@ -65,8 +83,6 @@ const RegisterScreen = () => {
       <RegisterNewStep
         email={flow.email}
         setEmail={flow.setEmail}
-        password={flow.password}
-        setPassword={flow.setPassword}
         honeypot={flow.honeypot}
         setHoneypot={flow.setHoneypot}
         turnstile={flow.turnstileReg}

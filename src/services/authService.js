@@ -42,22 +42,27 @@ export default class AuthService {
     return authRequest("/dni/resolve", { body: { dni, turnstileToken }, signal });
   }
 
-  static registerExistingClient(cuit, password, turnstileToken, signal) {
+  static registerExistingClient(cuit, turnstileToken, signal) {
     return authRequest("/register-existing-client", {
-      body: { cuit, password, turnstileToken },
+      body: { cuit, turnstileToken },
       signal,
     });
   }
 
-  static register(email, password, turnstileToken, cuit = null, signal) {
-    return authRequest("/register", {
-      body: { email, password, turnstileToken, ...(cuit ? { cuit } : {}) },
-      signal,
-    });
+  static register(email, turnstileToken, signal) {
+    return authRequest("/register", { body: { email, turnstileToken }, signal });
   }
 
+  /** Devuelve { registrationToken } para elegir la contraseña con completeRegistration. */
   static verifyEmail(email, code, turnstileToken, signal) {
     return authRequest("/verify-email", { body: { email, code, turnstileToken }, signal });
+  }
+
+  static completeRegistration(registrationToken, password, cuit, turnstileToken, signal) {
+    return authRequest("/register/complete", {
+      body: { registrationToken, password, turnstileToken, ...(cuit ? { cuit } : {}) },
+      signal,
+    });
   }
 
   static resendOtp(email, turnstileToken, signal) {

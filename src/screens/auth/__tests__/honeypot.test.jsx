@@ -180,38 +180,31 @@ describe("RegisterScreen — honeypot", () => {
     // 1. Completar paso DNI
     await completeDniStep(container);
 
-    // 2. Rellenar email, contraseña y honeypot
+    // 2. Rellenar email y honeypot
     fillByName(container, "email", "nuevo@test.com");
-    fillByName(container, "password", "password123!");
     fillHoneypot(container);
 
-    fireEvent.click(screen.getByRole("button", { name: /crear cuenta/i }));
+    fireEvent.click(screen.getByRole("button", { name: /continuar/i }));
 
     await waitFor(() => {
       expect(authService.register).not.toHaveBeenCalled();
     });
   });
 
-  it("sí llama a register (con cuit) si el honeypot está vacío", async () => {
+  it("sí llama a register si el honeypot está vacío", async () => {
     authService.register.mockResolvedValue({ success: true });
     const { container } = renderInRouter(<RegisterScreen />);
 
     // 1. Completar paso DNI
     await completeDniStep(container);
 
-    // 2. Rellenar email y contraseña (sin honeypot)
+    // 2. Rellenar email (sin honeypot)
     fillByName(container, "email", "nuevo@test.com");
-    fillByName(container, "password", "password123!");
 
-    fireEvent.click(screen.getByRole("button", { name: /crear cuenta/i }));
+    fireEvent.click(screen.getByRole("button", { name: /continuar/i }));
 
     await waitFor(() => {
-      expect(authService.register).toHaveBeenCalledWith(
-        "nuevo@test.com",
-        "password123!",
-        "fake-turnstile-token",
-        "20301234568", // cuit del paso DNI
-      );
+      expect(authService.register).toHaveBeenCalledWith("nuevo@test.com", "fake-turnstile-token");
     });
   });
 });

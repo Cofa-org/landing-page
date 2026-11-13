@@ -4,7 +4,7 @@
  * - Que el paso inicial muestra el formulario de DNI (no email)
  * - Que un DNI inválido muestra error antes de llamar al servicio
  * - Que resolveDni es llamado con el DNI correcto
- * - Que con identidad única + nuevo usuario → pasa al paso de email/contraseña
+ * - Que con identidad única + nuevo usuario → pasa al paso de email
  * - Que con múltiples identidades → muestra la pantalla de selección
  * - Que con cliente existente (existingClient) → muestra el paso de email enmascarado
  */
@@ -67,8 +67,8 @@ vi.mock("../../../Components/Forms/GenericInput/PasswordInput.jsx", async () => 
 }));
 
 vi.mock("../../../Components/buttons/GenericButton/GenericButton.jsx", async () => ({
-  default: ({ children, disabled, type }) => (
-    <button type={type} disabled={disabled}>{children}</button>
+  default: ({ children, disabled, type, onClick }) => (
+    <button type={type} disabled={disabled} onClick={onClick}>{children}</button>
   ),
 }));
 
@@ -91,6 +91,7 @@ vi.mock("../../../services/authService.js", () => ({
 }));
 
 import RegisterScreen from "../register/RegisterScreen.jsx";
+import RegisterPasswordStep from "../register/components/RegisterPasswordStep.jsx";
 
 function renderScreen() {
   return render(
@@ -127,7 +128,7 @@ describe("RegisterScreen — paso DNI inicial", () => {
     expect(btn.disabled).toBe(false);
   });
 
-  it("con identidad única y nuevo usuario → avanza al paso email/contraseña", async () => {
+  it("con identidad única y nuevo usuario → avanza al paso del email", async () => {
     mockResolveDni.mockResolvedValue({
       identities: [{ cuit: "20301234568", nombreCompleto: "Juan Pérez" }],
       existingClient: null,
@@ -165,7 +166,7 @@ describe("RegisterScreen — paso DNI inicial", () => {
     });
   });
 
-  it("con cliente existente → muestra email enmascarado y paso de contraseña", async () => {
+  it("con cliente existente → muestra email enmascarado", async () => {
     mockResolveDni.mockResolvedValue({
       identities: [{ cuit: "20301234568", nombreCompleto: "Juan Pérez" }],
       existingClient: { maskedEmail: "j****ez@gm****.com" },
@@ -245,8 +246,48 @@ describe("RegisterScreen — paso DNI inicial", () => {
   });
 });
 
-describe("RegisterScreen — registro nuevo usuario con CUIT", () => {
-  it("pasa cuit al llamar a authService.register", async () => {
+describe("RegisterPasswordStep", () => {
+  const baseProps = {
+    newPassword: "passphrase-de-prueba-1",
+    setNewPassword: vi.fn(),
+    confirmPassword: "passphrase-de-prueba-1",
+    setConfirmPassword: vi.fn(),
+    honeypot: "",
+    setHoneypot: vi.fn(),
+    turnstile: { ref: { current: null }, token: "tok", onVerify: vi.fn(), onClear: vi.fn() },
+    loading: false,
+    error: "",
+    expired: false,
+    onSubmit: vi.fn(),
+    onRestart: vi.fn(),
+  };
+
+  it("pide contraseña y confirmación y habilita Crear cuenta si coinciden", () => {
+    render(<RegisterPasswordStep {...baseProps} />);
+    expect(screen.getByLabelText(/^contraseña$/i)).toBeTruthy();
+    expect(screen.getByLabelText(/confirmar contraseña/i)).toBeTruthy();
+    expect(screen.getByRole("button", { name: /crear cuenta/i }).disabled).toBe(false);
+  });
+
+  it("con contraseñas distintas, Crear cuenta queda deshabilitado", () => {
+    render(<RegisterPasswordStep {...baseProps} confirmPassword="otra" />);
+    expect(screen.getByRole("button", { name: /crear cuenta/i }).disabled).toBe(true);
+  });
+
+  it("vencido: muestra el error y Volver a empezar en lugar de Crear cuenta", () => {
+    const onRestart = vi.fn();
+    render(
+      <RegisterPasswordStep {...baseProps} expired error="El tiempo para crear la contraseña venció." onRestart={onRestart} />,
+    );
+    expect(screen.getByText(/venció/i)).toBeTruthy();
+    expect(screen.queryByRole("button", { name: /crear cuenta/i })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: /volver a empezar/i }));
+    expect(onRestart).toHaveBeenCalled();
+  });
+});
+
+describe("RegisterScreen — registro nuevo usuario", () => {
+  it("el paso del email no pide contraseña y pasa al código", async () => {
     mockResolveDni.mockResolvedValue({
       identities: [{ cuit: "20301234568", nombreCompleto: "Juan Pérez" }],
       existingClient: null,
@@ -254,23 +295,32 @@ describe("RegisterScreen — registro nuevo usuario con CUIT", () => {
     mockRegister.mockResolvedValue({ success: true });
 
     renderScreen();
-    // Paso DNI
     fireEvent.change(screen.getByLabelText(/dni/i), { target: { value: "30123456" } });
     fireEvent.submit(screen.getByLabelText(/dni/i).closest("form"));
 
-    // Paso email + contraseña
     await waitFor(() => screen.getByLabelText(/^email$/i));
+    expect(screen.queryByLabelText(/contraseña/i)).toBeNull();
     fireEvent.change(screen.getByLabelText(/^email$/i), { target: { value: "test@test.com" } });
-    fireEvent.change(screen.getByLabelText(/contraseña/i), { target: { value: "Password123!" } });
     fireEvent.submit(screen.getByLabelText(/^email$/i).closest("form"));
 
     await waitFor(() => {
-      expect(mockRegister).toHaveBeenCalledWith(
-        "test@test.com",
-        "Password123!",
-        expect.any(String), // turnstileToken
-        "20301234568",       // cuit
-      );
+      expect(mockRegister).toHaveBeenCalledWith("test@test.com", expect.any(String));
+      expect(screen.getByTestId("otp-stub")).toBeTruthy();
     });
+  });
+
+  it("cliente existente: no pide contraseña antes del código", async () => {
+    mockResolveDni.mockResolvedValue({
+      identities: [{ cuit: "20301234568", nombreCompleto: "Juan Pérez" }],
+      existingClient: { maskedEmail: "j****ez@gm****.com" },
+    });
+    renderScreen();
+    fireEvent.change(screen.getByLabelText(/dni/i), { target: { value: "30123456" } });
+    fireEvent.submit(screen.getByLabelText(/dni/i).closest("form"));
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /enviar código/i })).toBeTruthy();
+    });
+    expect(screen.queryByLabelText(/contraseña/i)).toBeNull();
   });
 });

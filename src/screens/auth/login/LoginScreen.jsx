@@ -1,23 +1,8 @@
 import { useLoginFlow } from "./hooks/useLoginFlow.js";
 import LoginForm from "./components/LoginForm.jsx";
-import LoginVerifyStep from "./components/LoginVerifyStep.jsx";
 
 const LoginScreen = () => {
   const flow = useLoginFlow();
-
-  if (flow.needsVerify) {
-    return (
-      <LoginVerifyStep
-        destination={flow.email.trim()}
-        onValidate={flow.handleVerify}
-        onResend={flow.handleResend}
-        onBack={flow.goBackToForm}
-        loading={flow.loading}
-        error={flow.error}
-        turnstile={flow.turnstileVerify}
-      />
-    );
-  }
 
   return (
     <LoginForm

@@ -1,21 +1,13 @@
-import PasswordInput from "../../../../Components/Forms/GenericInput/PasswordInput.jsx";
 import GenericForm from "../../../../Components/Forms/GenericForm/GenericForm.jsx";
 import GenericButton from "../../../../Components/buttons/GenericButton/GenericButton.jsx";
 import Turnstile from "../../../../Components/Turnstile/Turnstile.jsx";
 import { TURNSTILE_SITE_KEY } from "../../../../config.js";
 import HoneypotField from "../../HoneypotField.jsx";
 import AuthSplitLayout from "../../AuthSplitLayout.jsx";
-import {
-  PASSWORD_HELPER_TEXT,
-  getPasswordPolicyError,
-  isPasswordPolicyValid,
-} from "../../passwordPolicy.js";
 import styles from "../../auth.module.css";
 
 const RegisterExistingStep = ({
   maskedEmail,
-  password,
-  setPassword,
   honeypot,
   setHoneypot,
   turnstile,
@@ -26,7 +18,7 @@ const RegisterExistingStep = ({
 }) => (
   <AuthSplitLayout
     title="Bienvenido de vuelta"
-    sub="Encontramos un registro vinculado a tu identidad. Elegí una contraseña para acceder."
+    sub="Encontramos un registro vinculado a tu identidad. Confirmá tu email para elegir una contraseña."
   >
     <GenericForm title="Activá tu cuenta" onSubmit={onSubmit}>
       <div className={styles.infoBox}>
@@ -35,17 +27,6 @@ const RegisterExistingStep = ({
           <strong>{maskedEmail}</strong>
         </p>
       </div>
-      <PasswordInput
-        label="Elegí una contraseña"
-        name="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        autoComplete="new-password"
-        required
-        minLength={8}
-        helperText={PASSWORD_HELPER_TEXT}
-        error={password.length > 0 ? getPasswordPolicyError(password) : ""}
-      />
       <HoneypotField value={honeypot} onChange={(e) => setHoneypot(e.target.value)} />
       <div className={styles.turnstileWrapper}>
         <Turnstile
@@ -58,12 +39,8 @@ const RegisterExistingStep = ({
       </div>
       {error && <p className={`${styles.alert} ${styles.alertError}`}>{error}</p>}
       <div className={styles.formActions}>
-        <GenericButton
-          type="submit"
-          loading={loading}
-          disabled={loading || !turnstile.token || !isPasswordPolicyValid(password)}
-        >
-          Activar cuenta
+        <GenericButton type="submit" loading={loading} disabled={loading || !turnstile.token}>
+          Enviar código
         </GenericButton>
         <button type="button" className={styles.backLink} onClick={onBack}>
           ← Volver

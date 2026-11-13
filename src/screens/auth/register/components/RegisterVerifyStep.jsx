@@ -16,7 +16,7 @@ const RegisterVerifyStep = ({
 }) => (
   <AuthSplitLayout
     title="Verificá tu email"
-    sub="Te enviamos un código de 6 dígitos. Ingresalo para activar tu cuenta."
+    sub="Te enviamos un código de 6 dígitos. Ingresalo para elegir tu contraseña."
   >
     <div style={{ width: "100%", maxWidth: "450px" }}>
       <OTPValidation

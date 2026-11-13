@@ -1,25 +1,17 @@
 import { Link } from "react-router-dom";
 import GenericForm from "../../../../Components/Forms/GenericForm/GenericForm.jsx";
 import GenericInput from "../../../../Components/Forms/GenericInput/GenericInput.jsx";
-import PasswordInput from "../../../../Components/Forms/GenericInput/PasswordInput.jsx";
 import GenericButton from "../../../../Components/buttons/GenericButton/GenericButton.jsx";
 import Turnstile from "../../../../Components/Turnstile/Turnstile.jsx";
 import { TURNSTILE_SITE_KEY } from "../../../../config.js";
 import HoneypotField from "../../HoneypotField.jsx";
 import AuthSplitLayout from "../../AuthSplitLayout.jsx";
-import {
-  PASSWORD_HELPER_TEXT,
-  getPasswordPolicyError,
-  isPasswordPolicyValid,
-} from "../../passwordPolicy.js";
 import styles from "../../auth.module.css";
 import { AUTH_EMAIL_MAX_LENGTH } from "../../../../constants/AUTH.js";
 
 const RegisterNewStep = ({
   email,
   setEmail,
-  password,
-  setPassword,
   honeypot,
   setHoneypot,
   turnstile,
@@ -45,17 +37,6 @@ const RegisterNewStep = ({
         required
         autoComplete="email"
       />
-      <PasswordInput
-        label="Contraseña"
-        name="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        autoComplete="new-password"
-        required
-        minLength={8}
-        helperText={PASSWORD_HELPER_TEXT}
-        error={password.length > 0 ? getPasswordPolicyError(password) : ""}
-      />
       <HoneypotField value={honeypot} onChange={(e) => setHoneypot(e.target.value)} />
       <div className={styles.turnstileWrapper}>
         <Turnstile
@@ -71,11 +52,9 @@ const RegisterNewStep = ({
         <GenericButton
           type="submit"
           loading={loading}
-          disabled={
-            loading || !turnstile.token || !email.trim() || !isPasswordPolicyValid(password)
-          }
+          disabled={loading || !turnstile.token || !email.trim()}
         >
-          Crear cuenta
+          Continuar
         </GenericButton>
         <button type="button" className={styles.backLink} onClick={onBack}>
           ← Volver

@@ -91,8 +91,37 @@ describe("AuthService", () => {
     expect(HttpApi.mock.calls[0][0]).toContain("/dni/resolve");
 
     HttpApi.mockResolvedValue(ok({ success: true, maskedEmail: "a****@b.com" }));
-    await AuthService.registerExistingClient("20301234568", "passphrase", "tok");
+    await AuthService.registerExistingClient("20301234568", "tok");
     expect(HttpApi.mock.calls[1][0]).toContain("/register-existing-client");
+    expect(HttpApi.mock.calls[1][1]).toEqual({ cuit: "20301234568", turnstileToken: "tok" });
+  });
+
+  it("register manda solo email y Turnstile", async () => {
+    HttpApi.mockResolvedValue(ok({ success: true }));
+    await AuthService.register("a@b.com", "tok");
+    expect(HttpApi.mock.calls[0][0]).toBe("https://api.test/api/auth/register");
+    expect(HttpApi.mock.calls[0][1]).toEqual({ email: "a@b.com", turnstileToken: "tok" });
+  });
+
+  it("verifyEmail devuelve el registrationToken", async () => {
+    HttpApi.mockResolvedValue(ok({ success: true, registrationToken: "rt_123456789" }));
+    const data = await AuthService.verifyEmail("a@b.com", "123456", "tok");
+    expect(data.registrationToken).toBe("rt_123456789");
+  });
+
+  it("completeRegistration manda token, contraseña, Turnstile y CUIT si hay", async () => {
+    HttpApi.mockResolvedValue(ok({ success: true }));
+    await AuthService.completeRegistration("rt_123456789", "pass", "20301234568", "tok");
+    expect(HttpApi.mock.calls[0][0]).toBe("https://api.test/api/auth/register/complete");
+    expect(HttpApi.mock.calls[0][1]).toEqual({
+      registrationToken: "rt_123456789",
+      password: "pass",
+      turnstileToken: "tok",
+      cuit: "20301234568",
+    });
+
+    await AuthService.completeRegistration("rt_123456789", "pass", null, "tok");
+    expect(HttpApi.mock.calls[1][1]).not.toHaveProperty("cuit");
   });
 
   it("forgot/reset/changePassword/requestEmailChange/confirmEmailChange", async () => {
