@@ -3,7 +3,6 @@ import { useSearchParams } from "react-router-dom";
 import {
   deleteCookie,
   getCookie,
-  roundToFiveHundreds,
   setCookieWithDuration,
 } from "../../../lib/utils.js";
 import { useDebounce } from "../../../hooks/useDebounce";
@@ -17,6 +16,7 @@ import {
 import LinkResolutionService from "../../../services/linkResolutionService.js";
 import { ERROR_CAUSE } from "../../../constants/error";
 import { getFingerprint, mapFingerprintToHuellaData } from "../../../lib/fingerprint.js";
+import { esSistemaAmortizacionValido, validarSesionSimulador } from '../../../lib/sistema-amortizacion.js';
 
 export const useLoanSimulator = () => {
   const [searchParams] = useSearchParams();
@@ -55,6 +55,7 @@ export const useLoanSimulator = () => {
   // Ref to the AbortController for the current calcularPlanes request.
   // Allows cancelling in-flight fetches when the user changes the capital rapidly.
   const fetchAbortControllerRef = useRef(null);
+  const initializationRef = useRef({ version: 0, controller: null, session: null });
   // Ref to the latest fetchSimulation callback. Updated on every render so the
   // initial/debounced effects can call it without depending on its identity
   // (which would otherwise re-fire the effects when huellaData changes).
@@ -68,15 +69,30 @@ export const useLoanSimulator = () => {
   // memory simulator-response-cause-detection-2026-07-31.
   const [rejectionReason, setRejectionReason] = useState(null);
   const shortId = searchParams.get("id");
+  const testPersonaId = searchParams.get('tp');
 
   useEffect(() => {
+    initializationRef.current.controller?.abort();
+    fetchAbortControllerRef.current?.abort();
+    const controller = new AbortController();
+    const operation = { version: initializationRef.current.version + 1, controller, session: null };
+    initializationRef.current = operation;
+    const isActive = () => initializationRef.current === operation && !controller.signal.aborted;
+    setScoringData({ scoringId: null, cuit: null });
+    setSimulationData(null);
+    setExistingSimulation(null);
+    setLoanInfo(null);
+    setRejectionReason(null);
+    setError(null);
+    setInitialSimulationResolved(false);
     const initVerification = async () => {
+      let sessionReady = false;
       // Check sessionStorage for test persona first (mocked link flow from
       // backoffice) AND also check the `tp` searchParam that the test panel
       // sets when navigating here. Malformed JSON is swallowed so the hook
       // falls through to the shortId-based flow.
       let mockPersona = null;
-      const tpFromUrl = searchParams.get("tp");
+      const tpFromUrl = testPersonaId;
       if (tpFromUrl) {
         try {
           const raw = sessionStorage.getItem("simuladorTestPersona");
@@ -133,6 +149,7 @@ export const useLoanSimulator = () => {
         } else {
           response = await LinkResolutionService.consumeLink(shortId);
         }
+        if (!isActive()) return;
         if (response.success && response.data) {
           // Get the fingerprint BEFORE any state update that triggers the initial
           // fetch. This way, scoringId and huellaData are set in the same React
@@ -146,8 +163,9 @@ export const useLoanSimulator = () => {
               scoringId: response.data.scoringId,
             });
           } catch (fpErr) {
-            console.warn("SIMULATOR_FINGERPRINT_ERROR:", fpErr);
+            if (isActive()) console.warn("SIMULATOR_FINGERPRINT_ERROR:", fpErr);
           }
+          if (!isActive()) return;
 
           // Intercambiar scoringId/cuit por un JWT del simulador ANTES de
           // setScoringData: si lo hacemos después, el effect que dispara
@@ -163,7 +181,8 @@ export const useLoanSimulator = () => {
             scoringId: String(response.data.scoringId),
             cuit: response.data.cuit || null,
             shortId: shortId || null,
-          });
+          }, { signal: controller.signal });
+          if (!isActive()) return;
 
           if (
             initResponse &&
@@ -176,6 +195,7 @@ export const useLoanSimulator = () => {
             } catch (delCookieErr) {
               console.warn("DELETE_COOKIE_FAILED:", delCookieErr);
             }
+            if (!isActive()) return;
             setRejectionReason("PHONE_NOT_VALIDATED");
             setStep(LOAN_SIM_STEPS.RECHAZADO);
             // initialSimulationResolved se setea en el finally de abajo.
@@ -194,12 +214,16 @@ export const useLoanSimulator = () => {
             setInitialSimulationResolved(true);
             return;
           }
+          const session = validarSesionSimulador(initResponse.data);
+          operation.session = { scoringId: String(response.data.scoringId), sistemaAmortizacion: session.sistemaAmortizacion };
 
           // All setState calls below execute in the same synchronous chunk.
           // React 18 batches them into a single render → the initial fetch
           // effect runs exactly once with both scoringId and huellaData ready.
 
           setScoringData({
+            sistemaAmortizacion: session.sistemaAmortizacion,
+            sessionScope: operation.version,
             scoringId: String(response.data.scoringId),
             cuit: response.data.cuit || null,
             nombreCompleto: response.data.nombreCompleto || null,
@@ -244,6 +268,7 @@ export const useLoanSimulator = () => {
             setHuellaData(mapFingerprintToHuellaData(fingerprint));
           }
           setHuellaRequestId(fingerprint?.requestId || null);
+          sessionReady = true;
         } else {
           const errorMessage =
             response.message ||
@@ -252,19 +277,29 @@ export const useLoanSimulator = () => {
           setError(`${errorMessage} 😕`);
         }
       } catch (err) {
+        if (!isActive() || err.name === 'AbortError') return;
         setError(err.message ? `${err.message} 😊` : "Error al verificar el acceso");
         console.error("VERIFY_LINK_ERROR:", err);
       } finally {
-        setLoading(false);
+        if (isActive()) {
+          setLoading(false);
+          if (!sessionReady) setInitialSimulationResolved(true);
+        }
       }
     };
 
     initVerification();
-  }, [shortId, searchParams.get("tp")]);
+    return () => {
+      controller.abort();
+      if (initializationRef.current === operation) fetchAbortControllerRef.current?.abort();
+    };
+  }, [shortId, testPersonaId]);
 
   const fetchSimulation = useCallback(
     async (currentAmount, isInitial = false) => {
-      if (!scoringData.scoringId) return;
+      const sessionScope = scoringData.sessionScope;
+      if (!scoringData.scoringId || sessionScope !== initializationRef.current.version ||
+          initializationRef.current.controller?.signal.aborted) return;
 
       // Cancel any in-flight request before starting a new one.
       // This prevents stale responses from overwriting newer simulation data
@@ -314,10 +349,14 @@ export const useLoanSimulator = () => {
         const response = await SimuladorService.calcularPlanes(params, controller.signal);
       
         // Discard response if this request was superseded by a newer one.
-        if (controller.signal.aborted) return;
+        if (controller.signal.aborted || sessionScope !== initializationRef.current.version) return;
 
         if (response.success) {
-          const newData = response.data;
+          const newData = { ...response.data };
+          if (!esSistemaAmortizacionValido(newData.sistemaAmortizacion) ||
+              newData.sistemaAmortizacion !== scoringData.sistemaAmortizacion) {
+            throw new Error('No se pudo confirmar la simulación. Volvé a abrir el link.');
+          }
 
           if (scoringData.cuotaADescontar) {
             newData.cuotaADescontar = scoringData.cuotaADescontar;
@@ -392,14 +431,15 @@ export const useLoanSimulator = () => {
         }
       } catch (err) {
         // Ignore errors from cancelled (aborted) requests — they are expected.
-        if (err.name === "AbortError") return;
+        if (err.name === "AbortError" || controller.signal.aborted || sessionScope !== initializationRef.current.version) return;
         // El catch solo se ejecuta para errores de red/HTTP (response.ok === false).
         // Los errores de aplicación vienen como response.success === false arriba.
         setError(err.message ? `${err.message} 😊` : "Error al conectar con el servidor");
         console.error("SIMULATION_HOOK_ERROR:", err);
       } finally {
         // Only clear the loading state if this request is still the active one.
-        if (!controller.signal.aborted) {
+        if (!controller.signal.aborted && sessionScope === initializationRef.current.version &&
+            !initializationRef.current.controller?.signal.aborted) {
           setLoading(false);
           // Libera el loading inicial de LoanSimScreen. Se ejecuta en finally
           // (no try) para que tanto éxito como error liberen el flag — un
@@ -411,7 +451,7 @@ export const useLoanSimulator = () => {
         }
       }
     },
-    [scoringData.scoringId, huellaData, huellaRequestId],
+    [scoringData.scoringId, scoringData.sistemaAmortizacion, scoringData.sessionScope, huellaData, huellaRequestId],
   );
 
   // Keep the ref pointing to the latest fetchSimulation on every render so the
@@ -424,14 +464,14 @@ export const useLoanSimulator = () => {
       fetchSimulationRef.current(0, true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [scoringData.scoringId]);
+  }, [scoringData.scoringId, scoringData.sessionScope]);
 
   useEffect(() => {
     if (debouncedAmount > 0 && scoringData.scoringId) {
       fetchSimulationRef.current(debouncedAmount);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedAmount, scoringData.scoringId]);
+  }, [debouncedAmount, scoringData.scoringId, scoringData.sessionScope]);
 
   useEffect(() => {
     if (step !== LOAN_SIM_STEPS.PENDING_CBU_VALIDATION) {
@@ -757,6 +797,10 @@ export const useLoanSimulator = () => {
   // Se recrea cada render (no es useCallback) — sus callers también lo son.
   const persistLoanToCookies = async (scoringId) => {
     if (!scoringId) return;
+    const operation = initializationRef.current;
+    const isActive = () => initializationRef.current === operation && !operation.controller?.signal.aborted &&
+      operation.session?.scoringId === String(scoringId);
+    if (!isActive()) return;
     // Cookie scoringId: legacy — se setea para no romper sistemas externos
     // que la busquen. No se usa en el nuevo flujo del simulador.
     try {
@@ -770,7 +814,9 @@ export const useLoanSimulator = () => {
     // cookie no se setea (fetch falló), el usuario no tiene acceso.
     try {
       const response = await SimuladorService.obtenerInfoPrestamo(scoringId);
-      if (response?.success && response.data) {
+      if (!isActive()) return;
+      if (response?.success && response.data && esSistemaAmortizacionValido(response.data.sistemaAmortizacion) &&
+          response.data.sistemaAmortizacion === operation.session.sistemaAmortizacion) {
         const combined = { scoringId, ...response.data };
         setLoanInfo(response.data);
         await setCookieWithDuration(
@@ -799,6 +845,7 @@ export const useLoanSimulator = () => {
   }, []);
 
   const handleInfoPrestamo = async () => {
+    const operation = initializationRef.current;
     setLoadingModal(true);
     try {
       // Regla de negocio: la única fuente de verdad para "puede ver la info"
@@ -812,10 +859,25 @@ export const useLoanSimulator = () => {
         const raw = await getCookie(COOKIE_LOAN_INFO_CONFIG.NAME);
         if (raw) {
           const parsed = JSON.parse(raw);
-          if (parsed && typeof parsed === "object") {
+          if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+            const activeSession = initializationRef.current.session;
+            if (activeSession && String(parsed.scoringId) !== activeSession.scoringId) return false;
             // Extraer scoringId si está presente; el resto es la data del préstamo.
             // El modal no necesita scoringId, sólo los campos de display.
             const { scoringId: _scoringId, ...loanData } = parsed;
+            if (!esSistemaAmortizacionValido(loanData.sistemaAmortizacion)) {
+              // Enriquecer solo una cookie legacy existente, sin renovar su
+              // vencimiento ni conceder acceso cuando la cookie ya expiró.
+              if (Object.prototype.hasOwnProperty.call(loanData, 'sistemaAmortizacion') || !_scoringId) return false;
+              const refreshed = await SimuladorService.obtenerInfoPrestamo(_scoringId);
+              if (initializationRef.current !== operation || operation.controller?.signal.aborted || !refreshed?.success ||
+                  !esSistemaAmortizacionValido(refreshed.data?.sistemaAmortizacion)) return false;
+              if (activeSession && refreshed.data.sistemaAmortizacion !== activeSession.sistemaAmortizacion) return false;
+              setLoanInfo(refreshed.data);
+              return true;
+            }
+            if (activeSession && loanData.sistemaAmortizacion !== activeSession.sistemaAmortizacion) return false;
+            if (initializationRef.current !== operation || operation.controller?.signal.aborted) return false;
             setLoanInfo(loanData);
             return true;
           }
@@ -825,7 +887,7 @@ export const useLoanSimulator = () => {
       }
       return false;
     } finally {
-      setLoadingModal(false);
+      if (initializationRef.current === operation && !operation.controller?.signal.aborted) setLoadingModal(false);
     }
   };
 

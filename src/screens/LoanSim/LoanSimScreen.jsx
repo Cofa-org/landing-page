@@ -1,4 +1,5 @@
 import { useEffect, lazy, Suspense } from "react";
+import { useSearchParams } from 'react-router-dom';
 import { toggleCallbellWebchat } from "../../utils/callbellHelpers";
 import GenericButton from "../../Components/buttons/GenericButton/GenericButton.jsx";
 import BackButton from "../../Components/buttons/backbutton/BackButton.jsx";
@@ -33,7 +34,7 @@ import { useTestSimuladorPanel } from "./hooks/useTestSimuladorPanel";
 import TestSimuladorPanel from "./components/TestSimuladorPanel/TestSimuladorPanel.jsx";
 import styles from "./LoanSimScreen.module.css";
 
-const LoanSimScreen = () => {
+const LoanSimScreenContent = () => {
   const testPanel = useTestSimuladorPanel();
   
   const {
@@ -371,6 +372,11 @@ const LoanSimScreen = () => {
       <Footer />
     </>
   );
+};
+
+const LoanSimScreen = () => {
+  const [params] = useSearchParams();
+  return <LoanSimScreenContent key={JSON.stringify([params.get('id'), params.get('tp')])} />;
 };
 
 export default LoanSimScreen;

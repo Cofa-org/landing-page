@@ -49,18 +49,18 @@ vi.mock("../../../../../config.js", async (importOriginal) => {
 });
 
 vi.mock("../../../hooks/useSimulationStep", () => ({
-  useSimulationStep: () => hookResult,
+  useSimulationStep: ({ simulationData }) => ({ ...hookResult, esSistemaFrances: simulationData.sistemaAmortizacion === 'frances' }),
 }));
 
 import SimulationStep from "../SimulationStep.jsx";
 
 const renderWithFlag = (sistemaFrancesOn) => {
-  sistemaFrances.value = sistemaFrancesOn;
+  sistemaFrances.value = !sistemaFrancesOn;
   render(
     <SimulationStep
       amount={100000}
       installment={6}
-      simulationData={{}}
+      simulationData={{ sistemaAmortizacion: sistemaFrancesOn ? 'frances' : 'directo' }}
       loading={false}
       nombreCompleto=""
       onAmountChange={() => {}}

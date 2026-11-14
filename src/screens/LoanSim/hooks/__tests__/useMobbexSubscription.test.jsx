@@ -169,4 +169,29 @@ describe("useMobbexSubscription", () => {
     expect(result.current.message).toBeNull();
     expect(result.current.error).toBeNull();
   });
+
+  test('a confirmation arriving after unmount cannot complete another loan view', async () => {
+    let release;
+    SimuladorService.confirmarSuscripcionMobbex.mockReturnValue(new Promise(resolve => { release = resolve; }));
+    const completed = vi.fn();
+    const { unmount } = renderHook(() => useMobbexSubscription('123', completed), {
+      wrapper: makeWrapper('/?id=abc123def0&fromMobbex=true'),
+    });
+    unmount();
+    await act(async () => release({ success: true }));
+    expect(completed).not.toHaveBeenCalled();
+  });
+
+  test('a checkout URL arriving after unmount cannot redirect a new loan view', async () => {
+    let release;
+    SimuladorService.solicitarSuscripcionMobbex.mockReturnValue(new Promise(resolve => { release = resolve; }));
+    const { result, unmount } = renderHook(() => useMobbexSubscription('123', vi.fn()), {
+      wrapper: makeWrapper('/?id=abc123def0'),
+    });
+    let pending;
+    act(() => { pending = result.current.handleSuscribirse(); });
+    unmount();
+    await act(async () => { release({ success: true, data: { subscriptionURL: 'https://checkout.example.test/' } }); await pending; });
+    expect(window.location.href).toBe('');
+  });
 });

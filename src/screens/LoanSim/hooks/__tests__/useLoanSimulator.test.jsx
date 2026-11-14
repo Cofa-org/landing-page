@@ -12,7 +12,7 @@ vi.mock("../../../../services/linkResolutionService.js", () => ({
 vi.mock("../../../../services/simuladorService.js", () => ({
   default: {
     calcularPlanes: vi.fn(),
-    iniciarSesion: vi.fn().mockResolvedValue({ success: true, data: { token: "mock-jwt" } }),
+    iniciarSesion: vi.fn().mockResolvedValue({ success: true, data: { sistemaAmortizacion: 'directo',  token: "mock-jwt" } }),
     validarCBU: vi.fn(),
     aceptarTerminos: vi.fn(),
     obtenerInfoPrestamo: vi.fn(),
@@ -72,7 +72,7 @@ const consumeLinkResponse = {
 
 const calcularPlanesResponse = {
   success: true,
-  data: {
+  data: { sistemaAmortizacion: 'directo', 
     capital_maximo_a_ofrecer: 100000,
     planes_disponibles: [{ plazo: 12, valorCuota: 1000, tasaOp: 0.85 }],
   },
@@ -84,7 +84,7 @@ const calcularPlanesResponse = {
 // < 100000 ⇒ el hook setea un error y vuelve antes de llegar al guardarPlan.
 const calcularPlanesCoherenteResponse = {
   success: true,
-  data: {
+  data: { sistemaAmortizacion: 'directo', 
     capital_maximo_a_ofrecer: 100000,
     planes_disponibles: [{ plazo: 12, valorCuota: 10000, tasaOp: 0.85 }],
   },
@@ -106,7 +106,7 @@ describe("useLoanSimulator — initial link paste", () => {
     getFingerprint.mockResolvedValue(FINGERPRINT_RAW);
     mapFingerprintToHuellaData.mockReturnValue(HUELLA_DATA);
     SimuladorService.calcularPlanes.mockResolvedValue(calcularPlanesResponse);
-    SimuladorService.iniciarSesion.mockResolvedValue({ success: true, data: { token: "mock-jwt" } });
+    SimuladorService.iniciarSesion.mockResolvedValue({ success: true, data: { sistemaAmortizacion: 'directo',  token: "mock-jwt" } });
     // Defensive: ensure no leftover persona from previous tests
     sessionStorage.clear();
   });
@@ -187,7 +187,7 @@ describe("useLoanSimulator — initial link paste", () => {
     let resolveCalcular;
     const calcularResponseConEstadoMobbex = {
       success: true,
-      data: {
+      data: { sistemaAmortizacion: 'directo', 
         capital_maximo_a_ofrecer: 100000,
         planes_disponibles: [{ plazo: 12, valorCuota: 1000, tasaOp: 0.85 }],
         existingSimulation: {
@@ -254,7 +254,7 @@ describe("useLoanSimulator — persistLoanToCookies / handleInfoPrestamo", () =>
     SimuladorService.calcularPlanes.mockResolvedValue(calcularPlanesResponse);
     SimuladorService.iniciarSesion.mockResolvedValue({
       success: true,
-      data: { token: "mock-jwt" },
+      data: { sistemaAmortizacion: 'directo',  token: "mock-jwt" },
     });
     // Defaults: cookies ausentes.
     getCookie.mockResolvedValue(null);
@@ -277,7 +277,7 @@ describe("useLoanSimulator — persistLoanToCookies / handleInfoPrestamo", () =>
     });
     SimuladorService.obtenerInfoPrestamo.mockResolvedValue({
       success: true,
-      data: {
+      data: { sistemaAmortizacion: 'directo', 
         FechaDeSolicitud: "2026-07-19",
         CapitalDelPrestamo: 100000,
       },
@@ -314,7 +314,7 @@ describe("useLoanSimulator — persistLoanToCookies / handleInfoPrestamo", () =>
       success: true,
       skipMobbex: true,
     });
-    const loanInfoData = {
+    const loanInfoData = { sistemaAmortizacion: 'directo', 
       FechaDeSolicitud: "2026-07-19",
       CapitalDelPrestamo: 100000,
       TotalDeIntereses: 50000,
@@ -386,7 +386,7 @@ describe("useLoanSimulator — persistLoanToCookies / handleInfoPrestamo", () =>
   it("handleInfoPrestamo corta al leer loanInfo cookie con objeto JSON válido (no llama backend)", async () => {
     // La cookie combina scoringId + data — handleInfoPrestamo extrae sólo
     // los campos de data (sin scoringId) para pasárselos al modal.
-    const cachedLoanInfo = {
+    const cachedLoanInfo = { sistemaAmortizacion: 'directo', 
       scoringId: SCORING_ID,
       FechaDeSolicitud: "2026-07-19",
       CapitalDelPrestamo: 100000,
@@ -397,7 +397,7 @@ describe("useLoanSimulator — persistLoanToCookies / handleInfoPrestamo", () =>
     });
     SimuladorService.obtenerInfoPrestamo.mockResolvedValue({
       success: true,
-      data: { ...cachedLoanInfo, CapitalDelPrestamo: 999 }, // distinto del cache
+      data: { sistemaAmortizacion: 'directo',  ...cachedLoanInfo, CapitalDelPrestamo: 999 }, // distinto del cache
     });
 
     const { result, unmount } = renderUseLoanSimulator(SHORT_ID);
@@ -437,11 +437,11 @@ describe("useLoanSimulator — persistLoanToCookies / handleInfoPrestamo", () =>
       SimuladorService.calcularPlanes.mockResolvedValue(calcularPlanesResponse);
       SimuladorService.iniciarSesion.mockResolvedValue({
         success: true,
-        data: { token: "mock-jwt" },
+        data: { sistemaAmortizacion: 'directo',  token: "mock-jwt" },
       });
       SimuladorService.obtenerInfoPrestamo.mockResolvedValue({
         success: true,
-        data: { FechaDeSolicitud: "2026-07-19", CapitalDelPrestamo: 100000 },
+        data: { sistemaAmortizacion: 'directo',  FechaDeSolicitud: "2026-07-19", CapitalDelPrestamo: 100000 },
       });
       // getCookie: loanInfo → cookieValue (caso bajo test). scoringId NO se
       // debe leer (no hay backend fallback).
@@ -512,7 +512,7 @@ describe("useLoanSimulator - phone-not-validated gate", () => {
   it("NO setea RECHAZADO cuando /init responde success=true (camino normal)", async () => {
     SimuladorService.iniciarSesion.mockResolvedValue({
       success: true,
-      data: { token: "mock-jwt" },
+      data: { sistemaAmortizacion: 'directo',  token: "mock-jwt" },
     });
     SimuladorService.calcularPlanes.mockResolvedValue({ success: true, data: {} });
 
@@ -594,7 +594,7 @@ describe("useLoanSimulator — sessionStorage simuladorTestPersona bypass", () =
     SimuladorService.calcularPlanes.mockResolvedValue(calcularPlanesResponse);
     SimuladorService.iniciarSesion.mockResolvedValue({
       success: true,
-      data: { token: "mock-jwt" },
+      data: { sistemaAmortizacion: 'directo',  token: "mock-jwt" },
     });
   });
 
@@ -624,7 +624,7 @@ describe("useLoanSimulator — sessionStorage simuladorTestPersona bypass", () =
       scoringId: String(personaScoringId),
       cuit: personaCuitSinGuiones,
       shortId: null,
-    });
+    }, expect.objectContaining({ signal: expect.any(AbortSignal) }));
 
     // El flujo continuó: scoringData poblada, step SIMULACION.
     expect(result.current.cuit).toBe(personaCuitSinGuiones);
@@ -664,7 +664,7 @@ describe("useLoanSimulator — sessionStorage simuladorTestPersona bypass", () =
       scoringId: SCORING_ID,
       cuit: CUIT,
       shortId: SHORT_ID,
-    });
+    }, expect.objectContaining({ signal: expect.any(AbortSignal) }));
   });
 
   it("shortId presente tiene prioridad cuando NO hay persona en sessionStorage", async () => {
@@ -685,7 +685,7 @@ describe("useLoanSimulator — sessionStorage simuladorTestPersona bypass", () =
       scoringId: SCORING_ID,
       cuit: CUIT,
       shortId: SHORT_ID,
-    });
+    }, expect.objectContaining({ signal: expect.any(AbortSignal) }));
   });
 });
 
@@ -699,7 +699,7 @@ describe("useLoanSimulator — payload de guardarPlan", () => {
     LinkResolutionService.consumeLink.mockResolvedValue(consumeLinkResponse);
     getFingerprint.mockResolvedValue(FINGERPRINT_RAW);
     mapFingerprintToHuellaData.mockReturnValue(HUELLA_DATA);
-    SimuladorService.iniciarSesion.mockResolvedValue({ success: true, data: { token: "mock-jwt" } });
+    SimuladorService.iniciarSesion.mockResolvedValue({ success: true, data: { sistemaAmortizacion: 'directo',  token: "mock-jwt" } });
     SimuladorService.calcularPlanes.mockResolvedValue(calcularPlanesCoherenteResponse);
     SimuladorService.guardarPlan.mockResolvedValue({ success: true, data: {} });
   });
