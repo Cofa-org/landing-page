@@ -1,8 +1,9 @@
+import { SISTEMA_AMORTIZACION } from '../../../constants/sistema-amortizacion.constants.js';
 import { useMemo } from "react";
 import { roundToFiveHundreds } from "../../../lib/utils.js";
 
 export const useSimulationStep = ({ simulationData, installment }) => {
-  const esSistemaFrances = simulationData?.sistemaAmortizacion === 'frances';
+  const esSistemaFrances = simulationData?.sistemaAmortizacion === SISTEMA_AMORTIZACION.FRANCES;
   const formatCurrency = (value) =>
     new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS" }).format(value || 0);
 

@@ -1,3 +1,4 @@
+import { SISTEMA_AMORTIZACION } from '../../constants/sistema-amortizacion.constants.js';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 vi.mock('../../lib/http.js', () => ({ HttpApi: vi.fn() }));
 vi.mock('../../lib/utils.js', () => ({ getCookie: vi.fn(), setCookieWithDuration: vi.fn().mockResolvedValue(undefined) }));
@@ -6,7 +7,7 @@ import { setCookieWithDuration } from '../../lib/utils.js';
 import SimuladorService from '../simuladorService.js';
 
 const payload = { scoringId: '123', cuit: '20123456789', shortId: 'abc123def0' };
-const session = { token: 'synthetic-jwt', sistemaAmortizacion: 'frances' };
+const session = { token: 'synthetic-jwt', sistemaAmortizacion: SISTEMA_AMORTIZACION.FRANCES };
 beforeEach(() => {
   vi.clearAllMocks();
   vi.spyOn(console, 'error').mockImplementation(() => {});

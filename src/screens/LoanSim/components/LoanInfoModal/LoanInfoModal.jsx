@@ -1,11 +1,12 @@
+import { SISTEMA_AMORTIZACION } from '../../../../constants/sistema-amortizacion.constants.js';
 import React from "react";
 import { usePDFExport } from "../../../../hooks/usePDFExport";
 import { esSistemaAmortizacionValido } from '../../../../lib/sistema-amortizacion.js';
 import styles from "./LoanInfoModal.module.css";
 
 const LoanInfoModal = ({ loanInfo, closeModal, simulationData }) => {
-  const CFTA_LABEL = loanInfo?.sistemaAmortizacion === 'frances' ? 'CFTNA' : 'CFTA';
-  const CFTO_LABEL = loanInfo?.sistemaAmortizacion === 'frances' ? 'CFTNO' : 'CFTO';
+  const CFTA_LABEL = loanInfo?.sistemaAmortizacion === SISTEMA_AMORTIZACION.FRANCES ? 'CFTNA' : 'CFTA';
+  const CFTO_LABEL = loanInfo?.sistemaAmortizacion === SISTEMA_AMORTIZACION.FRANCES ? 'CFTNO' : 'CFTO';
   const usedCapital = simulationData?.capital_utilizado;
   const discountInstallment = simulationData?.cuotaADescontar;
   const installmentNbr = simulationData?.nroCuota;
