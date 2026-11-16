@@ -1,12 +1,9 @@
 import React from "react";
-import { openCallbellWebchat } from "../../utils/callbellHelpers";
 import "./Hero.css";
 import { infoList } from "../../data/info";
 import { AnimatedTitle, Carrusel } from "../../Components";
-import { Link, useLocation } from "react-router-dom";
 
 const Hero = () => {
-  const { pathname } = useLocation();
   const arrImages = [
     // "/img/hero-img.webp",
     "/img/videos-cofa-2-dinero-contando.mp4",
@@ -23,25 +20,6 @@ const Hero = () => {
         <div className='hero-info'>
           <h1>Préstamos</h1>
           <AnimatedTitle />
-          {pathname === '/registro-simulador' ? (
-            <button
-              className='primary-btn btn-loan-main'
-              id='btn-hero-prestamo'
-              onClick={openCallbellWebchat}
-              aria-label='Solicitar ayuda'
-            >
-              SOLICITAR AYUDA
-            </button>
-          ) : (
-            <Link to='/registro-simulador' aria-label='Quiero mi préstamo'>
-              <button
-                className='primary-btn btn-loan-main'
-                id='btn-hero-prestamo'
-              >
-                QUIERO MI PRÉSTAMO
-              </button>
-            </Link>
-          )}
         </div>
         <Carrusel images={arrImages}></Carrusel>
       </div>

@@ -1,7 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import Loader from "./Components/Loader/Loader";
-import OnboardingFlowScreen from "./screens/registrationSim/OnboardingFlowScreen.jsx";
+import RegistroCerradoScreen from "./screens/registrationSim/RegistroCerradoScreen.jsx";
 
 // Lazy-loaded screens
 const HomeScreen = lazy(() => import("./screens/HomeScreen/HomeScreen"));
@@ -29,7 +29,6 @@ const FormWorkWithUs = lazy(() => import("./Sections/WorkWithUs/FormWorkWithUs")
 const BlogDetailScreen = lazy(() => import("./screens/blogDetailScreen/BlogDetailScreen.jsx"));
 const IaPoliciesScreen = lazy(() => import("./screens/IaPoliciesScreen.jsx/IaPoliciesScreen.jsx"));
 const ReqAutoridadesScreen = lazy(() => import("./screens/ReqAutoridadesScreen/ReqAutoridadesScreen.jsx"));
-const DNIUploadMobileScreen = lazy(() => import("./screens/DNIUploadMobile/DNIUploadMobileScreen"));
 
 /* import SuggestionsScreen from './screens/SuggestionsScreen/SuggestionsScreen' */
 
@@ -68,7 +67,7 @@ const RouterScreens = () => {
         />
         <Route
           path='/registro-simulador'
-          element={<OnboardingFlowScreen />}
+          element={<RegistroCerradoScreen />}
         />
         {/* Preguntas Frecuentes */}
         <Route
@@ -156,7 +155,7 @@ const RouterScreens = () => {
           <Route path='/asistencias/terminos-desempleo' element={<TermsV2 type={'DESEMPLEO'}/>}/> */}
         <Route
           path='/subir-dni'
-          element={<DNIUploadMobileScreen />}
+          element={<RegistroCerradoScreen />}
         />
         <Route
           path='*'
