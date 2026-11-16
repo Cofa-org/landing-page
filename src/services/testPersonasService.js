@@ -1,4 +1,5 @@
 import { LANDING_BACKEND_URL } from "../config.js";
+import { esSistemaAmortizacionValido } from '../lib/sistema-amortizacion.js';
 
 /**
  * Cliente único del catálogo de "personas test" expuestas por el backend
@@ -56,14 +57,21 @@ export async function fetchTestPersonaById(id) {
  *
  * Devuelve `{ success: true, data: { message, ... } }` o lanza Error si
  * el backend responde non-OK (incluye el `message` del body si existe).
+ * El segundo argumento opcional {sistemaAmortizacion} prepara Noriega en dev.
+ * Exige confirmacion success:true tambien cuando el backend responde HTTP 200.
  */
-export async function resetTestPersonaSimulation(id) {
+export async function resetTestPersonaSimulation(id, { sistemaAmortizacion } = {}) {
   if (!id || !VALID_ID.test(String(id).slice(0, 64))) {
     throw new Error("id inválido");
   }
+  if (sistemaAmortizacion !== undefined && !esSistemaAmortizacionValido(sistemaAmortizacion)) {
+    throw new Error('Sistema de amortización inválido');
+  }
   const response = await fetch(
     `${LANDING_BACKEND_URL}${PERSONAS_PATH}/${encodeURIComponent(id)}/reset-simulacion`,
-    { method: "POST" },
+    { method: "POST", ...(sistemaAmortizacion === undefined ? {} : {
+      headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sistemaAmortizacion }),
+    }) },
   );
   if (!response.ok) {
     let body = {};
@@ -75,7 +83,9 @@ export async function resetTestPersonaSimulation(id) {
     const message = body?.message || body?.error || `reset failed (HTTP ${response.status})`;
     throw new Error(message);
   }
-  return response.json();
+  const result = await response.json();
+  if (!result?.success) throw new Error(result?.message || 'No se pudo preparar la prueba');
+  return result;
 }
 
 /**

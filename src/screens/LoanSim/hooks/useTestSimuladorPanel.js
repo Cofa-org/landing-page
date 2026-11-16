@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { DEV, isTestPersonasVisible } from "../../../config.js";
 import {
@@ -62,6 +62,9 @@ export function useTestSimuladorPanel() {
   const [personas, setPersonas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [startingPersona, setStartingPersona] = useState(null);
+  const preparing = useRef(false);
+  const selectionScope = useRef(0);
   // Estado del approve del CBU (caso de QA del gate de validación manual).
   const [approvingCbu, setApprovingCbu] = useState(null);
   const [cbuAprobadoPara, setCbuAprobadoPara] = useState(null);
@@ -82,7 +85,7 @@ export function useTestSimuladorPanel() {
         const filtered = (all || []).filter((persona) =>
           (persona.useCases || []).includes("simulador"),
         );
-        
+
         setPersonas(filtered);
         setLoading(false);
       })
@@ -94,109 +97,135 @@ export function useTestSimuladorPanel() {
 
     return () => {
       cancelled = true;
+      selectionScope.current++;
     };
   }, []);
 
   const selectPersona = useCallback(
-    async (personaId) => {
-      const persona = await fetchTestPersonaById(personaId);
-      if (!persona) return;
+    async (personaId, sistemaAmortizacion) => {
+      if (preparing.current) return;
+      preparing.current = true;
+      const operation = selectionScope.current;
+      const isCurrent = () => selectionScope.current === operation;
+      let fullReloadStarted = false;
+      setStartingPersona(personaId);
+      setError(null);
+      try {
+        const persona = await fetchTestPersonaById(personaId);
+        if (!isCurrent()) return;
+        if (!persona) throw new Error('No se pudo obtener la persona de prueba. Reintentá.');
+        if (sistemaAmortizacion !== undefined && !persona.sistemasAmortizacion?.includes(sistemaAmortizacion)) {
+          throw new Error('Esta persona no permite elegir ese sistema');
+        }
 
-      // Caso NORIEGA (cliente real): resetear simulación via API y navegar
-      // al link real con full reload. NO usamos sessionStorage ni
-      // `?tp=...` porque el flujo debe correr toda la lógica real del
-      // simulador contra el lead existente, sin bypass.
-      if (persona.simuladorConfig?.realClient) {
-        // Defense-in-depth: el state-changing sink (POST + navegación
-        // cross-origin al link real) solo corre en builds de dev. Si
-        // el panel se renderizó por `?testMode=1` en un build de prod,
-        // abortamos antes del POST para evitar resetear una simulación
-        // real desde la UI. El backend también rechaza via
-        // isTestPersonasEnabled() + NODE_ENV check, pero la defensa
-        // en frontend debe ser conservadora también.
-        if (!DEV) {
-          console.warn("REAL_CLIENT_RESET_BLOCKED_IN_PRODUCTION", { personaId });
+        // Caso NORIEGA (cliente real): resetear simulación via API y navegar
+        // al link real con full reload. NO usamos sessionStorage ni
+        // `?tp=...` porque el flujo debe correr toda la lógica real del
+        // simulador contra el lead existente, sin bypass.
+        if (persona.simuladorConfig?.realClient) {
+          // Defense-in-depth: el state-changing sink (POST + navegación
+          // cross-origin al link real) solo corre en builds de dev. Si
+          // el panel se renderizó por `?testMode=1` en un build de prod,
+          // abortamos antes del POST para evitar resetear una simulación
+          // real desde la UI. El backend también rechaza via
+          // isTestPersonasEnabled() + NODE_ENV check, pero la defensa
+          // en frontend debe ser conservadora también.
+          if (!DEV) {
+            console.warn("REAL_CLIENT_RESET_BLOCKED_IN_PRODUCTION", { personaId });
+            throw new Error('El caso de Noriega solo se puede preparar en development');
+          }
+          const shortId = persona.simuladorConfig.shortId;
+          if (!shortId) {
+            throw new Error('No se encontró el link de prueba de Noriega');
+          }
+          const reset = sistemaAmortizacion === undefined
+            ? await resetTestPersonaSimulation(personaId)
+            : await resetTestPersonaSimulation(personaId, { sistemaAmortizacion });
+          if (!isCurrent()) return;
+          if (sistemaAmortizacion !== undefined && (!reset?.success ||
+            reset.data?.sistemaAmortizacion !== sistemaAmortizacion || reset.data?.shortId !== shortId)) {
+            throw new Error(reset?.message || 'No se pudo confirmar el sistema de la prueba');
+          }
+          sessionStorage.removeItem(SIMULADOR_TEST_PERSONA_STORAGE_KEY);
+          // Full reload para que /simulador?id=... arranque el path real
+          // de consumeLink desde cero (no useLoanSimulator hidratado).
+          window.location.href = `/simulador?id=${encodeURIComponent(shortId)}`;
+          fullReloadStarted = true;
           return;
         }
-        try {
-          await resetTestPersonaSimulation(personaId);
-        } catch (resetErr) {
-          console.warn("RESET_SIMULACION_FAILED:", resetErr);
-          // Continuamos igual: el usuario puede reintentar manualmente
-          // desde el panel, o seguir con la simulación existente.
+
+        // Plan 2026-10-21 (caso de QA del gate de CBU): el escenario arranca
+        // limpio en cada selección — se resetea la simulación (estado,
+        // marcadores de aprobación y cuenta nueva) para que el operador
+        // pueda repetir el ciclo tantas veces como necesite.
+        // Mismo patrón que las personas `realClient` (que también resetean
+        // su simulación antes de navegar).
+        if (persona.simuladorConfig?.pendingCbuValidation) {
+          // El caso de CBU sólo puede tocar la fila sintética de
+          // `SIM_CBU_PENDING` (el `scoringId` sale siempre del catálogo), así
+          // que el modo explícito `?testMode=1` —que existe para operar el
+          // panel en un build de staging, donde `VITE_DEV` no está seteado—
+          // también puede correr estos POST. La rama de NORIEGA, que sí
+          // resetea datos de un cliente real, mantiene su guard estricto.
+          // El backend igual rechaza via isTestPersonasEnabled() + NODE_ENV.
+          if (!DEV && !isTestPersonasVisible()) {
+            console.warn("CBU_RESET_BLOCKED_IN_PRODUCTION", { personaId });
+            return;
+          }
+          try {
+            await resetTestPersonaSimulation(personaId);
+            if (!isCurrent()) return;
+          } catch (resetErr) {
+            if (!isCurrent()) return;
+            console.warn("RESET_ESCENARIO_CBU_FAILED:", resetErr);
+            // Se avisa al operador y NO se navega: si el reset falló, el
+            // escenario puede no quedar armado y el simulador arrancaría en
+            // el step normal — el QA creía que está en el caso y
+            // quedaría en una pantalla que no es la que espera.
+            window.alert(
+              `No se pudo resetear el escenario de CBU: ${resetErr.message}`,
+            );
+            return;
+          }
         }
-        sessionStorage.removeItem(SIMULADOR_TEST_PERSONA_STORAGE_KEY);
-        const shortId = persona.simuladorConfig.shortId;
-        if (!shortId) {
-          console.warn("REAL_CLIENT_PERSONA_MISSING_SHORT_ID", { personaId });
+
+        sessionStorage.setItem(
+          SIMULADOR_TEST_PERSONA_STORAGE_KEY,
+          JSON.stringify(persona),
+        );
+        // Pass personaId via URL so the simulator hook can read it from
+        // searchParams (reliably re-runs the init effect). The sessionStorage
+        // payload above is kept as a fallback for `useLoanSimulator` when the
+        // persona is already hydrated (e.g. on subsequent clicks without a
+        // full reload).
+        //
+        // Plan 2026-10-21: el caso de CBU manual necesita un full reload —
+        // `navigate()` a la misma URL no re-dispara el init del simulador
+        // (el effect de `useLoanSimulator` no corre otra vez) y el re-arm
+        // del escenario no se aplicaría.
+        if (persona.simuladorConfig?.pendingCbuValidation) {
+          // El reload reemplaza la URL completa: sin preservar el `testMode=1`
+          // el panel se cerraría (su gate es `DEV || ?testMode=1`) y el botón
+          // "Validar CBU" desaparecería justo después de arrancar el caso.
+          const keepTestMode =
+            new URLSearchParams(window.location.search).get("testMode") === "1"
+              ? "&testMode=1"
+              : "";
+          window.location.href = `/simulador?tp=${encodeURIComponent(personaId)}${keepTestMode}`;
+          fullReloadStarted = true;
           return;
         }
-        // Full reload para que /simulador?id=... arranque el path real
-        // de consumeLink desde cero (no useLoanSimulator hidratado).
-        window.location.href = `/simulador?id=${encodeURIComponent(shortId)}`;
-        return;
+
+        navigate(`/simulador?tp=${encodeURIComponent(personaId)}`);
+      } catch (selectionError) {
+        if (isCurrent()) setError(selectionError.message || 'No se pudo preparar la prueba');
+      } finally {
+        // El documento anterior puede seguir activo mientras carga el destino.
+        if (!fullReloadStarted) {
+          preparing.current = false;
+          if (isCurrent()) setStartingPersona(null);
+        }
       }
-
-      // Plan 2026-10-21 (caso de QA del gate de CBU): el escenario arranca
-      // limpio en cada selección — se resetea la simulación (estado,
-      // marcadores de aprobación y cuenta nueva) para que el operador
-      // pueda repetir el ciclo tantas veces como necesite.
-      // Mismo patrón que las personas `realClient` (que también resetean
-      // su simulación antes de navegar).
-      if (persona.simuladorConfig?.pendingCbuValidation) {
-        // El caso de CBU sólo puede tocar la fila sintética de
-        // `SIM_CBU_PENDING` (el `scoringId` sale siempre del catálogo), así
-        // que el modo explícito `?testMode=1` —que existe para operar el
-        // panel en un build de staging, donde `VITE_DEV` no está seteado—
-        // también puede correr estos POST. La rama de NORIEGA, que sí
-        // resetea datos de un cliente real, mantiene su guard estricto.
-        // El backend igual rechaza via isTestPersonasEnabled() + NODE_ENV.
-        if (!DEV && !isTestPersonasVisible()) {
-          console.warn("CBU_RESET_BLOCKED_IN_PRODUCTION", { personaId });
-          return;
-        }
-        try {
-          await resetTestPersonaSimulation(personaId);
-        } catch (resetErr) {
-          console.warn("RESET_ESCENARIO_CBU_FAILED:", resetErr);
-          // Se avisa al operador y NO se navega: si el reset falló, el
-          // escenario puede no quedar armado y el simulador arrancaría en
-          // el step normal — el QA creía que está en el caso y
-          // quedaría en una pantalla que no es la que espera.
-          window.alert(
-            `No se pudo resetear el escenario de CBU: ${resetErr.message}`,
-          );
-          return;
-        }
-      }
-
-      sessionStorage.setItem(
-        SIMULADOR_TEST_PERSONA_STORAGE_KEY,
-        JSON.stringify(persona),
-      );
-      // Pass personaId via URL so the simulator hook can read it from
-      // searchParams (reliably re-runs the init effect). The sessionStorage
-      // payload above is kept as a fallback for `useLoanSimulator` when the
-      // persona is already hydrated (e.g. on subsequent clicks without a
-      // full reload).
-      //
-      // Plan 2026-10-21: el caso de CBU manual necesita un full reload —
-      // `navigate()` a la misma URL no re-dispara el init del simulador
-      // (el effect de `useLoanSimulator` no corre otra vez) y el re-arm
-      // del escenario no se aplicaría.
-      if (persona.simuladorConfig?.pendingCbuValidation) {
-        // El reload reemplaza la URL completa: sin preservar el `testMode=1`
-        // el panel se cerraría (su gate es `DEV || ?testMode=1`) y el botón
-        // "Validar CBU" desaparecería justo después de arrancar el caso.
-        const keepTestMode =
-          new URLSearchParams(window.location.search).get("testMode") === "1"
-            ? "&testMode=1"
-            : "";
-        window.location.href = `/simulador?tp=${encodeURIComponent(personaId)}${keepTestMode}`;
-        return;
-      }
-
-      navigate(`/simulador?tp=${encodeURIComponent(personaId)}`);
     },
     [navigate],
   );
@@ -255,6 +284,7 @@ export function useTestSimuladorPanel() {
     personas,
     loading,
     error,
+    startingPersona,
     selectPersona,
     resetSession,
     aprobarCbu,

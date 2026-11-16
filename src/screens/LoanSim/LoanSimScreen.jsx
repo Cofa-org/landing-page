@@ -344,8 +344,13 @@ const LoanSimScreenContent = () => {
     <>
       {testPanel.personas.length > 0 && (
         <TestSimuladorPanel
+          key={simulationData?.sistemaAmortizacion ?? 'sin-sistema'}
+          sistemaActual={simulationData?.sistemaAmortizacion}
+          consultandoSistema={isInitializing}
           personas={testPanel.personas}
           loading={testPanel.loading}
+          error={testPanel.error}
+          startingPersona={testPanel.startingPersona}
           onSelectPersona={testPanel.selectPersona}
           onReset={testPanel.resetSession}
           onAprobarCbu={testPanel.aprobarCbu}
