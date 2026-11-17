@@ -92,6 +92,7 @@ input:-internal-autofill-selected {
 }
 
 /* Ocultamiento global forzado para Callbell Livechat */
-body.hide-callbell #callbell-livechat-host {
+body.hide-callbell #callbell-livechat-host,
+body.dni-camera-open #callbell-livechat-host {
   display: none !important;
 }

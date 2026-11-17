@@ -1,22 +1,13 @@
-import { ERROR_CAUSE, ERROR_MESSAGE } from "../../../constants/camera.constants.js";
 
-const MIN_WIDTH = 640;
-const MIN_HEIGHT = 480;
-
-const RESOLUTION_VALIDATION = {
-  [ERROR_CAUSE.CAMERA_INSUFFICIENT_RESOLUTION]: ERROR_MESSAGE.CAMERA_INSUFFICIENT_RESOLUTION,
-};
-
-/**
- * Valida que la resolución del video sea suficiente para capturar el DNI.
- * @returns {{ ok: true } | { ok: false, cause: string, message: string }}
- */
+/** Advisory only; readiness and resource limits are checked by captureFrame. */
 export function checkResolution(videoEl) {
-  if (videoEl.videoWidth < MIN_WIDTH || videoEl.videoHeight < MIN_HEIGHT) {
+  const longer = Math.max(videoEl.videoWidth, videoEl.videoHeight);
+  const shorter = Math.min(videoEl.videoWidth, videoEl.videoHeight);
+  if (longer < 1000 || shorter < 600) {
     return {
-      ok: false,
-      cause: ERROR_CAUSE.CAMERA_INSUFFICIENT_RESOLUTION,
-      message: RESOLUTION_VALIDATION[ERROR_CAUSE.CAMERA_INSUFFICIENT_RESOLUTION],
+      ok: true,
+      warning: "DNI_LOW_RESOLUTION",
+      message: "La resolución es baja. Podés confirmar o volver a sacar la foto con otro celular.",
     };
   }
   return { ok: true };

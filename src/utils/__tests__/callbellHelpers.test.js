@@ -41,6 +41,7 @@ describe("openCallbellWebchat (Plan 2026-10-09 fix e2e)", () => {
     document.body.removeChild(host);
     vi.useRealTimers();
     getElementByIdSpy.mockRestore();
+    vi.restoreAllMocks();
   });
 
   it("clic inmediato al launcher button si ya está en el DOM", () => {
@@ -106,7 +107,7 @@ describe("openCallbellWebchat (Plan 2026-10-09 fix e2e)", () => {
     vi.advanceTimersByTime(3100);
 
     expect(warnSpy).toHaveBeenCalledWith(
-      expect.stringContaining("launcher button not found"),
+      "Callbell Livechat launcher unavailable after timeout.",
     );
   });
 
@@ -130,26 +131,19 @@ describe("openCallbellWebchat (Plan 2026-10-09 fix e2e)", () => {
     expect(clickSpy).toHaveBeenCalledTimes(1);
   });
 
-  it("el warning final loguea info de diagnóstico del host (children + shadow + preview)", () => {
+  it("uses a fixed warning without conversation content or host diagnostics", () => {
     vi.spyOn(host, "querySelector").mockReturnValue(null);
     const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
 
-    // Agregamos un child al host para que el preview tenga contenido.
     const child = document.createElement("div");
-    child.id = "test-child";
+    child.id = "PRIVATE-HOST-CANARY";
+    child.textContent = "PRIVATE-CONVERSATION-CANARY";
     host.appendChild(child);
 
     openCallbellWebchat();
     vi.advanceTimersByTime(3100);
 
-    expect(warnSpy).toHaveBeenCalledWith(
-      expect.stringContaining("host children=1"),
-    );
-    expect(warnSpy).toHaveBeenCalledWith(
-      expect.stringContaining("hasShadowRoot=false"),
-    );
-    expect(warnSpy).toHaveBeenCalledWith(
-      expect.stringContaining("test-child"),
-    );
+    expect(warnSpy).toHaveBeenCalledExactlyOnceWith("Callbell Livechat launcher unavailable after timeout.");
+    expect(JSON.stringify(warnSpy.mock.calls)).not.toMatch(/PRIVATE|host children|hasShadowRoot|innerHTML/);
   });
 });

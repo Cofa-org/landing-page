@@ -33,3 +33,6 @@ CLAUDE.md
 /.agents
 
 vite.config.js.timestamp-*.mjs
+/test-results/
+/playwright-report/
+/coverage/

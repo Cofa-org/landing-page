@@ -11,6 +11,7 @@ vi.mock("../../config.js", () => ({
 
 const cookieName = COOKIE_LEAD_TOKEN_CONFIG.NAME;
 const sessionId = "callbell-de-esta-pagina";
+const captureContext = { solicitudId: "7", captureSessionId: "11111111-1111-4111-8111-111111111111", baseRevision: "a".repeat(64) };
 const originalCookieDescriptor = Object.getOwnPropertyDescriptor(document, "cookie");
 function restorePlatformMocks() {
   vi.restoreAllMocks();
@@ -62,7 +63,11 @@ describe("registro integrado con almacenamiento bloqueado", () => {
           data: { lead: { id: 42 }, token: "jwt-nuevo" },
         }))
         .mockResolvedValueOnce(jsonResponse({ success: true }))
-        .mockResolvedValueOnce(jsonResponse({ success: true }));
+        .mockResolvedValueOnce(jsonResponse({ success: true }))
+        .mockResolvedValueOnce(jsonResponse({ success: true, data: {
+          ...captureContext, canCapture: true, estado_onboarding: "CELULAR_VALIDADO",
+          dniReceivedForSession: false, receivedUploadId: null, receiptKind: "none",
+        } }));
       vi.stubGlobal("fetch", fetchMock);
 
       const uploads = [];
@@ -77,7 +82,10 @@ describe("registro integrado con almacenamiento bloqueado", () => {
         send(body) {
           this.body = body;
           this.status = 200;
-          this.responseText = JSON.stringify({ success: true });
+          this.responseText = JSON.stringify({ success: true, data: {
+            solicitudId: body.get("solicitudId"), captureSessionId: body.get("captureSessionId"), uploadId: body.get("uploadId"),
+            dniReceivedForSession: true, estado_onboarding: "DNI_SUBIDO", documentValidation: "not_performed",
+          } });
           this.onload();
         }
       }
@@ -101,15 +109,20 @@ describe("registro integrado con almacenamiento bloqueado", () => {
       await expect(LeadRegistrationService.verificarOTPCelular({
         leadId, codigo: "123456", huella_dispositivo: null, requestId: null,
       })).resolves.toMatchObject({ success: true });
+      await expect(LeadRegistrationService.obtenerContextoDni(leadId)).resolves.toMatchObject({ data: captureContext });
       await expect(LeadRegistrationService.subirDni({ leadId }, {
-        dniFront: new File(["frente"], "frente.jpg", { type: "image/jpeg" }),
-        dniBack: new File(["dorso"], "dorso.jpg", { type: "image/jpeg" }),
+        dniFront: new Blob(["frente"], { type: "image/png" }),
+        dniBack: new Blob(["dorso"], { type: "image/png" }),
+      }, null, null, {
+        context: captureContext,
+        uploadId: "22222222-2222-4222-8222-222222222222", rotationFront: 0, rotationBack: 90,
       })).resolves.toMatchObject({ success: true });
 
       expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
         "https://backend.example.test/api/lead-registration/crear",
         "https://backend.example.test/api/lead-registration/solicitar-otp-celular",
         "https://backend.example.test/api/lead-registration/verificar-otp-celular",
+        "https://backend.example.test/api/lead-registration/dni-contexto/42",
       ]);
       expect(fetchMock.mock.calls[0][1].headers.Authorization).toBeUndefined();
       for (const [, options] of fetchMock.mock.calls) {
@@ -129,8 +142,8 @@ describe("registro integrado con almacenamiento bloqueado", () => {
       });
       expect(uploads[0].requestHeaders["Content-Type"]).toBeUndefined();
       expect(uploads[0].body).toBeInstanceOf(FormData);
-      expect(uploads[0].body.get("dniFront").name).toBe("frente.jpg");
-      expect(uploads[0].body.get("dniBack").name).toBe("dorso.jpg");
+      expect(uploads[0].body.get("dniFront").name).toBe("dni-front.png");
+      expect(uploads[0].body.get("dniBack").name).toBe("dni-back.png");
     },
   );
 });

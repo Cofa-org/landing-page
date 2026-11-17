@@ -15,9 +15,8 @@ const LRS_API_KEY = import.meta.env.VITE_LRS_API_KEY;
 const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY;
 const TURNSTILE_MANAGED_SITE_KEY = import.meta.env.VITE_TURNSTILE_MANAGED_SITE_KEY;
 const THUMBMARKJS_API_KEY = import.meta.env.VITE_THUMBMARKJS_API_KEY;
-// SISTEMA_FRANCES_ON: feature flag para el sistema francés nuevo.
-// Default false → comportamiento legacy pre-merge.
-// Rollback sin redeploy: VITE_SISTEMA_FRANCES_ON=false.
+// Export conservado por compatibilidad. El simulador usa el sistema confirmado
+// por el backend para cada link; este valor no selecciona ni revierte su sistema.
 const SISTEMA_FRANCES_ON = parseBool(import.meta.env.VITE_SISTEMA_FRANCES_ON);
 
 // VITE_DEV: feature flag dev/staging expuesto vía env var. Default false.

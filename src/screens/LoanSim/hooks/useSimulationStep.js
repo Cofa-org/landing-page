@@ -1,8 +1,9 @@
+import { SISTEMA_AMORTIZACION } from '../../../constants/sistema-amortizacion.constants.js';
 import { useMemo } from "react";
 import { roundToFiveHundreds } from "../../../lib/utils.js";
-import { SISTEMA_FRANCES_ON } from "../../../config.js";
 
 export const useSimulationStep = ({ simulationData, installment }) => {
+  const esSistemaFrances = simulationData?.sistemaAmortizacion === SISTEMA_AMORTIZACION.FRANCES;
   const formatCurrency = (value) =>
     new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS" }).format(value || 0);
 
@@ -18,13 +19,9 @@ export const useSimulationStep = ({ simulationData, installment }) => {
     [simulationData?.planes_disponibles, installment],
   );
 
-  // Tasas flag-gated. SISTEMA_FRANCES_ON es boolean (parseado en config.js).
-  //   flag=false (legacy pre-merge 8cce032): cfta = tasas.cftna * 100,
-  //                                          cfto = plan.tasaOp * 100,
-  //                                          tna  = cfta * 0.79
-  //   flag=true (sistema francés nuevo):   cfta = tasas.cftna * 100,
-  //                                          cfto = plan.tasas.cftno * 100,
-  //                                          tna  = tasas.tna * 100
+  // Tasas segun el sistema confirmado en esta respuesta.
+  // Directo: tasa_nominal, plan.tasaOp y TNA = CFTA * 0.79.
+  // Frances: tasas.cftna, plan.tasas.cftno y tasas.tna.
   //
   // Cada valor es UN solo useMemo (no condicionales dentro de useMemo — Rules of Hooks).
   // Orden de declaración: cfta primero (tna legacy depende de cfta, evita TDZ).
@@ -34,26 +31,26 @@ export const useSimulationStep = ({ simulationData, installment }) => {
 
   const cfta = useMemo(
     () =>
-      SISTEMA_FRANCES_ON
+      esSistemaFrances
         ? ((simulationData?.tasas?.cftna || 0) * 100).toFixed(2)
         : ((simulationData?.tasa_nominal || 0) * 100).toFixed(2),
-    [simulationData?.tasas?.cftna, simulationData?.tasa_nominal, SISTEMA_FRANCES_ON],
+    [simulationData?.tasas?.cftna, simulationData?.tasa_nominal, esSistemaFrances],
   );
 
   const cfto = useMemo(
     () =>
-      SISTEMA_FRANCES_ON
+      esSistemaFrances
         ? ((selectedPlan?.tasas?.cftno || 0) * 100).toFixed(2)
         : ((selectedPlan?.tasaOp || 0) * 100).toFixed(2),
-    [selectedPlan?.tasas?.cftno, selectedPlan?.tasaOp, SISTEMA_FRANCES_ON],
+    [selectedPlan?.tasas?.cftno, selectedPlan?.tasaOp, esSistemaFrances],
   );
 
   const tna = useMemo(
     () =>
-      SISTEMA_FRANCES_ON
+      esSistemaFrances
         ? ((simulationData?.tasas?.tna || 0) * 100).toFixed(2)
         : (Number(cfta) * 0.79).toFixed(2),
-    [simulationData?.tasas?.tna, cfta, SISTEMA_FRANCES_ON],
+    [simulationData?.tasas?.tna, cfta, esSistemaFrances],
   );
 
   const usedCapital = simulationData?.capital_utilizado;
@@ -78,6 +75,7 @@ export const useSimulationStep = ({ simulationData, installment }) => {
   );
 
   return {
+    esSistemaFrances,
     formatCurrency,
     installments,
     maxOffer,

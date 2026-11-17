@@ -4,6 +4,7 @@ import { COOKIE_SIMULADOR_TOKEN_CONFIG } from "../constants/LOAN_SIM.js";
 import { parseErrorResponse } from "../lib/http-error.js";
 import { HttpApi } from "../lib/http.js";
 import { getCookie, setCookieWithDuration } from "../lib/utils";
+import { validarSesionSimulador } from '../lib/sistema-amortizacion.js';
 
 export default class SimuladorService {
   static async calcularPlanes(
@@ -53,13 +54,13 @@ export default class SimuladorService {
     }
   }
 
-  static async iniciarSesion({ scoringId, cuit, shortId = null }) {
+  static async iniciarSesion({ scoringId, cuit, shortId = null }, { signal } = {}) {
     try {
       const url = `${LANDING_BACKEND_URL}/api/simulador-prestamos/init`;
       const apiKey = LANDING_BACKEND_API_KEY;
       const body = { scoringId, cuit, shortId };
 
-      const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, null);
+      const response = await HttpApi(url, body, HTTP_METHOD.POST, apiKey, null, signal);
 
       if (!response.ok) {
         const errorData = await parseErrorResponse(response);
@@ -67,13 +68,15 @@ export default class SimuladorService {
       }
 
       const jsonResponse = await response.json();
+      if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
 
       // Solo persistir el cookie si la respuesta es success=true y trae token.
       // Cuando el back rechaza con cause=PHONE_NOT_VALIDATED (HTTP 200 +
       // body { success: false, data: null }), el caller va a inspeccionar
       // jsonResponse.cause y mostrar la pantalla de rechazo — no debe
       // haber un cookie con valor undefined persistido.
-      if (jsonResponse.success && jsonResponse.data?.token) {
+      if (jsonResponse.success) {
+        validarSesionSimulador(jsonResponse.data);
         await setCookieWithDuration(
           COOKIE_SIMULADOR_TOKEN_CONFIG.NAME,
           jsonResponse.data.token,
@@ -83,7 +86,7 @@ export default class SimuladorService {
 
       return jsonResponse;
     } catch (error) {
-      console.error("INICIAR_SESION_SIMULADOR_ERROR:", error);
+      if (error.name !== 'AbortError') console.error("INICIAR_SESION_SIMULADOR_ERROR:", error);
       throw error;
     }
   }

@@ -121,6 +121,7 @@ export const useOnboardingFlow = (resumeShortId = null) => {
       targetStep = LOAN_SIM_STEPS.RECIBO_UPLOAD;
     } else if (
       estadoOnboarding === ONBOARDING_STATES.RECIBO_SUBIDO ||
+      estadoOnboarding === ONBOARDING_STATES.REALIZADO ||
       estadoOnboarding === ONBOARDING_STATES.ONBOARDING_COMPLETO
     ) {
       targetStep = LOAN_SIM_STEPS.WELCOME;
@@ -153,6 +154,37 @@ export const useOnboardingFlow = (resumeShortId = null) => {
     }));
     setOnboardingStep(targetStep);
   }, []);
+
+  const dniRestoreController = useRef(null);
+  useEffect(() => () => {
+    dniRestoreController.current?.abort();
+    dniRestoreController.current = null;
+  }, [currentLeadId, leadToken]);
+  const handleDniReceived = useCallback(async () => {
+    const fallback = "Tus fotos se guardaron. Volvé a intentar continuar.";
+    const leadId = getLeadId();
+    if (!leadId) throw new Error(fallback);
+    dniRestoreController.current?.abort();
+    const controller = new AbortController();
+    dniRestoreController.current = controller;
+    try {
+      const response = await LeadRegistrationService.obtenerEstadoOnboarding(leadId, controller.signal);
+      if (controller.signal.aborted || dniRestoreController.current !== controller) return;
+      const snapshot = response?.data;
+      const validState = Object.values(ONBOARDING_STATES).includes(snapshot?.estado_onboarding);
+      const needsPicker = snapshot?.estado_onboarding === ONBOARDING_STATES.PHONE_PICKER
+        && snapshot.requiresAdvisorContact !== true && !snapshot.emailOtpDestination;
+      const validPicker = Array.isArray(snapshot?.pickerContext?.options) && snapshot.pickerContext.options.length === 4
+        && snapshot.pickerContext.options.every(option => typeof option === "string");
+      const validAdvisor = snapshot?.estado_onboarding !== ONBOARDING_STATES.EMAIL_PENDING_ADVISOR || snapshot.requiresAdvisorContact === true;
+      if (response?.success !== true || !validState || (needsPicker && !validPicker) || !validAdvisor) throw new Error(fallback);
+      applyOnboardingState(snapshot);
+    } catch {
+      if (!controller.signal.aborted) throw new Error(fallback);
+    } finally {
+      if (dniRestoreController.current === controller) dniRestoreController.current = null;
+    }
+  }, [getLeadId, applyOnboardingState]);
 
   const verificarEstadoEmailPendingAdvisor = useCallback(async () => {
     if (onboardingStep !== LOAN_SIM_STEPS.EMAIL_PENDING_ADVISOR || emailPendingAdvisorController.current) return;
@@ -281,7 +313,7 @@ export const useOnboardingFlow = (resumeShortId = null) => {
     LOAN_SIM_STEPS.IDENTITY_SELECTION,
     LOAN_SIM_STEPS.PHONE_VALIDATION,
     // LOAN_SIM_STEPS.DNI_UPLOAD,
-    ...(!leadData?.es_cliente ? [LOAN_SIM_STEPS.RECIBO_UPLOAD] : []),
+    // ...(!leadData?.es_cliente ? [LOAN_SIM_STEPS.RECIBO_UPLOAD] : []),
     LOAN_SIM_STEPS.WELCOME,
     LOAN_SIM_STEPS.EN_ANALISIS,
     // LOAN_SIM_STEPS.PHONE_PICKER,
@@ -653,6 +685,7 @@ export const useOnboardingFlow = (resumeShortId = null) => {
 
     // Handlers de steps
     handleLeadSuccess,
+    handleDniReceived,
     handleRejected,
     handleAnalysis,
     goToAnalysis,

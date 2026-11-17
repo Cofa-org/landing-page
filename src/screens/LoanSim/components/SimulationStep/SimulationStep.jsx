@@ -10,8 +10,6 @@ import {
 import styles from "../../LoanSimScreen.module.css";
 import { useSimulationStep } from "../../hooks/useSimulationStep";
 import { FraudWarning } from "../../../../Components/index.js";
-import { roundToFiveHundreds } from "../../../../lib/utils.js";
-import { SISTEMA_FRANCES_ON } from "../../../../config.js";
 
 
 
@@ -19,7 +17,6 @@ const SimulationStep = ({
   amount,
   installment,
   simulationData,
-  loading,
   nombreCompleto,
   onAmountChange,
   onInstallmentChange,
@@ -27,8 +24,8 @@ const SimulationStep = ({
   error,
 }) => {
   const {
+    esSistemaFrances,
     formatCurrency,
-    installments,
     maxOffer,
     selectedPlan,
     cfta,
@@ -40,8 +37,6 @@ const SimulationStep = ({
     loanNbr,
     capitalWithoutDiscount,
     sortedInstallments,
-    maxPlazo,
-    secondMaxPlazo,
   } = useSimulationStep({ simulationData, installment });
 
   const [prevencionFraudes, setPrevencionFraudes] = React.useState(false);
@@ -97,13 +92,6 @@ const SimulationStep = ({
         </label>
         <div className={styles.installmentGrid}>
           {sortedInstallments.map((plazo) => {
-            // const isRecommended = plazo === maxPlazo;
-            // const isPopular = plazo === secondMaxPlazo && sortedInstallments.length > 2;
-
-            let badgeText = "";
-            // if (isRecommended) badgeText = "CUOTA MÍNIMA";
-            // else if (isPopular) badgeText = "RECOMENDADO";
-
             return (
               <button
                 key={plazo}
@@ -113,13 +101,6 @@ const SimulationStep = ({
                 }`}
                 onClick={() => onInstallmentChange(plazo)}
               >
-                {badgeText && (
-                  <span
-                    className={`${styles.installmentBadge} ${!isRecommended ? styles.installmentBadgeSecondary : ""}`}
-                  >
-                    {badgeText}
-                  </span>
-                )}
                 {plazo === 1 ? `${plazo} cuota` : `${plazo} cuotas`}
               </button>
             );
@@ -211,8 +192,8 @@ const SimulationStep = ({
           <MdInfoOutline className={styles.infoIcon} />
           <div className={styles.tooltip}>
             {/* En modo francés `cfta`/`cfto` son CFTNA/CFTNO (ver useSimulationStep). */}
-            <p>{SISTEMA_FRANCES_ON ? "CFTNA" : "CFTA"}: {cfta}%</p>
-            <p>{SISTEMA_FRANCES_ON ? "CFTNO" : "CFTO"}: {cfto}%</p>
+            <p>{esSistemaFrances ? "CFTNA" : "CFTA"}: {cfta}%</p>
+            <p>{esSistemaFrances ? "CFTNO" : "CFTO"}: {cfto}%</p>
             <p>TNA: {tna}%</p>
           </div>
         </div>

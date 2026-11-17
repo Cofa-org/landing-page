@@ -62,6 +62,7 @@ const OnboardingFlowScreen = () => {
     navigateToNext,
     navigateToPrev,
     handleLeadSuccess,
+    handleDniReceived,
     handleRejected,
     handleAnalysis,
     goToAnalysis,
@@ -277,7 +278,7 @@ const OnboardingFlowScreen = () => {
           <DNIUploadStep
             leadId={getLeadId()}
             leadToken={leadToken}
-            onSuccess={() => navigateToNext(LOAN_SIM_STEPS.DNI_UPLOAD)}
+            onSuccess={handleDniReceived}
             error={null}
           />
         );

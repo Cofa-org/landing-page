@@ -1,22 +1,20 @@
+import { SISTEMA_AMORTIZACION } from '../../../../constants/sistema-amortizacion.constants.js';
 import React from "react";
 import { usePDFExport } from "../../../../hooks/usePDFExport";
-import { SISTEMA_FRANCES_ON } from "../../../../config.js";
+import { esSistemaAmortizacionValido } from '../../../../lib/sistema-amortizacion.js';
 import styles from "./LoanInfoModal.module.css";
 
-// Las keys del backend (CFTA/CFTO) son legacy: en modo francés transportan
-// CFTNA/CFTNO. Las labels del modal y del PDF siguen al flag del front.
-const CFTA_LABEL = SISTEMA_FRANCES_ON ? "CFTNA" : "CFTA";
-const CFTO_LABEL = SISTEMA_FRANCES_ON ? "CFTNO" : "CFTO";
-
 const LoanInfoModal = ({ loanInfo, closeModal, simulationData }) => {
+  const CFTA_LABEL = loanInfo?.sistemaAmortizacion === SISTEMA_AMORTIZACION.FRANCES ? 'CFTNA' : 'CFTA';
+  const CFTO_LABEL = loanInfo?.sistemaAmortizacion === SISTEMA_AMORTIZACION.FRANCES ? 'CFTNO' : 'CFTO';
   const usedCapital = simulationData?.capital_utilizado;
   const discountInstallment = simulationData?.cuotaADescontar;
   const installmentNbr = simulationData?.nroCuota;
   const loanNbr = simulationData?.nroPrestamo;
 
   const fields = [
-    { label: "Fecha de solicitud", value: loanInfo.FechaDeSolicitud, type: "text" },
-    { label: "Capital del préstamo", value: loanInfo.CapitalDelPrestamo, type: "currency" },
+    { label: "Fecha de solicitud", value: loanInfo?.FechaDeSolicitud, type: "text" },
+    { label: "Capital del préstamo", value: loanInfo?.CapitalDelPrestamo, type: "currency" },
     ...(discountInstallment && installmentNbr && loanNbr
       ? [{
           label: "",
@@ -24,12 +22,12 @@ const LoanInfoModal = ({ loanInfo, closeModal, simulationData }) => {
           type: "text",
         }]
       : []),
-    { label: "Total de intereses", value: loanInfo.TotalDeIntereses, type: "currency" },
-    { label: "Cantidad de cuotas", value: loanInfo.CantidadDeCuotas, type: "text" },
-    { label: "Monto cuota", value: loanInfo.MontoCuota, type: "currency" },
-    { label: CFTO_LABEL, value: loanInfo.CFTO, type: "percent" },
-    { label: "TNA", value: loanInfo.TNA, type: "percent" },
-    { label: CFTA_LABEL, value: loanInfo.CFTA, type: "percent" },
+    { label: "Total de intereses", value: loanInfo?.TotalDeIntereses, type: "currency" },
+    { label: "Cantidad de cuotas", value: loanInfo?.CantidadDeCuotas, type: "text" },
+    { label: "Monto cuota", value: loanInfo?.MontoCuota, type: "currency" },
+    { label: CFTO_LABEL, value: loanInfo?.CFTO, type: "percent" },
+    { label: "TNA", value: loanInfo?.TNA, type: "percent" },
+    { label: CFTA_LABEL, value: loanInfo?.CFTA, type: "percent" },
   ];
 
   const { generatePDF } = usePDFExport({
@@ -38,7 +36,7 @@ const LoanInfoModal = ({ loanInfo, closeModal, simulationData }) => {
     fields,
   });
 
-  if (!loanInfo) return null;
+  if (!loanInfo || !esSistemaAmortizacionValido(loanInfo.sistemaAmortizacion)) return null;
 
   return (
     <div className={styles.modalContainer}>

@@ -28,6 +28,7 @@ export const useMobbexSubscription = (scoringId, onSubscriptionCompleted) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [message, setMessage] = useState(null);
+  const scope = useRef(0);
 
   // Mantener el callback en una ref para que el efecto de auto-confirmación
   // no se re-ejecute si el padre lo recrea en cada render (vi.fn() inline,
@@ -41,7 +42,13 @@ export const useMobbexSubscription = (scoringId, onSubscriptionCompleted) => {
 
   // Auto-confirmar al volver de Mobbex
   useEffect(() => {
-    if (!fromMobbex) return;
+    const operation = ++scope.current;
+    const cleanup = () => { if (scope.current === operation) scope.current++; };
+    if (!fromMobbex) {
+      setIsConfirming(false);
+      return cleanup;
+    }
+    setIsConfirming(true);
 
     const confirm = async () => {
       try {
@@ -51,6 +58,7 @@ export const useMobbexSubscription = (scoringId, onSubscriptionCompleted) => {
           uid: mobbexUid,
           status: mobbexStatus,
         });
+        if (scope.current !== operation) return;
         if (!response?.success) {
           setMessage(null);
           setError(
@@ -68,14 +76,16 @@ export const useMobbexSubscription = (scoringId, onSubscriptionCompleted) => {
           console.error("MOBBEX_COMPLETION_CALLBACK_ERROR:", err),
         );
       } catch (err) {
+        if (scope.current !== operation) return;
         setMessage(null);
         setError(err.message || "Error al confirmar la suscripción");
       } finally {
-        setIsConfirming(false);
+        if (scope.current === operation) setIsConfirming(false);
       }
     };
     confirm();
-  }, [fromMobbex, scoringId, mobbexSid, mobbexUid, mobbexStatus]);
+    return cleanup;
+  }, [fromMobbex, scoringId, linkId, mobbexSid, mobbexUid, mobbexStatus]);
 
   // Detecta modo test persona (panel de QA visual). En ese modo, el flujo
   // del simulador bypashea Mobbex: no hay link real, no redirigimos a su
@@ -94,6 +104,7 @@ export const useMobbexSubscription = (scoringId, onSubscriptionCompleted) => {
   })();
 
   const handleSuscribirse = useCallback(async () => {
+    const operation = scope.current;
     if (isTestPersonaBypass) {
       // Bypass de QA: saltamos Mobbex y vamos directo a COMPLETADO.
       // El backend ya creó el préstamo y marcó la simulación vía
@@ -109,6 +120,7 @@ export const useMobbexSubscription = (scoringId, onSubscriptionCompleted) => {
         scoringId,
         ...(linkId ? { linkId } : {}),
       });
+      if (scope.current !== operation) return;
       if (!response?.success) {
         setError(
           `${response?.message} 😕` ||
@@ -123,6 +135,7 @@ export const useMobbexSubscription = (scoringId, onSubscriptionCompleted) => {
       }
       window.location.href = url;
     } catch (err) {
+      if (scope.current !== operation) return;
       setError(err.message || "Error al obtener la URL de suscripción");
       setLoading(false);
     }

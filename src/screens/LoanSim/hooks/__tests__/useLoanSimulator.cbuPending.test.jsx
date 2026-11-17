@@ -14,7 +14,7 @@ vi.mock("../../../../services/linkResolutionService.js", () => ({
 vi.mock("../../../../services/simuladorService.js", () => ({
   default: {
     calcularPlanes: vi.fn(),
-    iniciarSesion: vi.fn().mockResolvedValue({ success: true, data: { token: "mock-jwt" } }),
+    iniciarSesion: vi.fn().mockResolvedValue({ success: true, data: { sistemaAmortizacion: 'directo',  token: "mock-jwt" } }),
     validarCBU: vi.fn(),
     aceptarTerminos: vi.fn(),
     obtenerInfoPrestamo: vi.fn(),
@@ -83,7 +83,7 @@ const consumeLinkResponse = {
  */
 const buildCalcularResponse = (existingSimulation) => ({
   success: true,
-  data: {
+  data: { sistemaAmortizacion: 'directo', 
     capital_maximo_a_ofrecer: 0,
     planes_disponibles: [],
     existingSimulation,
@@ -107,7 +107,7 @@ describe("useLoanSimulator — gate de validación de CBU (Plan 2026-10-20)", ()
     mapFingerprintToHuellaData.mockReturnValue(HUELLA_DATA);
     SimuladorService.iniciarSesion.mockResolvedValue({
       success: true,
-      data: { token: "mock-jwt" },
+      data: { sistemaAmortizacion: 'directo',  token: "mock-jwt" },
     });
     getCookie.mockResolvedValue(null);
     setCookie.mockResolvedValue(undefined);
@@ -184,7 +184,7 @@ describe("useLoanSimulator — gate de validación de CBU (Plan 2026-10-20)", ()
     SimuladorService.aceptarTerminos.mockResolvedValue({ success: true, skipMobbex: true });
     SimuladorService.obtenerInfoPrestamo.mockResolvedValue({
       success: true,
-      data: { FechaDeSolicitud: "2026-10-20" },
+      data: { sistemaAmortizacion: 'directo',  FechaDeSolicitud: "2026-10-20" },
     });
 
     const { result } = renderUseLoanSimulator(SHORT_ID);

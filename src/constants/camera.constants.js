@@ -1,15 +1,10 @@
-// Mensajes user-facing para el flujo de captura de cámara (getUserMedia).
-// Espejo de las constantes CAMERA_* definidas en
-// landing-page-backend/core/constants/error.constants.js — la landing page
-// corre en el navegador y no comparte módulo con el backend, por lo que se
-// mantienen duplicadas en frontend. Si el wording cambia, hay que actualizar
-// ambos archivos.
+// Closed browser-camera guidance; backend DNI causes have their own protocol map.
 export const ERROR_MESSAGE = Object.freeze({
   CAMERA_PERMISSION_DENIED:
-    "Necesitamos acceso a tu cámara para sacar las fotos. Sin este permiso no podemos continuar",
-  CAMERA_NOT_AVAILABLE: "No encontramos una cámara disponible en tu dispositivo",
+    "Habilitá el permiso de cámara en tu navegador y reintentá. También podés usar otro celular o contactar a un asesor.",
+  CAMERA_NOT_AVAILABLE: "No encontramos una cámara disponible. Reintentá con un navegador compatible en tu celular, otro celular o un asesor.",
   CAMERA_INSUFFICIENT_RESOLUTION:
-    "La cámara no tiene suficiente resolución. Probá con otro dispositivo o contactanos",
+    "No pudimos iniciar la cámara con esta configuración. Reintentá con otro celular o contactá a un asesor.",
   CAMERA_BLURRY_PHOTO: "La foto salió borrosa. Mantené firme el celular y volvé a sacarla",
   CAMERA_HTTPS_REQUIRED: "Necesitamos una conexión segura para acceder a la cámara",
   CAMERA_IN_USE: "La cámara está siendo usada por otra aplicación. Cerrala e intentá de nuevo",

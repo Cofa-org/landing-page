@@ -1,8 +1,12 @@
-import { memo } from "react";
+import { memo, useState } from "react";
 import GenericButton from "../../../../Components/buttons/GenericButton/GenericButton.jsx";
 import { isTestPersonasVisible } from "../../../../config.js";
 import { PERSONAS_CON_APROBAR_CBU } from "../../hooks/useTestSimuladorPanel.js";
+import { SISTEMA_AMORTIZACION } from '../../../../constants/sistema-amortizacion.constants.js';
+import { esSistemaAmortizacionValido } from '../../../../lib/sistema-amortizacion.js';
 import styles from "./TestSimuladorPanel.module.css";
+
+const nombreSistema = sistema => sistema === SISTEMA_AMORTIZACION.FRANCES ? 'Francés' : 'Directo';
 
 /**
  * Dev-only panel mounted over /loan-sim to let QA pick a "test persona"
@@ -29,7 +33,13 @@ const TestSimuladorPanel = ({
   loading = false,
   approvingCbu = null,
   cbuAprobadoPara = null,
+  startingPersona = null,
+  error = null,
+  sistemaActual = null,
+  consultandoSistema = false,
 }) => {
+  const [sistemasSeleccionados, setSistemasSeleccionados] = useState({});
+  const sistemaConfirmado = esSistemaAmortizacionValido(sistemaActual) ? sistemaActual : null;
   if (!isTestPersonasVisible()) return null;
   if (loading) return null;
   if (!personas || personas.length === 0) return null;
@@ -51,6 +61,7 @@ const TestSimuladorPanel = ({
             type='button'
             variant='secondary'
             onClick={onReset}
+            disabled={Boolean(startingPersona)}
             className={styles.resetButton}
           >
             Reset
@@ -60,13 +71,39 @@ const TestSimuladorPanel = ({
       <span className={styles.subtitle}>
         Elegí una persona para saltar el flujo de links externos.
       </span>
+      <p className={styles.currentSystem} role="status">
+        {consultandoSistema ? 'Consultando sistema…' : sistemaConfirmado
+          ? `Sistema actual: ${nombreSistema(sistemaConfirmado)}` : 'Sin simulación activa'}
+      </p>
+      {error && <p className={styles.errorMessage} role="alert">{error}</p>}
       <div className={styles.list}>
-        {personas.map((persona) => (
+        {personas.map((persona) => {
+          const sistemas = Array.isArray(persona.sistemasAmortizacion)
+            ? persona.sistemasAmortizacion.filter(esSistemaAmortizacionValido) : [];
+          const sistemaElegido = consultandoSistema ? '' : sistemasSeleccionados[persona.id] ||
+            (sistemas.includes(sistemaConfirmado) ? sistemaConfirmado : sistemas[0]);
+          const accionPrueba = consultandoSistema ? 'Consultando sistema…' : `Iniciar prueba en ${nombreSistema(sistemaElegido)}`;
+          return (
           <div key={persona.id} className={styles.personaItem}>
+            {sistemas.length > 0 && <>
+              <label className={styles.systemLabel} htmlFor={`sistema-${persona.id}`}>Sistema para {persona.label}</label>
+              <select id={`sistema-${persona.id}`} className={styles.systemSelect}
+                value={sistemaElegido} disabled={Boolean(startingPersona) || consultandoSistema}
+                onChange={event => setSistemasSeleccionados(current => ({ ...current, [persona.id]: event.target.value }))}>
+                {consultandoSistema && <option value="">Consultando sistema…</option>}
+                {sistemas.map(sistema => <option key={sistema} value={sistema}>
+                  {nombreSistema(sistema)}
+                </option>)}
+              </select>
+            </>}
             <GenericButton
               type='button'
               variant='outline'
-              onClick={() => onSelectPersona(persona.id)}
+              onClick={() => sistemas.length ? onSelectPersona(persona.id, sistemaElegido) : onSelectPersona(persona.id)}
+              disabled={Boolean(startingPersona) || (sistemas.length > 0 && consultandoSistema)}
+              loading={startingPersona === persona.id}
+              aria-label={sistemas.length ? `${persona.label} — ${accionPrueba}` : undefined}
+              aria-busy={startingPersona === persona.id || undefined}
               className={styles.personaButton}
             >
               <span className={styles.personaLabel}>{persona.label}</span>
@@ -76,6 +113,7 @@ const TestSimuladorPanel = ({
               {persona.tip && (
                 <span className={styles.personaTip}>💡 {persona.tip}</span>
               )}
+              {sistemas.length > 0 && <span>{accionPrueba}</span>}
             </GenericButton>
             {/* Plan 2026-10-21 (caso de QA del gate de validación manual de
                 CBU): el botón aprueba el CBU/CVU de la simulación
@@ -89,7 +127,7 @@ const TestSimuladorPanel = ({
                 variant='secondary'
                 onClick={() => onAprobarCbu?.(persona.id)}
                 loading={approvingCbu === persona.id}
-                disabled={cbuAprobadoPara === persona.id}
+                disabled={cbuAprobadoPara === persona.id || Boolean(startingPersona)}
                 // Con `loading` el GenericButton reemplaza los children por
                 // un spinner `aria-hidden` → sin `aria-label` el botón
                 // perdería su nombre accesible.
@@ -108,7 +146,7 @@ const TestSimuladorPanel = ({
               </GenericButton>
             )}
           </div>
-        ))}
+        ); })}
       </div>
     </div>
   );
