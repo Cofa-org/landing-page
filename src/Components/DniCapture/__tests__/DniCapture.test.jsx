@@ -88,6 +88,29 @@ it("explicit conflict refresh prepares preserved photos; separate Enviar creates
  const first=Service.subirDniMobile.mock.calls[0][5];const second=Service.subirDniMobile.mock.calls[1][5];
  expect(second.context.baseRevision).toBe("b".repeat(64));expect(second.uploadId).not.toBe(first.uploadId);
 });
+it("shows a status message while the DNI photos are being processed", async () => {
+ Object.defineProperty(navigator, "userAgentData", { configurable: true, value: { mobile: true } });
+ let finishUpload;
+ Service.subirDniMobile.mockImplementationOnce((_lead, _files, _token, _signal, _retry, options) =>
+  new Promise(resolve => {
+   finishUpload = () => resolve({
+    success: true,
+    data: { ...options.context, uploadId: options.uploadId, dniReceivedForSession: true, estado_onboarding: "DNI_SUBIDO", documentValidation: "not_performed" },
+   });
+  }));
+ render(<DNIUploadStep leadId="42" leadToken="synthetic" />);
+ await confirmSide("frente");
+ await confirmSide("dorso");
+
+ const message = "Estamos procesando tus fotos. Aguardá unos segundos.";
+ expect(screen.queryByText(message)).not.toBeInTheDocument();
+ fireEvent.click(screen.getByRole("button", { name: "Enviar fotos" }));
+ expect(screen.getByRole("status")).toHaveTextContent(message);
+
+ finishUpload();
+ await screen.findByText(/Recibimos tus fotos/);
+ expect(screen.queryByText(message)).not.toBeInTheDocument();
+});
 afterEach(()=>{cleanup();vi.restoreAllMocks();});
 it("names dialog, starts camera, traps focus and Escape returns focus",async()=>{
  const onCancel=vi.fn();const trigger=document.createElement("button");document.body.append(trigger);trigger.focus();
