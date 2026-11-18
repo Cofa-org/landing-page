@@ -44,7 +44,11 @@
 .videoContainer { position: relative; width: min(100cqw, calc(100cqh * var(--camera-aspect))); aspect-ratio: var(--camera-aspect); flex: none; background: #000; border-radius: 8px; overflow: hidden; container-type: size; }
 .video { width: 100%; height: 100%; display: block; object-fit: contain; }
 .overlay { position: absolute; inset: 0; pointer-events: none; }
-.guideRect { position: absolute; border: 2px solid #fff; box-shadow: 0 0 0 100vmax rgb(0 0 0 / 55%); }
+.guideRect {
+  position: absolute;
+  border: 2px solid #fff;
+  box-shadow: inset 0 0 0 3px #222, 0 0 0 100vmax rgb(0 0 0 / 55%);
+}
 .previewContainer { display: flex; flex-direction: column; gap: var(--spacing-md, 16px); min-width: 0; }
 .previewImage { position: absolute; display: block; max-width: none; }
 .previewActions { display: flex; gap: var(--spacing-sm, 12px); flex-wrap: wrap; }

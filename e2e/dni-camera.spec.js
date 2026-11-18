@@ -129,6 +129,18 @@ for (const entry of ['mobile', 'inline']) for (const frame of [wideFrame, tallFr
     }
   }
   const video = dialog.locator('video');
+  await video.evaluate(node => node.style.setProperty('background-color', '#fff'));
+  const guide = video.locator('..').locator(':scope > [aria-hidden] > div');
+  const guideBox = await guide.boundingBox();
+  const edgeSamples = [
+    { x: 3, y: guideBox.height / 2 },
+    { x: guideBox.width - 4, y: guideBox.height / 2 },
+    { x: guideBox.width / 2, y: 3 },
+    { x: guideBox.width / 2, y: guideBox.height - 4 },
+  ];
+  const { sampled } = await screenshotPixels(guide, edgeSamples, info.outputPath('guide-on-white.png'));
+  expect(sampled).toEqual(Array.from({ length: edgeSamples.length }, () => [34, 34, 34]));
+  await video.evaluate(node => node.style.removeProperty('background-color'));
   await video.evaluate(node => node.style.setProperty('height', '80%'));
   await expectProjectedGuide(video, frame);
   await video.evaluate(node => node.style.removeProperty('height'));
