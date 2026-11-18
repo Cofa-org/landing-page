@@ -26,7 +26,7 @@ export function useDniCaptureScreen({ leadId, token, expectedContext, onSuccess,
   const [continuing, setContinuing] = useState(false);
   const [receiptObserved, setReceiptObserved] = useState(false);
   const continuation = useRef({ attempted: false, inFlight: false, received: false, generation: 0 });
-  const { isPolling, pollingError, startPolling, stopPolling } = useDNIPolling(leadId, token, model.context);
+  const { pollingError, startPolling, stopPolling } = useDNIPolling(leadId, token, model.context);
   const { acceptCapture, submitCaptures, refreshContext, cancel } = model;
 
   useLayoutEffect(() => {
@@ -149,6 +149,7 @@ export function useDniCaptureScreen({ leadId, token, expectedContext, onSuccess,
     };
   });
   const received = receiptObserved || model.uploadSuccess;
+  const isPreparingQr = !isPhone && (model.contextStatus === "idle" || model.isContextLoading);
   const canHandoff = !isPhone && model.contextStatus === "ready" && !pollingError && validDniContext(model.context) && leadId && token;
   const qrUrl = canHandoff ? `${window.location.origin}/subir-dni?${new URLSearchParams({
     leadId: String(leadId), token, ...model.context,
@@ -161,12 +162,12 @@ export function useDniCaptureScreen({ leadId, token, expectedContext, onSuccess,
   const retakeSide = SIDES.find(({ side }) => side === model.sideToRecapture);
   const retakeMessage = retakeSide ? `Volvé a sacar la foto del ${retakeSide.name} para usar el mismo encuadre en ambas caras.` : "";
   return {
-    viewModel: { isPhone, slots, qrUrl, isPolling, received, continuing,
+    viewModel: { isPhone, slots, qrUrl, isPreparingQr, received, continuing,
       description: isPhone ? "Sacá una foto del frente y otra del dorso con la cámara de tu celular." : undefined,
       isLoading: model.isContextLoading, isUploading: model.isUploading,
       canSubmit: isPhone && model.isFormValid && !loading && !received,
       error: continuationError || pollingError || uploadError || retakeMessage || externalError,
-      canRefresh: Boolean(pollingError || ["error", "conflict", "unavailable", "idle"].includes(model.contextStatus)),
+      canRefresh: !isPreparingQr && Boolean(pollingError || ["error", "conflict", "unavailable", "idle"].includes(model.contextStatus)),
       canNewOperation, continuationError, handleSubmit, handleRefresh, handleNewOperation, continueFlow, handleCancelUpload,
       handleContactAdvisor: openCallbellWebchat },
     cameraProps: { open: isPhone && activeSide !== null, tipoFoto: activeSide === "back" ? "dorso" : "frente", onCapture: handleCapture, onCancel: handleCancelCapture },

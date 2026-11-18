@@ -36,14 +36,18 @@ export default function DniCapture({ viewModel }) {
           </div>
           {viewModel.isUploading ? <GenericButton variant="secondary" onClick={viewModel.handleCancelUpload}>Cancelar envío</GenericButton> : null}
         </>
-      ) : (
+      ) : (viewModel.isPreparingQr || viewModel.qrUrl) ? (
         <div className={styles.handoff}>
           <p>Escaneá el código con tu celular para sacar las fotos de tu DNI.</p>
-          {viewModel.qrUrl ? <QRCodeSVG value={viewModel.qrUrl} size={180} title="Escaneá con tu celular" /> : null}
-          {viewModel.isPolling ? <p role="status">Esperando las fotos de tu celular…</p> : null}
+          <div className={styles.qrFrame} aria-busy={viewModel.isPreparingQr}>
+            {viewModel.qrUrl ? <QRCodeSVG value={viewModel.qrUrl} size={180} title="Escaneá con tu celular" /> : null}
+          </div>
+          <p className={styles.qrStatus} role="status">
+            {viewModel.isPreparingQr ? "Preparando el código QR…" : "Esperando las fotos de tu celular…"}
+          </p>
         </div>
-      )}
-      {viewModel.isLoading ? <p role="status">Preparando la captura…</p> : null}
+      ) : null}
+      {viewModel.isPhone && viewModel.isLoading ? <p role="status">Preparando la captura…</p> : null}
       {viewModel.continuing ? <p role="status">Recuperando el paso de tu solicitud…</p> : null}
       {viewModel.error ? <p className={styles.error} role="alert">{viewModel.error}</p> : null}
       {viewModel.continuationError ? <GenericButton onClick={viewModel.continueFlow} disabled={viewModel.continuing}>Volver a intentar continuar</GenericButton> : null}

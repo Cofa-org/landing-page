@@ -154,6 +154,35 @@ for (const entry of ['mobile', 'inline']) for (const frame of [wideFrame, tallFr
 
 test.afterEach(async ({ page }) => { await expect(page.locator('a[href*="/subir-dni?"], a[href*="wa.me"]')).toHaveCount(0); await page.close(); await page.context().unrouteAll({ behavior: 'ignoreErrors' }); });
 
+test('desktop QR keeps the title and help in place after a delayed response', async ({ page }, info) => {
+  test.skip(isPhone(info));
+  await installSyntheticCapture(page, { phone: false });
+  const contextResponse = Promise.withResolvers();
+  await page.route('**/api/lead-registration/dni-contexto/*', async route => {
+    await contextResponse.promise;
+    await route.fallback();
+  });
+  const form = page.locator('form');
+  const title = form.getByRole('heading', { name: 'Subí las fotos de tu DNI' });
+  const help = form.getByRole('button', { name: 'Hablar con un asesor' });
+  const qr = form.getByRole('img', { name: 'Escaneá con tu celular' });
+  let before;
+  try {
+    await openEntry(page, 'inline');
+    await expect(help).toBeVisible();
+    await expect(form.getByRole('status')).toHaveText('Preparando el código QR…');
+    await expect(qr).toHaveCount(0);
+    before = { title: await title.boundingBox(), help: await help.boundingBox() };
+  } finally {
+    contextResponse.resolve();
+  }
+
+  await expect(qr).toBeVisible();
+  await expect(form.getByRole('status')).toHaveText('Esperando las fotos de tu celular…');
+  expect(await title.boundingBox()).toEqual(before.title);
+  expect(await help.boundingBox()).toEqual(before.help);
+});
+
 test('desktop touch/webcam offers context-bound scannable QR and polls the phone receipt', async ({ page, browser }, info) => {
   test.skip(isPhone(info));
   const desktop = await installSyntheticCapture(page, { phone: false });
