@@ -46,6 +46,25 @@ describe("DNI transport contract", () => {
     await Service.subirDni({ leadId: "42" }, files(), null, null, { ...options, tokenOverride: "synthetic-prop" });
     expect(HttpApi.mock.calls[0][4]).toBe("synthetic-prop");
   });
+  it.each(["inline", "mobile"])("adds the guide profile once and preserves the full PNG bytes (%s)", async mode => {
+    const pair = files();
+    const guided = { ...options, rotationFront: 0, captureProfile: "DNI_GUIDE_8X5_V1" };
+    if (mode === "inline") await Service.subirDni({ leadId: "42" }, pair, null, null, guided);
+    else await Service.subirDniMobile({ leadId: "42" }, pair, "synthetic-link", null, null, guided);
+    const form = HttpApi.mock.calls[0][1];
+    expect([...form.keys()].sort()).toEqual([
+      "baseRevision", "captureProfile", "captureSessionId", "dniBack", "dniFront", "rotationBack", "rotationFront", "solicitudId", "uploadId",
+    ]);
+    expect(form.getAll("captureProfile")).toEqual(["DNI_GUIDE_8X5_V1"]);
+    expect(await form.get("dniFront").text()).toBe("front");
+    expect(await form.get("dniBack").text()).toBe("back");
+  });
+  it.each([{ captureProfile: "DNI_GUIDE_8X5_V1" }, { captureProfile: "arbitrary", rotationFront: 0 }])(
+    "rejects a profile with invalid rotations or name before transport %j", async patch => {
+      await expect(Service.subirDni({ leadId: "42" }, files(), null, null, { ...options, ...patch }))
+        .rejects.toMatchObject({ cause: "DNI_CAPTURE_INVALID_INPUT" });
+      expect(HttpApi).not.toHaveBeenCalled();
+    });
   it("rejects context-free uploads before transport", async () => {
     await expect(Service.subirDni({ leadId: "42" }, files())).rejects.toMatchObject({ cause: "DNI_CAPTURE_CONTEXT_REQUIRED" });
     expect(HttpApi).not.toHaveBeenCalled();

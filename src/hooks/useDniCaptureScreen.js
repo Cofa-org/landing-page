@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useDniCapture } from "./useDniCapture.js";
 import { useDNIPolling } from "../screens/registrationSim/hooks/useDNIPolling.js";
-import { normalizeDniId, resolveDniCaptureSurface, validDniContext } from "../lib/dni-capture.js";
+import { getDniCropPreviewStyles, normalizeDniId, resolveDniCaptureSurface, validDniContext } from "../lib/dni-capture.js";
 import { openCallbellWebchat } from "../utils/callbellHelpers.js";
 
 const SIDES = [{ side: "front", label: "Frente del DNI", name: "frente" }, { side: "back", label: "Dorso del DNI", name: "dorso" }];
@@ -142,7 +142,7 @@ export function useDniCaptureScreen({ leadId, token, expectedContext, onSuccess,
       ...definition, previewUrl: capture?.previewUrl, expanded: zoomSide === definition.side,
       open: definition.side === "front" ? openFront : openBack,
       zoom: definition.side === "front" ? zoomFront : zoomBack,
-      frameStyle: capture ? { aspectRatio: capture.width / capture.height } : undefined,
+      ...(capture && getDniCropPreviewStyles(capture)),
       disabled: !model.canCapture || model.isUploading || loading,
       actionLabel: capture ? `Volver a sacar el ${definition.name}` : `Sacar foto del ${definition.name}`,
       zoomLabel: zoomSide === definition.side ? `Reducir ${definition.name}` : `Ampliar ${definition.name}`,
@@ -158,12 +158,14 @@ export function useDniCaptureScreen({ leadId, token, expectedContext, onSuccess,
   const activeSide = activeCapture?.binding === binding ? activeCapture.side : null;
   const errorFace = IMAGE_ERRORS.has(model.error?.cause) ? SIDES.find(definition => definition.side === model.error?.side) : null;
   const uploadError = errorFace ? `${errorFace.label}: ${model.uploadError}` : model.uploadError;
+  const retakeSide = SIDES.find(({ side }) => side === model.sideToRecapture);
+  const retakeMessage = retakeSide ? `Volvé a sacar la foto del ${retakeSide.name} para usar el mismo encuadre en ambas caras.` : "";
   return {
     viewModel: { isPhone, slots, qrUrl, isPolling, received, continuing,
       description: isPhone ? "Sacá una foto del frente y otra del dorso con la cámara de tu celular." : undefined,
       isLoading: model.isContextLoading, isUploading: model.isUploading,
       canSubmit: isPhone && model.isFormValid && !loading && !received,
-      error: continuationError || pollingError || uploadError || externalError,
+      error: continuationError || pollingError || uploadError || retakeMessage || externalError,
       canRefresh: Boolean(pollingError || ["error", "conflict", "unavailable", "idle"].includes(model.contextStatus)),
       canNewOperation, continuationError, handleSubmit, handleRefresh, handleNewOperation, continueFlow, handleCancelUpload,
       handleContactAdvisor: openCallbellWebchat },

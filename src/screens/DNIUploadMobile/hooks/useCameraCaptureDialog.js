@@ -1,8 +1,22 @@
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { useCameraCapture } from "./useCameraCapture.js";
 import { checkResolution } from "./useQualityCheck.js";
-import { normalizeDniError } from "../../../lib/dni-capture.js";
+import { DNI_GUIDE_CAPTURE_PROFILE } from "../../../constants/dni.constants.js";
+import { getDniCropPreviewStyles, getDniGuideCrop, normalizeDniError, projectDniGuide } from "../../../lib/dni-capture.js";
 import { openCallbellWebchat } from "../../../utils/callbellHelpers.js";
+
+function measureGuide(video) {
+  const frame = { width: video.videoWidth, height: video.videoHeight };
+  const { width, height } = video.getBoundingClientRect();
+  const box = { width, height };
+  const crop = getDniGuideCrop(frame.width, frame.height);
+  return { frame, box, crop, style: projectDniGuide(crop, frame, box) };
+}
+
+function sameGuide(previous, next) {
+  return previous?.frame.width === next.frame.width && previous.frame.height === next.frame.height
+    && previous.box.width === next.box.width && previous.box.height === next.box.height;
+}
 
 export function useCameraCaptureDialog({ open, side: suppliedSide, tipoFoto, onConfirm, onCancel }) {
   const side = suppliedSide ?? (tipoFoto === "dorso" ? "back" : tipoFoto === "frente" ? "front" : null);
@@ -19,8 +33,11 @@ export function useCameraCaptureDialog({ open, side: suppliedSide, tipoFoto, onC
   const [warning, setWarning] = useState(null);
   const [warningMessage, setWarningMessage] = useState("");
   const [permissionHint, setPermissionHint] = useState(false);
-  const [videoAspectRatio, setVideoAspectRatio] = useState(4 / 3);
+  const [guide, setGuide] = useState(null);
   const { stream, error: cameraError, startCamera, stopCamera, captureFrame } = useCameraCapture();
+  const videoAspectRatio = guide?.crop ? guide.frame.width / guide.frame.height : 4 / 3;
+
+  const updateGuide = useCallback(next => setGuide(previous => sameGuide(previous, next) ? previous : next), []);
 
   const changePhase = useCallback(next => { lifecycle.current.phase = next; setPhase(next); }, []);
   const release = useCallback(() => {
@@ -33,7 +50,7 @@ export function useCameraCaptureDialog({ open, side: suppliedSide, tipoFoto, onC
   }, [stopCamera]);
 
   const reset = useCallback(() => {
-    setPreviewUrl(""); setExpanded(false); setError(""); setWarning(null); setWarningMessage(""); changePhase("idle");
+    setPreviewUrl(""); setExpanded(false); setError(""); setWarning(null); setWarningMessage(""); setGuide(null); changePhase("idle");
   }, [changePhase]);
 
   useEffect(() => {
@@ -45,8 +62,8 @@ export function useCameraCaptureDialog({ open, side: suppliedSide, tipoFoto, onC
     const isCurrent = () => !disposed && lifecycle.current.active && generation === lifecycle.current.generation;
     const markReady = () => {
       if (!isCurrent() || !["starting", "streaming"].includes(lifecycle.current.phase) || !playbackReady) return;
+      updateGuide(measureGuide(video));
       if (video.readyState >= 2 && video.videoWidth > 0 && video.videoHeight > 0) {
-        setVideoAspectRatio(video.videoWidth / video.videoHeight);
         if (lifecycle.current.phase === "starting") changePhase("streaming");
       }
     };
@@ -59,6 +76,8 @@ export function useCameraCaptureDialog({ open, side: suppliedSide, tipoFoto, onC
     const readinessEvents = ["loadeddata", "canplay", "playing", "resize"];
     readinessEvents.forEach(event => video.addEventListener(event, markReady));
     video.addEventListener("error", failPlayback);
+    const observer = typeof ResizeObserver === "function" ? new ResizeObserver(markReady) : null;
+    observer?.observe(video);
     try {
       video.srcObject = stream;
       Promise.resolve(video.play()).then(() => { playbackReady = true; markReady(); }, failPlayback);
@@ -67,10 +86,17 @@ export function useCameraCaptureDialog({ open, side: suppliedSide, tipoFoto, onC
     }
     return () => {
       disposed = true;
+      observer?.disconnect();
       readinessEvents.forEach(event => video.removeEventListener(event, markReady));
       video.removeEventListener("error", failPlayback);
     };
-  }, [stream, open, release, changePhase]);
+  }, [stream, open, release, changePhase, updateGuide]);
+
+  useLayoutEffect(() => {
+    const video = videoRef.current;
+    // Opening and aspect changes can resize the CSS box on this commit.
+    if (open && phase === "streaming" && video) updateGuide(measureGuide(video));
+  }, [open, phase, videoAspectRatio, updateGuide]);
 
   useEffect(() => {
     setPermissionHint(false);
@@ -109,14 +135,21 @@ export function useCameraCaptureDialog({ open, side: suppliedSide, tipoFoto, onC
 
   const handleCapture = useCallback(async () => {
     if (!lifecycle.current.active || lifecycle.current.phase !== "streaming") return;
+    const video = videoRef.current;
+    if (!video) return;
+    const measured = measureGuide(video);
+    // The shutter must use the guide committed by React, including the current video box.
+    if (!sameGuide(guide, measured)) { updateGuide(measured); return; }
+    if (!guide.style) return;
+    const { crop } = guide;
     const generation = lifecycle.current.generation;
     changePhase("capturing"); setError("");
     try {
-      const frame = await captureFrame(videoRef.current, canvasRef.current);
+      const frame = await captureFrame(video, canvasRef.current);
       if (!lifecycle.current.active || generation !== lifecycle.current.generation) return;
       const url = URL.createObjectURL(frame.blob);
-      candidateRef.current = { ...frame, previewUrl: url };
-      const resolution = checkResolution({ videoWidth: frame.width, videoHeight: frame.height });
+      candidateRef.current = { ...frame, crop, rotation: 0, captureProfile: DNI_GUIDE_CAPTURE_PROFILE, previewUrl: url };
+      const resolution = checkResolution(crop);
       setWarning(resolution.warning ?? null); setWarningMessage(resolution.message ?? "");
       setPreviewUrl(url); changePhase("preview");
       stopCamera();
@@ -126,7 +159,7 @@ export function useCameraCaptureDialog({ open, side: suppliedSide, tipoFoto, onC
       if (!lifecycle.current.active || generation !== lifecycle.current.generation) return;
       stopCamera(); setError(normalizeDniError(failure).message); changePhase("error");
     }
-  }, [captureFrame, stopCamera, changePhase]);
+  }, [guide, updateGuide, captureFrame, stopCamera, changePhase]);
 
   const handleRetry = useCallback(() => {
     if (!lifecycle.current.active) return;
@@ -136,7 +169,7 @@ export function useCameraCaptureDialog({ open, side: suppliedSide, tipoFoto, onC
   const handleConfirm = useCallback(() => {
     const candidate = candidateRef.current;
     if (!lifecycle.current.active || lifecycle.current.phase !== "preview" || !candidate) return;
-    const confirmed = { blob: candidate.blob, width: candidate.width, height: candidate.height, rotation: 0 };
+    const { previewUrl: _url, ...confirmed } = candidate;
     lifecycle.current.active = false;
     release(); reset();
     onConfirm(confirmed);
@@ -184,11 +217,10 @@ export function useCameraCaptureDialog({ open, side: suppliedSide, tipoFoto, onC
     document.body.classList.remove("dni-camera-open");
     openCallbellWebchat();
   }, [handleClose]);
-  const candidate = candidateRef.current;
-  const previewFrameStyle = candidate ? { aspectRatio: candidate.width / candidate.height } : undefined;
+  const preview = candidateRef.current ? getDniCropPreviewStyles(candidateRef.current) : {};
   return { videoRef, canvasRef, phase, previewUrl, error: error || cameraError, warning, warningMessage,
-    videoFrameStyle: { "--camera-aspect": videoAspectRatio },
-    modalRef, titleId, expanded, previewFrameStyle, handleZoom, handleContactAdvisor,
+    videoFrameStyle: { "--camera-aspect": videoAspectRatio }, guideStyle: guide?.style,
+    modalRef, titleId, expanded, previewFrameStyle: preview.frameStyle, previewImageStyle: preview.imageStyle, handleZoom, handleContactAdvisor,
     title: `Sacar foto del ${side === "back" ? "dorso" : "frente"}`,
     previewAlt: `Foto del ${side === "back" ? "dorso" : "frente"}`,
     zoomLabel: expanded ? "Reducir foto" : "Ampliar foto",
@@ -196,7 +228,7 @@ export function useCameraCaptureDialog({ open, side: suppliedSide, tipoFoto, onC
     showRetry: phase === "error", showStream: ["idle", "starting", "streaming", "capturing"].includes(phase),
     isOpening: phase === "idle" || phase === "starting",
     showPermissionHint: permissionHint && phase === "starting" && !stream,
-    isCapturing: phase === "capturing",
+    canCapture: phase === "streaming" && Boolean(guide?.style),
     captureLabel: phase === "capturing" ? "Capturando…" : "Capturar",
     handleStart, handleCapture, handleRetry, handleConfirm, handleClose };
 }

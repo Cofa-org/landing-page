@@ -113,6 +113,7 @@ const prepareRealCamera=()=>{
  vi.spyOn(HTMLMediaElement.prototype,"readyState","get").mockReturnValue(4);
  vi.spyOn(HTMLVideoElement.prototype,"videoWidth","get").mockReturnValue(1200);
  vi.spyOn(HTMLVideoElement.prototype,"videoHeight","get").mockReturnValue(800);
+ vi.spyOn(HTMLVideoElement.prototype,"getBoundingClientRect").mockReturnValue({width:400,height:300});
  URL.createObjectURL=vi.fn(()=>`blob:binding-${URL.createObjectURL.mock.calls.length}`);
  URL.revokeObjectURL=vi.fn();
  return stop;

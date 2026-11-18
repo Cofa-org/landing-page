@@ -3,15 +3,107 @@ import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import qrcodeReact from 'qrcode.react';
 import { writeFile } from 'node:fs/promises';
-import { contextSnapshot, installSyntheticCapture, openEntry, takePhoto, takePair } from './fixtures/dni-camera.js';
+import { contextSnapshot, guideMarks, outsideMark, installSyntheticCapture, openEntry, takePhoto, takePair } from './fixtures/dni-camera.js';
 
 const { QRCodeSVG } = qrcodeReact;
 const isPhone = info => info.project.name.endsWith('-phone');
+const wideFrame = { width: 1280, height: 720, crop: { left: 64, top: 0, width: 1152, height: 720 } };
+const tallFrame = { width: 720, height: 1280, crop: { left: 0, top: 415, width: 720, height: 450 } };
 
-for (const entry of ['mobile', 'inline']) for (const frame of [[1600,1200],[1200,1600]]) test(`${entry} short landscape camera contains frame and guide ${frame.join('x')}`, async ({page}, info) => {
+async function expectProjectedGuide(video, frame) {
+  await expect.poll(() => video.evaluate((node, { width, height, crop }) => {
+    const box = node.getBoundingClientRect();
+    const guide = node.parentElement.querySelector('[aria-hidden] > div')?.getBoundingClientRect();
+    if (!guide || node.videoWidth !== width || node.videoHeight !== height) return null;
+    const scale = Math.min(box.width / width, box.height / height);
+    const left = box.x + (box.width - width * scale) / 2 + crop.left * scale;
+    const top = box.y + (box.height - height * scale) / 2 + crop.top * scale;
+    return Math.max(Math.abs(guide.x - left), Math.abs(guide.y - top),
+      Math.abs(guide.width - crop.width * scale), Math.abs(guide.height - crop.height * scale));
+  }, frame)).toBeLessThan(.6);
+  await expect(video).toHaveCSS('object-fit', 'contain');
+}
+
+async function screenshotPixels(locator, points, path) {
+  const png = await locator.screenshot({ path, scale: 'css' });
+  return locator.page().evaluate(async ({ png, points, outsideMark }) => {
+    const image = new Image();
+    image.src = `data:image/png;base64,${png}`;
+    await image.decode();
+    const canvas = document.createElement('canvas');
+    canvas.width = image.width;
+    canvas.height = image.height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(image, 0, 0);
+    const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+    let outsidePixels = 0;
+    for (let offset = 0; offset < pixels.length; offset += 4) {
+      if (outsideMark.every((channel, index) => channel === pixels[offset + index])) outsidePixels++;
+    }
+    return {
+      sampled: points.map(({ x, y }) => [...ctx.getImageData(Math.floor(x), Math.floor(y), 1, 1).data].slice(0, 3)),
+      outsidePixels,
+    };
+  }, { png: png.toString('base64'), points, outsideMark });
+}
+
+async function expectPreviewGeometry(image, frame) {
+  const geometry = await image.evaluate((node, { width, height, crop }) => {
+    const imageBox = node.getBoundingClientRect();
+    const box = node.parentElement.getBoundingClientRect();
+    const scale = box.width / crop.width;
+    return { width: box.width, height: box.height, differences: [
+      box.height - crop.height * scale, imageBox.width - width * scale, imageBox.height - height * scale,
+      imageBox.x - box.x + crop.left * scale, imageBox.y - box.y + crop.top * scale,
+    ] };
+  }, frame);
+  expect(Math.max(...geometry.differences.map(Math.abs))).toBeLessThan(.6);
+  return geometry;
+}
+
+async function expectCroppedPreview(image, frame, path) {
+  const cropBox = image.locator('..');
+  await expect.poll(() => image.evaluate(node => [node.naturalWidth, node.naturalHeight])).toEqual([frame.width, frame.height]);
+  await expect(cropBox).toHaveCSS('overflow', 'hidden');
+  const geometry = await expectPreviewGeometry(image, frame);
+  const points = guideMarks.map(({ x, y }) => ({ x: x * geometry.width, y: y * geometry.height }));
+  expect(await screenshotPixels(cropBox, points, path)).toEqual({ sampled: guideMarks.map(({ rgb }) => rgb), outsidePixels: 0 });
+}
+
+async function expectZoomedPreview(image, frame, path) {
+  const viewport = image.locator('../..');
+  for (const edge of ['left', 'right']) {
+    const geometry = await viewport.evaluate((node, edge) => {
+      node.scrollLeft = edge === 'left' ? 0 : node.scrollWidth;
+      const viewport = node.getBoundingClientRect();
+      const cropBox = node.firstElementChild.getBoundingClientRect();
+      return { x: cropBox.x - viewport.x, y: cropBox.y - viewport.y, viewportWidth: viewport.width };
+    }, edge);
+    const { width, height } = await expectPreviewGeometry(image, frame);
+    expect(width / geometry.viewportWidth).toBeCloseTo(2, 1);
+    const marks = guideMarks.filter(({ x }) => edge === 'left' ? x < .5 : x > .5);
+    const points = marks.map(({ x, y }) => ({ x: geometry.x + x * width, y: geometry.y + y * height }));
+    expect(await screenshotPixels(viewport, points, `${path}-zoom-${edge}.png`)).toEqual({ sampled: marks.map(({ rgb }) => rgb), outsidePixels: 0 });
+  }
+}
+
+function readMultipart({ contentType, body }) {
+  const boundary = /boundary="?([^";]+)"?/.exec(contentType)[1];
+  return body.toString('latin1').split(`--${boundary}`).slice(1, -1).map(part => {
+    const headerEnd = part.indexOf('\r\n\r\n');
+    const headers = part.slice(0, headerEnd);
+    return {
+      name: /name="([^"]+)"/.exec(headers)[1],
+      type: /Content-Type: ([^\r]+)/i.exec(headers)?.[1],
+      bytes: Buffer.from(part.slice(headerEnd + 4, -2), 'latin1'),
+    };
+  });
+}
+
+for (const entry of ['mobile', 'inline']) for (const frame of [wideFrame, tallFrame]) test(`${entry} short landscape camera contains frame and guide ${frame.width}x${frame.height}`, async ({page}, info) => {
   test.skip(!isPhone(info));
   await page.setViewportSize({width:844,height:300});
-  await installSyntheticCapture(page,{phone:true,width:frame[0],height:frame[1]});
+  await installSyntheticCapture(page, { phone: true, width: frame.width, height: frame.height });
   await openEntry(page,entry);
   await page.evaluate(()=>{const host=document.createElement('div');host.id='callbell-livechat-host';host.textContent='SYNTHETIC CHAT';document.body.append(host);});
   await page.getByRole('button',{name:'Sacar foto del frente',exact:true}).click();
@@ -21,6 +113,7 @@ for (const entry of ['mobile', 'inline']) for (const frame of [[1600,1200],[1200
   await expect(page.locator('#callbell-livechat-host')).toBeHidden();
   for (const viewport of [{width:844,height:300},{width:740,height:260},{width:390,height:700},{width:844,height:300}]) {
     await page.setViewportSize(viewport);
+    await expectProjectedGuide(dialog.locator('video'), frame);
     await expect.poll(()=>dialog.locator('video').evaluate(video=>{
       const box=node=>{const r=node.getBoundingClientRect();return {x:r.x,y:r.y,right:r.right,bottom:r.bottom,width:r.width,height:r.height};};
       const container=video.parentElement;
@@ -35,6 +128,11 @@ for (const entry of ['mobile', 'inline']) for (const frame of [[1600,1200],[1200
       expect(b.y+b.height).toBeLessThanOrEqual(viewport.height);
     }
   }
+  const video = dialog.locator('video');
+  await video.evaluate(node => node.style.setProperty('height', '80%'));
+  await expectProjectedGuide(video, frame);
+  await video.evaluate(node => node.style.removeProperty('height'));
+  await expectProjectedGuide(video, frame);
   await page.screenshot({path:info.outputPath('landscape-camera.png'),fullPage:true});
   await shutter.click();
   await expect(dialog.getByRole('img')).toBeVisible();
@@ -44,10 +142,10 @@ for (const entry of ['mobile', 'inline']) for (const frame of [[1600,1200],[1200
 
 test.afterEach(async ({ page }) => { await expect(page.locator('a[href*="/subir-dni?"], a[href*="wa.me"]')).toHaveCount(0); await page.close(); await page.context().unrouteAll({ behavior: 'ignoreErrors' }); });
 
-test('desktop touch/webcam only offers context-bound scannable QR', async ({ page }, info) => {
+test('desktop touch/webcam offers context-bound scannable QR and polls the phone receipt', async ({ page, browser }, info) => {
   test.skip(isPhone(info));
-  await installSyntheticCapture(page, { phone: false });
-  await openEntry(page);
+  const desktop = await installSyntheticCapture(page, { phone: false });
+  await openEntry(page, 'inline');
   await expect(page.getByText("Escaneá el código con tu celular para sacar las fotos de tu DNI.", { exact: true })).toBeVisible();
   const qr = page.getByRole('img', { name: 'Escaneá con tu celular' });
   await expect(qr).toBeVisible();
@@ -60,14 +158,47 @@ test('desktop touch/webcam only offers context-bound scannable QR', async ({ pag
   expect(await page.evaluate(() => window.__dni.calls)).toBe(0);
 
   await page.screenshot({ path: info.outputPath(`${info.project.name}-qr.png`), fullPage: true });
+  const pollingBeforeUpload = desktop.contextGets;
+  const phoneContext = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, serviceWorkers: 'block' });
+  try {
+    const phone = await phoneContext.newPage();
+    const phoneState = await installSyntheticCapture(phone, { phone: true });
+    await phone.goto(expectedUrl.href);
+    await takePair(phone);
+    await phone.getByRole('button', { name: 'Enviar fotos', exact: true }).click();
+    await expect(phone.getByRole('status')).toHaveText('Volvé a la PC para continuar con tu solicitud.');
+    const { uploadId, captureSessionId, solicitudId } = phoneState.receipt;
+    expect(uploadId).toMatch(/^[a-f0-9-]{36}$/);
+    desktop.context = { ...desktop.context, captureSessionId, solicitudId, baseRevision: 'b'.repeat(64),
+      receivedUploadId: uploadId, dniReceivedForSession: true, receiptKind: 'current_session', estado_onboarding: 'DNI_SUBIDO' };
+    await expect.poll(() => page.evaluate(() => window.__dni.continued)).toBe(1);
+    await expect(qr).toHaveCount(0);
+    expect(desktop.contextGets).toBeGreaterThan(pollingBeforeUpload);
+    expect(desktop.uploads).toBe(0);
+  } finally {
+    await phoneContext.close();
+  }
 });
 
 for (const entry of ['mobile', 'inline']) test(`${entry} captures original PNG pair without persistent image data or console disclosure`, async ({ page }, info) => {
   test.skip(!isPhone(info));
   const consoleMessages = [];
-  page.on('console', message => consoleMessages.push(message.text()));
-  await installSyntheticCapture(page, { phone: true }); await openEntry(page, entry);
-  await takePair(page);
+  page.on('console', message => {
+    const text = message.text();
+    // Firefox adds the current document URL to its own unused hero preload warning.
+    const nativePreloadWarning = message.type() === 'warning'
+      && message.location().url === page.url() && message.location().lineNumber === 0
+      && text.startsWith('[JavaScript Warning: "The resource at')
+      && text.includes('/img/hero-loan-sim-600.webp” preloaded with link preload was not used within a few seconds.');
+    if (!nativePreloadWarning) consoleMessages.push(text);
+  });
+  const state = await installSyntheticCapture(page, { phone: true, width: wideFrame.width, height: wideFrame.height, inspectMultipart: true });
+  await openEntry(page, entry);
+  const front = await page.evaluate(() => window.__dni.originalPng());
+  await takePhoto(page);
+  await page.evaluate(({ width, height }) => window.__dni.setFrame(width, height), tallFrame);
+  const back = await page.evaluate(() => window.__dni.originalPng());
+  await takePhoto(page, 'dorso');
   await expect(page.locator('input[type=file], [ondrop], [onpaste]')).toHaveCount(0);
   await page.getByRole('button', { name: 'Enviar fotos', exact: true }).click();
   await expect(page.getByText(/Recibimos tus fotos/)).toBeVisible();
@@ -78,43 +209,90 @@ for (const entry of ['mobile', 'inline']) test(`${entry} captures original PNG p
     await expect(page.getByText(/Sacá una foto|Sacá el DNI|Necesitás ayuda/)).toHaveCount(0);
     await page.screenshot({path:info.outputPath('received-photos.png'),fullPage:true});
   }
-  const upload = await page.evaluate(() => window.__dni.uploads[0]);
-  expect(upload.files).toHaveLength(2);
-  for (const file of upload.files) { expect(file.type).toBe('image/png'); expect(file.bytes.slice(0, 8)).toEqual([137,80,78,71,13,10,26,10]); expect(Buffer.from(file.bytes).readUInt32BE(16)).toBe(1600); expect(Buffer.from(file.bytes).readUInt32BE(20)).toBe(1200); }
-  expect(upload.fields).toMatchObject({ solicitudId: '81', captureSessionId: contextSnapshot.captureSessionId, baseRevision: contextSnapshot.baseRevision, rotationFront: '0', rotationBack: '0' });
-  expect(upload.fields.uploadId).toMatch(/^[a-f0-9-]{36}$/);
+  expect(state.multipart).toHaveLength(1);
+  const parts = readMultipart(state.multipart[0]);
+  const files = parts.filter(({ type }) => type);
+  expect(files.map(({ name, type }) => ({ name, type }))).toEqual([
+    { name: 'dniFront', type: 'image/png' }, { name: 'dniBack', type: 'image/png' },
+  ]);
+  expect(files[0].bytes.equals(Buffer.from(front))).toBe(true);
+  expect(files[1].bytes.equals(Buffer.from(back))).toBe(true);
+  const fields = parts.filter(({ type }) => !type);
+  expect(fields.filter(({ name }) => name === 'captureProfile').map(({ bytes }) => bytes.toString())).toEqual(['DNI_GUIDE_8X5_V1']);
+  const values = Object.fromEntries(fields.map(({ name, bytes }) => [name, bytes.toString()]));
+  expect(values).toMatchObject({ solicitudId: '81', captureSessionId: contextSnapshot.captureSessionId, baseRevision: contextSnapshot.baseRevision, rotationFront: '0', rotationBack: '0' });
+  expect(values.uploadId).toMatch(/^[a-f0-9-]{36}$/);
   expect(await page.evaluate(() => JSON.stringify({ local: { ...localStorage }, session: { ...sessionStorage } }))).not.toMatch(/data:image|blob:|base64|PRUEBA SIN VALIDEZ/);
   expect(consoleMessages.join('\n')).not.toMatch(/synthetic-token|PRIVATE-UPSTREAM|base64|blob:|a1234567/);
 });
 
-for (const portrait of [false, true]) test(`actual preview geometry, original orientation, zoom, corners, focus (${portrait ? 'portrait' : 'landscape'})`, async ({ page }, info) => {
-  await installSyntheticCapture(page, { phone: true, width: portrait ? 1200 : 1600, height: portrait ? 1600 : 1200 });
+for (const frame of [wideFrame, tallFrame]) test(`actual preview geometry, original orientation, zoom, corners, focus (${frame.width}x${frame.height})`, async ({ page }, info) => {
+  await installSyntheticCapture(page, { phone: true, width: frame.width, height: frame.height });
   await openEntry(page); const opener = page.getByRole('button', { name: 'Sacar foto del frente', exact: true });
   await opener.click(); const dialog = page.getByRole('dialog'); const close = dialog.getByRole('button', { name: 'Cerrar cámara' });
+  const video = dialog.locator('video');
   await expect(dialog.getByRole('button', { name: 'Capturar', exact: true })).toBeVisible();
+  await expectProjectedGuide(video, frame);
+  await video.evaluate(node => { node.poster = window.__dni.fixturePoster(); });
+  const videoBox = await video.boundingBox();
+  const outerPoint = frame === wideFrame ? { x: videoBox.width * .025, y: videoBox.height / 2 }
+    : { x: videoBox.width / 2, y: videoBox.height * .15 };
+  const { sampled, outsidePixels } = await screenshotPixels(video, [outerPoint, { x: videoBox.width / 2, y: videoBox.height / 2 }], info.outputPath('live-mask.png'));
+  expect(outsidePixels).toBe(0);
+  for (const [index, channel] of outsideMark.entries()) expect(Math.abs(sampled[0][index] - channel * .45)).toBeLessThan(3);
+  expect(sampled[1]).toEqual([255, 255, 255]);
   await expect(close).toBeFocused(); await page.keyboard.press('Shift+Tab'); await expect(dialog.getByRole('button', { name: 'Capturar', exact: true })).toBeFocused(); await page.keyboard.press('Tab'); await expect(close).toBeFocused();
   await dialog.getByRole('button', { name: 'Capturar', exact: true }).click();
   await expect(dialog.getByRole('img')).toBeVisible();
-  await expect.poll(() => dialog.getByRole('img').evaluate(image => image.naturalWidth)).toBe(portrait ? 1200 : 1600);
-  const geometry = [];
   await expect(dialog.getByRole('button', {name:/Girar/})).toHaveCount(0);
+  const resolutionWarning = dialog.getByText(/La resolución del encuadre es baja/);
+  await expect(resolutionWarning).toHaveCount(frame === wideFrame ? 0 : 1);
   const image = dialog.getByRole('img');
-  const boxes = await image.evaluate(img => { const r=img.getBoundingClientRect(); const f=img.parentElement.getBoundingClientRect(); return { image: { x:r.x,y:r.y,width:r.width,height:r.height }, frame: { x:f.x,y:f.y,width:f.width,height:f.height }, natural: [img.naturalWidth,img.naturalHeight] }; });
-  expect(Math.abs(boxes.image.width-boxes.frame.width)).toBeLessThan(1);
-  expect(Math.abs(boxes.image.height-boxes.frame.height)).toBeLessThan(1);
-  expect(boxes.natural).toEqual(portrait ? [1200,1600] : [1600,1200]); geometry.push(boxes);
-  await image.scrollIntoViewIfNeeded();
-  await page.screenshot({ path: info.outputPath(`${info.project.name}-${portrait ? 'portrait' : 'landscape'}-original.png`), fullPage: true });
+  await expectCroppedPreview(image, frame, info.outputPath('review.png'));
   await dialog.getByRole('button', { name: 'Ampliar foto', exact: true }).click();
-  const scroll = dialog.locator('[data-expanded=true]');
-  expect(await scroll.evaluate(el => el.scrollWidth > el.clientWidth)).toBe(true);
-  for (const corner of ['left','right']) { await scroll.evaluate((el,corner) => { el.scrollLeft = corner === 'left' ? 0 : el.scrollWidth; }, corner); await scroll.screenshot({ path: info.outputPath(`${info.project.name}-${portrait ? 'portrait' : 'landscape'}-original-zoom-${corner}.png`) }); }
+  await expectZoomedPreview(image, frame, info.outputPath('review'));
   await dialog.getByRole('button', { name: 'Reducir foto', exact: true }).click();
-  await writeFile(info.outputPath(`${info.project.name}-${portrait ? 'portrait' : 'landscape'}-geometry.json`), JSON.stringify(geometry,null,2));
+  await expectCroppedPreview(image, frame);
   const targets = await dialog.locator('button,a').evaluateAll(nodes => nodes.filter(node=>node.getClientRects().length).map(node => ({ name:node.textContent, height:node.getBoundingClientRect().height, width:node.getBoundingClientRect().width })));
   expect(targets.every(target=>target.height>=44 && target.width>=44)).toBe(true);
   await page.keyboard.press('Escape'); await expect(dialog).toHaveCount(0); await expect(opener).toBeFocused();
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
+
+for (const entry of ['mobile', 'inline']) test(`${entry} updates the guide before shutter and preserves shutter geometry while encoding`, async ({ page }, info) => {
+  test.skip(!isPhone(info));
+  await installSyntheticCapture(page, { phone: true, width: wideFrame.width, height: wideFrame.height });
+  await openEntry(page, entry);
+  await page.getByRole('button', { name: 'Sacar foto del frente', exact: true }).click();
+  const dialog = page.getByRole('dialog');
+  const video = dialog.locator('video');
+  const shutter = dialog.getByRole('button', { name: 'Capturar', exact: true });
+  await expect(shutter).toBeEnabled();
+  await expectProjectedGuide(video, wideFrame);
+
+  // Change the natural size on the same task as the click, before any resize notification arrives.
+  await shutter.evaluate((button, { width, height }) => {
+    window.__dni.setFrame(width, height, { notify: false });
+    button.click();
+  }, tallFrame);
+  expect(await page.evaluate(() => window.__dni.draws ?? 0)).toBe(0);
+  await expectProjectedGuide(video, tallFrame);
+  await page.setViewportSize({ width: 844, height: 390 });
+  await expectProjectedGuide(video, tallFrame);
+
+  await page.evaluate(() => { window.__dni.pauseEncoding = true; });
+  await shutter.click();
+  await expect.poll(() => page.evaluate(() => typeof window.__dni.finishEncoding)).toBe('function');
+  expect(await page.evaluate(() => window.__dni.draws)).toBe(1);
+  await page.evaluate(({ width, height }) => {
+    window.__dni.setFrame(width, height);
+    window.__dni.finishEncoding();
+  }, wideFrame);
+  const image = dialog.getByRole('img');
+  await expectCroppedPreview(image, tallFrame, info.outputPath('review-after-rotation.png'));
+  await expect(dialog.getByText(/La resolución del encuadre es baja/)).toBeVisible();
+  await dialog.getByRole('button', { name: 'Usar esta foto', exact: true }).click();
+  await expectCroppedPreview(page.getByAltText('Frente del DNI', { exact: true }), tallFrame);
 });
 
 for (const [status,cause] of [[400,'DNI_CAPTURE_INVALID_INPUT'],[401,'DNI_SESSION_EXPIRED'],[403,'DNI_FORBIDDEN'],[404,'DNI_CAPTURE_NOT_FOUND'],[409,'DNI_CAPTURE_CONTEXT_REQUIRED'],[409,'DNI_CAPTURE_CONTEXT_CHANGED'],[409,'DNI_CAPTURE_SUPERSEDED'],[409,'DNI_CAPTURE_STEP_UNAVAILABLE'],[413,'DNI_FILE_TOO_LARGE'],[413,'DNI_IMAGE_LIMIT'],[415,'DNI_IMAGE_UNSUPPORTED'],[422,'DNI_IMAGE_INVALID'],[429,'DNI_UPLOAD_BUSY'],[503,'DNI_IMAGE_TIMEOUT'],[503,'DNI_STORAGE_UNAVAILABLE'],[503,'DNI_CAPTURE_SAVE_FAILED'],[502,'DNI_TECHNICAL_ERROR']]) test(`safe ${status} ${cause} preserves previews without file fallback`, async ({ page }, info) => {
@@ -126,11 +304,22 @@ for (const [status,cause] of [[400,'DNI_CAPTURE_INVALID_INPUT'],[401,'DNI_SESSIO
 });
 
 for (const failure of ['network','html','legacy200']) test(`transport ${failure} explicit retry keeps operation`,async({page},info)=>{
-  test.skip(!isPhone(info)); const state=await installSyntheticCapture(page,{phone:true}); await openEntry(page); await takePair(page);
+  test.skip(!isPhone(info)); const state=await installSyntheticCapture(page,{phone:true,inspectMultipart:true}); await openEntry(page); await takePair(page);
   state.error=failure==='network'?'network':failure==='html'?{html:true}:{httpStatus:200,status:503,cause:'DNI_STORAGE_UNAVAILABLE'};
   await page.getByRole('button',{name:'Enviar fotos',exact:true}).click(); await expect(page.getByRole('alert')).toBeVisible();
   state.error=null; await page.getByRole('button',{name:'Enviar fotos',exact:true}).click(); await expect(page.getByText(/Recibimos tus fotos/)).toBeVisible();
-  const uploads=await page.evaluate(()=>window.__dni.uploads); expect(uploads[0].fields.uploadId).toBe(uploads[1].fields.uploadId);
+  expect(state.multipart).toHaveLength(2);
+  const [first, retry] = state.multipart.map(readMultipart);
+  const files = first.filter(({ type }) => type);
+  expect(files.map(({ name, type }) => ({ name, type }))).toEqual([
+    { name: 'dniFront', type: 'image/png' }, { name: 'dniBack', type: 'image/png' },
+  ]);
+  for (const { bytes } of files) {
+    expect(bytes.length).toBeGreaterThan(8);
+    expect(bytes.subarray(0, 8)).toEqual(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
+  }
+  expect(first.find(({ name }) => name === 'captureProfile').bytes.toString()).toBe('DNI_GUIDE_8X5_V1');
+  expect(retry).toEqual(first);
 });
 
 test('permission late, no frame, null blob, playback failure and cancelled retake release safely',async({page},info)=>{
@@ -386,37 +575,29 @@ for (const entry of ['mobile', 'inline']) for (const [status, cause, side, label
 
 
 
-for (const portrait of [false, true]) test(`confirmed parent previews contain every corner without shrinking or overlapping (${portrait ? 'portrait' : 'landscape'})`, async ({ page }, info) => {
+for (const frame of [wideFrame, tallFrame]) test(`confirmed previews contain every corner without overlapping (${frame.width}x${frame.height})`, async ({ page }, info) => {
   test.setTimeout(70000);
-  await installSyntheticCapture(page, { phone: true, width: portrait ? 1200 : 1600, height: portrait ? 1600 : 1200 });
-  await openEntry(page);
+  await installSyntheticCapture(page, { phone: true, width: frame.width, height: frame.height });
+  await openEntry(page, frame === wideFrame ? 'mobile' : 'inline');
   for (const side of ['frente', 'dorso']) {
     await page.getByRole('button', { name: new RegExp(`^(Sacar foto del|Volver a sacar el) ${side}$`) }).click();
     const dialog = page.getByRole('dialog');
     await dialog.getByRole('button', { name: 'Capturar', exact: true }).click();
-    await expect.poll(() => dialog.getByRole('img').evaluate(image => image.naturalWidth)).toBe(portrait ? 1200 : 1600);
+    const path = info.outputPath(`confirmed-${side}`);
+    await expectCroppedPreview(dialog.getByRole('img'), frame);
     await dialog.getByRole('button', { name: 'Usar esta foto', exact: true }).click();
     const image = page.getByAltText(side === 'frente' ? 'Frente del DNI' : 'Dorso del DNI', { exact: true });
-    await expect.poll(() => image.evaluate(image => image.naturalWidth)).toBe(portrait ? 1200 : 1600);
+    await expectCroppedPreview(image, frame, `${path}.png`);
     const geometry = await image.evaluate(image => {
       const frame = image.parentElement; const viewport = frame.parentElement; const slot = viewport.parentElement;
       const bounds = node => { const box = node.getBoundingClientRect(); return { x: box.x, y: box.y, width: box.width, height: box.height }; };
-      return { image: bounds(image), frame: bounds(frame), viewport: bounds(viewport), slot: bounds(slot), slotScrollHeight: slot.scrollHeight, slotClientHeight: slot.clientHeight };
+      return { frame: bounds(frame), viewport: bounds(viewport), slotScrollHeight: slot.scrollHeight, slotClientHeight: slot.clientHeight };
     });
     expect(geometry.viewport.height + 1).toBeGreaterThanOrEqual(geometry.frame.height);
     expect(geometry.slotScrollHeight).toBeLessThanOrEqual(geometry.slotClientHeight + 1);
-    expect(Math.abs(geometry.image.width - geometry.frame.width)).toBeLessThan(1);
-    expect(Math.abs(geometry.image.height - geometry.frame.height)).toBeLessThan(1);
 
-    const name = `${info.project.name}-parent-${portrait ? 'portrait' : 'landscape'}-${side}-original`;
-    await image.locator('..').screenshot({ path: info.outputPath(`${name}.png`) });
     await page.getByRole('button', { name: `Ampliar ${side}`, exact: true }).click();
-    const viewport = image.locator('../..');
-    expect(await viewport.evaluate(node => node.scrollWidth > node.clientWidth)).toBe(true);
-    for (const corner of ['left', 'right']) {
-      await viewport.evaluate((node, corner) => { node.scrollLeft = corner === 'left' ? 0 : node.scrollWidth; }, corner);
-      await viewport.screenshot({ path: info.outputPath(`${name}-zoom-${corner}.png`) });
-    }
+    await expectZoomedPreview(image, frame, path);
     await page.getByRole('button', { name: `Reducir ${side}`, exact: true }).click();
   }
   await expect(page.getByRole('button', { name: 'Enviar fotos', exact: true })).toBeEnabled();

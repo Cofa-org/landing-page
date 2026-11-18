@@ -8,6 +8,11 @@ const CONFLICTS = new Set(["DNI_CAPTURE_CONTEXT_REQUIRED", "DNI_CAPTURE_CONTEXT_
 const emptyModel = () => ({ context: null, contextStatus: "idle", captures: { front: null, back: null }, error: null,
   isUploading: false, uploadSuccess: false, estadoOnboarding: null, receiptKind: "none" });
 
+function getSideToRecapture({ front, back }) {
+  if (!front || !back || front.captureProfile === back.captureProfile) return null;
+  return front.captureProfile ? "back" : "front";
+}
+
 function readContext(response, expected, allowNewRevision, newOperation) {
   if (response?.success === false) throw normalizeDniError(response);
   const record = response?.data;
@@ -116,6 +121,7 @@ export function useDniCapture({ leadId, tokenOverride, expectedContext } = {}) {
     try {
       assertDniCapture(capture);
       const confirmed = { blob: capture.blob, width: capture.width, height: capture.height, rotation: capture.rotation,
+        ...(capture.captureProfile && { captureProfile: capture.captureProfile, crop: { ...capture.crop } }),
         previewUrl: URL.createObjectURL(capture.blob) };
       const previous = modelRef.current.captures[side];
       if (previous) URL.revokeObjectURL(previous.previewUrl);
@@ -139,7 +145,9 @@ export function useDniCapture({ leadId, tokenOverride, expectedContext } = {}) {
   const submitCaptures = useCallback(async () => {
     const life = lifecycle.current;
     const snapshot = modelRef.current;
-    if (!life.mounted || life.uploadRequest || snapshot.contextStatus !== "ready" || !snapshot.captures.front || !snapshot.captures.back) return { success: false };
+    const { front, back } = snapshot.captures;
+    if (!life.mounted || life.uploadRequest || snapshot.contextStatus !== "ready" || !front || !back
+      || getSideToRecapture(snapshot.captures)) return { success: false };
     const controller = new AbortController();
     const generation = life.generation;
     life.uploadRequest = controller;
@@ -147,8 +155,9 @@ export function useDniCapture({ leadId, tokenOverride, expectedContext } = {}) {
     try {
       life.uploadId ??= crypto.randomUUID();
       const options = { context: snapshot.context, uploadId: life.uploadId,
-        rotationFront: snapshot.captures.front.rotation, rotationBack: snapshot.captures.back.rotation };
-      const files = { dniFront: snapshot.captures.front.blob, dniBack: snapshot.captures.back.blob };
+        rotationFront: front.rotation, rotationBack: back.rotation,
+        ...(front.captureProfile && { captureProfile: front.captureProfile }) };
+      const files = { dniFront: front.blob, dniBack: back.blob };
       const response = tokenOverride == null
         ? await LeadRegistrationService.subirDni({ leadId: normalizedLeadId }, files, controller.signal, null, options)
         : await LeadRegistrationService.subirDniMobile({ leadId: normalizedLeadId }, files, tokenOverride, controller.signal, null, options);
@@ -178,9 +187,10 @@ export function useDniCapture({ leadId, tokenOverride, expectedContext } = {}) {
     update({ isUploading: false, error: null, ...(modelRef.current.contextStatus === "loading" ? { contextStatus: "idle" } : {}) });
   }, [invalidate, update]);
 
+  const sideToRecapture = getSideToRecapture(model.captures);
   return {
     ...model, canCapture: model.contextStatus === "ready", isContextLoading: model.contextStatus === "loading",
-    isFormValid: model.contextStatus === "ready" && Boolean(model.captures.front && model.captures.back),
+    sideToRecapture, isFormValid: model.contextStatus === "ready" && Boolean(model.captures.front && model.captures.back) && !sideToRecapture,
     uploadError: model.error?.message ?? "", acceptCapture, clearCapture, submitCaptures, refreshContext, cancel,
   };
 }
