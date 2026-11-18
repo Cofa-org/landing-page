@@ -8,6 +8,7 @@ import { useDniCapture } from "../useDniCapture.js";
 const context = { solicitudId: "9007199254740993", captureSessionId: "11111111-1111-4111-8111-111111111111", baseRevision: "a".repeat(64) };
 const current = (patch = {}) => ({ success: true, data: { ...context, canCapture: true, estado_onboarding: "CELULAR_VALIDADO", dniReceivedForSession: false, receivedUploadId: null, receiptKind: "none", ...patch } });
 const capture = (rotation = 0) => ({ blob: new Blob(["synthetic"], { type: "image/png" }), width: 1920, height: 1080, rotation });
+const guidedCapture = () => ({ ...capture(), crop: { left: 96, top: 0, width: 1728, height: 1080 }, captureProfile: "DNI_GUIDE_8X5_V1" });
 const receipt = options => ({ success: true, data: { uploadId: options.uploadId, solicitudId: context.solicitudId, captureSessionId: context.captureSessionId, dniReceivedForSession: true, estado_onboarding: "DNI_SUBIDO", documentValidation: "not_performed" } });
 const setup = async (props = {}) => {
   const hook = renderHook(p => useDniCapture(p), { initialProps: { leadId: "42", ...props } });
@@ -62,6 +63,46 @@ describe("shared confirmed capture model", () => {
     await act(async () => uploading.resolve(receipt(Service.subirDni.mock.calls[0][4])));
     await expect(first).resolves.toMatchObject({ success: true });
   });
+  it("retains guided crop and PNGs and submits the same profile on network retry", async () => {
+    Service.subirDni.mockRejectedValueOnce(new TypeError("synthetic lost response"));
+    const { result } = await setup();
+    const front = guidedCapture();
+    const back = guidedCapture();
+    act(() => { result.current.acceptCapture("front", front); result.current.acceptCapture("back", back); });
+    expect(result.current.captures.front).toMatchObject(front);
+    expect(result.current.captures.back).toMatchObject(back);
+    await act(async () => result.current.submitCaptures());
+    await act(async () => result.current.submitCaptures());
+    const [, firstFiles, , , firstOptions] = Service.subirDni.mock.calls[0];
+    const [, secondFiles, , , secondOptions] = Service.subirDni.mock.calls[1];
+    expect(firstFiles.dniFront).toBe(front.blob);
+    expect(firstFiles.dniBack).toBe(back.blob);
+    expect(secondFiles.dniFront).toBe(front.blob);
+    expect(secondFiles.dniBack).toBe(back.blob);
+    expect(firstOptions).toMatchObject({ captureProfile: "DNI_GUIDE_8X5_V1", rotationFront: 0, rotationBack: 0 });
+    expect(secondOptions).toEqual(firstOptions);
+  });
+  it.each(["front", "back"])("blocks a pair containing a legacy %s until that side is retaken", async legacySide => {
+    const { result } = await setup();
+    act(() => {
+      result.current.acceptCapture("front", legacySide === "front" ? capture() : guidedCapture());
+      result.current.acceptCapture("back", legacySide === "back" ? capture() : guidedCapture());
+    });
+    expect(result.current.isFormValid).toBe(false);
+    expect(result.current.sideToRecapture).toBe(legacySide);
+    await act(async () => expect(await result.current.submitCaptures()).toEqual({ success: false }));
+    expect(Service.subirDni).not.toHaveBeenCalled();
+    act(() => result.current.acceptCapture(legacySide, guidedCapture()));
+    expect(result.current.isFormValid).toBe(true);
+    await act(async () => result.current.submitCaptures());
+    expect(Service.subirDni.mock.calls[0][4]).toMatchObject({ captureProfile: "DNI_GUIDE_8X5_V1" });
+  });
+  it.each([{ rotation: 90 }, { crop: { left: 0, top: 0, width: 1728, height: 1080 } }, { captureProfile: "arbitrary" }])(
+    "does not confirm a profile with incompatible capture geometry %j", async patch => {
+      const { result } = await setup();
+      act(() => expect(result.current.acceptCapture("front", { ...guidedCapture(), ...patch })).toBe(false));
+      expect(result.current.captures.front).toBeNull();
+    });
   it("preserves photos and uploadId for an explicit identical network retry; recapture or rotate replaces it", async () => {
     Service.subirDni.mockRejectedValue(new TypeError("raw secret"));
     const { result } = await setup(); acceptPair(result);

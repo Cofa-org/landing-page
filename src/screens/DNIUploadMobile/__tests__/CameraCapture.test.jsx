@@ -9,6 +9,9 @@ let readyState;
 let videoWidth;
 let videoHeight;
 let play;
+let videoBox;
+let resize;
+let disconnect;
 const props = { open: true, tipoFoto: "frente", onCapture: vi.fn(), onCancel: vi.fn() };
 const openCamera = async () => {
   const view = render(<CameraCapture {...props} />);
@@ -21,6 +24,14 @@ beforeEach(() => {
   readyState = 4;
   videoWidth = 1200;
   videoHeight = 800;
+  videoBox = { width: 400, height: 300 };
+  vi.spyOn(HTMLVideoElement.prototype, "getBoundingClientRect").mockImplementation(() => videoBox);
+  disconnect = vi.fn();
+  vi.stubGlobal("ResizeObserver", class {
+    constructor(callback) { resize = callback; }
+    observe() {}
+    disconnect() { disconnect(); }
+  });
   play = vi.spyOn(HTMLMediaElement.prototype, "play").mockResolvedValue();
   vi.spyOn(HTMLMediaElement.prototype, "readyState", "get").mockImplementation(() => readyState);
   vi.spyOn(HTMLVideoElement.prototype, "videoWidth", "get").mockImplementation(() => videoWidth);
@@ -34,6 +45,32 @@ afterEach(() => {
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
   vi.useRealTimers();
+});
+
+it("projects the visible mask against the painted pixels after video and box resizes", async () => {
+  const { container } = await openCamera();
+  const video = container.querySelector("video");
+  expect(screen.getByRole("button", { name: "Capturar" })).toBeEnabled();
+  videoWidth = 1200;
+  videoHeight = 1600;
+  fireEvent.resize(video);
+  const guide = video.nextElementSibling.firstElementChild;
+  expect(guide.style).toMatchObject({ left: "87.5px", top: "79.6875px", width: "225px", height: "140.625px" });
+  videoBox = { width: 320, height: 240 };
+  act(() => resize());
+  expect(guide.style).toMatchObject({ left: "70px", top: "63.75px", width: "180px", height: "112.5px" });
+  fireEvent.click(screen.getByRole("button", { name: "Cerrar cámara" }));
+  expect(disconnect).toHaveBeenCalledOnce();
+  expect(stop).toHaveBeenCalledOnce();
+});
+
+it("keeps the shutter disabled until the video has a visible box for the guide", async () => {
+  videoBox = { width: 0, height: 0 };
+  await openCamera();
+  expect(screen.getByRole("button", { name: "Capturar" })).toBeDisabled();
+  videoBox = { width: 400, height: 300 };
+  act(() => resize());
+  expect(screen.getByRole("button", { name: "Capturar" })).toBeEnabled();
 });
 
 it("keeps permission waiting as loading, offers a delayed hint and releases a late camera after close", async () => {

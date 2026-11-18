@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { captureFrame, resolveDniCaptureSurface, normalizeDniError } from "../dni-capture.js";
+import {
+  captureFrame, getDniCropPreviewStyles, getDniGuideCrop, normalizeDniError, projectDniGuide, resolveDniCaptureSurface,
+} from "../dni-capture.js";
 import { checkResolution } from "../../screens/DNIUploadMobile/hooks/useQualityCheck.js";
 
 describe("DNI surface is a UX choice only", () => {
@@ -47,9 +49,43 @@ describe("full frame PNG", () => {
     canvas.getContext.mockReturnValue(null);
     await expect(captureFrame(video, canvas)).rejects.toMatchObject({ cause: "DNI_IMAGE_INVALID" });
   });
-  it("warns on low resolution in either orientation while permitting confirmation", () => {
-    expect(checkResolution({ videoWidth: 500, videoHeight: 900 })).toMatchObject({ ok: true, warning: "DNI_LOW_RESOLUTION" });
-    expect(checkResolution({ videoWidth: 600, videoHeight: 1000 })).toEqual({ ok: true });
+});
+
+describe("DNI guide geometry", () => {
+  it.each([
+    [1280, 720, { left: 64, top: 0, width: 1152, height: 720 }],
+    [1920, 1080, { left: 96, top: 0, width: 1728, height: 1080 }],
+    [720, 1280, { left: 0, top: 415, width: 720, height: 450 }],
+    [801, 603, { left: 0, top: 51, width: 800, height: 500 }],
+    [8, 5, { left: 0, top: 0, width: 8, height: 5 }],
+  ])("uses the same integer 8:5 crop as the server for %i × %i", (width, height, expected) => {
+    expect(getDniGuideCrop(width, height)).toEqual(expected);
+  });
+
+  it.each([[7, 5], [8, 4], [0, 720], [1280, -1], [1280.5, 720], [1280, "720"], [Infinity, 720]])(
+    "has no guide for invalid or unframeable dimensions %s × %s", (width, height) => {
+      expect(getDniGuideCrop(width, height)).toBeNull();
+    });
+
+  it("projects a portrait crop through the horizontal letterboxing of a landscape video box", () => {
+    const crop = { left: 0, top: 425, width: 1200, height: 750 };
+    const frame = { width: 1200, height: 1600 };
+    expect(projectDniGuide(crop, frame, { width: 400, height: 300 }))
+      .toEqual({ left: 87.5, top: 79.6875, width: 225, height: 140.625 });
+    expect(projectDniGuide(crop, frame, { width: 0, height: 300 })).toBeNull();
+  });
+
+  it("positions the full PNG behind the crop window with zoom-independent percentages", () => {
+    const crop = { left: 64, top: 0, width: 1152, height: 720 };
+    expect(getDniCropPreviewStyles({ width: 1280, height: 720, crop })).toEqual({
+      frameStyle: { aspectRatio: 1.6 },
+      imageStyle: { left: "-5.555555555555555%", top: "0%", width: "111.11111111111111%", height: "100%" },
+    });
+  });
+
+  it("warns on a small crop while permitting confirmation and accepts the target size without warning", () => {
+    expect(checkResolution({ width: 720, height: 450 })).toMatchObject({ ok: true, warning: "DNI_LOW_RESOLUTION" });
+    expect(checkResolution({ width: 1152, height: 720 })).toEqual({ ok: true });
   });
 });
 

@@ -1,5 +1,7 @@
 export const DNI_LIMITS = Object.freeze({ maxBytes: 20971520, maxPixels: 16000000, maxAxis: 8192 });
 export const DNI_ROTATIONS = Object.freeze([0, 90, 180, 270]);
+export const DNI_GUIDE_CAPTURE_PROFILE = "DNI_GUIDE_8X5_V1";
+export const DNI_GUIDE_OUTPUT_SIZE = Object.freeze({ width: 1152, height: 720 });
 
 // Closed protocol vocabulary. External messages are never displayed or retained.
 export const DNI_ERRORS = Object.freeze({

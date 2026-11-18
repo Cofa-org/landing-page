@@ -1,5 +1,5 @@
 import { LANDING_BACKEND_URL, LANDING_BACKEND_API_KEY } from "../config";
-import { DNI_ROTATIONS } from "../constants/dni.constants.js";
+import { DNI_GUIDE_CAPTURE_PROFILE, DNI_ROTATIONS } from "../constants/dni.constants.js";
 import { assertDniPng, dniError, normalizeDniError, normalizeDniId, validDniContext, validDniUuid } from "../lib/dni-capture.js";
 import { HTTP_METHOD } from "../constants/HTTP_METHODS.js";
 import { HttpApi } from "../lib/http.js";
@@ -451,6 +451,11 @@ async function uploadDni(leadId, { dniFront, dniBack }, token, signal, options) 
     || !DNI_ROTATIONS.includes(options.rotationFront) || !DNI_ROTATIONS.includes(options.rotationBack)) {
     throw dniError("DNI_CAPTURE_INVALID_INPUT");
   }
+  const { captureProfile } = options;
+  if (captureProfile !== undefined && (captureProfile !== DNI_GUIDE_CAPTURE_PROFILE
+    || options.rotationFront !== 0 || options.rotationBack !== 0)) {
+    throw dniError("DNI_CAPTURE_INVALID_INPUT");
+  }
   assertDniPng(dniFront);
   assertDniPng(dniBack);
   const form = new FormData();
@@ -460,6 +465,7 @@ async function uploadDni(leadId, { dniFront, dniBack }, token, signal, options) 
   form.append("uploadId", options.uploadId);
   form.append("rotationFront", String(options.rotationFront));
   form.append("rotationBack", String(options.rotationBack));
+  if (captureProfile !== undefined) form.append("captureProfile", captureProfile);
   try {
     const response = await HttpApi(
       `${LANDING_BACKEND_URL}/api/lead-registration/subir-dni/${leadId}`,

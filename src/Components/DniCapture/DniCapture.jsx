@@ -11,7 +11,7 @@ export default function DniCapture({ viewModel }) {
         <p role="status">Recibimos tus fotos. Podés volver a la PC para continuar con tu solicitud. Esto confirma la recepción de las fotos.</p>
       ) : viewModel.isPhone ? (
         <>
-          <p className={styles.instructions}>Sacá el DNI de la funda. Apoyalo sobre una superficie lisa con luz pareja. Incluí las cuatro esquinas y acercate hasta que se lean los datos y códigos. Evitá reflejos y sombras sobre ellos. Revisá que esté bien enfocado. La guía no recorta la foto.</p>
+          <p className={styles.instructions}>Sacá el DNI de la funda y apoyalo sobre una mesa con luz pareja. Sostené el celular paralelo al DNI, justo encima. Incluí las cuatro esquinas dentro del marco y acercate hasta que se lean los datos y códigos. Evitá reflejos y sombras. Revisá que esté bien enfocado.</p>
           <div className={styles.slots}>
             {viewModel.slots.map(slot => (
               <section key={slot.side} className={styles.slot} aria-label={slot.label}>
@@ -19,7 +19,7 @@ export default function DniCapture({ viewModel }) {
                 {slot.previewUrl ? (
                   <div className={styles.previewScroll} data-expanded={slot.expanded}>
                     <div className={styles.previewFrame} style={slot.frameStyle}>
-                      <img src={slot.previewUrl} alt={slot.label} />
+                      <img src={slot.previewUrl} alt={slot.label} style={slot.imageStyle} />
                     </div>
                   </div>
                 ) : null}

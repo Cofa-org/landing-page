@@ -2,7 +2,12 @@ import { act, renderHook } from "@testing-library/react";
 import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 import { useCameraCaptureDialog } from "../useCameraCaptureDialog.js";
 
-const video = () => Object.assign(new EventTarget(), { readyState: 2, videoWidth: 1920, videoHeight: 1080, play: vi.fn(async () => {}), srcObject: null });
+const video = () => Object.assign(new EventTarget(), {
+  readyState: 2, videoWidth: 1920, videoHeight: 1080, play: vi.fn(async () => {}), srcObject: null,
+  getBoundingClientRect: () => ({ width: 400, height: 300 }),
+});
+const landscapeCapture = () => ({ blob: original, width: 1920, height: 1080, rotation: 0,
+  crop: { left: 96, top: 0, width: 1728, height: 1080 }, captureProfile: "DNI_GUIDE_8X5_V1" });
 let stop, original, encode;
 const setup = (overrides = {}) => {
   const props = { open: true, side: "front", onConfirm: vi.fn(), onCancel: vi.fn(), ...overrides };
@@ -47,7 +52,7 @@ describe("candidate lifecycle", () => {
     expect(props.onConfirm).not.toHaveBeenCalled();
     expect(encode).toHaveBeenCalledTimes(1);
     act(() => { result.current.handleConfirm(); result.current.handleConfirm(); });
-    expect(props.onConfirm).toHaveBeenCalledExactlyOnceWith({ blob: original, width: 1920, height: 1080, rotation: 0 });
+    expect(props.onConfirm).toHaveBeenCalledExactlyOnceWith(landscapeCapture());
     expect(URL.revokeObjectURL).toHaveBeenCalledExactlyOnceWith("blob:modal-1");
     unmount();
     expect(URL.revokeObjectURL).toHaveBeenCalledTimes(1);
@@ -73,6 +78,38 @@ describe("candidate lifecycle", () => {
     expect(URL.createObjectURL).not.toHaveBeenCalled();
     expect(props.onConfirm).not.toHaveBeenCalled();
     expect(result.current.phase).toBe("idle");
+  });
+  it("waits for the newly projected guide when the natural video dimensions change at shutter time", async () => {
+    const { result, props } = setup();
+    await act(async () => {});
+    const liveVideo = result.current.videoRef.current;
+    liveVideo.videoWidth = 1200;
+    liveVideo.videoHeight = 1600;
+    await act(async () => result.current.handleCapture());
+    expect(encode).not.toHaveBeenCalled();
+    expect(result.current.guideStyle).toEqual({ left: 87.5, top: 79.6875, width: 225, height: 140.625 });
+    await takePhoto(result);
+    act(() => result.current.handleConfirm());
+    expect(props.onConfirm).toHaveBeenCalledExactlyOnceWith({ blob: original, width: 1200, height: 1600, rotation: 0,
+      crop: { left: 0, top: 425, width: 1200, height: 750 }, captureProfile: "DNI_GUIDE_8X5_V1" });
+  });
+  it("freezes the crop and quality assessment before an asynchronous PNG encode", async () => {
+    let finish; encode.mockImplementation(callback => { finish = callback; });
+    const { result, props } = setup();
+    const liveVideo = result.current.videoRef.current;
+    liveVideo.videoWidth = 1280;
+    liveVideo.videoHeight = 720;
+    await act(async () => {});
+    let pending;
+    act(() => { pending = result.current.handleCapture(); });
+    liveVideo.videoWidth = 720;
+    liveVideo.videoHeight = 1280;
+    act(() => liveVideo.dispatchEvent(new Event("resize")));
+    await act(async () => { finish(original); await pending; });
+    expect(result.current.warning).toBeNull();
+    act(() => result.current.handleConfirm());
+    expect(props.onConfirm).toHaveBeenCalledExactlyOnceWith({ blob: original, width: 1280, height: 720, rotation: 0,
+      crop: { left: 64, top: 0, width: 1152, height: 720 }, captureProfile: "DNI_GUIDE_8X5_V1" });
   });
   it("closing while permission pending stops late tracks and never resumes streaming", async () => {
     let permit; navigator.mediaDevices.getUserMedia.mockImplementation(() => new Promise(resolve => { permit = resolve; }));
@@ -112,13 +149,13 @@ describe("candidate lifecycle", () => {
     expect(URL.revokeObjectURL).not.toHaveBeenCalled();
     expect(result.current.error).toBe("");
     act(() => result.current.handleConfirm());
-    expect(props.onConfirm).toHaveBeenCalledExactlyOnceWith({ blob: original, width: 1920, height: 1080, rotation: 0 });
+    expect(props.onConfirm).toHaveBeenCalledExactlyOnceWith(landscapeCapture());
     expect(URL.revokeObjectURL).toHaveBeenCalledExactlyOnceWith(candidateUrl);
   });
   it("keeps low resolution as advisory and permits confirmation", async () => {
     const { result, props } = setup();
-    result.current.videoRef.current.videoWidth = 800;
-    result.current.videoRef.current.videoHeight = 500;
+    result.current.videoRef.current.videoWidth = 720;
+    result.current.videoRef.current.videoHeight = 1280;
     await takePhoto(result);
     expect(result.current.warning).toBe("DNI_LOW_RESOLUTION");
     act(() => result.current.handleConfirm());

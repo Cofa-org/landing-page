@@ -1,4 +1,4 @@
-import { DNI_ERRORS, DNI_LIMITS, DNI_ROTATIONS } from "../constants/dni.constants.js";
+import { DNI_ERRORS, DNI_GUIDE_CAPTURE_PROFILE, DNI_LIMITS, DNI_ROTATIONS } from "../constants/dni.constants.js";
 
 export function resolveDniCaptureSurface({ userAgentDataMobile, userAgent = "" } = {}) {
   const mobile = typeof userAgentDataMobile === "boolean"
@@ -37,6 +37,46 @@ export function validDniDimensions(width, height) {
     && width <= DNI_LIMITS.maxAxis && height <= DNI_LIMITS.maxAxis && width * height <= DNI_LIMITS.maxPixels;
 }
 
+export function getDniGuideCrop(width, height) {
+  if (!Number.isSafeInteger(width) || !Number.isSafeInteger(height) || width <= 0 || height <= 0) return null;
+  // Keep the integer pixel region identical to the server's reconstruction of this profile.
+  const scale = Math.min(Math.floor(width / 8), Math.floor(height / 5));
+  if (scale < 1) return null;
+  const cropWidth = scale * 8;
+  const cropHeight = scale * 5;
+  return {
+    left: Math.floor((width - cropWidth) / 2),
+    top: Math.floor((height - cropHeight) / 2),
+    width: cropWidth,
+    height: cropHeight,
+  };
+}
+
+export function projectDniGuide(crop, frameSize, videoBoxSize) {
+  if (!crop || ![frameSize?.width, frameSize?.height, videoBoxSize?.width, videoBoxSize?.height]
+    .every(size => Number.isFinite(size) && size > 0)) return null;
+  const scale = Math.min(videoBoxSize.width / frameSize.width, videoBoxSize.height / frameSize.height);
+  return {
+    left: (videoBoxSize.width - frameSize.width * scale) / 2 + crop.left * scale,
+    top: (videoBoxSize.height - frameSize.height * scale) / 2 + crop.top * scale,
+    width: crop.width * scale,
+    height: crop.height * scale,
+  };
+}
+
+export function getDniCropPreviewStyles({ width, height, crop }) {
+  if (!crop) return { frameStyle: { aspectRatio: width / height } };
+  return {
+    frameStyle: { aspectRatio: crop.width / crop.height },
+    imageStyle: {
+      left: `${-100 * crop.left / crop.width}%`,
+      top: `${-100 * crop.top / crop.height}%`,
+      width: `${100 * width / crop.width}%`,
+      height: `${100 * height / crop.height}%`,
+    },
+  };
+}
+
 export function assertDniPng(blob) {
   if (blob?.size > DNI_LIMITS.maxBytes) throw dniError("DNI_FILE_TOO_LARGE");
   if (!(blob instanceof Blob) || blob.type !== "image/png" || blob.size === 0) throw dniError("DNI_IMAGE_INVALID");
@@ -46,6 +86,13 @@ export function assertDniCapture(capture) {
   assertDniPng(capture?.blob);
   if (!validDniDimensions(capture.width, capture.height)) throw dniError("DNI_IMAGE_LIMIT");
   if (!DNI_ROTATIONS.includes(capture.rotation)) throw dniError("DNI_CAPTURE_INVALID_INPUT");
+  if (capture.captureProfile !== undefined) {
+    const expected = getDniGuideCrop(capture.width, capture.height);
+    if (capture.captureProfile !== DNI_GUIDE_CAPTURE_PROFILE || capture.rotation !== 0 || !expected
+      || !Object.keys(expected).every(key => capture.crop?.[key] === expected[key])) {
+      throw dniError("DNI_CAPTURE_INVALID_INPUT");
+    }
+  }
 }
 
 export async function captureFrame(video, canvas) {

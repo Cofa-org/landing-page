@@ -1,13 +1,79 @@
 import { expect } from '@playwright/test';
+import { once } from 'node:events';
+import { createServer } from 'node:http';
+
+const harnessOrigin = 'http://127.0.0.1:4179';
 
 export const contextSnapshot = { solicitudId: '81', captureSessionId: 'a1234567-1234-4123-8123-123456789abc', baseRevision: 'a'.repeat(64), canCapture: true, estado_onboarding: 'CELULAR_VALIDADO', dniReceivedForSession: false, receivedUploadId: null, receiptKind: 'none' };
 
-export async function installSyntheticCapture(page, { phone, width = 1600, height = 1200 } = {}) {
-  const state = { context: { ...contextSnapshot }, error: null, contextError: null, contextGets: 0, uploads: 0, blocked: [], delay: 0 };
+export const guideMarks = [
+  { x: .08, y: .08, rgb: [220, 30, 30] },
+  { x: .92, y: .08, rgb: [30, 160, 50] },
+  { x: .08, y: .92, rgb: [30, 60, 220] },
+  { x: .92, y: .92, rgb: [230, 190, 20] },
+];
+export const outsideMark = [240, 20, 210];
+
+function uploadResponse(state, body) {
+  if (state.error === 'network') return null;
+  if (state.error?.html) return { status: 502, contentType: 'text/html', body: '<h1>PRIVATE-UPSTREAM-MARKER</h1>' };
+  if (state.error) {
+    const { status, cause, side, httpStatus } = state.error;
+    return { status: httpStatus ?? status, json: { success: false, status, cause, message: 'PRIVATE-UPSTREAM-MARKER',
+      data: { category: status === 422 ? 'capture' : 'technical', side: side ?? null, retryable: [429, 502, 503].includes(status) } } };
+  }
+  const uploadId = /name="uploadId"\r\n\r\n([^\r]+)/.exec(body)?.[1];
+  state.receipt = { ...state.context, uploadId, dniReceivedForSession: true, estado_onboarding: 'DNI_SUBIDO', documentValidation: 'not_performed' };
+  return { status: 200, json: { success: true, data: state.receipt } };
+}
+
+async function listenForMultipart(page, state) {
+  // WebKit's interception metadata omits Blob payloads. Read the bytes on loopback.
+  const server = createServer(async (request, response) => {
+    response.setHeader('Access-Control-Allow-Origin', harnessOrigin);
+    if (request.method === 'OPTIONS') {
+      response.setHeader('Access-Control-Allow-Methods', 'POST');
+      response.setHeader('Access-Control-Allow-Headers', 'authorization,x-api-key,x-callbell-session-id');
+      response.writeHead(204).end();
+      return;
+    }
+    if (request.method !== 'POST') {
+      response.writeHead(405).end();
+      return;
+    }
+    const chunks = [];
+    try {
+      for await (const chunk of request) chunks.push(chunk);
+    } catch {
+      response.destroy();
+      return;
+    }
+    const body = Buffer.concat(chunks);
+    state.multipart.push({ contentType: request.headers['content-type'], body });
+    const result = uploadResponse(state, body.toString());
+    if (!result) {
+      response.destroy();
+      return;
+    }
+    response.writeHead(result.status, { 'Content-Type': result.contentType ?? 'application/json' });
+    response.end(result.body ?? JSON.stringify(result.json));
+  });
+  server.listen(0, '127.0.0.1');
+  await once(server, 'listening');
+  page.once('close', () => {
+    server.close();
+    server.closeAllConnections();
+  });
+  return `http://127.0.0.1:${server.address().port}/upload`;
+}
+
+export async function installSyntheticCapture(page, { phone, width = 1600, height = 1200, inspectMultipart = false } = {}) {
+  const state = { context: { ...contextSnapshot }, error: null, contextError: null, contextGets: 0, uploads: 0, blocked: [], delay: 0, multipart: [], receipt: null };
+  const multipartUrl = inspectMultipart ? await listenForMultipart(page, state) : null;
   // Routes are installed BEFORE navigation. No provider request can leave the browser.
   await page.context().route('**/*', async route => {
     const url = new URL(route.request().url());
-    if (url.protocol === 'blob:' && new URL(url.pathname).origin === 'http://127.0.0.1:4179') return route.continue();
+    if (url.protocol === 'blob:' && new URL(url.pathname).origin === harnessOrigin) return route.continue();
     if (!['127.0.0.1', 'localhost', '[::1]'].includes(url.hostname)) {
       state.blocked.push(url.hostname);
       const resource = route.request().resourceType();
@@ -25,30 +91,68 @@ export async function installSyntheticCapture(page, { phone, width = 1600, heigh
       if (url.pathname.includes('subir-dni')) {
         state.uploads++;
         if (state.delay) await new Promise(resolve => setTimeout(resolve, state.delay));
-        if (state.error === 'network') return route.abort('failed');
-        if (state.error?.html) return route.fulfill({ status: 502, contentType: 'text/html', body: '<h1>PRIVATE-UPSTREAM-MARKER</h1>' });
-        if (state.error) return route.fulfill({ status: state.error.httpStatus ?? state.error.status, json: { success: false, status: state.error.status, cause: state.error.cause, message: 'PRIVATE-UPSTREAM-MARKER', data: { category: state.error.status === 422 ? 'capture' : 'technical', side: state.error.side ?? null, retryable: [429, 502, 503].includes(state.error.status) } } });
-        const uploadId = /name="uploadId"\r\n\r\n([^\r]+)/.exec(route.request().postData() ?? '')?.[1];
-        return route.fulfill({ status: 200, json: { success: true, data: { ...state.context, uploadId, dniReceivedForSession: true, estado_onboarding: 'DNI_SUBIDO', documentValidation: 'not_performed' } } });
+        if (multipartUrl) return route.continue({ url: multipartUrl });
+        const response = uploadResponse(state, route.request().postData() ?? '');
+        return response ? route.fulfill(response) : route.abort('failed');
       }
       return route.fulfill({ status: 200, json: { success: true, data: { estado_onboarding: 'CELULAR_VALIDADO' } } });
     }
     return route.continue();
   });
-  await page.addInitScript(({ phone, width, height }) => {
+  await page.addInitScript(({ phone, width, height, guideMarks, outsideMark }) => {
     Object.defineProperty(navigator, 'userAgentData', { configurable: true, value: { mobile: phone } });
     window.__dni = { calls: 0, stopped: 0, uploads: [], error: null, late: false, noFrame: false, nullBlob: false, continuationFailure: false, continued: 0 };
-    const fixture = document.createElement('canvas'); fixture.width = width; fixture.height = height;
-    const ctx = fixture.getContext('2d'); ctx.fillStyle = 'white'; ctx.fillRect(0, 0, width, height);
-    const size = Math.min(width, height) * .12;
-    for (const [color, x, y] of [['#dc1e1e', 0, 0], ['#1ea032', width-size, 0], ['#1e3cdc', 0, height-size], ['#e6be14', width-size, height-size]]) { ctx.fillStyle = color; ctx.fillRect(x, y, size, size); }
-    ctx.fillStyle = 'black'; ctx.font = `${Math.round(width / 20)}px monospace`; ctx.fillText('PRUEBA SIN VALIDEZ', width*.15, height*.3); ctx.fillText('ABC0123456789', width*.15, height*.45);
-    for (let y=height*.55; y<height*.8; y+=8) ctx.fillRect(width*.15, y, width*.65, 2);
+    const fixture = document.createElement('canvas');
+    const ctx = fixture.getContext('2d');
+    window.__dni.setFrame = (width, height, { notify = true } = {}) => {
+      fixture.width = width;
+      fixture.height = height;
+      ctx.fillStyle = 'white';
+      ctx.fillRect(0, 0, width, height);
+
+      const unit = Math.floor(Math.min(width / 8, height / 5));
+      const cropWidth = unit * 8;
+      const cropHeight = unit * 5;
+      const left = Math.floor((width - cropWidth) / 2);
+      const top = Math.floor((height - cropHeight) / 2);
+      ctx.fillStyle = `rgb(${outsideMark.join(',')})`;
+      ctx.fillRect(0, 0, width, height);
+      ctx.fillStyle = 'white';
+      ctx.fillRect(left, top, cropWidth, cropHeight);
+      const size = unit * .3;
+      for (const { x, y, rgb } of guideMarks) {
+        ctx.fillStyle = `rgb(${rgb.join(',')})`;
+        ctx.fillRect(left + x * cropWidth - size / 2, top + y * cropHeight - size / 2, size, size);
+      }
+      ctx.fillStyle = 'black';
+      ctx.font = `${Math.round(cropWidth / 20)}px monospace`;
+      ctx.fillText('PRUEBA SIN VALIDEZ', left + cropWidth * .15, top + cropHeight * .3);
+      ctx.fillText('ABC0123456789', left + cropWidth * .15, top + cropHeight * .45);
+      for (let y = top + cropHeight * .55; y < top + cropHeight * .8; y += 8) {
+        ctx.fillRect(left + cropWidth * .15, y, cropWidth * .65, 2);
+      }
+      if (notify) document.querySelector('video')?.dispatchEvent(new Event('resize'));
+    };
+    window.__dni.setFrame(width, height, { notify: false });
     const draw = CanvasRenderingContext2D.prototype.drawImage;
-    CanvasRenderingContext2D.prototype.drawImage = function(source, ...args) { return draw.call(this, source instanceof HTMLVideoElement ? fixture : source, ...args); };
+    CanvasRenderingContext2D.prototype.drawImage = function(source, ...args) {
+      if (!(source instanceof HTMLVideoElement)) return draw.call(this, source, ...args);
+      window.__dni.draws = (window.__dni.draws ?? 0) + 1;
+      return draw.call(this, fixture, ...args);
+    };
     const toBlob = HTMLCanvasElement.prototype.toBlob;
-    HTMLCanvasElement.prototype.toBlob = function(callback, ...args) { if (window.__dni.nullBlob) return callback(null); return toBlob.call(this, callback, ...args); };
-    for (const [property, getter] of Object.entries({ videoWidth: () => width, videoHeight: () => height, readyState: () => window.__dni.noFrame ? 0 : 4 })) Object.defineProperty(HTMLVideoElement.prototype, property, { configurable: true, get: getter });
+    window.__dni.originalPng = () => new Promise(resolve => {
+      toBlob.call(fixture, async blob => resolve([...new Uint8Array(await blob.arrayBuffer())]), 'image/png');
+    });
+    window.__dni.fixturePoster = () => fixture.toDataURL('image/png');
+    HTMLCanvasElement.prototype.toBlob = function(callback, ...args) {
+      if (window.__dni.nullBlob) return callback(null);
+      return toBlob.call(this, blob => {
+        if (window.__dni.pauseEncoding) window.__dni.finishEncoding = () => callback(blob);
+        else callback(blob);
+      }, ...args);
+    };
+    for (const [property, getter] of Object.entries({ videoWidth: () => fixture.width, videoHeight: () => fixture.height, readyState: () => window.__dni.noFrame ? 0 : 4 })) Object.defineProperty(HTMLVideoElement.prototype, property, { configurable: true, get: getter });
     Object.defineProperty(HTMLMediaElement.prototype, 'srcObject', { configurable: true, set(value) { this.__syntheticSource = value; }, get() { return this.__syntheticSource; } });
     HTMLMediaElement.prototype.play = function() { return new Promise((resolve, reject) => { window.__dni.rejectPlay = reject; if (!window.__dni.latePlay) resolve(); }); };
     const getUserMedia = async constraints => {
@@ -62,18 +166,15 @@ export async function installSyntheticCapture(page, { phone, width = 1600, heigh
     const sendOriginal = XMLHttpRequest.prototype.send;
     XMLHttpRequest.prototype.send = function(body) {
       if (body instanceof FormData) {
-        const upload = { fields: {}, files: [] };
+        const upload = { fields: {} };
         window.__dni.uploads.push(upload);
         for (const [name, value] of body.entries()) {
-          if (value instanceof Blob) {
-            const file = { field: name, type: value.type, bytes: [] }; upload.files.push(file);
-            value.arrayBuffer().then(bytes => { file.bytes = [...new Uint8Array(bytes)]; });
-          } else upload.fields[name] = value;
+          if (typeof value === 'string') upload.fields[name] = value;
         }
       }
       return sendOriginal.call(this, body);
     };
-  }, { phone, width, height });
+  }, { phone, width, height, guideMarks, outsideMark });
   return state;
 }
 

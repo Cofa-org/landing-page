@@ -19,22 +19,24 @@ export default function CameraCapture({ open, onCapture, onCancel, tipoFoto }) {
           <div className={styles.cameraStage}>
             <div className={styles.videoContainer} style={dialog.videoFrameStyle}>
               <video ref={dialog.videoRef} autoPlay playsInline muted className={styles.video} />
-              <div className={styles.overlay} aria-hidden="true"><div className={styles.guideRect} /></div>
+              {dialog.guideStyle ? <div className={styles.overlay} aria-hidden="true">
+                <div className={styles.guideRect} style={dialog.guideStyle} />
+              </div> : null}
             </div>
           </div>
-          {!dialog.isOpening ? <GenericButton onClick={dialog.handleCapture} disabled={dialog.isCapturing}>{dialog.captureLabel}</GenericButton> : null}
+          {!dialog.isOpening ? <GenericButton onClick={dialog.handleCapture} disabled={!dialog.canCapture}>{dialog.captureLabel}</GenericButton> : null}
         </div> : null}
         <canvas ref={dialog.canvasRef} hidden />
         {dialog.phase === "preview" ? <div className={styles.previewContainer}>
           <div className={styles.previewScroll} data-expanded={dialog.expanded}>
             <div className={styles.previewFrame} style={dialog.previewFrameStyle}>
-              <img src={dialog.previewUrl} alt={dialog.previewAlt} className={styles.previewImage} />
+              <img src={dialog.previewUrl} alt={dialog.previewAlt} className={styles.previewImage} style={dialog.previewImageStyle} />
             </div>
           </div>
           <div className={styles.previewActions}>
             <GenericButton variant="secondary" onClick={dialog.handleZoom} aria-expanded={dialog.expanded}>{dialog.zoomLabel}</GenericButton>
           </div>
-          <p>Revisá la foto completa antes de usarla.</p>
+          <p>Revisá que se vean las cuatro esquinas y que los datos y códigos se lean con claridad.</p>
           <div className={styles.previewActions}>
             <GenericButton variant="secondary" onClick={dialog.handleRetry}>Volver a sacar</GenericButton>
             <GenericButton onClick={dialog.handleConfirm}>Usar esta foto</GenericButton>
