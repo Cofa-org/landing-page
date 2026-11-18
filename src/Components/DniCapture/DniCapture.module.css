@@ -1,6 +1,8 @@
 .form { width: 100%; min-width: 0; margin: 0; padding: var(--spacing-lg, 24px); }
 .content { display: flex; flex-direction: column; gap: var(--spacing-lg, 24px); min-width: 0; }
 .instructions, .help p { color: #444; line-height: 1.6; margin: 0; }
+.uploadStatus { color: #444; line-height: 1.6; margin: 0; text-align: center; }
+.uploadStatus:not(:empty) { margin-top: var(--spacing-sm, 12px); }
 .slots { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: var(--spacing-lg, 24px); }
 .slot { min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; gap: var(--spacing-sm, 12px); }
 .slot h4 { margin: 0; color: #333; }

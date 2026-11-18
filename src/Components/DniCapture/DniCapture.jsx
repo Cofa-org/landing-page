@@ -28,7 +28,12 @@ export default function DniCapture({ viewModel }) {
               </section>
             ))}
           </div>
-          <GenericButton type="submit" disabled={!viewModel.canSubmit} loading={viewModel.isUploading}>Enviar fotos</GenericButton>
+          <div>
+            <GenericButton type="submit" disabled={!viewModel.canSubmit} loading={viewModel.isUploading}>Enviar fotos</GenericButton>
+            <p className={styles.uploadStatus} role="status">
+              {viewModel.isUploading ? "Estamos procesando tus fotos. Aguardá unos segundos." : null}
+            </p>
+          </div>
           {viewModel.isUploading ? <GenericButton variant="secondary" onClick={viewModel.handleCancelUpload}>Cancelar envío</GenericButton> : null}
         </>
       ) : (
