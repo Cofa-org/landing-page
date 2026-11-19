@@ -150,14 +150,6 @@ const Header = () => {
       </nav>
 
       <div className='buttons-container'>
-        {pathname === "/registro-simulador" || pathname === "/simulador" ? null : (
-          <Link
-            to='/registro-simulador'
-            aria-label='Quiero mi préstamo'
-          >
-            <button className='primary-btn header-primary-btn'>Quiero mi préstamo</button>
-          </Link>
-        )}
         <button
           className='btn-show-links'
           onClick={() => handleToggleNavbar(true)}

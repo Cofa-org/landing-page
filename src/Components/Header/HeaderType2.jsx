@@ -1,13 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import { openCallbellWebchat } from '../../utils/callbellHelpers';
-import { Link, useLocation } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import './HeaderType2.css'
 
 import {IoMdArrowBack} from 'react-icons/io'
 import {FiMenu} from 'react-icons/fi'
 const HeaderType2 = () => {
-  const { pathname } = useLocation();
-
   const [isOpen, setIsOpen] = useState(false)
   const [first, setFirst] = useState(true)
   const openNavbar = () =>{
@@ -48,14 +45,6 @@ const HeaderType2 = () => {
             <Link to={'/#preguntas-frecuentes'} onClick={handleCloseNabvar}>Preguntas Frecuentes</Link>
             <Link to={'/#contacto'} onClick={handleCloseNabvar}>Contacto</Link>
           </nav>
-          {pathname === '/registro-simulador' || pathname === '/simulador' ? (
-            <button className='primary-btn mobible-nav-secondary-btn' id='btn-header-type-2-prestamo' onClick={openCallbellWebchat} aria-label='Solicitar ayuda'>Solicitar ayuda</button>
-          ) : (
-            <Link to='/registro-simulador' aria-label='Quiero mi préstamo'>
-              <button className='primary-btn mobible-nav-secondary-btn' id='btn-header-type-2-prestamo' >Quiero mi Préstamo</button>
-            </Link>
-          )}
-          
         </div>
         {
           isOpen && <div className='background-layer' onClick={handleCloseNabvar}></div>
