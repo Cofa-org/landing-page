@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import { memo } from "react";
 import GenericButton from "../../Components/buttons/GenericButton/GenericButton.jsx";
 import { Footer, Header } from "../../Components/index.js";
 import { HeroLoanSim } from "../../Sections/index.js";
