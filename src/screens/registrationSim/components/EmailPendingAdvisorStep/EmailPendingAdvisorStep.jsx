@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import { memo } from "react";
 import PropTypes from "prop-types";
 import GenericButton from "../../../../Components/buttons/GenericButton/GenericButton.jsx";
 import styles from "./EmailPendingAdvisorStep.module.css";

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { openCallbellWebchat } from '../../utils/callbellHelpers';
 import './Header.css'
 import {FiMenu} from 'react-icons/fi'

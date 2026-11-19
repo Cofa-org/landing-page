@@ -1,4 +1,3 @@
-import React from 'react'
 import { ourServices } from '../../data/info'
 
 const OurServicesList = () => {

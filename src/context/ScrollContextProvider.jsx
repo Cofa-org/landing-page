@@ -1,6 +1,5 @@
-import React, { createContext, useContext, useEffect, useState } from 'react'
-
-const ScrollContext = createContext()
+import { useEffect, useState } from 'react'
+import { ScrollContext } from './scrollContext'
 
 const ScrollContextProvider = ({children}) => {
     const [scrolled, setScrolled] = useState(false);
@@ -26,5 +25,3 @@ const ScrollContextProvider = ({children}) => {
 }
 
 export default ScrollContextProvider
-
-export const useScrollContext = () => useContext(ScrollContext)

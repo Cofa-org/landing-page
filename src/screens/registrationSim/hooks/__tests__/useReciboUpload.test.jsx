@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { renderHook, act, render, screen } from "@testing-library/react";
 
 // Mocks: declarados ANTES de importar el hook bajo test

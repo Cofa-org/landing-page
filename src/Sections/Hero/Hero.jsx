@@ -1,4 +1,3 @@
-import React from "react";
 import { openCallbellWebchat } from "../../utils/callbellHelpers";
 import "./Hero.css";
 import { infoList } from "../../data/info";

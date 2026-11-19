@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { openCallbellWebchat } from '../../utils/callbellHelpers';
 import { Link, useLocation } from 'react-router-dom'
 import './HeaderType2.css'

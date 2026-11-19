@@ -1,4 +1,3 @@
-import React from 'react'
 import './AccreditationPoints.css'
 import { FiCheckCircle } from "react-icons/fi";
 

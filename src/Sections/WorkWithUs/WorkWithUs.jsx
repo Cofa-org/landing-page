@@ -1,4 +1,3 @@
-import React from 'react'
 import './WorkWithUs.css'
 import { Link } from 'react-router-dom'
 import { GoArrowRight } from "react-icons/go";

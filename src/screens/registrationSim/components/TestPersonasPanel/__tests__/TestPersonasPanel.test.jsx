@@ -3,7 +3,8 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
 import { MemoryRouter, useLocation } from "react-router-dom";
 vi.mock("../../../../../services/testPersonasService.js", () => ({ fetchTestPersonas: vi.fn(), setPersonaEmail: vi.fn(), resetPersonaEmail: vi.fn() }));
-vi.mock("../../../../../config.js", () => ({ isTestPersonasVisible: () => true }));
+vi.mock("../../../../../config.js", () => ({ isTestPersonasVisible: vi.fn(() => true) }));
+import { isTestPersonasVisible } from "../../../../../config.js";
 import { fetchTestPersonas, setPersonaEmail } from "../../../../../services/testPersonasService.js";
 import TestPersonasPanel from "../TestPersonasPanel.jsx";
 const Location = () => { const location = useLocation(); return <output data-testid="location">{location.pathname}{location.search}</output>; };
@@ -12,12 +13,36 @@ describe("TestPersonasPanel add email", () => {
   let reloadSpy;
   beforeEach(() => {
     vi.clearAllMocks();
+    isTestPersonasVisible.mockReturnValue(true);
     fetchTestPersonas.mockResolvedValue([{ id: "CARLOS_NO_EMAIL", label: "Carlos sin email", useCases: ["registro"] }, { id: "REG_HAPPY", label: "Registro Happy", useCases: ["registro"] }]);
     reloadSpy = vi.fn();
     Object.defineProperty(window, "location", { configurable: true, value: { ...window.location, reload: reloadSpy } });
     vi.spyOn(window, "alert").mockImplementation(() => {});
   });
   afterEach(() => vi.restoreAllMocks());
+  it("leaves the catalog idle while hidden and discards responses after hiding", async () => {
+    isTestPersonasVisible.mockReturnValue(false);
+    const panel = () => <MemoryRouter><TestPersonasPanel /></MemoryRouter>;
+    const { rerender } = render(panel());
+    expect(screen.queryByTestId("test-personas-panel")).toBeNull();
+    expect(fetchTestPersonas).not.toHaveBeenCalled();
+
+    let resolveCatalog;
+    fetchTestPersonas.mockReturnValueOnce(new Promise(resolve => { resolveCatalog = resolve; }));
+    isTestPersonasVisible.mockReturnValue(true);
+    rerender(panel());
+    expect(screen.getByTestId("test-personas-panel")).toBeInTheDocument();
+    expect(fetchTestPersonas).toHaveBeenCalledTimes(1);
+
+    isTestPersonasVisible.mockReturnValue(false);
+    rerender(panel());
+    expect(screen.queryByTestId("test-personas-panel")).toBeNull();
+
+    const catalog = [];
+    const filterCatalog = vi.spyOn(catalog, "filter");
+    await act(async () => { resolveCatalog(catalog); });
+    expect(filterCatalog).not.toHaveBeenCalled();
+  });
   it("shows add email only on supported personas and hides it when collapsed", async () => {
     renderPanel();
     const button = await screen.findByRole("button", { name: /agregar email/i });

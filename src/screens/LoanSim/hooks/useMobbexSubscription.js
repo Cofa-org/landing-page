@@ -61,10 +61,7 @@ export const useMobbexSubscription = (scoringId, onSubscriptionCompleted) => {
         if (scope.current !== operation) return;
         if (!response?.success) {
           setMessage(null);
-          setError(
-            `${response?.message} 😕` ||
-              "¡Lo sentimos! No pudimos confirmar tu suscripción. Intentá nuevamente 😕",
-          );
+          setError(`${response?.message} 😕`);
           return;
         }
         // Catch defensivo: si onSubscriptionCompleted rompe su contrato
@@ -124,10 +121,7 @@ export const useMobbexSubscription = (scoringId, onSubscriptionCompleted) => {
       const response = await SimuladorService.solicitarSuscripcionMobbex({ scoringId, linkId });
       if (scope.current !== operation) return;
       if (!response?.success) {
-        setError(
-          `${response?.message} 😕` ||
-            "¡Lo sentimos! No pudimos iniciar tu suscripción. Intentá nuevamente 😕",
-        );
+        setError(`${response?.message} 😕`);
         setLoading(false);
         return;
       }

@@ -62,6 +62,7 @@ export const useCameraCapture = () => {
       if (!mounted.current || requestGeneration !== generation.current) return null;
       const errorMessage = mapCameraError(err);
       setError(errorMessage);
+      // eslint-disable-next-line preserve-caught-error -- El error público conserva el mensaje sanitizado y descarta el error original del navegador.
       throw new Error(errorMessage);
     } finally {
       if (mounted.current && requestGeneration === generation.current) setIsStarting(false);

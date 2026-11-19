@@ -97,6 +97,7 @@ export function useTestSimuladorPanel() {
 
     return () => {
       cancelled = true;
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- Se invalida la generación vigente al desmontar.
       selectionScope.current++;
     };
   }, []);
@@ -278,6 +279,7 @@ export function useTestSimuladorPanel() {
   const resetSession = useCallback(() => {
     sessionStorage.removeItem(SIMULADOR_TEST_PERSONA_STORAGE_KEY);
     navigate("/simulador");
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Mantener la referencia estable para el reinicio hacia esta ruta absoluta.
   }, []);
 
   return {

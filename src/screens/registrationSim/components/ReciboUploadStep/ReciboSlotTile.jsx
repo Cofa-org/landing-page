@@ -1,4 +1,3 @@
-import React from "react";
 import PropTypes from "prop-types";
 import { FaCamera, FaCheck, FaFilePdf, FaSyncAlt, FaTimes } from "react-icons/fa";
 import styles from "./ReciboUploadStep.module.css";

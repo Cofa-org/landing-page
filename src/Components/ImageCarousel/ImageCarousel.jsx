@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import styles from "./ImageCarousel.module.css";
 
 const ImageCarousel = ({ images, interval = 8000, showControls = false }) => {

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import SimuladorService from "../../../services/simuladorService.js";
 import { COMPLIANCE_STEPS, PEP_TIPO } from "../../../constants/LOAN_SIM.js";
 
@@ -40,7 +40,7 @@ export const useComplianceForm = (onValidate, initialStep, existingCompliance, c
       so_detalle: null,
       cuit: cuit,
     });
-  }, [onValidate]);
+  }, [onValidate, cuit]);
 
   const handleStatusUnchanged = useCallback(() => {
     if (existingCompliance) {

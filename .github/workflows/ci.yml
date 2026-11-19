@@ -1,6 +1,6 @@
 name: CI
 
-# Corre los tests del front en cada push y en cada PR hacia las ramas
+# Corre el lint y los tests del front en cada push y en cada PR hacia las ramas
 # que despliegan a Railway: `development` (staging/dev) y `main` (producción).
 on:
   push:
@@ -48,6 +48,9 @@ jobs:
         # `npm ci` (y no `npm install`) para instalar exactamente lo que dice
         # el lockfile y fallar si package.json y package-lock.json no coinciden.
         run: npm ci
+
+      - name: Correr el lint
+        run: npm run lint
 
       - name: Correr los tests
         run: npm test

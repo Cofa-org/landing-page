@@ -1,5 +1,4 @@
 // @vitest-environment jsdom
-import React from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { fireEvent, render, screen, waitFor, cleanup } from "@testing-library/react";
 import { beforeEach, afterEach, expect, it, vi } from "vitest";

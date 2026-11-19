@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Field, Formik, Form, ErrorMessage } from "formik";
 import { FaArrowRightLong, FaCheck } from "react-icons/fa6";
 import "./style.css";
@@ -36,14 +36,9 @@ const mapIngresos = (value) => {
 
 const PersonalLendForm = ({ type = "EL-MEJOR-TRATO" }) => {
   const [isSent, setIsSent] = useState(false);
-  const [aceptoTerminos, setAceptoTerminos] = useState(false);
   const [notification, setNotification] = useState({ show: false, message: "", type: "success" });
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-
-  const handleAceptoCambio = () => {
-    setAceptoTerminos(!aceptoTerminos);
-  };
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     const formData = new FormData();
@@ -70,7 +65,7 @@ const PersonalLendForm = ({ type = "EL-MEJOR-TRATO" }) => {
     });
 
     try {
-      const response = await MailService.sendMail(type, formData);
+      await MailService.sendMail(type, formData);
 
       setNotification({
         show: true,

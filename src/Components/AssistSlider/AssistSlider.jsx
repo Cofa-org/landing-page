@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import './AssistSlider.css'
 /* import { HeaderAssistence } from '../../Components'
 import HeroAssistence from '../../Sections/Hero/HeroLend'

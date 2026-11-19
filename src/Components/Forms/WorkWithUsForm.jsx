@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import { useDropzone } from "react-dropzone";
 import { PiCloudArrowUp } from "react-icons/pi";
@@ -10,7 +10,7 @@ import Notification from "../Notifications/Notification.jsx";
 
 import "./style.css";
 
-const MyDropzone = ({ field, form: { setFieldValue, setFieldError } }) => {
+const MyDropzone = ({ field, form: { setFieldValue } }) => {
   const [fileNames, setFileNames] = useState([]);
   const [localError, setLocalError] = useState("");
 
@@ -119,7 +119,7 @@ const WorkWithUsForm = () => {
     }
 
     try {
-      const response = await MailService.sendMail("TRABAJO", formData);
+      await MailService.sendMail("TRABAJO", formData);
       setNotification({
         show: true,
         message: "¡CV enviado con éxito!",

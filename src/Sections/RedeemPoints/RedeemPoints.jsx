@@ -1,4 +1,3 @@
-import React from 'react'
 import './RedeemPoints.css'
 import { TbTransfer } from "react-icons/tb";
 import { PiWarningOctagon } from "react-icons/pi";

@@ -1,8 +1,7 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import React from "react";
 import fs from "fs";
-import path from "path";
+import { URL as NodeURL } from "node:url";
 import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
 
 // Mocks: declarados ANTES de importar el componente bajo test.
@@ -433,7 +432,7 @@ describe("ReciboUploadStep", () => {
     // present in the CSS module file to guard against accidental removal of
     // the responsive fixes. If a future refactor drops the @media blocks,
     // these tests fail before users see overflow on 360px devices.
-    const cssPath = path.join(__dirname, "..", "ReciboUploadStep.module.css");
+    const cssPath = new NodeURL("../ReciboUploadStep.module.css", import.meta.url);
     const readCss = () => fs.readFileSync(cssPath, "utf-8");
 
     const extractMediaBlock = (source, headerRe) => {

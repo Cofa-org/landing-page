@@ -1,4 +1,3 @@
-import React from "react";
 import "./UsePoints.css";
 import { TbDiscount2 } from "react-icons/tb";
 

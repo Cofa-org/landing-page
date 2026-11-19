@@ -71,7 +71,6 @@ const OnboardingFlowScreen = () => {
     handlePickerPick: submitPickerPick,
     pendingIdentities,
     pickerContext,
-    rejectedFechaExpiracionBloqueo,
     getLeadId,
     shouldShowBackButton,
     leadData,
@@ -219,7 +218,7 @@ const OnboardingFlowScreen = () => {
         });
       }
     },
-    [verificarOTP, onboardingStep, leadData, handleRejected, navigateToNext, handlePickerTriggered],
+    [verificarOTP, onboardingStep, leadData, handleRejected, navigateToNext, handlePickerTriggered, setOnboardingStep],
   );
 
   // Plan 2026-09-29 (cliente email OTP): handler para el submit del OTP por

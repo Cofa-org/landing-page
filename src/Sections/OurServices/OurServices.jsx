@@ -1,4 +1,3 @@
-import React from 'react'
 import './OurServices.css'
 import { OurServicesList } from '../../Components'
 import { GoArrowRight } from "react-icons/go";

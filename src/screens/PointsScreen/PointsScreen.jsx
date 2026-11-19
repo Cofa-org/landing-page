@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { Footer, HeaderPoints } from '../../Components'
 import { Contact, HeroPoints, UsePoints, AccreditationPoints, RedeemPoints, ValuePoints } from '../../Sections';
 

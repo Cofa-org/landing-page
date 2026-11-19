@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+
+const options = ['rápidos', 'sencillos', '100% digital'];
 
 function AnimatedTitle() {
-  const options = ['rápidos', 'sencillos', '100% digital'];
   const [currentOptionIndex, setCurrentOptionIndex] = useState(0);
 
   useEffect(() => {
@@ -26,7 +27,7 @@ function TypeWriterText({ text }) {
   useEffect(() => {
     let currentIndex = 0;
     const typingInterval = setInterval(() => {
-      setDisplayedText((prevText) => {
+      setDisplayedText(() => {
         currentIndex += 1;
         return text.slice(0, currentIndex);
       });

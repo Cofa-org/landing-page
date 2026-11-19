@@ -105,7 +105,7 @@ export const useLoanSimulator = () => {
               mockPersona = stored;
             }
           }
-        } catch (parseErr) {
+        } catch {
           // ignore — fall through to shortId-based flow
         }
       }
@@ -252,7 +252,7 @@ export const useLoanSimulator = () => {
                 testHuellaMock = stored.simuladorConfig.huellaVisitorId;
               }
             }
-          } catch (parseErr) {
+          } catch {
             // ignore — fall through to real fingerprint
           }
           if (testHuellaMock) {
@@ -451,7 +451,21 @@ export const useLoanSimulator = () => {
         }
       }
     },
-    [scoringData.scoringId, scoringData.sistemaAmortizacion, scoringData.sessionScope, huellaData, huellaRequestId],
+    [
+      scoringData.scoringId,
+      scoringData.sistemaAmortizacion,
+      scoringData.sessionScope,
+      scoringData.capitalMaximoOperador,
+      scoringData.cuotaADescontar,
+      scoringData.motivo,
+      scoringData.nroCuota,
+      scoringData.nroPrestamo,
+      scoringData.plazoMaximoOperador,
+      scoringData.tasaOperador,
+      scoringData.tipoTasaOperador,
+      huellaData,
+      huellaRequestId,
+    ],
   );
 
   // Keep the ref pointing to the latest fetchSimulation on every render so the
@@ -463,14 +477,12 @@ export const useLoanSimulator = () => {
     if (scoringData.scoringId) {
       fetchSimulationRef.current(0, true);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scoringData.scoringId, scoringData.sessionScope]);
 
   useEffect(() => {
     if (debouncedAmount > 0 && scoringData.scoringId) {
       fetchSimulationRef.current(debouncedAmount);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedAmount, scoringData.scoringId, scoringData.sessionScope]);
 
   useEffect(() => {
@@ -711,10 +723,7 @@ export const useLoanSimulator = () => {
       );
 
       if (!cbuResponse.success) {
-        setError(
-          `${cbuResponse.message} 😕` ||
-            "¡Lo sentimos! No pudimos validar tu CBU. Revisá los datos e intentá nuevamente 😕",
-        );
+        setError(`${cbuResponse.message} 😕`);
         return;
       }
 

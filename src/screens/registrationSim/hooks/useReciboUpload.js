@@ -61,7 +61,6 @@ export const useReciboUpload = ({ maxSlots: maxSlotsProp } = {}) => {
     async (orden, file) => {
       if (!file) return;
       if (!isValidOrden(orden, maxSlots)) return;
-      const index = toSlotIndex(orden);
      
       // Paso 1: ocupar el slot inmediatamente con el preview del file
       // original. Sin importar si es imagen o PDF, el usuario quiere ver
@@ -140,7 +139,7 @@ export const useReciboUpload = ({ maxSlots: maxSlotsProp } = {}) => {
       if (previewToRevoke && previewToRevoke.startsWith("blob:")) {
         try {
           URL.revokeObjectURL(previewToRevoke);
-        } catch (_e) {
+        } catch {
           // best-effort cleanup; nunca fallamos el clear por un revoke
         }
       }

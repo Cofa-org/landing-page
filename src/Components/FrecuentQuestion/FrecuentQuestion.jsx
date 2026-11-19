@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import "./FrecuentQuestion.css";
 import { frecuentQuestions } from "../../data/info";
 import { FaCircleChevronUp } from "react-icons/fa6";

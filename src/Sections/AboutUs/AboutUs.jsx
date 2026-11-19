@@ -1,4 +1,3 @@
-import React from "react";
 import { reasonsToChose } from "../../data/info";
 import { FiCheckCircle } from "react-icons/fi";
 import "./AboutUs.css";

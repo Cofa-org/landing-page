@@ -1,4 +1,4 @@
-import React, { useMemo, memo } from "react";
+import { useMemo, memo } from "react";
 import PropTypes from "prop-types";
 import {
   ComplianceStatusCheck,
@@ -111,7 +111,7 @@ const ComplianceStep = ({ scoringId, onBack, loading, error, complianceForm }) =
         );
 
       case COMPLIANCE_STEPS.FORM_PEP_DIRECT:
-      case COMPLIANCE_STEPS.FORM_PEP_INDIRECT:
+      case COMPLIANCE_STEPS.FORM_PEP_INDIRECT: {
         const type = currentStep === COMPLIANCE_STEPS.FORM_PEP_DIRECT ? "DIRECTO" : "INDIRECTO";
         return (
           <CompliancePEPForm
@@ -123,10 +123,12 @@ const ComplianceStep = ({ scoringId, onBack, loading, error, complianceForm }) =
             loading={loading}
           />
         );
+      }
 
       default:
         return null;
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Mantener las invalidaciones actuales del formulario de compliance.
   }, [currentStep, formData, goToStep, handleInputChange, handleSubmit, loading, resetAndProceed]);
 
   return (

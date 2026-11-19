@@ -3,9 +3,7 @@ import GenericButton from "../../../../Components/buttons/GenericButton/GenericB
 import { isTestPersonasVisible } from "../../../../config.js";
 import styles from "./TestPersonasPanel.module.css";
 
-const TestPersonasPanel = () => {
-  if (!isTestPersonasVisible()) return null;
-
+const VisibleTestPersonasPanel = () => {
   const { collapsed, setCollapsed, personas, activePersonaId, selectPersona, resetSession, addEmail, emailStatusByPersona } = useTestPersonasPanel();
 
   return (
@@ -51,5 +49,7 @@ const TestPersonasPanel = () => {
     </div>
   );
 };
+
+const TestPersonasPanel = () => isTestPersonasVisible() ? <VisibleTestPersonasPanel /> : null;
 
 export default TestPersonasPanel;

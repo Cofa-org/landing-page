@@ -1,4 +1,5 @@
-import ScrollContextProvider, { useScrollContext } from "./ScrollContextProvider";
+import ScrollContextProvider from "./ScrollContextProvider";
+import { useScrollContext } from "./scrollContext";
 
 
 export {

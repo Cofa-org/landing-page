@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { terminos } from '../../data/termsData'
 import './TermsV2.css'
 import { Contact } from '../../Sections'
@@ -23,7 +23,7 @@ const TermsV2 = ({type}) => {
         {termSelected.description.map(term =>(<p>{term}</p>))}
         <ul className='terms-list'>
             {
-                termSelected.terms.map((term, index) => (
+                termSelected.terms.map((term) => (
                     <>
                         <h2>
                             {term.title}

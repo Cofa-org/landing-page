@@ -1,4 +1,3 @@
-import React from "react";
 import "./Hero.css";
 import { howDoAddPoints } from "../../data/info";
 import { GoArrowDown } from "react-icons/go";

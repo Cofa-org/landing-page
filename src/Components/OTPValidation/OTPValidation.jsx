@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import { memo } from "react";
 import PropTypes from "prop-types";
 import GenericForm from "../Forms/GenericForm/GenericForm.jsx";
 import GenericButton from "../buttons/GenericButton/GenericButton.jsx";

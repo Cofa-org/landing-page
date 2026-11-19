@@ -1,11 +1,10 @@
-import React, { memo } from "react";
+import { memo } from "react";
 import PropTypes from "prop-types";
 import GenericButton from "../../../../Components/buttons/GenericButton/GenericButton.jsx";
 import styles from "./WelcomeStep.module.css";
 import { useWelcomeStep } from "../../hooks/useWelcomeStep.js";
 
-const WelcomeStep = ({ leadId, onBack }) => {
-  const handleBack = () => onBack && onBack();
+const WelcomeStep = ({ leadId }) => {
 
   const { handleWelcomeComplete, onboardingCompletado, welcomeImage } =
     useWelcomeStep();

@@ -170,7 +170,6 @@ export const ComplianceSOInfo = ({
   const [showErrorNotification, setShowErrorNotification] = React.useState(false);
 
   const handleNextPage = () => setPage((prev) => prev + 1);
-  const handlePrevPage = () => setPage((prev) => Math.max(1, prev - 1));
 
   const handleOpenModal = (e) => {
     if (e) e.preventDefault();

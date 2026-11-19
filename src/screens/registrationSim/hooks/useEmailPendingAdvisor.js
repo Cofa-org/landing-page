@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { toggleCallbellWebchat, openCallbellWebchat } from "../../../utils/callbellHelpers";
+import { openCallbellWebchat } from "../../../utils/callbellHelpers";
 
 /**
  * Plan 2026-10-09: hook para el step `EMAIL_PENDING_ADVISOR`. Encapsula la

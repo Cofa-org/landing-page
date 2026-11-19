@@ -13,7 +13,7 @@ import {
 // HTMLCanvasElement.prototype, así que NO redefinimos via Object.defineProperty
 // (causaría "Cannot redefine property" en jsdom reciente).
 const setupCanvasMock = () => {
-  const toBlob = vi.fn((cb, mimeType, quality) => {
+  const toBlob = vi.fn((cb, mimeType) => {
     cb(new Blob(["compressed"], { type: mimeType }));
   });
   HTMLCanvasElement.prototype.getContext = vi.fn(() => ({

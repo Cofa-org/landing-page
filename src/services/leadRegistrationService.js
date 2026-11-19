@@ -241,7 +241,7 @@ export default class LeadRegistrationService {
     }
   }
 
-  static async solicitarOTPCelular({ leadId, celular }, signal = null) {
+  static async solicitarOTPCelular({ celular }, signal = null) {
     try {
       const url = `${LANDING_BACKEND_URL}/api/lead-registration/solicitar-otp-celular`;
       const token = await getCookie(COOKIE_LEAD_TOKEN_CONFIG.NAME);
@@ -265,7 +265,7 @@ export default class LeadRegistrationService {
     }
   }
 
-  static async verificarOTPCelular({ leadId, codigo, huella_dispositivo, requestId }, signal = null) {
+  static async verificarOTPCelular({ codigo, huella_dispositivo, requestId }, signal = null) {
     try {
       const url = `${LANDING_BACKEND_URL}/api/lead-registration/verificar-otp-celular`;
       const token = await getCookie(COOKIE_LEAD_TOKEN_CONFIG.NAME);

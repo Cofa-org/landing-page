@@ -22,10 +22,7 @@ export const useEmailOTP = (getLeadId) => {
           codigo,
         });
         if (!result.success) {
-          setError(
-            `${result.message} 😊` ||
-              "¡Ups! El código que ingresaste no es correcto. Inténtalo de nuevo 😊",
-          );
+          setError(`${result.message} 😊`);
           return undefined;
         }
         return result;

@@ -1,4 +1,4 @@
-import React, { useEffect, memo } from "react";
+import { memo } from "react";
 import PropTypes from "prop-types";
 import GenericForm from "../../../../Components/Forms/GenericForm/GenericForm";
 import GenericInput from "../../../../Components/Forms/GenericInput/GenericInput";
@@ -27,7 +27,6 @@ const CBUValidation = ({
     setTermsAccepted,
     structureError,
     bancoEncontrado,
-    setBancoEncontrado,
     codigoBancoError,
     handleSubmit,
     handleToggleUpdate,
