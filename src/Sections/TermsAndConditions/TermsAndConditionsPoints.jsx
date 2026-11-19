@@ -1,4 +1,3 @@
-import React from 'react'
 import { termsAndConditionsPoints } from '../../data/info'
 import './termsAndCondition.css'
 

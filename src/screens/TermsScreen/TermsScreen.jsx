@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { Footer, Header } from '../../Components'
 import { Contact, TermsAndConditions, TermsHeader } from '../../Sections'
 

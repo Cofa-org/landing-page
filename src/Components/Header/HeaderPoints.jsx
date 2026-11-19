@@ -1,10 +1,18 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { openCallbellWebchat } from '../../utils/callbellHelpers';
 import './Header.css'
 import {FiMenu} from 'react-icons/fi'
 import {IoMdArrowBack} from 'react-icons/io'
 import { Link, useLocation } from 'react-router-dom'
 import { useScrollContext } from '../../context'
+
+const sections = [
+  { id: 'uso-de-puntos', name: 'use-of-points' },
+  { id: 'acreditacion', name: 'accreditation' },
+  { id: 'restricciones', name: 'restrictions' },
+  { id: 'valor', name: 'value' },
+  { id: 'contacto', name: 'contacto' },
+];
 
 const HeaderPoints = () => {
   const location = useLocation()
@@ -13,15 +21,6 @@ const HeaderPoints = () => {
   const [inHome, setInHome] = useState(location.pathname == '/puntos-cofa')
   const {scrolled} = useScrollContext()
   const [selectedLink, setSelectedLink] = useState('prestamos');
-  
-  const sections = [
-    { id: 'uso-de-puntos', name: 'use-of-points' },
-    { id: 'acreditacion', name: 'accreditation' },
-    { id: 'restricciones', name: 'restrictions' },
-    { id: 'valor', name: 'value' },
-    { id: 'contacto', name: 'contacto' },
-  ];
-
   // Scroll spy functionality to update selected link based on visible section
   useEffect(() => {
     const handleScroll = () => {

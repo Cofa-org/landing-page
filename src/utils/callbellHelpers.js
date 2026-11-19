@@ -75,10 +75,10 @@ export const openCallbellWebchat = () => {
   const tryClick = () => {
     attempts += 1;
 
-    let widgetHost = null;
+    let widgetHost;
     try {
       widgetHost = document.getElementById('callbell-livechat-host');
-    } catch (e) {
+    } catch {
       console.error('Callbell host unavailable.');
       return;
     }
@@ -96,7 +96,7 @@ export const openCallbellWebchat = () => {
     if (launcherBtn) {
       try {
         launcherBtn.click();
-      } catch (e) {
+      } catch {
         console.error('Callbell launcher unavailable.');
       }
       return;

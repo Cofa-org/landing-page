@@ -1,5 +1,4 @@
 import { SISTEMA_AMORTIZACION } from '../../../../constants/sistema-amortizacion.constants.js';
-import React from "react";
 import { usePDFExport } from "../../../../hooks/usePDFExport";
 import { esSistemaAmortizacionValido } from '../../../../lib/sistema-amortizacion.js';
 import styles from "./LoanInfoModal.module.css";

@@ -1,13 +1,11 @@
-import React from 'react'
 import './Hero.css'
 import { FaFacebookF,FaTwitter,FaLinkedinIn,FaInstagram } from "react-icons/fa";
 import { RiGlobalLine } from "react-icons/ri";
 import { PersonalLendForm } from '../../Components';
-import { IoIosCheckmarkCircleOutline } from "react-icons/io"; 
 import { MdMailOutline } from "react-icons/md";
 import { Link } from 'react-router-dom';
 
-const HeroElMejorTrato = ({}) => {
+const HeroElMejorTrato = () => {
     return(
         <>
             <section className='container-el-mejor-trato' id='hero-elmejortrato'>

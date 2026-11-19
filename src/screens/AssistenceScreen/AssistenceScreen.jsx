@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { IoMdArrowRoundForward } from "react-icons/io";
 import { asistencias, asistenciasDesempleo, asistenciasSalud } from '../../data/assistData';
 import { AssistSlider, Footer, HeaderAssist } from '../../Components';

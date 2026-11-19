@@ -95,7 +95,7 @@ export async function setCookie(name, value, expires) {
   const expiresStr = new Date(expires).toUTCString();
   try {
     document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expiresStr}; path=/`;
-  } catch (cookieWriteBlocked) {
+  } catch {
     // El browser deniega la escritura: el valor queda sólo en el fallback.
   }
   cookieMemoryFallback.set(name, {
@@ -127,7 +127,7 @@ export async function setCookieWithDuration(name, value, durationMs) {
 export async function deleteCookie(name) {
   try {
     document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/`;
-  } catch (cookieWriteBlocked) {
+  } catch {
     // El browser deniega la escritura: el fallback en memoria se limpia igual.
   }
   cookieMemoryFallback.delete(name);
@@ -144,7 +144,7 @@ function readCookieFromDocument(name) {
   try {
     const match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
     return match ? decodeURIComponent(match[2]) : null;
-  } catch (cookieReadBlocked) {
+  } catch {
     return null;
   }
 }

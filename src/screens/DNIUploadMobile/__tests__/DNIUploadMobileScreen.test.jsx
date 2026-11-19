@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import React, { useLayoutEffect } from "react";
+import { useLayoutEffect } from "react";
 import { act, render, screen, cleanup, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, afterEach, expect, it, vi } from "vitest";

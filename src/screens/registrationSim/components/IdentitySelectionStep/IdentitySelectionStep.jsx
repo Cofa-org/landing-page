@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import GenericButton from "../../../../Components/buttons/GenericButton/GenericButton.jsx";
 import { SECURITY_SLIDES } from "../../hooks/useLeadRegistration.js";

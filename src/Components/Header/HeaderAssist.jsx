@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { openCallbellWebchat } from '../../utils/callbellHelpers';
 import './Header.css';
 import { FiMenu } from 'react-icons/fi';
@@ -7,10 +7,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { useScrollContext } from '../../context';
 
 const HeaderAssist = () => {
-  const location = useLocation();
   const [first, setFirst] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
-  const [inHome, setInHome] = useState(location.pathname === '/asistencias');
   const { pathname, hash } = useLocation();
   const { scrolled } = useScrollContext();
   const [selectedLink, setSelectedLink] = useState('prestamos');

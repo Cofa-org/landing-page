@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
 import './HeaderType2.css'
 
 import {IoMdArrowBack} from 'react-icons/io'

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FaCheckCircle, FaExclamationCircle, FaInfoCircle, FaTimes } from "react-icons/fa";
 import "./Notification.css";
 
@@ -12,6 +12,7 @@ const Notification = ({ message, type = "success", onClose, duration = 5000 }) =
       }, duration);
       return () => clearTimeout(timer);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- El temporizador se rearma al cambiar la duración. Los padres pasan callbacks nuevos en cada render.
   }, [duration]);
 
   const handleClose = () => {

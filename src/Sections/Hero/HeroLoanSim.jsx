@@ -1,4 +1,3 @@
-import React from "react";
 import PropTypes from "prop-types";
 import styles from "./HeroLoanSim.module.css";
 import { IoIosCheckmarkCircleOutline } from "react-icons/io";

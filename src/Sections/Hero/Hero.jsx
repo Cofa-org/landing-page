@@ -1,4 +1,3 @@
-import React from "react";
 import "./Hero.css";
 import { infoList } from "../../data/info";
 import { AnimatedTitle, Carrusel } from "../../Components";

@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import { useDropzone } from "react-dropzone";
 import { PiCloudArrowUp } from "react-icons/pi";
-import { FaChevronRight, FaChevronLeft, FaChevronDown, FaChevronUp } from "react-icons/fa";
+import { FaChevronRight, FaChevronDown } from "react-icons/fa";
 
 import "./style.css";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { AiOutlineDelete } from "react-icons/ai";
 import { FaArrowRightLong, FaCheck } from "react-icons/fa6";
 import MailService from "../../services/mailService.js";
 import Notification from "../Notifications/Notification.jsx";
 
-const MyDropzone = ({ field, form: { setFieldValue, setFieldError } }) => {
+const MyDropzone = ({ field, form: { setFieldValue } }) => {
   const [fileNames, setFileNames] = useState([]);
   const [localError, setLocalError] = useState("");
 
@@ -107,8 +107,6 @@ const ContactForm = ({ type }) => {
   const [notification, setNotification] = useState({ show: false, message: "", type: "success" });
   const navigate = useNavigate();
 
-  const pathname = useLocation();
-  const route = pathname.pathname.substring(1);
   const sendMailRequest = async (values) => {
     const formData = new FormData();
     formData.append("name", values.name);
@@ -129,7 +127,7 @@ const ContactForm = ({ type }) => {
     if (type === "RECLAMO") {
       if (reasonSelected.reason && reasonSelected.value) {
         try {
-          const response = await MailService.sendMail(`${type}/`, formData);
+          await MailService.sendMail(`${type}/`, formData);
           setNotification({
             show: true,
             message: "¡Mensaje enviado con éxito!",
@@ -150,7 +148,7 @@ const ContactForm = ({ type }) => {
       }
     } else {
       try {
-        const response = await MailService.sendMail(`${type}/`, formData);
+        await MailService.sendMail(`${type}/`, formData);
         setNotification({
           show: true,
           message: "¡Mensaje enviado con éxito!",

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, lazy, Suspense } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import styles from "./SuccessStep.module.css";
 import { MdCheckCircleOutline } from "react-icons/md";
 import GenericButton from "../../../../Components/buttons/GenericButton/GenericButton.jsx";

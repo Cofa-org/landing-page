@@ -5,12 +5,12 @@ import { getDecodedToken } from "../../../lib/token.js";
 import { getCookie, setCookieWithDuration } from "../../../lib/utils.js";
 import LeadRegistrationService from "../../../services/leadRegistrationService.js";
 
-const ONBOARDING_STEPS = {
-  LEAD_REGISTRATION: LOAN_SIM_STEPS.LEAD_REGISTRATION,
-  DNI_UPLOAD: LOAN_SIM_STEPS.DNI_UPLOAD,
-  RECIBO_UPLOAD: LOAN_SIM_STEPS.RECIBO_UPLOAD,
-  WELCOME: LOAN_SIM_STEPS.WELCOME,
-};
+const BACK_BUTTON_STEPS = [
+  LOAN_SIM_STEPS.IDENTITY_SELECTION,
+  LOAN_SIM_STEPS.PHONE_VALIDATION,
+  LOAN_SIM_STEPS.WELCOME,
+  LOAN_SIM_STEPS.EN_ANALISIS,
+];
 
 const NEXT_STEP_MAP = {
   [LOAN_SIM_STEPS.LEAD_REGISTRATION]: LOAN_SIM_STEPS.PHONE_VALIDATION,
@@ -304,16 +304,6 @@ export const useOnboardingFlow = (resumeShortId = null) => {
       restoreInFlight.current = false;
     };
   }, [resumeShortId, restoreAttempt, applyOnboardingState]);
-
-  const BACK_BUTTON_STEPS = [
-    LOAN_SIM_STEPS.IDENTITY_SELECTION,
-    LOAN_SIM_STEPS.PHONE_VALIDATION,
-    // LOAN_SIM_STEPS.DNI_UPLOAD,
-    // ...(!leadData?.es_cliente ? [LOAN_SIM_STEPS.RECIBO_UPLOAD] : []),
-    LOAN_SIM_STEPS.WELCOME,
-    LOAN_SIM_STEPS.EN_ANALISIS,
-    // LOAN_SIM_STEPS.PHONE_PICKER,
-  ];
 
   const navigateToNext = useCallback((currentStep, extras = {}) => {
     let next;

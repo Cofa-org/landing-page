@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { PiCloudArrowUp as PiCloudArrowUpIcon } from "react-icons/pi";
 import { AiOutlineDelete } from "react-icons/ai";
 
-const DropzoneMulti = ({ field, form: { setFieldValue }, ...props }) => {
+const DropzoneMulti = ({ field, form: { setFieldValue } }) => {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [localError, setLocalError] = useState("");
 

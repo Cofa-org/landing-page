@@ -1,11 +1,11 @@
-import React, { memo } from "react";
+import { memo } from "react";
 import PropTypes from "prop-types";
 import GenericForm from "../../../../Components/Forms/GenericForm/GenericForm";
 import GenericInput from "../../../../Components/Forms/GenericInput/GenericInput";
 import GenericButton from "../../../../Components/buttons/GenericButton/GenericButton.jsx";
 import { useEmailValidation } from "../../hooks/useEmailValidation";
 
-const EmailValidation = ({ onValidate, onBack, loading, error }) => {
+const EmailValidation = ({ onValidate, loading, error }) => {
   const { email, setEmail, errorMessage, isValid } = useEmailValidation();
 
   const handleSubmit = (e) => {

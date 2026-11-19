@@ -1,5 +1,4 @@
-﻿import React from 'react';
-import { createRoot } from 'react-dom/client';
+﻿import { createRoot } from 'react-dom/client';
 import DNIUploadStep from '../src/screens/registrationSim/components/DNIUploadStep/DNIUploadStep.jsx';
 import '../src/index.css';
 

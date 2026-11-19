@@ -112,6 +112,7 @@ const LoanSimScreenContent = () => {
     if (step === LOAN_SIM_STEPS.COMPLIANCE) {
       verificarComplianceExistente();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Consultar al entrar al paso, sin repetir la solicitud cuando cambia la referencia de la función.
   }, [step]);
 
   useEffect(() => {

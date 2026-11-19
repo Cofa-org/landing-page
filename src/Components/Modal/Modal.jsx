@@ -1,4 +1,3 @@
-import React from "react";
 import "./Modal.css";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import { GoArrowRight } from "react-icons/go";

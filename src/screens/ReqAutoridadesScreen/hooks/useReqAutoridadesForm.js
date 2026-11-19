@@ -16,7 +16,7 @@ export const useReqAutoridadesForm = () => {
           formData.append(key, values[key].join(", "));
         } else if (typeof values[key] === 'object' && values[key] !== null) {
           const formattedObject = Object.entries(values[key])
-            .filter(([_, val]) => val && String(val).trim() !== "")
+            .filter(([, val]) => val && String(val).trim() !== "")
             .map(([k, v]) => `${k}: ${v}`)
             .join(" | ");
           formData.append(key, formattedObject || "N/A");
@@ -34,7 +34,7 @@ export const useReqAutoridadesForm = () => {
     }
 
     try {
-      const response = await MailService.sendMail("AUTORIDADES", formData);
+      await MailService.sendMail("AUTORIDADES", formData);
       
       // ✅ GTM Conversion Event
       window.dataLayer = window.dataLayer || [];

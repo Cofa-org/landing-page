@@ -1,15 +1,6 @@
-import React from "react";
 import { openCallbellWebchat } from "../../utils/callbellHelpers";
 import "./Contact.css";
-import { AiOutlineClockCircle } from "react-icons/ai";
-import {
-  BsTelephone,
-  BsFacebook,
-  BsInstagram,
-  BsLinkedin,
-  BsWhatsapp,
-  BsTiktok,
-} from "react-icons/bs";
+import { BsTelephone } from "react-icons/bs";
 import { CiMail, CiLocationOn } from "react-icons/ci";
 import { Link } from "react-router-dom";
 import SocialNetworks from "../../Components/SocialNetworks/SocialNetworks.jsx";

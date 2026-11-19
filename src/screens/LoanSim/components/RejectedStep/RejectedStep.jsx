@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import { memo } from "react";
 import { MdWarning } from "react-icons/md";
 import { REJECTION_CONFIG } from "../../../../constants/LOAN_SIM.js";
 import styles from "../../LoanSimScreen.module.css";

@@ -1,7 +1,7 @@
 import { UI_CONFIG } from "../../../../constants/LOAN_SIM.js";
 import styles from "./AnalysisStep.module.css";
 
-const AnalysisStep = ({ onBack }) => {
+const AnalysisStep = () => {
 
   return (
     <div className={styles.container}>

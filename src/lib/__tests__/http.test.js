@@ -3,7 +3,6 @@
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { HttpApi } from "../http";
-import { NetworkError } from "../network-error";
 
 function buildResponse(status, body) {
   return {

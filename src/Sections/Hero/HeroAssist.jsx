@@ -1,4 +1,3 @@
-import React from 'react'
 import { openCallbellWebchat } from '../../utils/callbellHelpers';
 import {GoArrowDown, GoArrowRight} from 'react-icons/go'
 import { OurServicesList } from '../../Components'

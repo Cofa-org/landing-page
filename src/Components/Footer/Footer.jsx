@@ -1,14 +1,9 @@
-import React from "react";
 
 import { BiRegistered } from "react-icons/bi";
 import "./Footer.css";
-import { Link, useLocation } from "react-router-dom";
-/*  */
-const Footer = ({ hideWhatsAppBtn = false }) => {
-  const { pathname } = useLocation();
+import { Link } from "react-router-dom";
 
-
-
+const Footer = () => {
   return (
     <footer>
       <div className='footer-box-left'>

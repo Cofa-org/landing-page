@@ -53,14 +53,11 @@ export const usePhoneOTP = (getLeadId) => {
         }
 
         if (!result.success) {
-          setError(
-            `${result.message} 😊` ||
-              "¡Ups! El código que ingresaste no es correcto. Inténtalo de nuevo 😊",
-          );
+          setError(`${result.message} 😊`);
           return;
         }
         return result;
-      } catch (err) {
+      } catch {
         setError(
           "¡Oh no! Hubo un problema al verificar tu código. Por favor, inténtalo otra vez 🤔",
         );

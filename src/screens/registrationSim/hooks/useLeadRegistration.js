@@ -108,10 +108,12 @@ export const useLeadRegistration = (turnstileToken) => {
   }, [isSubmitting]);
 
   const handleExpire = useCallback(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Conservar el manejo actual del token en el callback de expiración.
     turnstileToken = "";
   }, []);
 
   const handleError = useCallback(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Conservar el manejo actual del token en el callback de error.
     turnstileToken = "";
   }, []);
 
@@ -178,7 +180,7 @@ export const useLeadRegistration = (turnstileToken) => {
         // validateField puede reportarlos con mensaje específico.
         if (value.includes("+")) {
           setCelularInvalidChar("plus");
-        } else if (/[\s\-\(\)]/.test(value)) {
+        } else if (/[\s\-()]/.test(value)) {
           setCelularInvalidChar("separators");
         } else {
           setCelularInvalidChar(null);
@@ -329,6 +331,7 @@ export const useLeadRegistration = (turnstileToken) => {
         setIsSubmitting(false);
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Conservar la renovación del callback cuando cambia el token recibido.
     [formData, validateForm, turnstileToken],
   );
 

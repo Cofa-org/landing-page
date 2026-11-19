@@ -1,4 +1,3 @@
-import React from 'react';
 import { Footer, HeaderType2 } from '../../Components';
 import { Contact, HeroSuggestions } from '../../Sections';
 

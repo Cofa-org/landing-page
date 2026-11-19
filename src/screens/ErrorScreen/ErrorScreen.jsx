@@ -1,4 +1,3 @@
-import React from 'react';
 import "./ErrorScreen.css"
 import { Header } from '../../Components';
 

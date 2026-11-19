@@ -1,4 +1,3 @@
-import React from 'react'
 import { openCallbellWebchat } from '../../utils/callbellHelpers';
 import './ValuePoints.css'
 import { GoArrowRight } from "react-icons/go";

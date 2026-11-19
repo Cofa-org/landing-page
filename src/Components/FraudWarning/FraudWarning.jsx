@@ -1,4 +1,3 @@
-import React from "react";
 import PropTypes from "prop-types";
 import { MdWarningAmber } from "react-icons/md";
 import styles from "./FraudWarning.module.css";
