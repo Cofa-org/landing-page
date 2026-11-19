@@ -2,8 +2,6 @@ import { useRegisterFlow, STEP } from "./hooks/useRegisterFlow.js";
 import RegisterDniStep from "./components/RegisterDniStep.jsx";
 import RegisterIdentityStep from "./components/RegisterIdentityStep.jsx";
 import RegisterNewStep from "./components/RegisterNewStep.jsx";
-import RegisterExistingStep from "./components/RegisterExistingStep.jsx";
-import RegisterAlreadyRegisteredStep from "./components/RegisterAlreadyRegisteredStep.jsx";
 import RegisterVerifyStep from "./components/RegisterVerifyStep.jsx";
 import RegisterPasswordStep from "./components/RegisterPasswordStep.jsx";
 
@@ -39,31 +37,6 @@ const RegisterScreen = () => {
         loading={flow.loadingVerify}
         error={flow.errorVerify}
         turnstile={flow.turnstileVerify}
-      />
-    );
-  }
-
-  if (flow.step === STEP.ALREADY_REGISTERED) {
-    return (
-      <RegisterAlreadyRegisteredStep
-        maskedEmail={flow.existingMaskedEmail}
-        onLogin={flow.goToLogin}
-        onBack={flow.goBackIdentityOrDni}
-      />
-    );
-  }
-
-  if (flow.step === STEP.EXISTING) {
-    return (
-      <RegisterExistingStep
-        maskedEmail={flow.existingMaskedEmail}
-        honeypot={flow.honeypot}
-        setHoneypot={flow.setHoneypot}
-        turnstile={flow.turnstileExisting}
-        loading={flow.loadingExisting}
-        error={flow.errorExisting}
-        onSubmit={flow.handleExistingClientRegister}
-        onBack={flow.goBackIdentityOrDni}
       />
     );
   }

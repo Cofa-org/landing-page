@@ -8,21 +8,11 @@ export const STEP = {
   DNI: "dni",
   IDENTITY: "identity",
   REGISTER: "register",
-  EXISTING: "existing",
-  ALREADY_REGISTERED: "already_registered",
   VERIFY: "verify",
   PASSWORD: "password",
 };
 
 export const REGISTRATION_INVALID_CAUSE = "AUTH_REGISTRATION_INVALID";
-
-export const nextStepFromExisting = (existingClient) => {
-  if (!existingClient?.maskedEmail) return STEP.REGISTER;
-  if (existingClient.alreadyRegistered && existingClient.verified) {
-    return STEP.ALREADY_REGISTERED;
-  }
-  return STEP.EXISTING;
-};
 
 export function useRegisterFlow() {
   const navigate = useNavigate();
@@ -32,9 +22,6 @@ export function useRegisterFlow() {
   const [dni, setDni] = useState("");
   const [identities, setIdentities] = useState([]);
   const [selectedCuit, setSelectedCuit] = useState(null);
-  const [existingMaskedEmail, setExistingMaskedEmail] = useState("");
-  const [existingFullEmail, setExistingFullEmail] = useState("");
-  const [existingFromResolve, setExistingFromResolve] = useState(null);
   const [email, setEmail] = useState("");
   const [honeypot, setHoneypot] = useState("");
   const [registrationToken, setRegistrationToken] = useState("");
@@ -44,7 +31,6 @@ export function useRegisterFlow() {
 
   const turnstileDni = useTurnstile();
   const turnstileReg = useTurnstile();
-  const turnstileExisting = useTurnstile();
   const turnstileVerify = useTurnstile();
   const turnstilePassword = useTurnstile();
 
@@ -52,8 +38,6 @@ export function useRegisterFlow() {
   const [errorDni, setErrorDni] = useState("");
   const [loadingReg, setLoadingReg] = useState(false);
   const [errorReg, setErrorReg] = useState("");
-  const [loadingExisting, setLoadingExisting] = useState(false);
-  const [errorExisting, setErrorExisting] = useState("");
   const [loadingVerify, setLoadingVerify] = useState(false);
   const [errorVerify, setErrorVerify] = useState("");
   const [loadingPassword, setLoadingPassword] = useState(false);
@@ -72,16 +56,13 @@ export function useRegisterFlow() {
     setLoadingDni(true);
     try {
       const result = await authService.resolveDni(dni.trim(), turnstileDni.token);
-      const existing = result.existingClient ?? null;
-      setExistingFromResolve(existing);
-      setExistingMaskedEmail(existing?.maskedEmail || "");
 
       if (result.identities.length > 1) {
         setIdentities(result.identities);
         setStep(STEP.IDENTITY);
       } else if (result.identities.length === 1) {
         setSelectedCuit(result.identities[0].cuit);
-        setStep(nextStepFromExisting(existing));
+        setStep(STEP.REGISTER);
       } else {
         const msg =
           result.padronOk === false
@@ -100,9 +81,7 @@ export function useRegisterFlow() {
 
   const handleIdentitySelect = (cuit) => {
     setSelectedCuit(cuit);
-    const match = existingFromResolve?.cuit === cuit ? existingFromResolve : null;
-    setExistingMaskedEmail(match?.maskedEmail || "");
-    setStep(nextStepFromExisting(match));
+    setStep(STEP.REGISTER);
   };
 
   // Respuesta genérica: se pasa al código exista o no una cuenta activa con ese email.
@@ -117,7 +96,6 @@ export function useRegisterFlow() {
     try {
       await authService.register(email.trim(), turnstileReg.token);
       turnstileReg.reset();
-      setExistingFullEmail("");
       setStep(STEP.VERIFY);
     } catch (err) {
       setErrorReg(err.message || "No pudimos crear la cuenta. Intentá de nuevo.");
@@ -127,33 +105,7 @@ export function useRegisterFlow() {
     }
   };
 
-  const handleExistingClientRegister = async () => {
-    if (honeypot) return;
-    if (!turnstileExisting.token) {
-      setErrorExisting("Completá la verificación de seguridad.");
-      return;
-    }
-    setErrorExisting("");
-    setLoadingExisting(true);
-    try {
-      const result = await authService.registerExistingClient(selectedCuit, turnstileExisting.token);
-      turnstileExisting.reset();
-      if (result.alreadyVerified) {
-        setExistingMaskedEmail(result.maskedEmail || existingMaskedEmail);
-        setStep(STEP.ALREADY_REGISTERED);
-        return;
-      }
-      setExistingFullEmail(result.email);
-      setStep(STEP.VERIFY);
-    } catch (err) {
-      setErrorExisting(err.message || "No pudimos crear la cuenta. Intentá de nuevo.");
-      turnstileExisting.reset();
-    } finally {
-      setLoadingExisting(false);
-    }
-  };
-
-  const emailParaVerificar = existingFullEmail || email.trim();
+  const emailParaVerificar = email.trim();
 
   const handleVerify = async (code) => {
     if (!turnstileVerify.token) {
@@ -229,7 +181,7 @@ export function useRegisterFlow() {
     setRegistrationExpired(false);
     setErrorPassword("");
     turnstilePassword.reset();
-    setStep(existingFullEmail ? STEP.EXISTING : STEP.REGISTER);
+    setStep(STEP.REGISTER);
   };
 
   return {
@@ -239,7 +191,6 @@ export function useRegisterFlow() {
     dni,
     setDni,
     identities,
-    existingMaskedEmail,
     email,
     setEmail,
     honeypot,
@@ -251,15 +202,12 @@ export function useRegisterFlow() {
     registrationExpired,
     turnstileDni,
     turnstileReg,
-    turnstileExisting,
     turnstileVerify,
     turnstilePassword,
     loadingDni,
     errorDni,
     loadingReg,
     errorReg,
-    loadingExisting,
-    errorExisting,
     loadingVerify,
     errorVerify,
     loadingPassword,
@@ -268,14 +216,12 @@ export function useRegisterFlow() {
     handleDniSubmit,
     handleIdentitySelect,
     handleRegister,
-    handleExistingClientRegister,
     handleVerify,
     handleResend,
     handleCompleteRegistration,
     restartRegistration,
-    goToLogin: () => navigate("/ingresar", { state: location.state }),
-    goBackFromVerify: () => setStep(existingFullEmail ? STEP.EXISTING : STEP.REGISTER),
+    goBackFromVerify: () => setStep(STEP.REGISTER),
     goBackToDni: () => setStep(STEP.DNI),
-    verifyDestination: existingMaskedEmail || email.trim(),
+    verifyDestination: emailParaVerificar,
   };
 }

@@ -6,7 +6,7 @@
  * - Que resolveDni es llamado con el DNI correcto
  * - Que con identidad única + nuevo usuario → pasa al paso de email
  * - Que con múltiples identidades → muestra la pantalla de selección
- * - Que con cliente existente (existingClient) → muestra el paso de email enmascarado
+ * - Que aunque la respuesta traiga una cuenta existente, se pide el email
  */
 
 // @vitest-environment jsdom
@@ -78,13 +78,12 @@ vi.mock("../../../Components/OTPValidation/OTPValidation.jsx", async () => ({
 
 const mockResolveDni = vi.fn();
 const mockRegister = vi.fn();
-const mockRegisterExistingClient = vi.fn();
 
 vi.mock("../../../services/authService.js", () => ({
   default: {
     resolveDni: (...a) => mockResolveDni(...a),
     register: (...a) => mockRegister(...a),
-    registerExistingClient: (...a) => mockRegisterExistingClient(...a),
+    registerExistingClient: vi.fn(),
     verifyEmail: vi.fn(),
     resendOtp: vi.fn(),
   },
@@ -166,22 +165,7 @@ describe("RegisterScreen — paso DNI inicial", () => {
     });
   });
 
-  it("con cliente existente → muestra email enmascarado", async () => {
-    mockResolveDni.mockResolvedValue({
-      identities: [{ cuit: "20301234568", nombreCompleto: "Juan Pérez" }],
-      existingClient: { maskedEmail: "j****ez@gm****.com" },
-    });
-    renderScreen();
-    const input = screen.getByLabelText(/dni/i);
-    fireEvent.change(input, { target: { value: "30123456" } });
-    fireEvent.submit(input.closest("form"));
-
-    await waitFor(() => {
-      expect(screen.getByText(/j\*\*\*\*ez@gm\*\*\*\*\.com/)).toBeTruthy();
-    });
-  });
-
-  it("con cuenta ya verificada → muestra email enmascarado y avisa que ya tiene cuenta", async () => {
+  it("con una cuenta ya conocida igual pide el email y no muestra la cuenta", async () => {
     mockResolveDni.mockResolvedValue({
       identities: [{ cuit: "20301234568", nombreCompleto: "Juan Pérez" }],
       existingClient: {
@@ -197,10 +181,10 @@ describe("RegisterScreen — paso DNI inicial", () => {
     fireEvent.submit(input.closest("form"));
 
     await waitFor(() => {
-      expect(screen.getByText(/tu cuenta ya está activa/i)).toBeTruthy();
-      expect(screen.getByText(/j\*\*\*\*ez@gm\*\*\*\*\.com/)).toBeTruthy();
-      expect(screen.getByRole("button", { name: /ingresar/i })).toBeTruthy();
+      expect(screen.getByLabelText(/^email$/i)).toBeTruthy();
     });
+    expect(screen.queryByText(/tu cuenta ya está activa/i)).toBeNull();
+    expect(screen.queryByText(/j\*\*\*\*ez@gm\*\*\*\*\.com/)).toBeNull();
   });
 
   it("error del servicio muestra mensaje al usuario", async () => {
@@ -309,18 +293,4 @@ describe("RegisterScreen — registro nuevo usuario", () => {
     });
   });
 
-  it("cliente existente: no pide contraseña antes del código", async () => {
-    mockResolveDni.mockResolvedValue({
-      identities: [{ cuit: "20301234568", nombreCompleto: "Juan Pérez" }],
-      existingClient: { maskedEmail: "j****ez@gm****.com" },
-    });
-    renderScreen();
-    fireEvent.change(screen.getByLabelText(/dni/i), { target: { value: "30123456" } });
-    fireEvent.submit(screen.getByLabelText(/dni/i).closest("form"));
-
-    await waitFor(() => {
-      expect(screen.getByRole("button", { name: /enviar código/i })).toBeTruthy();
-    });
-    expect(screen.queryByLabelText(/contraseña/i)).toBeNull();
-  });
 });

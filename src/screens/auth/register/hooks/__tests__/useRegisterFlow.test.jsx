@@ -189,45 +189,27 @@ describe("useRegisterFlow", () => {
     expect(authService.register).toHaveBeenLastCalledWith("nuevo@test.com", "tok-reg-2");
   });
 
-  it("cliente existente no verificado: solo CUIT, pasa a VERIFY con el email completo", async () => {
-    authService.registerExistingClient.mockResolvedValue({
-      email: "full@test.com",
-      maskedEmail: "f****@t.com",
-      alreadyVerified: false,
+  it("con cuenta previa en la respuesta del DNI igual pide el email", async () => {
+    authService.resolveDni.mockResolvedValue({
+      identities: [{ cuit: "20301234568", nombreCompleto: "Juan Pérez" }],
+      existingClient: {
+        cuit: "20301234568",
+        maskedEmail: "j****an@ma****.com",
+        alreadyRegistered: true,
+        verified: true,
+      },
     });
     const { result } = renderHook(() => useRegisterFlow(), { wrapper });
 
     act(() => {
-      result.current.turnstileExisting.onVerify("tok");
+      result.current.setDni("30123456");
+      result.current.turnstileDni.onVerify("tok-dni");
     });
     await act(async () => {
-      await result.current.handleExistingClientRegister();
+      await result.current.handleDniSubmit();
     });
 
-    expect(authService.registerExistingClient).toHaveBeenCalledWith(null, "tok");
-    expect(result.current.step).toBe(STEP.VERIFY);
-
-    await verifyCode(result);
-    expect(authService.verifyEmail).toHaveBeenCalledWith("full@test.com", "123456", "tok-verify");
-    expect(result.current.step).toBe(STEP.PASSWORD);
-    expect(mockNavigate).not.toHaveBeenCalled();
-  });
-
-  it("cliente existente con cuenta activa: ALREADY_REGISTERED", async () => {
-    authService.registerExistingClient.mockResolvedValue({
-      email: "full@test.com",
-      maskedEmail: "f****@t.com",
-      alreadyVerified: true,
-    });
-    const { result } = renderHook(() => useRegisterFlow(), { wrapper });
-
-    act(() => {
-      result.current.turnstileExisting.onVerify("tok");
-    });
-    await act(async () => {
-      await result.current.handleExistingClientRegister();
-    });
-
-    expect(result.current.step).toBe(STEP.ALREADY_REGISTERED);
+    expect(result.current.step).toBe(STEP.REGISTER);
+    expect(authService.registerExistingClient).not.toHaveBeenCalled();
   });
 });
