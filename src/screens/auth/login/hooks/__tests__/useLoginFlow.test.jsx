@@ -25,15 +25,28 @@ describe("useLoginFlow", () => {
     sessionStorage.clear();
   });
 
-  const submit = async (result) => {
+  const submit = async (result, email = "a@b.com") => {
     act(() => {
-      result.current.setEmail("a@b.com");
+      result.current.setEmail(email);
       result.current.setPassword("password1");
       result.current.turnstile.onVerify("tok");
     });
     await act(async () => {
       await result.current.handleSubmit();
     });
+  };
+
+  const loginFailed = (captchaMode) => {
+    const err = new Error("fail");
+    err.cause = "AUTH_LOGIN_FAILED";
+    err.data = { captchaMode, bloqueado_hasta: null, delayMs: 0 };
+    return err;
+  };
+
+  const turnstileInvalid = () => {
+    const err = new Error("Verificación de seguridad fallida. Por favor, intentá nuevamente.");
+    err.cause = "TURNSTILE_INVALID";
+    return err;
   };
 
   it("honeypot relleno no llama a login", async () => {
@@ -75,6 +88,84 @@ describe("useLoginFlow", () => {
 
     expect(result.current.captchaMode).toBe("managed");
     expect(result.current.turnstile.token).toBe("");
+  });
+
+  describe("modo de CAPTCHA según email y señales del back (H05)", () => {
+    it("otro email vuelve a invisible y al regresar al email anterior recupera managed", async () => {
+      mockLogin.mockRejectedValue(loginFailed("managed"));
+      const { result } = renderHook(() => useLoginFlow(), { wrapper });
+      await submit(result, "a@b.com");
+      expect(result.current.captchaMode).toBe("managed");
+
+      act(() => result.current.setEmail("otro@b.com"));
+      expect(result.current.captchaMode).toBe("invisible");
+
+      act(() => result.current.setEmail("a@b.com"));
+      expect(result.current.captchaMode).toBe("managed");
+    });
+
+    it("compara el email normalizado: espacios y mayúsculas no cambian el modo", async () => {
+      mockLogin.mockRejectedValue(loginFailed("managed"));
+      const { result } = renderHook(() => useLoginFlow(), { wrapper });
+      await submit(result, "a@b.com");
+
+      act(() => result.current.setEmail("  A@B.com "));
+      expect(result.current.captchaMode).toBe("managed");
+    });
+
+    it("cambiar de modo descarta el token del widget anterior", async () => {
+      mockLogin.mockRejectedValue(loginFailed("managed"));
+      const { result } = renderHook(() => useLoginFlow(), { wrapper });
+      await submit(result, "a@b.com");
+      act(() => result.current.turnstile.onVerify("tok-managed"));
+
+      act(() => result.current.setEmail("otro@b.com"));
+      expect(result.current.captchaMode).toBe("invisible");
+      expect(result.current.turnstile.token).toBe("");
+    });
+
+    it("sin cambio de modo conserva el token al editar el email", () => {
+      const { result } = renderHook(() => useLoginFlow(), { wrapper });
+      act(() => result.current.turnstile.onVerify("tok"));
+      act(() => result.current.setEmail("otro@b.com"));
+      expect(result.current.turnstile.token).toBe("tok");
+    });
+
+    it("adopta invisible cuando el back lo devuelve después de managed", async () => {
+      mockLogin.mockRejectedValueOnce(loginFailed("managed")).mockRejectedValueOnce(loginFailed("invisible"));
+      const { result } = renderHook(() => useLoginFlow(), { wrapper });
+      await submit(result, "a@b.com");
+      expect(result.current.captchaMode).toBe("managed");
+
+      await submit(result, "a@b.com");
+      expect(result.current.captchaMode).toBe("invisible");
+    });
+
+    it("TURNSTILE_INVALID estando en managed vuelve a invisible para ese email", async () => {
+      mockLogin.mockRejectedValueOnce(loginFailed("managed")).mockRejectedValueOnce(turnstileInvalid());
+      const { result } = renderHook(() => useLoginFlow(), { wrapper });
+      await submit(result, "a@b.com");
+      await submit(result, "a@b.com");
+
+      expect(result.current.captchaMode).toBe("invisible");
+      expect(result.current.error).toBe("Verificación de seguridad fallida. Por favor, intentá nuevamente.");
+    });
+
+    it("TURNSTILE_INVALID estando en invisible no cambia el modo", async () => {
+      mockLogin.mockRejectedValue(turnstileInvalid());
+      const { result } = renderHook(() => useLoginFlow(), { wrapper });
+      await submit(result, "a@b.com");
+      expect(result.current.captchaMode).toBe("invisible");
+    });
+
+    it("un error sin señales no altera el modo vigente", async () => {
+      const sinSenales = new Error("Error de red");
+      mockLogin.mockRejectedValueOnce(loginFailed("managed")).mockRejectedValueOnce(sinSenales);
+      const { result } = renderHook(() => useLoginFlow(), { wrapper });
+      await submit(result, "a@b.com");
+      await submit(result, "a@b.com");
+      expect(result.current.captchaMode).toBe("managed");
+    });
   });
 
   it("muestra el aviso que dejó el registro", () => {

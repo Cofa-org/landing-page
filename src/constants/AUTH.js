@@ -27,3 +27,6 @@ export const AUTH_CAPTCHA_MODE = {
   INVISIBLE: "invisible",
   MANAGED: "managed",
 };
+
+// Rechazo de Turnstile en el back; en el login no trae el modo vigente.
+export const AUTH_TURNSTILE_INVALID_CAUSE = "TURNSTILE_INVALID";
