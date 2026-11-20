@@ -31,6 +31,9 @@ const DEV = parseBool(import.meta.env.VITE_DEV);
 // Misma trampa que VITE_DEV — sin parseBool, "false" es truthy.
 const ENABLE_TEST_PERSONAS = parseBool(import.meta.env.VITE_ENABLE_TEST_PERSONAS);
 
+// El registro web se abre únicamente con el valor explícito "true".
+const REGISTRO_WEB_HABILITADO = import.meta.env.VITE_REGISTRO_WEB_HABILITADO === "true";
+
 /**
  * Gate del panel de personas-test. Habilita la UI cuando Vite está en
  * modo dev (`VITE_DEV === true`) o cuando la URL trae `?testMode=1`
@@ -63,6 +66,7 @@ export {
   SISTEMA_FRANCES_ON,
   DEV,
   ENABLE_TEST_PERSONAS,
+  REGISTRO_WEB_HABILITADO,
   parseBool,
   isTestPersonasVisible,
 };

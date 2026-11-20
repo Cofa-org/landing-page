@@ -9,4 +9,5 @@ export const SYNTHETIC_UNIT_ENV = {
   VITE_SISTEMA_FRANCES_ON: "false",
   VITE_DEV: "false",
   VITE_ENABLE_TEST_PERSONAS: "false",
+  VITE_REGISTRO_WEB_HABILITADO: "false",
 };

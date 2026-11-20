@@ -11,10 +11,10 @@ const guardBeforeApplicationImport = {
   wrapped: [fetch, XMLHttpRequest.prototype.open, http.request, http.get, https.request, https.get, net.connect, net.createConnection, tls.connect]
     .every(method => method[UNIT_NETWORK_GUARD_MARKER] === true),
 };
-const { LANDING_BACKEND_URL, LANDING_BACKEND_API_KEY, LRS_URL, LRS_API_KEY, TURNSTILE_SITE_KEY, THUMBMARKJS_API_KEY, SISTEMA_FRANCES_ON, DEV, ENABLE_TEST_PERSONAS } = await import("../../config.js");
+const { LANDING_BACKEND_URL, LANDING_BACKEND_API_KEY, LRS_URL, LRS_API_KEY, TURNSTILE_SITE_KEY, THUMBMARKJS_API_KEY, SISTEMA_FRANCES_ON, DEV, ENABLE_TEST_PERSONAS, REGISTRO_WEB_HABILITADO } = await import("../../config.js");
 const importTimeProof = {
   ...guardBeforeApplicationImport,
-  configuration: { LANDING_BACKEND_URL, LANDING_BACKEND_API_KEY, LRS_URL, LRS_API_KEY, TURNSTILE_SITE_KEY, THUMBMARKJS_API_KEY, SISTEMA_FRANCES_ON, DEV, ENABLE_TEST_PERSONAS },
+  configuration: { LANDING_BACKEND_URL, LANDING_BACKEND_API_KEY, LRS_URL, LRS_API_KEY, TURNSTILE_SITE_KEY, THUMBMARKJS_API_KEY, SISTEMA_FRANCES_ON, DEV, ENABLE_TEST_PERSONAS, REGISTRO_WEB_HABILITADO },
 };
 
 test.each([
@@ -59,14 +59,18 @@ test("installs every network boundary before application config is imported with
       LANDING_BACKEND_URL: "https://unit-backend.invalid", LANDING_BACKEND_API_KEY: "unit-synthetic-api-key",
       LRS_URL: "https://unit-lrs.invalid", LRS_API_KEY: "unit-synthetic-lrs-key",
       TURNSTILE_SITE_KEY: "unit-synthetic-turnstile", THUMBMARKJS_API_KEY: "unit-synthetic-thumbmark",
-      SISTEMA_FRANCES_ON: false, DEV: false, ENABLE_TEST_PERSONAS: false,
+      SISTEMA_FRANCES_ON: false, DEV: false, ENABLE_TEST_PERSONAS: false, REGISTRO_WEB_HABILITADO: false,
     },
   });
 });
 
 test("keeps explicit unit env stubs usable without returning to inherited configuration", async () => {
   try {
-    vi.stubEnv("VITE_DEV", "true"); vi.resetModules();
-    expect((await import("../../config.js")).DEV).toBe(true);
+    vi.stubEnv("VITE_DEV", "true");
+    vi.stubEnv("VITE_REGISTRO_WEB_HABILITADO", "true");
+    vi.resetModules();
+    const config = await import("../../config.js");
+    expect(config.DEV).toBe(true);
+    expect(config.REGISTRO_WEB_HABILITADO).toBe(true);
   } finally { vi.unstubAllEnvs(); vi.resetModules(); }
 });

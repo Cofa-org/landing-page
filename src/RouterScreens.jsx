@@ -2,6 +2,7 @@ import { Route, Routes } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import Loader from "./Components/Loader/Loader";
 import RegistroCerradoScreen from "./screens/registrationSim/RegistroCerradoScreen.jsx";
+import { REGISTRO_WEB_HABILITADO } from "./config.js";
 
 // Lazy-loaded screens
 const HomeScreen = lazy(() => import("./screens/HomeScreen/HomeScreen"));
@@ -35,8 +36,6 @@ const OnboardingFlowScreen = lazy(() => import("./screens/registrationSim/Onboar
 /* import SuggestionsScreen from './screens/SuggestionsScreen/SuggestionsScreen' */
 
 const RouterScreens = () => {
-  const registroWebHabilitado = import.meta.env.VITE_REGISTRO_WEB_HABILITADO === "true";
-
   
   return (
     <Suspense
@@ -71,7 +70,7 @@ const RouterScreens = () => {
         />
         <Route
           path='/registro-simulador'
-          element={registroWebHabilitado ? <OnboardingFlowScreen /> : <RegistroCerradoScreen />}
+          element={REGISTRO_WEB_HABILITADO ? <OnboardingFlowScreen /> : <RegistroCerradoScreen />}
         />
         {/* Preguntas Frecuentes */}
         <Route
@@ -159,7 +158,7 @@ const RouterScreens = () => {
           <Route path='/asistencias/terminos-desempleo' element={<TermsV2 type={'DESEMPLEO'}/>}/> */}
         <Route
           path='/subir-dni'
-          element={registroWebHabilitado ? <DNIUploadMobileScreen /> : <RegistroCerradoScreen />}
+          element={REGISTRO_WEB_HABILITADO ? <DNIUploadMobileScreen /> : <RegistroCerradoScreen />}
         />
         <Route
           path='*'
