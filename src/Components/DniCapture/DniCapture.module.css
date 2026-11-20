@@ -1,6 +1,46 @@
 .form { width: 100%; min-width: 0; margin: 0; padding: var(--spacing-lg, 24px); }
 .content { display: flex; flex-direction: column; gap: var(--spacing-lg, 24px); min-width: 0; }
-.instructions, .help p { color: #444; line-height: 1.6; margin: 0; }
+.help p { color: #444; line-height: 1.6; margin: 0; }
+.intro {
+  display: grid;
+  justify-items: center;
+  gap: var(--spacing-sm, 8px);
+  text-align: center;
+}
+.introIcon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--primary-color-10);
+}
+.intro h3 { color: var(--text-color); font-size: 1.5rem; line-height: 1.2; }
+.intro p { color: var(--text-color); font-size: 0.95rem; line-height: 1.5; }
+.tips {
+  margin: 0;
+  padding: 0 var(--spacing-md, 16px);
+  list-style: none;
+  border-radius: var(--border-radius-md, 15px);
+  background: var(--primary-color-10);
+}
+.tips li, .mobileHelp {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm, 8px);
+  text-align: start;
+  line-height: 1.5;
+}
+.tips li { padding-block: var(--spacing-sm, 8px); }
+.tips li + li { border-top: 1px solid var(--border-color); }
+.introIcon svg, .tips svg, .mobileHelp svg {
+  flex: none;
+  color: var(--primary-color);
+}
+.introIcon svg { font-size: 1.75rem; }
+.tips svg, .mobileHelp svg { font-size: 1.2rem; margin-top: 2px; }
+.introIcon svg *, .tips svg *, .mobileHelp svg *, .slot button svg, .slot button svg * { color: inherit; }
+.slot button svg { flex: none; font-size: 1rem; }
 .uploadStatus { color: #444; line-height: 1.6; margin: 0; text-align: center; }
 .uploadStatus:not(:empty) { margin-top: var(--spacing-sm, 12px); }
 .slots { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: var(--spacing-lg, 24px); }

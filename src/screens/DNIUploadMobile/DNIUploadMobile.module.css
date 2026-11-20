@@ -17,6 +17,29 @@
   min-height: 44px;
   margin-bottom: var(--spacing-md, 16px);
 }
-.confirmation { width: 100%; min-width: 0; margin: 0; padding: var(--spacing-lg, 24px); }
+.confirmation {
+  display: grid;
+  justify-items: center;
+  gap: var(--spacing-sm, 8px);
+  width: 100%;
+  max-width: 450px;
+  margin-inline: auto;
+  padding: var(--spacing-lg, 24px);
+  border-radius: var(--border-radius-lg);
+  background: var(--color-background);
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+.confirmation h1 { font-size: 1.5rem; line-height: 1.2; }
+.confirmationIcon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--primary-color-10);
+}
+.confirmationIcon svg { color: var(--primary-color); font-size: 1.75rem; }
+.confirmationIcon svg * { color: inherit; }
 .confirmation p { margin: 0; color: #444; line-height: 1.6; text-align: center; }
 .backButton:focus-visible { outline: 3px solid #176a3d; outline-offset: 3px; }

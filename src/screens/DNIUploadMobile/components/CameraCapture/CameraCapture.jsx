@@ -36,7 +36,7 @@ export default function CameraCapture({ open, onCapture, onCancel, tipoFoto }) {
           <div className={styles.previewActions}>
             <GenericButton variant="secondary" onClick={dialog.handleZoom} aria-expanded={dialog.expanded}>{dialog.zoomLabel}</GenericButton>
           </div>
-          <p>Revisá que se vean las cuatro esquinas y que los datos y códigos se lean con claridad.</p>
+          <p className={styles.reviewInstruction}>Comprobá que el DNI se vea completo, enfocado y sin reflejos. Los datos deben leerse con claridad.</p>
           <div className={styles.previewActions}>
             <GenericButton variant="secondary" onClick={dialog.handleRetry}>Volver a sacar</GenericButton>
             <GenericButton onClick={dialog.handleConfirm}>Usar esta foto</GenericButton>

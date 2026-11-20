@@ -10,7 +10,22 @@ const synthetic = {
   VITE_DEV: 'false', VITE_ENABLE_TEST_PERSONAS: 'false', VITE_SISTEMA_FRANCES_ON: 'false',
 };
 export default defineConfig({
-  plugins: [react()], envDir: fileURLToPath(new URL('./empty-env', import.meta.url)),
+  plugins: [
+    {
+      name: 'dni-qr-test-entry',
+      configureServer(server) {
+        server.middlewares.use((request, _response, next) => {
+          const url = new URL(request.url, 'http://127.0.0.1:4179');
+          if (url.pathname === '/subir-dni') {
+            request.url = '/e2e/harness.html' + url.search;
+          }
+          next();
+        });
+      },
+    },
+    react(),
+  ],
+  envDir: fileURLToPath(new URL('./empty-env', import.meta.url)),
   define: Object.fromEntries(Object.entries(synthetic).map(([name, value]) => [`import.meta.env.${name}`, JSON.stringify(value)])),
   server: { host: '127.0.0.1', port: 4179, strictPort: true, hmr: false },
 });

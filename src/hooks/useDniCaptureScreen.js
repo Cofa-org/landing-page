@@ -145,7 +145,7 @@ export function useDniCaptureScreen({ leadId, token, expectedContext, onSuccess,
       ...(capture && getDniCropPreviewStyles(capture)),
       disabled: !model.canCapture || model.isUploading || loading,
       actionLabel: capture ? `Volver a sacar el ${definition.name}` : `Sacar foto del ${definition.name}`,
-      zoomLabel: zoomSide === definition.side ? `Reducir ${definition.name}` : `Ampliar ${definition.name}`,
+      zoomLabel: zoomSide === definition.side ? "Reducir foto" : "Ver foto",
     };
   });
   const received = receiptObserved || model.uploadSuccess;
@@ -163,7 +163,7 @@ export function useDniCaptureScreen({ leadId, token, expectedContext, onSuccess,
   const retakeMessage = retakeSide ? `Volvé a sacar la foto del ${retakeSide.name} para usar el mismo encuadre en ambas caras.` : "";
   return {
     viewModel: { isPhone, slots, qrUrl, isPreparingQr, received, continuing,
-      description: isPhone ? "Sacá una foto del frente y otra del dorso con la cámara de tu celular." : undefined,
+      description: isPhone ? "Fotografiá el frente y el dorso con tu celular." : undefined,
       isLoading: model.isContextLoading, isUploading: model.isUploading,
       canSubmit: isPhone && model.isFormValid && !loading && !received,
       error: continuationError || pollingError || uploadError || retakeMessage || externalError,

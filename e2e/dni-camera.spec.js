@@ -6,6 +6,7 @@ import { writeFile } from 'node:fs/promises';
 import { contextSnapshot, guideMarks, outsideMark, installSyntheticCapture, openEntry, takePhoto, takePair } from './fixtures/dni-camera.js';
 
 const { QRCodeSVG } = qrcodeReact;
+const receivedText = 'Ya recibimos las fotos de tu DNI. Volvé a la computadora para continuar con tu solicitud.';
 const isPhone = info => info.project.name.endsWith('-phone');
 const wideFrame = { width: 1280, height: 720, crop: { left: 64, top: 0, width: 1152, height: 720 } };
 const tallFrame = { width: 720, height: 1280, crop: { left: 0, top: 415, width: 720, height: 450 } };
@@ -135,7 +136,8 @@ for (const entry of ['mobile', 'inline']) for (const frame of [wideFrame, tallFr
   const edgeSamples = [
     { x: 3, y: guideBox.height / 2 },
     { x: guideBox.width - 4, y: guideBox.height / 2 },
-    { x: guideBox.width / 2, y: 3 },
+    // Sample inside the dark band even when the screenshot starts on a fractional pixel.
+    { x: guideBox.width / 2, y: 4 },
     { x: guideBox.width / 2, y: guideBox.height - 4 },
   ];
   const { sampled } = await screenshotPixels(guide, edgeSamples, info.outputPath('guide-on-white.png'));
@@ -148,11 +150,38 @@ for (const entry of ['mobile', 'inline']) for (const frame of [wideFrame, tallFr
   await page.screenshot({path:info.outputPath('landscape-camera.png'),fullPage:true});
   await shutter.click();
   await expect(dialog.getByRole('img')).toBeVisible();
+  await dialog.getByRole('button', { name: 'Ampliar foto' }).click();
+  const confirm = dialog.getByRole('button', { name: 'Usar esta foto' });
+  await confirm.scrollIntoViewIfNeeded();
+  await expect(confirm).toBeInViewport({ ratio: 1 });
   await page.keyboard.press('Escape');
   await expect(page.locator('#callbell-livechat-host')).toBeVisible();
 });
 
 test.afterEach(async ({ page }) => { await expect(page.locator('a[href*="/subir-dni?"], a[href*="wa.me"]')).toHaveCount(0); await page.close(); await page.context().unrouteAll({ behavior: 'ignoreErrors' }); });
+
+for (const entry of ['mobile', 'inline']) {
+  test(`${entry} mobile capture intro stays readable`, async ({ page }, info) => {
+    test.skip(!isPhone(info));
+    await installSyntheticCapture(page, { phone: true });
+    await openEntry(page, entry);
+    await expect(page.getByRole('heading', { name: 'Sacá las fotos de tu DNI' })).toBeVisible();
+    const tips = page.getByRole('list', { name: 'Consejos para sacar las fotos' });
+    await expect(tips.getByRole('listitem')).toHaveCount(3);
+    const actions = page.getByRole('button', { name: /^(Sacar foto del frente|Sacar foto del dorso|Enviar fotos|Hablar con un asesor)$/ });
+    await expect(actions).toHaveText(['Sacar foto del frente', 'Sacar foto del dorso', 'Enviar fotos', 'Hablar con un asesor']);
+    for (const viewport of [{ width: 320, height: 568 }, { width: 390, height: 844 }]) {
+      await page.setViewportSize(viewport);
+      for (const action of await actions.all()) {
+        await action.scrollIntoViewIfNeeded();
+        await expect(action).toBeInViewport({ ratio: 1 });
+        expect((await action.boundingBox()).height).toBeGreaterThanOrEqual(44);
+      }
+    }
+    await tips.scrollIntoViewIfNeeded();
+    await page.screenshot({ path: info.outputPath('capture-intro.png'), fullPage: true });
+  });
+}
 
 test('desktop QR keeps the title and help in place after a delayed response', async ({ page }, info) => {
   test.skip(isPhone(info));
@@ -207,7 +236,7 @@ test('desktop touch/webcam offers context-bound scannable QR and polls the phone
     await phone.goto(expectedUrl.href);
     await takePair(phone);
     await phone.getByRole('button', { name: 'Enviar fotos', exact: true }).click();
-    await expect(phone.getByRole('status')).toHaveText('Volvé a la PC para continuar con tu solicitud.');
+    await expect(phone.getByRole('status')).toHaveText(receivedText);
     const { uploadId, captureSessionId, solicitudId } = phoneState.receipt;
     expect(uploadId).toMatch(/^[a-f0-9-]{36}$/);
     desktop.context = { ...desktop.context, captureSessionId, solicitudId, baseRevision: 'b'.repeat(64),
@@ -242,13 +271,15 @@ for (const entry of ['mobile', 'inline']) test(`${entry} captures original PNG p
   await takePhoto(page, 'dorso');
   await expect(page.locator('input[type=file], [ondrop], [onpaste]')).toHaveCount(0);
   await page.getByRole('button', { name: 'Enviar fotos', exact: true }).click();
-  await expect(page.getByText(/Recibimos tus fotos/)).toBeVisible();
   if (entry === 'mobile') {
-    await expect(page.getByRole('heading', { name: 'Recibimos tus fotos', exact: true })).toBeVisible();
-    await expect(page.getByRole('status')).toHaveText('Volvé a la PC para continuar con tu solicitud.');
+    const receiptHeading = page.getByRole('heading', { name: '¡Fotos enviadas!', exact: true });
+    await expect(receiptHeading).toBeFocused();
+    await expect(page.getByRole('status')).toHaveText(receivedText);
     await expect(page.getByRole('button')).toHaveCount(0);
-    await expect(page.getByText(/Sacá una foto|Sacá el DNI|Necesitás ayuda/)).toHaveCount(0);
+    await expect(page.getByRole('heading', { name: 'Sacá las fotos de tu DNI' })).toHaveCount(0);
     await page.screenshot({path:info.outputPath('received-photos.png'),fullPage:true});
+  } else {
+    await expect(page.getByText('Recibimos tus fotos.', { exact: true })).toBeVisible();
   }
   expect(state.multipart).toHaveLength(1);
   const parts = readMultipart(state.multipart[0]);
@@ -348,7 +379,7 @@ for (const failure of ['network','html','legacy200']) test(`transport ${failure}
   test.skip(!isPhone(info)); const state=await installSyntheticCapture(page,{phone:true,inspectMultipart:true}); await openEntry(page); await takePair(page);
   state.error=failure==='network'?'network':failure==='html'?{html:true}:{httpStatus:200,status:503,cause:'DNI_STORAGE_UNAVAILABLE'};
   await page.getByRole('button',{name:'Enviar fotos',exact:true}).click(); await expect(page.getByRole('alert')).toBeVisible();
-  state.error=null; await page.getByRole('button',{name:'Enviar fotos',exact:true}).click(); await expect(page.getByText(/Recibimos tus fotos/)).toBeVisible();
+  state.error=null; await page.getByRole('button',{name:'Enviar fotos',exact:true}).click(); await expect(page.getByRole('heading', { name: '¡Fotos enviadas!', exact: true })).toBeVisible();
   expect(state.multipart).toHaveLength(2);
   const [first, retry] = state.multipart.map(readMultipart);
   const files = first.filter(({ type }) => type);
@@ -447,7 +478,7 @@ test('conflict explicit refresh keeps photos, adopts same-session winner, requir
   await page.getByRole('button',{name:'Enviar fotos',exact:true}).click(); await expect(page.getByRole('alert')).toBeVisible();
   state.context={...state.context,baseRevision:'b'.repeat(64),dniReceivedForSession:true,receivedUploadId:'c1234567-1234-4123-8123-123456789abc',receiptKind:'current_session',estado_onboarding:'DNI_SUBIDO'};
   await page.getByRole('button',{name:'Actualizar para reintentar con estas fotos',exact:true}).click(); await expect(page.getByRole('button',{name:'Enviar fotos',exact:true})).toBeEnabled(); expect(state.uploads).toBe(1);
-  state.error=null; await page.getByRole('button',{name:'Enviar fotos',exact:true}).click(); await expect(page.getByText(/Recibimos tus fotos/)).toBeVisible();
+  state.error=null; await page.getByRole('button',{name:'Enviar fotos',exact:true}).click(); await expect(page.getByRole('heading', { name: '¡Fotos enviadas!', exact: true })).toBeVisible();
   const uploads=await page.evaluate(()=>window.__dni.uploads); expect(uploads[1].fields.baseRevision).toBe('b'.repeat(64)); expect(uploads[1].fields.uploadId).not.toBe(uploads[0].fields.uploadId);
 });
 
@@ -494,9 +525,9 @@ test('lost response normal refresh restores own receipt without reuploading', as
   state.context = { ...state.context, baseRevision: 'b'.repeat(64), dniReceivedForSession: true, receivedUploadId: uploadId, receiptKind: 'current_session', estado_onboarding: 'DNI_SUBIDO' };
   // Reopen the same link: the context endpoint restores the committed own receipt before revision mismatch.
   await openEntry(page);
-  await expect(page.getByText(/Recibimos tus fotos/)).toBeVisible(); expect(state.uploads).toBe(1);
-  await expect(page.getByRole('heading', {name:'Recibimos tus fotos',exact:true})).toBeVisible();
-  await expect(page.getByRole('status')).toHaveText('Volvé a la PC para continuar con tu solicitud.');
+  await expect(page.getByRole('heading', { name: '¡Fotos enviadas!', exact: true })).toBeVisible();
+  expect(state.uploads).toBe(1);
+  await expect(page.getByRole('status')).toHaveText(receivedText);
   await expect(page.getByRole('button')).toHaveCount(0);
 });
 
@@ -571,7 +602,7 @@ for (const [name, overrides] of [
   ['partial binding', { captureSessionId: null, baseRevision: null }],
   ['empty binding', { solicitudId: '', captureSessionId: '', baseRevision: '' }],
   ['invalid binding', { captureSessionId: 'invalid' }],
-]) test(`actual QR boundary blocks ${name} before any context GET`, async ({ page }, info) => {
+]) test(`mounted QR screen blocks ${name} before any context GET`, async ({ page }, info) => {
   const state = await installSyntheticCapture(page, { phone: isPhone(info) });
   await page.context().addCookies([{ name: 'leadToken', value: 'synthetic-cookie', url: 'http://127.0.0.1:4179' }]);
   const params = new URLSearchParams({ leadId: '42', token: 'synthetic-token', solicitudId: contextSnapshot.solicitudId,
@@ -625,6 +656,8 @@ for (const frame of [wideFrame, tallFrame]) test(`confirmed previews contain eve
     const dialog = page.getByRole('dialog');
     await dialog.getByRole('button', { name: 'Capturar', exact: true }).click();
     const path = info.outputPath(`confirmed-${side}`);
+    await expect(dialog.getByRole('button', { name: 'Usar esta foto' })).toBeVisible();
+    await dialog.screenshot({ path: info.outputPath(`review-${side}.png`) });
     await expectCroppedPreview(dialog.getByRole('img'), frame);
     await dialog.getByRole('button', { name: 'Usar esta foto', exact: true }).click();
     const image = page.getByAltText(side === 'frente' ? 'Frente del DNI' : 'Dorso del DNI', { exact: true });
@@ -637,12 +670,13 @@ for (const frame of [wideFrame, tallFrame]) test(`confirmed previews contain eve
     expect(geometry.viewport.height + 1).toBeGreaterThanOrEqual(geometry.frame.height);
     expect(geometry.slotScrollHeight).toBeLessThanOrEqual(geometry.slotClientHeight + 1);
 
-    await page.getByRole('button', { name: `Ampliar ${side}`, exact: true }).click();
+    await page.getByRole('button', { name: `Ver foto del ${side}`, exact: true }).click();
     await expectZoomedPreview(image, frame, path);
-    await page.getByRole('button', { name: `Reducir ${side}`, exact: true }).click();
+    await page.getByRole('button', { name: `Reducir foto del ${side}`, exact: true }).click();
   }
   await expect(page.getByRole('button', { name: 'Enviar fotos', exact: true })).toBeEnabled();
   const slots = await page.locator('section[aria-label]').evaluateAll(slots => slots.map(slot => { const box = slot.getBoundingClientRect(); return { x: box.x, y: box.y, right: box.right, bottom: box.bottom }; }));
+  await page.screenshot({ path: info.outputPath('thumbnails.png'), fullPage: true });
   const [front, back] = slots;
   expect(back.y >= front.bottom || back.x >= front.right).toBe(true);
 });

@@ -107,7 +107,7 @@ it("shows a status message while the DNI photos are being processed", async () =
  expect(screen.getByRole("status")).toHaveTextContent(message);
 
  finishUpload();
- await screen.findByText(/Recibimos tus fotos/);
+ await screen.findByText("Recibimos tus fotos.");
  expect(screen.queryByText(message)).not.toBeInTheDocument();
 });
 afterEach(()=>{cleanup();vi.restoreAllMocks();});
@@ -125,11 +125,14 @@ it("names dialog, starts camera, traps focus and Escape returns focus",async()=>
  rerender(<CameraCapture open={false} tipoFoto="frente" onCapture={vi.fn()} onCancel={onCancel}/>);
  expect(trigger).toHaveFocus();trigger.remove();
 });
-it("shows the 8:5 region at both zoom levels and confirms the complete original once",async()=>{
- const onCapture=vi.fn();render(<CameraCapture open tipoFoto="dorso" onCapture={onCapture} onCancel={vi.fn()}/>);
+it.each(["frente", "dorso"])("reviews the %s in 8:5 at both zoom levels and confirms the original once", async side => {
+ const onCapture=vi.fn();render(<CameraCapture open tipoFoto={side} onCapture={onCapture} onCancel={vi.fn()}/>);
  await screen.findByRole("button",{name:"Capturar"});
  fireEvent.click(screen.getByRole("button",{name:"Capturar"}));
- const preview=await screen.findByAltText("Foto del dorso");
+ const preview = await screen.findByAltText(`Foto del ${side}`);
+ const dialog = screen.getByRole("dialog", { name: `Sacar foto del ${side}` });
+ expect(dialog).toHaveTextContent("Comprobá que el DNI se vea completo, enfocado y sin reflejos. Los datos deben leerse con claridad.");
+ expect(screen.getByRole("button", { name: "Volver a sacar" })).toBeEnabled();
  expect(screen.queryByRole("button",{name:"Hablar con un asesor"})).toBeNull();
  expect(preview.parentElement.style.aspectRatio).toBe("1.6 / 1");
  expect(preview.style.width).toBe("100%");
@@ -151,13 +154,19 @@ it.each(["registro", "QR"])("confirms 8:5 thumbnails and sends the untouched PNG
  const query = new URLSearchParams({leadId:"42",token:"synthetic",...context});
  const {container} = render(entry === "registro" ? <DNIUploadStep leadId="42" leadToken="synthetic" />
    : <MemoryRouter initialEntries={[`/subir-dni?${query}`]}><DNIUploadMobileScreen /></MemoryRouter>);
+ const submit = screen.getByRole("button", { name: "Enviar fotos" });
+ expect(submit).toBeDisabled();
  await confirmSide("frente");
+ expect(submit).toBeDisabled();
  await confirmSide("dorso");
+ expect(submit).toBeEnabled();
  const preview = screen.getByAltText("Frente del DNI");
  expect(preview.parentElement.style.aspectRatio).toBe("1.6 / 1");
  expect(parseFloat(preview.style.top)).toBeCloseTo(-3.3333333);
- fireEvent.click(screen.getByRole("button",{name:"Ampliar frente"}));
- expect(screen.getByRole("button",{name:"Reducir frente"})).toHaveAttribute("aria-expanded","true");
+ const zoom = screen.getByRole("button", { name: "Ver foto del frente" });
+ expect(zoom).toHaveTextContent("Ver foto");
+ fireEvent.click(zoom);
+ expect(screen.getByRole("button", { name: "Reducir foto del frente" })).toHaveAttribute("aria-expanded", "true");
  expect(parseFloat(preview.style.top)).toBeCloseTo(-3.3333333);
  expect(container.querySelector('input[type="file"]')).toBeNull();
  Service.subirDniMobile.mockImplementationOnce(async(_lead,_files,_token,_signal,_retry,options)=>({success:true,data:{
@@ -174,10 +183,18 @@ it.each(["registro", "QR"])("confirms 8:5 thumbnails and sends the untouched PNG
 it('shows preparation guidance only on the initial screen and opens camera directly', async () => {
  Object.defineProperty(navigator, 'userAgentData', { configurable: true, value: { mobile: true } });
  render(<DNIUploadStep leadId="42" leadToken="synthetic" />);
- expect(screen.getByText(/Sacá el DNI de la funda/)).toHaveTextContent(/mesa con luz pareja.*celular paralelo.*cuatro esquinas.*datos y códigos.*bien enfocado/);
+ expect(screen.getByRole("heading", { name: "Sacá las fotos de tu DNI", exact: true })).toBeVisible();
+ expect(screen.getByText("Fotografiá el frente y el dorso con tu celular.")).toBeVisible();
+ expect(screen.getByRole("list", { name: "Consejos para sacar las fotos" })).toBeVisible();
+ expect(screen.getAllByRole("listitem").map(item => item.textContent.trim())).toEqual([
+  "Apoyá el DNI sobre una superficie plana y bien iluminada.",
+  "Sacá la foto desde arriba, con el celular estable.",
+  "Asegurate de que se vea el DNI completo, sin reflejos y con los datos claros.",
+ ]);
+ expect(screen.getByRole("button", { name: "Hablar con un asesor" })).toBeVisible();
  const opener = await screen.findByRole('button', { name: 'Sacar foto del frente' });
  await waitFor(() => expect(opener).toBeEnabled()); fireEvent.click(opener);
- expect(screen.getByRole('dialog')).not.toHaveTextContent(/Sacá el DNI de la funda/);
+ expect(screen.getByRole("dialog")).not.toContainElement(screen.getByRole("list", { name: "Consejos para sacar las fotos" }));
  await screen.findByRole('button', { name: 'Capturar' });
  expect(screen.queryByRole('button', { name: 'Activar cámara' })).toBeNull();
 });

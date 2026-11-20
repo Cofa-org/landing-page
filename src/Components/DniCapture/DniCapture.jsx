@@ -1,17 +1,39 @@
+import { FaRegIdCard } from "react-icons/fa";
+import { FiCamera, FiEye, FiHelpCircle, FiMaximize, FiRefreshCw, FiSmartphone, FiSun } from "react-icons/fi";
 import { QRCodeSVG } from "qrcode.react";
 import GenericForm from "../Forms/GenericForm/GenericForm.jsx";
 import GenericButton from "../buttons/GenericButton/GenericButton.jsx";
 import styles from "./DniCapture.module.css";
 
 export default function DniCapture({ viewModel }) {
+  const showMobileCapture = viewModel.isPhone && !viewModel.received;
+
   return (
-    <GenericForm title="Subí las fotos de tu DNI" description={viewModel.description}
+    <GenericForm title={showMobileCapture ? undefined : "Subí las fotos de tu DNI"}
       onSubmit={viewModel.handleSubmit} className={styles.form} children_className={styles.content}>
       {viewModel.received ? (
-        <p role="status">Recibimos tus fotos. Podés volver a la PC para continuar con tu solicitud. Esto confirma la recepción de las fotos.</p>
+        <p role="status">Recibimos tus fotos.</p>
       ) : viewModel.isPhone ? (
         <>
-          <p className={styles.instructions}>Sacá el DNI de la funda y apoyalo sobre una mesa con luz pareja. Sostené el celular paralelo al DNI, justo encima. Incluí las cuatro esquinas dentro del marco y acercate hasta que se lean los datos y códigos. Evitá reflejos y sombras. Revisá que esté bien enfocado.</p>
+          <header className={styles.intro}>
+            <span className={styles.introIcon}><FaRegIdCard aria-hidden="true" /></span>
+            <h3>Sacá las fotos de tu DNI</h3>
+            <p>{viewModel.description}</p>
+          </header>
+          <ul className={styles.tips} role="list" aria-label="Consejos para sacar las fotos">
+            <li>
+              <FiSun aria-hidden="true" />
+              <span><strong>Apoyá el DNI sobre una superficie</strong> plana y bien iluminada.</span>
+            </li>
+            <li>
+              <FiSmartphone aria-hidden="true" />
+              <span><strong>Sacá la foto desde arriba,</strong> con el celular estable.</span>
+            </li>
+            <li>
+              <FiMaximize aria-hidden="true" />
+              <span><strong>Asegurate de que se vea el DNI completo,</strong> sin reflejos y con los datos claros.</span>
+            </li>
+          </ul>
           <div className={styles.slots}>
             {viewModel.slots.map(slot => (
               <section key={slot.side} className={styles.slot} aria-label={slot.label}>
@@ -23,8 +45,16 @@ export default function DniCapture({ viewModel }) {
                     </div>
                   </div>
                 ) : null}
-                {slot.previewUrl ? <GenericButton variant="secondary" onClick={slot.zoom} aria-expanded={slot.expanded}>{slot.zoomLabel}</GenericButton> : null}
-                <GenericButton variant="secondary" onClick={slot.open} disabled={slot.disabled}>{slot.actionLabel}</GenericButton>
+                {slot.previewUrl ? (
+                  <GenericButton variant="secondary" onClick={slot.zoom} aria-expanded={slot.expanded}
+                    aria-label={`${slot.zoomLabel} del ${slot.name}`}>
+                    <FiEye aria-hidden="true" />{slot.zoomLabel}
+                  </GenericButton>
+                ) : null}
+                <GenericButton variant="secondary" onClick={slot.open} disabled={slot.disabled} aria-label={slot.actionLabel}>
+                  {slot.previewUrl ? <FiRefreshCw aria-hidden="true" /> : <FiCamera aria-hidden="true" />}
+                  {slot.previewUrl ? "Volver a sacar" : slot.actionLabel}
+                </GenericButton>
               </section>
             ))}
           </div>
@@ -54,7 +84,14 @@ export default function DniCapture({ viewModel }) {
       {viewModel.canNewOperation ? <GenericButton variant="secondary" onClick={viewModel.handleNewOperation}>Actualizar para reintentar con estas fotos</GenericButton> : null}
       {viewModel.canRefresh ? <GenericButton variant="secondary" onClick={viewModel.handleRefresh}>Actualizar captura</GenericButton> : null}
       <div className={styles.help}>
-        <p>¿Necesitás ayuda con la cámara? Revisá los permisos, probá un navegador compatible u otro celular.</p>
+        {showMobileCapture ? (
+          <p className={styles.mobileHelp}>
+            <FiHelpCircle aria-hidden="true" />
+            <span>¿Necesitás ayuda con la cámara? Revisá los permisos, probá un navegador compatible o usá otro celular.</span>
+          </p>
+        ) : (
+          <p>¿Necesitás ayuda con la cámara? Revisá los permisos, probá un navegador compatible u otro celular.</p>
+        )}
         <GenericButton variant="secondary" onClick={viewModel.handleContactAdvisor}>Hablar con un asesor</GenericButton>
       </div>
     </GenericForm>

@@ -186,10 +186,11 @@ export async function openEntry(page, entry = 'mobile', context = contextSnapsho
 export async function takePhoto(page, side = 'frente', { confirm = true } = {}) {
   await page.getByRole('button', { name: `Sacar foto del ${side}`, exact: true }).click();
   const dialog = page.getByRole('dialog');
-  await expect(dialog.getByText(/Sacá el DNI de la funda/)).toHaveCount(0);
+  await expect(dialog.getByRole('list', { name: 'Consejos para sacar las fotos' })).toHaveCount(0);
   await expect(dialog.getByRole('button', { name: 'Activar cámara', exact: true })).toHaveCount(0);
   await dialog.getByRole('button', { name: 'Capturar', exact: true }).click();
   await expect(dialog.getByRole('img')).toBeVisible();
+  await expect(dialog.getByText('Comprobá que el DNI se vea completo, enfocado y sin reflejos. Los datos deben leerse con claridad.')).toBeVisible();
   if (confirm) {
     await dialog.getByRole('button', { name: 'Usar esta foto', exact: true }).click();
     const label = side === 'frente' ? 'Frente del DNI' : 'Dorso del DNI';

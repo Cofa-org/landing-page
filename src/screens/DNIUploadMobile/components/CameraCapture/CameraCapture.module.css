@@ -50,9 +50,10 @@
   box-shadow: inset 0 0 0 3px #222, 0 0 0 100vmax rgb(0 0 0 / 55%);
 }
 .previewContainer { display: flex; flex-direction: column; gap: var(--spacing-md, 16px); min-width: 0; }
+.reviewInstruction { margin: 0; color: var(--text-color); line-height: 1.5; }
 .previewImage { position: absolute; display: block; max-width: none; }
 .previewActions { display: flex; gap: var(--spacing-sm, 12px); flex-wrap: wrap; }
-.previewActions > button { flex: 1 1 140px; }
+.previewActions > button { flex: 1 1 140px; padding-inline: var(--spacing-md, 16px); }
 .previewScroll { width: 100%; overflow: auto; background: #f2f2f2; border-radius: 8px; }
 .previewFrame { width: 100%; position: relative; overflow: hidden; }
 .previewScroll[data-expanded="true"] .previewFrame { width: 200%; }
