@@ -23,8 +23,9 @@ it.each(['current_session','legacy'])("received %s link shows only confirmation 
   estado_onboarding:"DNI_SUBIDO",dniReceivedForSession:receiptKind==='current_session',receiptKind,
   receivedUploadId:receiptKind==='current_session'?"22222222-2222-4222-8222-222222222222":null}});
  renderScreen();
- expect(await screen.findByRole("heading",{name:"¡Fotos enviadas!"})).toBeVisible();
- expect(screen.getByRole("heading", { name: "¡Fotos enviadas!" })).toHaveFocus();
+ const confirmation = await screen.findByRole("heading", { name: "¡Fotos enviadas!" });
+ expect(confirmation).toBeVisible();
+ await waitFor(() => expect(confirmation).toHaveFocus());
  expect(screen.getByRole("status")).toHaveTextContent("Ya recibimos las fotos de tu DNI. Volvé a la computadora para continuar con tu solicitud.");
  expect(screen.queryByText(/Sacá las fotos de tu DNI|Necesitás ayuda/)).toBeNull();
  expect(screen.queryAllByRole("button")).toHaveLength(0);

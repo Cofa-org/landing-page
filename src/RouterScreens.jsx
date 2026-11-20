@@ -29,10 +29,14 @@ const FormWorkWithUs = lazy(() => import("./Sections/WorkWithUs/FormWorkWithUs")
 const BlogDetailScreen = lazy(() => import("./screens/blogDetailScreen/BlogDetailScreen.jsx"));
 const IaPoliciesScreen = lazy(() => import("./screens/IaPoliciesScreen.jsx/IaPoliciesScreen.jsx"));
 const ReqAutoridadesScreen = lazy(() => import("./screens/ReqAutoridadesScreen/ReqAutoridadesScreen.jsx"));
+const DNIUploadMobileScreen = lazy(() => import("./screens/DNIUploadMobile/DNIUploadMobileScreen.jsx"));
+const OnboardingFlowScreen = lazy(() => import("./screens/registrationSim/OnboardingFlowScreen.jsx"));
 
 /* import SuggestionsScreen from './screens/SuggestionsScreen/SuggestionsScreen' */
 
 const RouterScreens = () => {
+  const registroWebHabilitado = import.meta.env.VITE_REGISTRO_WEB_HABILITADO === "true";
+
   
   return (
     <Suspense
@@ -67,7 +71,7 @@ const RouterScreens = () => {
         />
         <Route
           path='/registro-simulador'
-          element={<RegistroCerradoScreen />}
+          element={registroWebHabilitado ? <OnboardingFlowScreen /> : <RegistroCerradoScreen />}
         />
         {/* Preguntas Frecuentes */}
         <Route
@@ -155,7 +159,7 @@ const RouterScreens = () => {
           <Route path='/asistencias/terminos-desempleo' element={<TermsV2 type={'DESEMPLEO'}/>}/> */}
         <Route
           path='/subir-dni'
-          element={<RegistroCerradoScreen />}
+          element={registroWebHabilitado ? <DNIUploadMobileScreen /> : <RegistroCerradoScreen />}
         />
         <Route
           path='*'
