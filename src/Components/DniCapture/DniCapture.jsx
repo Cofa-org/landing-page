@@ -15,11 +15,11 @@ export default function DniCapture({ viewModel }) {
         <p role="status">Recibimos tus fotos.</p>
       ) : viewModel.isPhone ? (
         <>
-          <header className={styles.intro}>
+          <div className={styles.intro}>
             <span className={styles.introIcon}><FaRegIdCard aria-hidden="true" /></span>
             <h3>Sacá las fotos de tu DNI</h3>
             <p>{viewModel.description}</p>
-          </header>
+          </div>
           <ul className={styles.tips} role="list" aria-label="Consejos para sacar las fotos">
             <li>
               <FiSun aria-hidden="true" />

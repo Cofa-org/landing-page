@@ -181,6 +181,31 @@ for (const entry of ['mobile', 'inline']) {
     await tips.scrollIntoViewIfNeeded();
     await page.screenshot({ path: info.outputPath('capture-intro.png'), fullPage: true });
   });
+
+  test(`${entry} mobile capture intro scrolls away from tips and photo`, async ({ page }, info) => {
+    test.skip(!isPhone(info));
+    await page.setViewportSize({ width: 390, height: 500 });
+    await installSyntheticCapture(page, { phone: true });
+    await openEntry(page, entry);
+
+    const title = page.getByRole('heading', { name: 'Sacá las fotos de tu DNI' });
+    const description = page.getByText('Fotografiá el frente y el dorso con tu celular.', { exact: true });
+    const tips = page.getByRole('list', { name: 'Consejos para sacar las fotos' });
+    await expect(title).toBeInViewport({ ratio: 1 });
+    await expect(description).toBeInViewport({ ratio: 1 });
+
+    await tips.evaluate(node => node.scrollIntoView({ block: 'start', behavior: 'instant' }));
+    await expect(tips).toBeInViewport({ ratio: 0.95 });
+    await expect(title).not.toBeInViewport();
+    await expect(description).not.toBeInViewport();
+
+    await takePhoto(page);
+    const preview = page.getByRole('img', { name: 'Frente del DNI', exact: true });
+    await preview.evaluate(node => node.scrollIntoView({ block: 'start', behavior: 'instant' }));
+    await expect(preview).toBeInViewport();
+    await expect(title).not.toBeInViewport();
+    await expect(description).not.toBeInViewport();
+  });
 }
 
 test('desktop QR keeps the title and help in place after a delayed response', async ({ page }, info) => {
