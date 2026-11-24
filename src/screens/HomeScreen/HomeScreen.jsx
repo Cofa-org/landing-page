@@ -1,8 +1,6 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { Footer, Header } from '../../Components'
-import StructuredData from '../../Components/Seo/StructuredData';
-import { AboutUs, Contact, FrecuentQuestionSection, Hero, OurServices, CofaTipsSection } from '../../Sections'
-import WorkWithUs from '../../Sections/WorkWithUs/WorkWithUs'
+import { AboutUs, Contact, FrecuentQuestionSection, Hero, CofaTipsSection } from '../../Sections'
 
 const HomeScreen = () => {
   useEffect(() => {
@@ -51,7 +49,7 @@ const HomeScreen = () => {
       {/* <OurServices/> */}
       <FrecuentQuestionSection />
       <CofaTipsSection />
-      <WorkWithUs />
+      {/* Empleo oculto. La sección sigue en Sections/WorkWithUs/WorkWithUs.jsx */}
       <Contact />
       <Footer />
     </>

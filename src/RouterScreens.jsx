@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import Loader from "./Components/Loader/Loader";
 import RegistroCerradoScreen from "./screens/registrationSim/RegistroCerradoScreen.jsx";
@@ -25,7 +25,8 @@ const FrecuentQuestionScreen = lazy(
   () => import("./screens/FrecuentQuestionScreen/FrecuentQuestionScreen"),
 );
 const SacarPrestamoScreen = lazy(() => import("./screens/SacarPrestamoScreen/SacarPrestamoScreen"));
-const FormWorkWithUs = lazy(() => import("./Sections/WorkWithUs/FormWorkWithUs"));
+// Empleo deshabilitado. Para reactivar: montar FormWorkWithUs en /trabaja-con-nosotros.
+// const FormWorkWithUs = lazy(() => import("./Sections/WorkWithUs/FormWorkWithUs"));
 const BlogDetailScreen = lazy(() => import("./screens/blogDetailScreen/BlogDetailScreen.jsx"));
 const IaPoliciesScreen = lazy(() => import("./screens/IaPoliciesScreen.jsx/IaPoliciesScreen.jsx"));
 const ReqAutoridadesScreen = lazy(() => import("./screens/ReqAutoridadesScreen/ReqAutoridadesScreen.jsx"));
@@ -127,9 +128,8 @@ const RouterScreens = () => {
         {/* Terminos y Condiciones Puntos COFA */}
         <Route
           path='/trabaja-con-nosotros'
-          element={<FormWorkWithUs />}
-        />{" "}
-        {/* Trabaja con Nosotros */}
+          element={<Navigate to="/" replace />}
+        />
         <Route
           path='/el-mejor-trato'
           element={<ElMejorTratoScreen />}

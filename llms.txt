@@ -18,7 +18,7 @@
 | `/blog/:slug` | Detalle de artículo |
 | `/el-mejor-trato` | Propuesta de valor |
 | `/sacar-prestamo` | Proceso de solicitud |
-| `/trabaja-con-nosotros` | Formulario laboral |
+| `/trabaja-con-nosotros` | Redirige al home. Flujo de empleo deshabilitado |
 | `/terminos-y-condiciones` | T&C generales |
 | `/terminos-y-condiciones-puntos-cofa` | T&C Puntos COFA |
 | `/politicas-de-privacidad` | Política de privacidad |
