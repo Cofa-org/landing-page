@@ -89,7 +89,7 @@ Todas las rutas usan `React.lazy` + `Suspense` (code splitting por ruta). El fal
 
 | Ruta | Componente | Descripción |
 |---|---|---|
-| `/` | `HomeScreen` | Home: Hero + AboutUs + FAQ + CofaTips + WorkWithUs + Contact |
+| `/` | `HomeScreen` | Home: Hero + AboutUs + FAQ + CofaTips + Contact |
 | `/prestamos` | `HomeScreen` | Alias de Home (misma pantalla) |
 | `/simulador` | `LoanSimScreen` | Simulador interactivo de cuotas y montos |
 | `/preguntas-frecuentes` | `FrecuentQuestionScreen` | FAQ completa (18 preguntas) |
@@ -97,7 +97,7 @@ Todas las rutas usan `React.lazy` + `Suspense` (code splitting por ruta). El fal
 | `/blog/:slug` | `BlogDetailScreen` | Artículo individual del blog (slug dinámico) |
 | `/el-mejor-trato` | `ElMejorTratoScreen` | Página de propuesta de valor |
 | `/sacar-prestamo` | `SacarPrestamoScreen` | Guía del proceso de solicitud |
-| `/trabaja-con-nosotros` | `FormWorkWithUs` | Formulario de empleo |
+| `/trabaja-con-nosotros` | redirige a `/` | Flujo de empleo deshabilitado. El formulario sigue en el repo |
 | `/terminos-y-condiciones` | `TermsScreen` | T&C generales del servicio |
 | `/terminos-y-condiciones-puntos-cofa` | `TermsPointsScreen` | T&C del programa de puntos |
 | `/politicas-de-privacidad` | `PrivacyPoliciesScreen` | Política de privacidad (Ley 25.326) |
@@ -120,9 +120,8 @@ El `HomeScreen` monta estas secciones en orden:
 3. **`<AboutUs />`** — Información institucional, infocards con íconos React Icons
 4. **`<FrecuentQuestionSection />`** — Acordeón FAQ (datos de `src/data/info.js`)
 5. **`<CofaTipsSection />`** — Preview del blog (llama a `blogService.js`)
-6. **`<WorkWithUs />`** — Llamado a la acción para empleo
-7. **`<Contact />`** — Formulario de contacto + mapa
-8. **`<Footer />`** — Links regulatorios, logos institucionales, redes sociales
+6. **`<Contact />`** — Formulario de contacto + mapa
+7. **`<Footer />`** — Links regulatorios, logos institucionales, redes sociales
 
 ---
 
